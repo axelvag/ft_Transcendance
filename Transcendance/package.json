@@ -1,0 +1,20 @@
+{
+  "name": "Transcendance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelvag/42_Transcendance.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/axelvag/42_Transcendance/issues"
+  },
+  "homepage": "https://github.com/axelvag/42_Transcendance#readme"
+}
