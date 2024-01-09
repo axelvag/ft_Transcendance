@@ -7,11 +7,11 @@
 </head>
 <body>
   {% if user.is_authenticated %}
-      <p>Connecte sous {{ user.username }} | <a href ="{% url 'accounts%}">Deconnexion</a></p>
+      <p>Connecte sous {{ user.username }} | <a href="{% url 'accounts:logout_user' %}">Deconnexion</a></p>
   {% else %}
-
+      <p><a href="{% url 'accounts:login_user' %}">Connexion</a></p>
+      <p><a href="{% url 'accounts:register_user' %}">Inscription</a></p>
   {% endif %}
-
   <h1>Exemple Account</h1>
   <p>{{ message }}</p>
 </body>

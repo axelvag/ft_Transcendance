@@ -1,9 +1,30 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 # Create your views here.
 
-def index(request):
-    context = {"message": "Hello World !"}
-    template = loader.get_template("accounts/index.html")
-    return HttpResponse(template.render(context, request))
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST["username"]
+        password = request.POST["password"]
+
+        user = authenticate(request, username = username, password = password)
+
+        if user is not None:
+            login(request, user)
+            return redirect ("Home:index")
+        else:
+            message.info(request, "Indentifiant ou mot de passe incorrect")
+    
+    form = AuthenticationForm()
+    return render(request, "accounts/login.html", {"form": form})
+
+def logout_user(request):
+    logout(request)
+    return redirect("Home:index")
+
+def register_user(request):
+    pass
