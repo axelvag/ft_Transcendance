@@ -3,21 +3,26 @@
 all: volumes build up
 
 build:
-		sudo docker-compose -fdocker-compose.yml --env-file .env build
+		docker-compose -fdocker-compose.yml --env-file .env build
 
 up:
-		sudo docker-compose -f docker-compose.yml --env-file .env up -d
+		docker-compose -f docker-compose.yml --env-file .env up -d
+		cd src && npm start
 
 stop:
-		sudo docker-compose -f docker-compose.yml --env-file .env stop
+		docker-compose -f docker-compose.yml --env-file .env stop
 volumes:
-		sudo mkdir -p /var/lib/postgresql/data
+		# mkdir -p /var/lib/postgresql/data
 
 fclean:
-		sudo docker-compose -f docker-compose.yml down -v --rmi all --remove-orphans
-		sudo rm -rf /var/lib/postgresql/data
+		docker-compose -f docker-compose.yml down -v --rmi all --remove-orphans
+		# rm -rf /var/lib/postgresql/data
 
 rebuild:
-		sudo docker-compose -f docker-compose.yml --env-file .env build --no-cache
+		docker-compose -f docker-compose.yml --env-file .env build --no-cache
 
-re: fclean rebuild all
+re:
+		fclean rebuild all
+
+ps:
+		docker-compose ps
