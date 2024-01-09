@@ -1,7 +1,10 @@
 # Alpine est une distribution Linux legere
 FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/nginx.conf
+# mettre le fichier de configuration nginx.conf dans le container
+COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
+
+# lance le serveur nginx
 CMD ["nginx", "-g", "daemon off;"]

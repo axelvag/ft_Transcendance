@@ -11,13 +11,11 @@ up:
 stop:
 		sudo docker-compose -f docker-compose.yml --env-file .env stop
 volumes:
-		# sudo mkdir -p /home/avaganay/data/wordpress
-		# sudo mkdir -p /home/avaganay/data/mariadb
+		sudo mkdir -p /var/lib/postgresql/data
 
 fclean:
 		sudo docker-compose -f docker-compose.yml down -v --rmi all --remove-orphans
-		# sudo rm -rf /home/avaganay/data/wordpress
-		# sudo rm -rf /home/avaganay/data/mariadb
+		sudo rm -rf /var/lib/postgresql/data
 
 rebuild:
 		sudo docker-compose -f docker-compose.yml --env-file .env build --no-cache

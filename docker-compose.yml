@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+
+    # Serveur web
+    nginx:
+      build:
+        context: ./src/front/Docker
+        dockerfile: Dockerfile
+      ports:
+        - "80:80"
+        - "443:443"
+      networks:
+        - front
+      depends_on:
+        - front
+      restart: on-failure
+
+    # Django
+    front:
+      build:
+        context: ./src/front/public
+        dockerfile: Dockerfile
+      volumes:
+        - ./src/front/public:/app
+      networks:
+        - front
+      depends_on:
+        - front_db
+      restart: on-failure
+
+
+    # Data base PostGreSQL
+    front_db:
+      image: postgres:16-bookworm
+      volumes:
+        - front_db:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: front_db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: pass
+      networks:
+        - front
+      restart: on-failure
+
+volumes:
+  front_db:
+    name: front_db
+    driver: local # ici nous stockons le volume en local
+    driver_opts:
+      type: 'none' # aucun type spécifique
+      o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
+      device: /var/lib/postgresql/data
+
+networks:
+  front:
+    driver: bridge
