@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Transcendence</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+			crossorigin="anonymous"
+		/>
+	</head>
+	<body>
+		<div id="#app">
+			<div class="container-fluid py-5" style="max-width: 48rem">
+				<h1 class="mb-4">Icons</h1>
+
+				<!-- Usage -->
+				<section class="py-3">
+					<h3 class="mb-3">Usage</h3>
+					<h6>1. Configure the list of the svg icons in the config file <i>ce-icons.config.js</i></h6>
+					<div class="alert alert-light text-black">
+						<div>export const icons = {</div>
+						<div>&nbsp;&nbsp;user: `</div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;svg viewBox="0 0 24 24"></div>
+						<div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis">
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;path fill="currentColor" d="M12 12q-1.65 0-2.825-1.175T8 8q0-1.65
+							1.175-2.825T12 4q1.65 0 2.825 1.175T16 8q0 1.65-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6
+							14.55q1.55-.775 3.15-1.162T12 13q1.65 0 3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"/>
+						</div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;/svg></div>
+						<div>&nbsp;&nbsp;`,</div>
+						<div>&nbsp;&nbsp;// ...</div>
+						<div>};</div>
+					</div>
+					<p>TIP: Find many icones on <a href="https://icones.js.org" target="_blank">icones.js.org</a></p>
+					<h6>2. Import the icon component in your javascript file</h6>
+					<div class="alert alert-light text-black">
+						<div>import "./components/ce-icon.js";</div>
+					</div>
+					<h6>3. Use the icon component in your HTML file</h6>
+					<div class="alert alert-light text-black">
+						<div>&lt;ce-icon name="user">&lt;/ce-icon></div>
+					</div>
+					<h6>Result:</h6>
+					<div class="alert alert-light text-black">
+						<ce-icon name="user"></ce-icon>
+					</div>
+				</section>
+
+				<!-- Colors -->
+				<section class="py-3">
+					<h3 class="mb-3">Colors</h3>
+					<p>You can change the color of the icon by setting the CSS color property.</p>
+					<h6>Code:</h6>
+					<div class="alert alert-light text-black">
+						<div>&lt;ce-icon name="user">&lt;/ce-icon></div>
+						<div>&lt;ce-icon name="user" style="color: green;">&lt;/ce-icon></div>
+						<div>&lt;ce-icon name="user" style="color: red;">&lt;/ce-icon></div>
+					</div>
+					<h6>Result:</h6>
+					<div class="alert alert-light text-black">
+						<ce-icon name="user"></ce-icon>
+						<ce-icon name="user" style="color: green"></ce-icon>
+						<ce-icon name="user" style="color: red"></ce-icon>
+					</div>
+				</section>
+
+				<!-- Size -->
+				<section class="py-3">
+					<h3 class="mb-3">Size</h3>
+					<p>You can change the size of the icon by setting the CSS font-size property.</p>
+					<h6>Code:</h6>
+					<div class="alert alert-light text-black">
+						<div>&lt;ce-icon name="user">&lt;/ce-icon></div>
+						<div>&lt;ce-icon name="user" style="font-size: 1.5rem;">&lt;/ce-icon></div>
+						<div>&lt;ce-icon name="user" style="font-size: 3rem;">&lt;/ce-icon></div>
+					</div>
+					<h6>Result:</h6>
+					<div class="alert alert-light text-black">
+						<ce-icon name="user"></ce-icon>
+						<ce-icon name="user" style="font-size: 1.5rem"></ce-icon>
+						<ce-icon name="user" style="font-size: 3rem"></ce-icon>
+					</div>
+				</section>
+
+				<!-- Scale -->
+				<section class="py-3">
+					<h3 class="mb-3">Scale</h3>
+					<p>You can adjust the size of the icon by setting the scale attribute.</p>
+					<h6>Code:</h6>
+					<div class="alert alert-light text-black">
+						<div>&lt;ce-icon name="user" scale="1.5">&lt;/ce-icon> My account</div>
+					</div>
+					<h6>Result:</h6>
+					<div class="alert alert-light text-black">
+						<div>
+							<ce-icon name="user" scale="1.5"></ce-icon>
+							<span>My account</span>
+						</div>
+					</div>
+				</section>
+
+				<!-- Block -->
+				<section class="py-3">
+					<h3 class="mb-3">Block</h3>
+					<p>You can remove the inline behaviour of the icon by adding the block attribute.</p>
+					<h6>Code:</h6>
+					<div class="alert alert-light text-black">
+						<div>&lt;ce-icon name="user" scale="1.5" block>&lt;/ce-icon> My account</div>
+					</div>
+					<h6>Result:</h6>
+					<div class="alert alert-light text-black">
+						<div>
+							<ce-icon name="user" scale="1.5" block></ce-icon>
+							<span>My account</span>
+						</div>
+					</div>
+				</section>
+
+				<!-- Rotate -->
+				<section class="py-3">
+					<h3 class="mb-3">Rotate</h3>
+					<p>You can rotate the icon by setting the rotate attribute.</p>
+					<h6>Code:</h6>
+					<div class="alert alert-light text-black">
+						<div>&lt;ce-icon name="user">&lt;/ce-icon></div>
+						<div>&lt;ce-icon name="user" rotate="45">&lt;/ce-icon></div>
+						<div>&lt;ce-icon name="user" rotate="90">&lt;/ce-icon></div>
+						<div>&lt;ce-icon name="user" rotate="135">&lt;/ce-icon></div>
+						<div>&lt;ce-icon name="user" rotate="180">&lt;/ce-icon></div>
+					</div>
+					<h6>Result:</h6>
+					<div class="alert alert-light text-black">
+						<div>
+							<ce-icon name="user"></ce-icon>
+							<ce-icon name="user" rotate="45"></ce-icon>
+							<ce-icon name="user" rotate="90"></ce-icon>
+							<ce-icon name="user" rotate="135"></ce-icon>
+							<ce-icon name="user" rotate="180"></ce-icon>
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+			crossorigin="anonymous"
+		></script>
+		<script type="module" src="./main.js"></script>
+	</body>
+</html>
