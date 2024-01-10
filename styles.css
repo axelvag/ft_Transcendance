@@ -1,0 +1,12 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+nav {
+    margin-bottom: 20px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: blue;
+}
