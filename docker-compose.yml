@@ -19,10 +19,10 @@ services:
     # Django
     front:
       build:
-        context: ./src/front/public
+        context: ./src/front/merchex
         dockerfile: Dockerfile
       volumes:
-        - ./src/front/public:/app
+        - ./src/front/merchex:/app
       networks:
         - front
       # depends_on:
@@ -32,7 +32,7 @@ services:
 
     # Data base PostGreSQL
     # front_db:
-    #   image: postgres:16-bookworm
+    #   image: postgres:16.1-bookworm
     #   volumes:
     #     - front_db:/var/lib/postgresql/data
     #   environment:

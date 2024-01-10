@@ -21,8 +21,8 @@ fclean:
 rebuild:
 		docker-compose -f docker-compose.yml --env-file .env build --no-cache
 
-re:
-		fclean rebuild all
-
 ps:
 		docker-compose ps
+
+re:
+	fclean rebuild all
