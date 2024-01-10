@@ -25,35 +25,39 @@ services:
         - ./back:/app
       networks:
         - back
-      # depends_on:
-        # - front_db
+      depends_on:
+        - data_base
       restart: on-failure
 
 
     # Data base PostGreSQL
-    # front_db:
-    #   image: postgres:16.1-bookworm
-    #   volumes:
-    #     - front_db:/var/lib/postgresql/data
-    #   environment:
-    #     POSTGRES_DB: front_db
-    #     POSTGRES_USER: postgres
-    #     POSTGRES_PASSWORD: pass
-    #   networks:
-    #     - front
-    #   restart: on-failure
+    data_base:
+      build:
+        context: ./data_base/Docker
+        dockerfile: Dockerfile
+      volumes:
+        - data_base:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: data_base
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+      networks:
+        - data_base
+      restart: on-failure
 
-# volumes:
-#   front_db:
-#     name: front_db
-#     driver: local # ici nous stockons le volume en local
-#     driver_opts:
-#       type: 'none' # aucun type spécifique
-#       o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
-#       device: /var/lib/postgresql/data
+volumes:
+  data_base:
+    name: data_base
+    driver: local # ici nous stockons le volume en local
+    driver_opts:
+      type: 'none' # aucun type spécifique
+      o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
+      device: data_base
 
 networks:
   front:
     driver: bridge
   back:
+    driver: bridge
+  data_base:
     driver: bridge
