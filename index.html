@@ -1,17 +1,21 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SPA Simple</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 <body>
     <nav>
-        <a href="/" class="nav-link">Accueil</a> |
-        <a href="/page1" class="nav-link">Page 1</a> |
-        <a href="/page2" class="nav-link">Page 2</a>
+        <a href="/" data-link>Home</a>
+        <a href="/about" data-link>About</a>
+        <a href="/contact" data-link>Contact</a>
     </nav>
-    <div id="app"></div>
-    <script src="app.js"></script>
+
+    <main id="app"></main>
+
+    <script type="module" src="./front/js/main.js"></script>
+
 </body>
 </html>

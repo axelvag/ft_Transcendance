@@ -1,13 +1,11 @@
-# ft_Transcendance
+# SPA - Routing-js
 
-> Ce projet consiste à créer un site web pour participer à une compétition du célèbre jeu Pong !
+```
+The term "SPA"
+stands for "Single Page Application". It is a 
+development concept in which a single HTML page is loaded into the browser
+in the browser, and all subsequent interactions with the 
+the user take place on that page. Here are the main aspects 
+of how SPAs work:
+```
 
-Grâce à votre site web, les utilisateurs pourront jouer à Pong entre eux. Vous fournirez une jolie interface utilisateur et des parties en ligne multijoueurs en temps réel !
-
- - Votre projet doit respecter au minimum les directives suivantes, ne contribuant seulement à une petite partie de la note finale.
-   
- - La seconde partie du sujet vous offre des modules additionnels qui peuvent rem- placer ou compléter les règles de base.
-
-Nous avons choisi 14 modules spécifiques tel que:
- - Le jeu Pong en 3D
- - Tout séparer en microservice
