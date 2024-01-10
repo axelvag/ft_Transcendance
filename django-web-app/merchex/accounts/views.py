@@ -17,7 +17,7 @@ def login_user(request):
             login(request, user)
             return redirect ("Home:index")
         else:
-            message.info(request, "Indentifiant ou mot de passe incorrect")
+            messages.info(request, "Indentifiant ou mot de passe incorrect")
     
     form = AuthenticationForm()
     return render(request, "accounts/login.html", {"form": form})
@@ -27,4 +27,14 @@ def logout_user(request):
     return redirect("Home:index")
 
 def register_user(request):
-    pass
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect("Home:index")
+    
+    else:
+        form = UserCreationForm()
+
+    return render(request,"accounts/register.html", {"form": form})

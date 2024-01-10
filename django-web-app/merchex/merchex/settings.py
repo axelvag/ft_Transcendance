@@ -78,12 +78,8 @@ WSGI_APPLICATION = 'merchex.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': 'nom_de_votre_base_de_donnees',
-        # 'USER': 'votre_nom_utilisateur',
-        # 'PASSWORD': 'votre_mot_de_passe',
-        # 'HOST': 'localhost',  # Ou l'adresse du serveur de base de données
-        # 'PORT': '5432',  # Le port par défaut de PostgreSQL
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
