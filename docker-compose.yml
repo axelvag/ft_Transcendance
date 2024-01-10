@@ -13,13 +13,13 @@ services:
       networks:
         - front
       depends_on:
-        - front
+        - back
       restart: on-failure
 
     # Django
-    front:
+    back:
       build:
-        context: ./back/merchex
+        context: ./back/Docker
         dockerfile: Dockerfile
       volumes:
         - ./back:/app
