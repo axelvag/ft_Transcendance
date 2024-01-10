@@ -4,6 +4,7 @@ from django.template import loader
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from .forms import UserCreationFormWithEmail
 # Create your views here.
 
 def login_user(request):
@@ -28,13 +29,12 @@ def logout_user(request):
 
 def register_user(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-
+        form = UserCreationFormWithEmail(request.POST)
         if form.is_valid():
             form.save()
+            # Redirigez ou traitez l'utilisateur créé ici
             return redirect("Home:index")
-    
     else:
-        form = UserCreationForm()
+        form = UserCreationFormWithEmail()
 
-    return render(request,"accounts/register.html", {"form": form})
+    return render(request, "accounts/register.html", {'form': form})
