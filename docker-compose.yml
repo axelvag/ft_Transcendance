@@ -5,7 +5,7 @@ services:
     # Serveur web
     nginx:
       build:
-        context: ./src/front/Docker
+        context: ./front/Docker
         dockerfile: Dockerfile
       ports:
         - "8000:80"
@@ -19,10 +19,10 @@ services:
     # Django
     front:
       build:
-        context: ./src/front/merchex
+        context: ./back/merchex
         dockerfile: Dockerfile
       volumes:
-        - ./src/front/merchex:/app
+        - ./back:/app
       networks:
         - front
       # depends_on:

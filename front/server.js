@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const port = 10000;
 
-app.use(express.static('front/public'));
+app.use(express.static('public'));
 
 const server = app.listen(port, () => {
   console.log(`Le serveur est en cours d'exécution sur le port ${port}`);
