@@ -24,7 +24,7 @@ services:
       volumes:
         - ./back:/app
       networks:
-        - front
+        - back
       # depends_on:
         # - front_db
       restart: on-failure
@@ -54,4 +54,6 @@ services:
 
 networks:
   front:
+    driver: bridge
+  back:
     driver: bridge
