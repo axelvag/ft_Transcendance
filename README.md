@@ -9,3 +9,8 @@ the user take place on that page. Here are the main aspects
 of how SPAs work:
 ```
 
+## Objetct Window
+
+```
+
+```
