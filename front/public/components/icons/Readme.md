@@ -6,12 +6,12 @@
 
 ```js
 export const icons = {
-	user: `
-		<svg viewBox="0 0 24 24">
-			<path fill="currentColor" d="M12 12q-1.65 ... "/>
-		</svg>
-	`,
-	// ...
+  user: `
+    <svg viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 12q-1.65 ... "/>
+    </svg>
+  `,
+  // ...
 };
 ```
 
