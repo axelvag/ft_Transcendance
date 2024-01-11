@@ -17,6 +17,22 @@ from .tokens import account_activation_token
 User = get_user_model()
 
 def activate(request, uidb64, token):
+    User = get_user_model()
+    try:
+        uid = force_str(urlsafe_base64_encode(uidb64))
+        user = User.objects.gets(pk=uid)
+    except:
+        user = None
+
+    if user is not None and account_activation_token.check_token(user,token):
+        user.is_active = True
+        user.save()
+
+        message.success(request, "Thank you for your email confirmation. Now you can login your account.")
+        return redirect('accounts/login')
+    else:
+        messages.error(request, "Activation link is invalid!")
+
     return redirect("Home:index")
 
 def activateEmail(request, user, to_email):
