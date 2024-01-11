@@ -50,7 +50,7 @@ volumes:
     name: data_base
     driver: local # ici nous stockons le volume en local
     driver_opts:
-      type: 'none' # aucun type spécifique
+      type: 'none' # aucun type specifique
       o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
       device: data_base
 
