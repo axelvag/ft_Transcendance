@@ -6,7 +6,7 @@
 
 Get started with BootStrap with an HTML login page.
 
-![image](doc/image/first_login.png)
+![image](../image/first_login.png)
 
 
 ## Code
