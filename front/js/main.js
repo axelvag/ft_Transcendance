@@ -1,21 +1,21 @@
-import './views/view-home.js'
-
-import about from "./views/about.js";
-import contact from "./views/contact.js";
-// import home from "./views/home.js";
+import friends from "./views/friends.js";
+import careers from "./views/careers.js";
+import profil from "./views/profil.js";
+import settings from "./views/settings.js";
 import notFound from "./views/notFound.js";
 
 /**
  Create a object Routes
     title: descrive a title of the page
     template: say a application use the name associate of "template"
-
+    '<view-home></view-home>'
  */
 
 const routes = {
-    "/": {title: "Home", template: '<view-home></view-home>'},
-    "/about": {title: "About", template: about}, 
-    "/contact": {title: "Contact", template:contact},
+    "/": {title: "Profil", template: profil},
+    "/friends": {title: "Friends", template: friends}, 
+    "/careers": {title: "Careers", template: careers},
+    "/settings": {title: "Settings", template: settings},
     "/not-found": { title: "Not Found", template: notFound },
 };
 

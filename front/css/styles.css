@@ -1,3 +1,56 @@
-body {
-    background: red !important;
+.custom-nav {
+    /* background: red !important; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
 }
+
+.sidebar {
+    background-color: #252529;
+    /* Dark background for the sidebar */
+    color: white;
+    padding: 1rem;
+}
+
+.sidebar h2 {
+    margin-bottom: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.sidebar .btn-primary {
+    background-color: #B558F6;
+    border: none;
+}
+
+.custom-nav a {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.custom-nav a.active {
+    background-color: #6c757d;
+}
+
+.custom-nav a:hover {
+    color: #B558F6;
+}
+
+.main-content {
+    background-color: #f8f9fa;
+    /* Light background for the main content */
+    padding: 1rem;
+}
+
+/* remove hover*/
+button.btn-primary:hover {
+    background-color: #B558F6;
+    color: white;
+    border-color: white;
+}
+

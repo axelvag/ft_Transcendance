@@ -1,8 +1,4 @@
 class ViewHome extends HTMLElement {
-    constructor() {
-        super()
-    }
-
     connectedCallback() {
         this.innerHTML = `
             <nav class="nav flex-column">
