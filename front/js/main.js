@@ -23,7 +23,7 @@ const routes = {
  * location.pathname --> retourne l'URL courante de la page web 
  */
 function router(e) {
-    
+
     let view = routes[location.pathname];
     const appEl = document.querySelector("#app");
 
@@ -46,7 +46,7 @@ function router(e) {
 document.addEventListener("click", e => {
     if (e.target.matches("[data-link]")) {
         e.preventDefault();
-        history.pushState("", "", e.target.href);
+        history.pushState("", "", e.target.href); // allows modify URL in the search bar
         router();
     }
 });
