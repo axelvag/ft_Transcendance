@@ -1,21 +1,23 @@
 # MicroService
 
+> axel
+
 ## Objective
 
-Separer les fichiers pour que tout soit encapsule dans des modules bien distincts et ainsi les modifier sans ctoucher au reste !
+Separate the files so that everything is encapsulated in very distinct modules and thus modify them without touching the rest!
 
 ## Folders
 
-DOCKERR-COMPOSE : qui regroupe tout
+DOCKER-COMPOSE: which brings together everything
 
 FRONT :
     - Docker Nginx
-    - Les files static (html, js, bootstrap)
-    - Node.js pour utiliser npm
+    - Static files (html, js, bootstrap)
+    - Node.js to use npm
 
-BACK :
+BACK:
     - Docker Python
     - Django (requirement.txt, env, auth)
 
-DATA_BASE :
+DATA_BASE:
     - Docker PostgreSQL
