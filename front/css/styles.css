@@ -54,3 +54,19 @@ button.btn-primary:hover {
     border-color: white;
 }
 
+.violet-border {
+    border-color: #B558F6 !important;
+    font-size: 1rem !important;
+}
+
+.sidebar .custom-button-large-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.sidebar .logout-large-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+}

@@ -3,6 +3,7 @@ import careers from "./views/careers.js";
 import profil from "./views/profil.js";
 import settings from "./views/settings.js";
 import notFound from "./views/notFound.js";
+import logout from "./views/logout.js";
 
 /**
  Create a object Routes
@@ -17,6 +18,7 @@ const routes = {
     "/careers": {title: "Careers", template: careers},
     "/settings": {title: "Settings", template: settings},
     "/not-found": { title: "Not Found", template: notFound },
+    "/logout": { title: "Logout", template: logout },
 };
 
 /**
