@@ -119,7 +119,7 @@ def activateEmail(request, user, to_email):
     else:
         messages.error(request, f'Problem sending email to {to_email}, check if you typed it correctly.')
 ```
-### For generate the token 
+For generate the token 
 
 ``` Python
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
@@ -129,7 +129,7 @@ class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
 account_activation_token = AccountActivationTokenGenerator()
 ```
 
-### I use a html tmeplate for the mail send
+I use a html tmeplate for the mail send
 
 ``` h
 {% autoescape off %}
@@ -140,7 +140,7 @@ Please click on the link below to confirm your registration:
 {{ protocol }}://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %}
 {% endautoescape %}
 ```
-### When the user clic that active his acompte with the function activate 
+When the user clic that active his acompte with the function activate 
 
 ``` Python
 def activate(request, uidb64, token):
@@ -162,7 +162,7 @@ def activate(request, uidb64, token):
 
     return redirect("Home:index")
 ```
-### When the user is activate the link redirect the user in the login page
+When the user is activate the link redirect the user in the login page
 
 ``` Python
 def login_user(request):
