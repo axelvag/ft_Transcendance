@@ -18,6 +18,7 @@ RUN pip install --upgrade pip \
 
 # copie du contenu de Django de l'appli dans le conteneur
 COPY . /app/
+# !!!! Je dois copier le reste de /auth
 
 EXPOSE 8000
 
