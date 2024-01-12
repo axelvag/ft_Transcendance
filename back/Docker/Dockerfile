@@ -6,6 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # assurant que la sortie est immediatement affichee sans delai
 ENV PYTHONUNBUFFERED 1
 
+# RUN mkdir /app
 WORKDIR /app
 
 # copie du fichier des dependances dans le conteneur
@@ -21,4 +22,4 @@ COPY . /app/
 EXPOSE 8000
 
 # lancer l'appli Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
