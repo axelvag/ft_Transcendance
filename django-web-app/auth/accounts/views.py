@@ -90,7 +90,6 @@ def register_user(request):
             user.is_active=False
             user.save()
             activateEmail(request, user, form.cleaned_data.get('email'))
-            # Redirigez ou traitez l'utilisateur créé ici
             return redirect("Home:index")
     else:
         form = UserCreationFormWithEmail()
