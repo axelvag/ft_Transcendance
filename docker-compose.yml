@@ -19,7 +19,7 @@ services:
     # Django
     back:
       build:
-        context: ./back/Docker
+        context: ./back/auth
         dockerfile: Dockerfile
       ports:
         - "8000:8000"
