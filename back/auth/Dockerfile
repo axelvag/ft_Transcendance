@@ -24,5 +24,8 @@ EXPOSE 8000
 
 WORKDIR /app/auth
 
+
+CMD ["python3", "manage.py", "migrate"]
+
 # lancer l'appli Django
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]

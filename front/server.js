@@ -2,7 +2,7 @@
 const express = require('express');
 // const open = require('open');
 const app = express();
-const port = 10000;
+const port = 8800;
 
 app.use(express.static('public'));
 

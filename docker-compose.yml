@@ -8,8 +8,7 @@ services:
         context: ./front/Docker
         dockerfile: Dockerfile
       ports:
-        - "8800:80"
-        - "8443:443"
+        - "8800:8800"
       networks:
         - front
       depends_on:
