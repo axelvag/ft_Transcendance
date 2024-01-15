@@ -21,6 +21,26 @@ const routes = {
     "/logout": { title: "Logout", template: logout },
 };
 
+// classList allow manipulate CSS class this element 
+function updateActiveNavLink() {
+    const links = document.querySelectorAll('.custom-nav a');
+    const currentPath = location.pathname;
+
+    let index = 0;
+    while (index < links.length)
+    {
+        const link = links[index];
+
+        console.log("test-->", link.getAttribute('href'));
+        if (link.getAttribute('href') === currentPath)
+            link.classList.add('active');
+        else
+            link.classList.remove('active');
+
+        index++;
+    }
+}
+
 /**
  * location.pathname --> retourne l'URL courante de la page web 
  */
@@ -33,8 +53,9 @@ function router(e) {
 
     if (view){
         document.title = view.title; // modify dynamichte page of title
-        console.log("template", view.template);
-        appEl.innerHTML = view.template; // update Html from the DOM
+        // console.log("template", view.template);
+        appEl.innerHTML = view.template; // Modify interior HTML of element 
+        updateActiveNavLink();
     }
     else{
         // history.replaceState("", "", "/");
@@ -48,11 +69,11 @@ function router(e) {
 document.addEventListener("click", e => {
     if (e.target.matches("[data-link]")) {
         e.preventDefault();
-        history.pushState("", "", e.target.href); // allows modify URL in the search bar
+        history.pushState("", "", e.target.href); // allows modify URL in the search bar nothing modify the page
         router();
     }
 });
 
 // Update router
-window.addEventListener("popstate", router);
+window.addEventListener("popstate", router); // When user click in previous or next
 window.addEventListener("DOMContentLoaded", router);

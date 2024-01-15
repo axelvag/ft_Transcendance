@@ -1,14 +1,8 @@
 const template = `
-    <nav class="nav flex-column">
-        <a class="nav-link active" href="/" data-link>Profil</a>
-        <a class="nav-link" href="/friends" data-link>Friends</a>
-        <a class="nav-link" href="/careers" data-link>Careers</a>
-        <a class="nav-link" href="/settings" data-link>Settings</a>
-        <a class="nav-link" href="/logout" data-link>Logout</a>
-    </nav>
+    <view-sidebar></view-sidebar>
     <main>
         <h1>Logout</h1>
-        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
+        <p>Welcome to your profile page. Here you can view and edit your profile information.</p>
     </main>
 `;
 

@@ -70,3 +70,11 @@ button.btn-primary:hover {
     font-weight: 600;
     font-size: 1rem;
 }
+
+#app {
+    display: flex;
+} 
+
+.widthMax{
+    max-width: auto;
+}
