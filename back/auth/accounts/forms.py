@@ -13,6 +13,14 @@ class UserCreationFormWithEmail(UserCreationForm):
         model = User
         fields = ("username", "email", "password1", "password2")
 
+    def clean_email(self):
+        # Récupération de l'email nettoyé du formulaire
+        email = self.cleaned_data.get('email')
+        # Vérification si un utilisateur avec cet email existe déjà
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('Un utilisateur avec cet email existe déjà.')
+        return email
+        
     def save(self, commit=True):
         user = super(UserCreationFormWithEmail, self).save(commit=False)
         user.email = self.cleaned_data["email"]

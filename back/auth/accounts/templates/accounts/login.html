@@ -1,3 +1,5 @@
+<h2><a href="{% url 'Home:index' %}">Home</a></h2>
+
 <h1>Connexion</h1>
 
 {% for messages in messages %}
@@ -9,3 +11,14 @@
     {{ form.as_p }}
     <input type="submit" value="Se connecter">
 </form>
+
+<div>
+    <small>
+        Pas encore inscrit.e?
+        <a href="{% url 'accounts:register_user' %}">
+            S'inscrire
+        </a>
+    <br>
+        Mot de passe oublié ?
+    </small>
+</div>

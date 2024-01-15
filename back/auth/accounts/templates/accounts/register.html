@@ -1,3 +1,4 @@
+<h2><a href="{% url 'Home:index' %}">Home</a></h2>
 <h1>Creer mon compte</h1>
 
 <form method="post">
@@ -5,3 +6,12 @@
     {{ form.as_p }}
     <input type="submit" value="Je m'inscris">
 </form>
+
+<div>
+    <small>
+        J'ai deja un compte?
+        <a href="{% url 'accounts:login_user' %}">
+            Se connecter
+        </a>
+    </small>
+</div>
