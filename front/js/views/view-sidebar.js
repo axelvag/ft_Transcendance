@@ -1,32 +1,52 @@
-class ViewSidebar extends HTMLElement {
-    connectedCallback() {
-        this.innerHTML = `
-        <div class="widthMax container-fluid h-100">
+// class ViewSidebar extends HTMLElement {
+//     connectedCallback() {
+//         this.innerHTML = `
+//         <div class="container-fluid h-100">
       
-          <div class="row h-100">
+//           <div class="row h-100">
       
-            <!-- Sidebar -->
-            <div class="col-md-6 p-4 sidebar vh-100 d-flex flex-column">
+//             <!-- Sidebar -->
+//             <div class="col-md-6 p-4 sidebar vh-100 d-flex flex-column">
       
-              <!-- LOGO could be an image or text -->
-              <img src="front/asset/pong-logo.png" alt="Logo" class="mb-4" style="max-width: 100%; height: auto;">
+//               <!-- LOGO could be an image or text -->
+//               <img src="front/asset/pong-logo.png" alt="Logo" class="mb-4" style="max-width: 100%; height: auto;">
       
-              <button class="btn btn-outline-light w-100 mb-4 violet-border custom-button-large-text">Start a Game</button>
+//               <button class="btn btn-outline-light w-100 mb-4 violet-border custom-button-large-text">Start a Game</button>
       
-              <!-- Navigation links -->
-              <nav class="nav flex-column custom-nav flex-grow-1">
-                <a class="nav-link active" href="/" data-link><i class="bi bi-person"></i> Profile</a>
-                <a class="nav-link" href="/friends" data-link><i class="bi bi-people"></i> Friends</a>
-                <a class="nav-link" href="/careers" data-link><i class="bi bi-briefcase"></i> Careers</a>
-                <a class="nav-link" href="/settings" data-link><i class="bi bi-gear"></i> Settings</a>
-              </nav>
+//               <!-- Navigation links -->
+//               <nav class="nav flex-column custom-nav flex-grow-1">
+//                 <a class="nav-link active" href="/" data-link><i class="bi bi-person"></i> Profile</a>
+//                 <a class="nav-link" href="/friends" data-link><i class="bi bi-people"></i> Friends</a>
+//                 <a class="nav-link" href="/careers" data-link><i class="bi bi-briefcase"></i> Careers</a>
+//                 <a class="nav-link" href="/settings" data-link><i class="bi bi-gear"></i> Settings</a>
+//               </nav>
                 
-              <a class="nav-link logout-large-text" href="/logout" data-link><i class="bi bi-box-arrow-right"></i> Logout</a>
-            </div>
-          </div>
-        </div>
-      `;
-    }
+//               <a class="nav-link logout-large-text" href="/logout" data-link><i class="bi bi-box-arrow-right"></i> Logout</a>
+//             </div>
+//           </div>
+//         </div>
+//       `;
+//     }
+// }
+class ViewSidebar extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      <div class="sidebar">
+
+        <img src="front/asset/pong-logo.png" alt="Logo" class="logo">
+        <button class="start-game">Start a Game</button>
+
+        <nav class="custom-nav">
+          <a class="nav-item active" href="/" data-link><i class="bi bi-person"></i> Profile</a>
+          <a class="nav-item" href="/friends" data-link><i class="bi bi-people"></i> Friends</a>
+          <a class="nav-item" href="/careers" data-link><i class="bi bi-briefcase"></i> Careers</a>
+          <a class="nav-item" href="/settings" data-link><i class="bi bi-gear"></i> Settings</a>
+        </nav>
+
+        <a class="logout" href="/logout" data-link><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </div>
+    `;
+  }
 }
 
 customElements.define('view-sidebar', ViewSidebar);
