@@ -28,6 +28,7 @@
 //       `;
 //     }
 // }
+
 class ViewSidebar extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
