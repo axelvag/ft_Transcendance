@@ -2,7 +2,7 @@
 
 ## Usage
 
-**1. Configure the list of the svg icons in the config file `ce-icons.config.js`**
+**1. Configure the list of the svg icons in the config file `icons.js`**
 
 ```js
 export const icons = {
@@ -20,13 +20,13 @@ export const icons = {
 **1. Import the icon component in your javascript file**
 
 ```js
-import './components/icons/ce-icon.js';
+import "./components/icons/ui-icon.ce.js";
 ```
 
 **3. Use the icon component in your HTML file**
 
 ```html
-<ce-icon name="user"></ce-icon>
+<ui-icon name="user"></ui-icon>
 ```
 
 ## Color
@@ -34,7 +34,7 @@ import './components/icons/ce-icon.js';
 The icon uses the CSS `color` property as color of the icon.
 
 ```html
-<ce-icon name="user" style="color: blue;"></ce-icon>
+<ui-icon name="user" style="color: blue;"></ui-icon>
 ```
 
 ## Size
@@ -42,7 +42,7 @@ The icon uses the CSS `color` property as color of the icon.
 The icon uses the CSS `font-size` property as vertical size of the icon.
 
 ```html
-<ce-icon name="user" style="font-size: 1.5rem;"></ce-icon>
+<ui-icon name="user" style="font-size: 1.5rem;"></ui-icon>
 ```
 
 ## Scale
@@ -50,7 +50,7 @@ The icon uses the CSS `font-size` property as vertical size of the icon.
 You can adjust the size of the icon by setting the scale attribute.
 
 ```html
-<ce-icon name="user" scale="1.5"></ce-icon>
+<ui-icon name="user" scale="1.5"></ui-icon>
 ```
 
 ## Block
@@ -58,7 +58,7 @@ You can adjust the size of the icon by setting the scale attribute.
 By default, the icon is displayed inline. You can display the icon as a block by adding the `block` attribute.
 
 ```html
-<ce-icon name="user" block></ce-icon>
+<ui-icon name="user" block></ui-icon>
 ```
 
 ## Rotate
@@ -66,5 +66,5 @@ By default, the icon is displayed inline. You can display the icon as a block by
 You can rotate the icon by setting the rotate attribute.
 
 ```html
-<ce-icon name="user" rotate="90"></ce-icon>
+<ui-icon name="user" rotate="90"></ui-icon>
 ```

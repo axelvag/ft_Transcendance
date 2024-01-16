@@ -1,5 +1,5 @@
 // components
-import './components/icons/ce-icon.js';
+import './components/icons/ui-icon.ce.js';
 
 // views
 import './views/view-game.ce.js';
