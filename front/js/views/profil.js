@@ -1,11 +1,9 @@
 import "./view-sidebar.js";
+import "./view-profil.js";
 
 const template = `
       <view-sidebar></view-sidebar>
-      <main>
-        <h1>Profil</h1>
-        <p>Welcome to your profile page. Here you can view and edit your profile information.</p>
-      </main>
+      <view-profil></view-profil>
 `;
 
 export default template;

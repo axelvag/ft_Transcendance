@@ -1,0 +1,57 @@
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 250px; /* Ajustez en fonction de la largeur de votre sidebar */
+    padding: 20px;
+  }
+  
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  
+  .profile-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    margin-bottom: 5px;
+  }
+  
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group input[type="password"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .cancel-button,
+  .save-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .save-button {
+    background-color: #8a2be2; /* Utilisez la couleur de votre choix */
+    color: white;
+    /* Autres styles pour le bouton Enregistrer */
+  }
