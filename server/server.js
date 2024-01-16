@@ -2,9 +2,9 @@
 const express = require('express');
 // const open = require('open');
 const app = express();
-const port = 8800;
+const port = 9000;
 
-app.use(express.static('public'));
+app.use(express.static('../dashbord'));
 
 const server = app.listen(port, () => {
   console.log(`Le serveur est en cours d'exécution sur le port ${port}`);
