@@ -36,7 +36,7 @@ services:
         context: ./dashboard
         dockerfile: Dockerfile
       ports:
-        - "8002:8002"
+        - "8002:8000"
       networks:
         - front
       depends_on:

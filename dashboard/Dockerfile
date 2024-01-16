@@ -1,11 +1,23 @@
-# Utilisez une image Nginx légère
-FROM nginx:alpine
+# Dockerfile du service dashboard
 
-# Copiez le contenu du dossier "dashboard" dans le répertoire par défaut d'Nginx
-COPY . /usr/share/nginx/html
+FROM python:3.12-bookworm
 
-# Exposez le port spécifié dans le docker-compose.yml pour ce service
-EXPOSE 8002
+# Autres configurations du Dockerfile
 
-# Commande pour démarrer Nginx
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /app
+
+# Copie des fichiers de l'application
+COPY . /app/
+# COPY ./authentification/auth/ /app/
+
+# WORKDIR /
+
+# COPY ./authentification/auth/ /app/auth/
+
+# Exposer le port sur lequel l'application Django écoute à l'intérieur du conteneur
+EXPOSE 8000
+
+# Commande pour lancer l'application Django
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# CMD ["tail", "-f", "/dev/null"]
