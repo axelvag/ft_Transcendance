@@ -2,6 +2,10 @@ body{
   background-color: #000000;
 }
 
+.white-mode {
+  background-color: whitesmoke;
+}
+
 H1{
   /* margin-top: 15%; */
   /* text-align: center; */
@@ -22,9 +26,30 @@ H1{
   display: inline-block; /* Permet au bouton de ne prendre que l'espace nécessaire */
 }
 
+.white-mode .play-now-btn {
+  background-color: rgb(255, 255, 255); /* Couleur de fond */
+  color: rgb(0, 0, 0); /* Couleur du texte */
+  padding: 10px 20px; /* Espacement interne */
+  border: 2px solid rgb(0, 0, 0); /* Bordure blanche*/
+  border-radius: 5px; /* Coins arrondis */
+  font-size: 16px; /* Taille de la police */
+  font-weight: bold; /* Police en gras */
+  text-transform: uppercase; /* Texte en majuscules */
+  cursor: pointer; /* Curseur en forme de pointeur */
+  transition: background-color 0.3s, color 0.3s; /* Animation de transition */
+  text-decoration: none; /* Aucune décoration de texte */
+  display: inline-block; /* Permet au bouton de ne prendre que l'espace nécessaire */
+}
+
 .play-now-btn:hover, .play-now-btn:focus {
   background-color: white; /* Couleur de fond lors du survol */
   color: black; /* Couleur du texte lors du survol */
+  text-decoration: none; /* Aucune décoration de texte lors du survol */
+}
+
+.white-mode .play-now-btn:hover, .play-now-btn:focus {
+  background-color: rgb(0, 0, 0); /* Couleur de fond lors du survol */
+  color: rgb(255, 255, 255); /* Couleur du texte lors du survol */
   text-decoration: none; /* Aucune décoration de texte lors du survol */
 }
 
@@ -70,6 +95,27 @@ H1{
   text-decoration: none; /* Aucune décoration de texte lors du survol */
 }
 
+.white-mode .play-now-btn_play{
+  background-color: rgb(255, 255, 255); /* Couleur de fond */
+  color: rgb(0, 0, 0); /* Couleur du texte */
+  padding: 15px 35px; /* Espacement interne */
+  border: 2px solid rgb(0, 0, 0); /* Bordure blanche*/
+  border-radius: 5px; /* Coins arrondis */
+  font-size: 16px; /* Taille de la police */
+  font-weight: bold; /* Police en gras */
+  text-transform: uppercase; /* Texte en majuscules */
+  cursor: pointer; /* Curseur en forme de pointeur */
+  transition: background-color 0.3s, color 0.3s; /* Animation de transition */
+  text-decoration: none; /* Aucune décoration de texte */
+  display: inline-block; /* Permet au bouton de ne prendre que l'espace nécessaire */
+}
+
+.white-mode .play-now-btn_play:hover, .play-now-btn_play:focus {
+  background-color: rgb(0, 0, 0); /* Couleur de fond lors du survol */
+  color: rgb(255, 255, 255); /* Couleur du texte lors du survol */
+  text-decoration: none; /* Aucune décoration de texte lors du survol */
+}
+
 .navbar{
   display: flex;
   flex-direction: row;
@@ -88,7 +134,7 @@ H1{
 }
 
 img {
-  /* margin-left: 60%; */
+  margin-left: 48.5%;
   width : 67px;
   height : 45px;
 }
@@ -96,5 +142,83 @@ img {
 .flex{
   display: flex;
   flex-direction: row;
-  margin-right: 2%;
+  margin-right: 1%;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  margin-left: 15%;
+}
+
+/* Style pour l'input checkbox - sera caché */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Style pour le curseur / slider du switch */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #623cba;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+/* Style pour le slider lorsque le switch est en position ON */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: rgb(0, 0, 0);
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #ffffff;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1
+px #2196F3;
+}
+
+/* Style pour le slider lorsque le switch est en position OFF */
+input:checked + .slider:before {
+-webkit-transform: translateX(26px);
+-ms-transform: translateX(26px);
+transform: translateX(26px);
+}
+
+/* Style arrondi pour le slider */
+.slider.round {
+border-radius: 34px;
+}
+
+.slider.round:before {
+border-radius: 50%;
+}
+
+.padding-global{
+  padding-bottom: 5rem;
+}
+
+p{
+  color: white;
+}
+
+.white-mode p {
+  color: black;
 }
