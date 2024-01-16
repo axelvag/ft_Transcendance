@@ -1,0 +1,100 @@
+body{
+  background-color: #000000;
+}
+
+H1{
+  /* margin-top: 15%; */
+  /* text-align: center; */
+}
+
+.play-now-btn {
+  background-color: black; /* Couleur de fond */
+  color: white; /* Couleur du texte */
+  padding: 10px 20px; /* Espacement interne */
+  border: 2px solid white; /* Bordure blanche*/
+  border-radius: 5px; /* Coins arrondis */
+  font-size: 16px; /* Taille de la police */
+  font-weight: bold; /* Police en gras */
+  text-transform: uppercase; /* Texte en majuscules */
+  cursor: pointer; /* Curseur en forme de pointeur */
+  transition: background-color 0.3s, color 0.3s; /* Animation de transition */
+  text-decoration: none; /* Aucune décoration de texte */
+  display: inline-block; /* Permet au bouton de ne prendre que l'espace nécessaire */
+}
+
+.play-now-btn:hover, .play-now-btn:focus {
+  background-color: white; /* Couleur de fond lors du survol */
+  color: black; /* Couleur du texte lors du survol */
+  text-decoration: none; /* Aucune décoration de texte lors du survol */
+}
+
+.center-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centrer horizontalement */
+  align-items: center; /* Centrer verticalement */
+  height: 20vh; /* Utiliser toute la hauteur de la fenêtre */
+}
+
+.gradient-text {
+  background: linear-gradient(to right, purple, blue); /* Définissez vos couleurs ici */
+  -webkit-background-clip: text;
+  color: transparent;
+  display: inline-block;
+  font-size: 30px;
+  font-weight: bold; */
+}
+
+.margin_top{
+  margin-top: 5%;
+}
+
+.play-now-btn_play{
+  background-color: black; /* Couleur de fond */
+  color: white; /* Couleur du texte */
+  padding: 15px 35px; /* Espacement interne */
+  border: 2px solid white; /* Bordure blanche*/
+  border-radius: 5px; /* Coins arrondis */
+  font-size: 16px; /* Taille de la police */
+  font-weight: bold; /* Police en gras */
+  text-transform: uppercase; /* Texte en majuscules */
+  cursor: pointer; /* Curseur en forme de pointeur */
+  transition: background-color 0.3s, color 0.3s; /* Animation de transition */
+  text-decoration: none; /* Aucune décoration de texte */
+  display: inline-block; /* Permet au bouton de ne prendre que l'espace nécessaire */
+}
+
+.play-now-btn_play:hover, .play-now-btn_play:focus {
+  background-color: white; /* Couleur de fond lors du survol */
+  color: black; /* Couleur du texte lors du survol */
+  text-decoration: none; /* Aucune décoration de texte lors du survol */
+}
+
+.navbar{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.margin_left{
+  margin-left: 4%;
+}
+
+.bottom_navbar{
+  padding: 2px ;
+  background-color: rgb(79, 79, 79);
+}
+
+img {
+  /* margin-left: 60%; */
+  width : 67px;
+  height : 45px;
+}
+
+.flex{
+  display: flex;
+  flex-direction: row;
+  margin-right: 2%;
+}

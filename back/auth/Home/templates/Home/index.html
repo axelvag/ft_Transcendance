@@ -1,21 +1,34 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>django auth</title>
 </head>
 <body>
-  {% if user.is_authenticated %}
+  <div class="navbar">
+    <img src="{% static 'img/logoTranscendencenew.png' %}" alt="Description de l'image">
+    <div class="flex">
+      {% if user.is_authenticated %}
       <p>Connecte sous {{ user.username }} | <a href="{% url 'accounts:logout_user' %}">Deconnexion</a></p>
-  {% else %}
-      <p><a href="{% url 'accounts:login_user' %}">Connexion</a></p>
-      <p><a href="{% url 'accounts:register_user' %}">Inscription</a></p>
-  {% endif %}
-  {% for messages in messages %}
-    <p>{{ messages }}</p>
-  {% endfor %}
-  <h1>Exemple Account</h1>
-  <p>{{ message }}</p>
+      {% else %}
+        <p class="margin_left"><a href="{% url 'accounts:login_user' %}" class="play-now-btn">Connexion</a></p>
+        <p class="margin_left"><a href="{% url 'accounts:register_user' %}" class="play-now-btn">Inscription</a></p>
+      {% endif %}
+      {% for messages in messages %}
+      <p>{{ messages }}</p>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="bottom_navbar"></div>
+  <div class="center-container">
+  <h1 class="gradient-text">The Pong Game</h1>
+  <div class="margin_top"></div>
+    <form action="#">
+      <button type="submit" class="play-now-btn_play">Play Now</button>
+    </form>
+  </div>
 </body>
 </html>
