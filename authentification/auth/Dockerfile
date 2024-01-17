@@ -53,21 +53,13 @@ CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 
 # EXPOSE 8000
 
-
 # # Copier le script start.sh
-# COPY ./conf/script_docker.sh /app/
+# COPY ./script_docker.sh ./app
+
+# WORKDIR /app
 
 # # Donner les permissions d'exécution au script
-# RUN chmod +x /app/script_docker.sh
-
-# WORKDIR /app/auth
+# RUN chmod +x script_docker.sh
 
 # # Utiliser le script comme CMD
 # CMD ["./script_docker.sh"]
-
-# # Faire un script !!!
-
-# # CMD ["python3", "manage.py", "migrate"]
-
-# # # lancer l'appli Django
-# # CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
