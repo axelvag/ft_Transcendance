@@ -1,7 +1,10 @@
 .profile-container {
     display: flex;
     flex-direction: column;
-    margin-left: 250px; /* Ajustez en fonction de la largeur de votre sidebar */
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin-left: 250px;
     padding: 20px;
   }
   
@@ -51,7 +54,6 @@
   }
   
   .save-button {
-    background-color: #8a2be2; /* Utilisez la couleur de votre choix */
+    background-color: #8a2be2;
     color: white;
-    /* Autres styles pour le bouton Enregistrer */
   }

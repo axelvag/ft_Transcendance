@@ -5,13 +5,6 @@ import settings from "./views/settings.js";
 import notFound from "./views/notFound.js";
 import logout from "./views/logout.js";
 
-/**
- Create a object Routes
-    title: descrive a title of the page
-    template: say a application use the name associate of "template"
-    '<view-home></view-home>'
- */
-
 const routes = {
     "/": {title: "Profil", template: profil},
     "/friends": {title: "Friends", template: friends}, 
@@ -21,7 +14,6 @@ const routes = {
     "/logout": { title: "Logout", template: logout },
 };
 
-// classList allow manipulate CSS class this element 
 function updateActiveNavLink() {
     const links = document.querySelectorAll('.custom-nav a');
     const currentPath = location.pathname;
@@ -41,9 +33,6 @@ function updateActiveNavLink() {
     }
 }
 
-/**
- * location.pathname --> retourne l'URL courante de la page web 
- */
 function router(e) {
 
     let view = routes[location.pathname];
@@ -52,28 +41,23 @@ function router(e) {
     if (!appEl) console.error("#app not found");
 
     if (view){
-        document.title = view.title; // modify dynamichte page of title
-        // console.log("template", view.template);
-        appEl.innerHTML = view.template; // Modify interior HTML of element 
+        document.title = view.title;
+        appEl.innerHTML = view.template;
         updateActiveNavLink();
     }
     else{
-        // history.replaceState("", "", "/");
-        // router();
         document.title = routes["/not-found"].title;
         appEl.innerHTML = routes["/not-found"].template;
     }
 };
 
-// Handle navigation
 document.addEventListener("click", e => {
     if (e.target.matches("[data-link]")) {
         e.preventDefault();
-        history.pushState("", "", e.target.href); // allows modify URL in the search bar nothing modify the page
+        history.pushState("", "", e.target.href);
         router();
     }
 });
 
-// Update router
-window.addEventListener("popstate", router); // When user click in previous or next
+window.addEventListener("popstate", router);
 window.addEventListener("DOMContentLoaded", router);
