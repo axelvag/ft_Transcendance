@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 
 
 class UserCreationFormWithEmail(UserCreationForm):
-    email = forms.EmailField(required=True, help_text='Requis. Entrez une adresse email valide.')
+    email = forms.EmailField(required=True)
 
     class Meta:
         model = User

@@ -9,12 +9,12 @@
 </head>
 <body>
   <div class="navbar">
-    <img src="{% static 'img/logoTranscendencenew.png' %}" alt="Description de l'image">
-    <label class="switch">
-      <input type="checkbox" id="toggle-example" onchange="toggleTheme()">
-      <span class="slider round"></span>
-    </label>
+    <img src="{% static 'img/logoTranscendencenew.png' %}" alt="Description de l'image" class="img-home">
     <div class="flex">
+      <label class="switch">
+        <input type="checkbox" id="toggle-example" onchange="toggleTheme()">
+        <span class="slider round"></span>
+      </label>
       {% if user.is_authenticated %}
       <p>{{ user.username }} | <a href="{% url 'accounts:logout_user' %}" class="play-now-btn">Deconnexion</a></p>
       {% else %}
@@ -27,15 +27,15 @@
     </div>
   </div>
   <div class="bottom_navbar"></div>
-  <div class="padding-global">
-    <div class="center-container">
-      <h1 class="gradient-text">The Pong Game</h1>
-      <div class="margin_top"></div>
-      <form action="#">
-        <button type="submit" class="play-now-btn_play">Play Now</button>
-      </form>
+    <div class="padding-global">
+      <div class="center-container">
+        <h1 class="gradient-text">The Pong Game</h1>
+        <div class="margin_top"></div>
+        <form action="#">
+          <button type="submit" class="play-now-btn_play">Play Now</button>
+        </form>
+      </div>
+      <script src="{% static 'js/theme-toggle.js' %}"></script>
     </div>
-    <script src="{% static 'js/theme-toggle.js' %}"></script>
-  </div>
 </body>
 </html>
