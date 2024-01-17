@@ -5,6 +5,8 @@ import settings from "./views/settings.js";
 import notFound from "./views/notFound.js";
 import logout from "./views/logout.js";
 
+const baseUrl = '/front/public';
+
 const routes = {
     "/": {title: "Profil", template: profil},
     "/friends": {title: "Friends", template: friends}, 
@@ -16,15 +18,14 @@ const routes = {
 
 function updateActiveNavLink() {
     const links = document.querySelectorAll('.custom-nav a');
-    const currentPath = location.pathname;
+    const currentPath = location.pathname.substring(baseUrl.length);
 
     let index = 0;
     while (index < links.length)
     {
         const link = links[index];
 
-        console.log("test-->", link.getAttribute('href'));
-        if (link.getAttribute('href') === currentPath)
+        if (link.getAttribute('data-link') === currentPath)
             link.classList.add('active');
         else
             link.classList.remove('active');
@@ -35,7 +36,8 @@ function updateActiveNavLink() {
 
 function router(e) {
 
-    let view = routes[location.pathname];
+    const relativePath = location.pathname.substring(baseUrl.length);
+    let view = routes[relativePath];
     const appEl = document.querySelector("#app");
 
     if (!appEl) console.error("#app not found");
@@ -54,7 +56,8 @@ function router(e) {
 document.addEventListener("click", e => {
     if (e.target.matches("[data-link]")) {
         e.preventDefault();
-        history.pushState("", "", e.target.href);
+        const path = e.target.getAttribute('data-link');
+        history.pushState("", "", baseUrl + path);
         router();
     }
 });
