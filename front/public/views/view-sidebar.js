@@ -4,7 +4,7 @@ class ViewSidebar extends HTMLElement {
       <div class="sidebar">
 
         <img src="asset/pong-logo.png" alt="Logo" class="logo">
-        <button class="start-game">Start a Game</button>
+        <button class="start-game" data-link="/game">Start a Game</button>
 
         <nav class="custom-nav">
           <a class="nav-item active" data-link="/"><i class="bi bi-person"></i> Profile</a>

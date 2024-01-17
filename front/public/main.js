@@ -1,3 +1,10 @@
+// components
+import './components/icons/ui-icon.ce.js';
+
+// views
+import './views/view-game.ce.js';
+
+// templates
 import friends from "./views/friends.js";
 import careers from "./views/careers.js";
 import profil from "./views/profil.js";
@@ -13,6 +20,7 @@ const routes = {
     "/careers": {title: "Careers", template: careers},
     "/settings": {title: "Settings", template: settings},
     "/not-found": { title: "Not Found", template: notFound },
+    "/game": { title: "Game", template: '<view-game></view-game>' },
     "/logout": { title: "Logout", template: logout },
 };
 
