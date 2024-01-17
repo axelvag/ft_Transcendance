@@ -65,7 +65,7 @@ H1{
   flex-direction: column;
   justify-content: center; /* Centrer horizontalement */
   align-items: center; /* Centrer verticalement */
-  height: 20vh; /* Utiliser toute la hauteur de la fenêtre */
+  /* height: 20vh; Utiliser toute la hauteur de la fenêtre */
 }
 
 .gradient-text {
@@ -73,7 +73,7 @@ H1{
   /* -webkit-background-clip: text; */
   /* color: transparent; */
   /* display: inline-block; */
-  /* font-size: 30px; */
+  font-size: 50px;
   /* font-weight: bold;  */
   background: -webkit-linear-gradient(315deg,#B558F6 ,#0EA3D2);
   background-clip: text;
@@ -88,10 +88,10 @@ H1{
 .play-now-btn_play{
   background-color: black; /* Couleur de fond */
   color: white; /* Couleur du texte */
-  padding: 15px 35px; /* Espacement interne */
-  border: 2px solid white; /* Bordure blanche*/
+  padding: 15px 70px; /* Espacement interne */
+  border: 4px solid white; /* Bordure blanche*/
   border-radius: 5px; /* Coins arrondis */
-  font-size: 16px; /* Taille de la police */
+  font-size: 25px; /* Taille de la police */
   font-weight: bold; /* Police en gras */
   text-transform: uppercase; /* Texte en majuscules */
   cursor: pointer; /* Curseur en forme de pointeur */
@@ -109,10 +109,10 @@ H1{
 .white-mode .play-now-btn_play{
   background-color: rgb(255, 255, 255); /* Couleur de fond */
   color: rgb(0, 0, 0); /* Couleur du texte */
-  padding: 15px 35px; /* Espacement interne */
-  border: 2px solid rgb(0, 0, 0); /* Bordure blanche*/
+  padding: 15px 70px; /* Espacement interne */
+  border: 4px solid rgb(0, 0, 0); /* Bordure blanche*/
   border-radius: 5px; /* Coins arrondis */
-  font-size: 16px; /* Taille de la police */
+  font-size: 25px; /* Taille de la police */
   font-weight: bold; /* Police en gras */
   text-transform: uppercase; /* Texte en majuscules */
   cursor: pointer; /* Curseur en forme de pointeur */
@@ -140,8 +140,8 @@ H1{
 }
 
 .bottom_navbar{
-  padding: 2px ;
-  background-color: rgb(79, 79, 79);
+  padding: 1px ;
+  background-color: rgb(255, 255, 255);
 }
 
 img {
@@ -223,7 +223,8 @@ border-radius: 50%;
 }
 
 .padding-global{
-  padding-bottom: 5rem;
+  padding-bottom: 7rem;
+  padding-top: 7rem;
 }
 
 p{
@@ -232,4 +233,56 @@ p{
 
 .white-mode p {
   color: black;
+}
+
+.login-container {
+  background-color: rgba(255, 255, 255, 0.2); /* Fond semi-transparent */
+  border-radius: 20px;
+  padding: 40px;
+  width: 300px; /* ou la largeur que vous préférez */
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2); /* Ombre portée légère */
+  border: 4px solid rgb(255, 255, 255);
+}
+
+.login-btn {
+  background-color: #B558F6; /* Couleur de votre choix */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 100%; /* Pour étendre le bouton à toute la largeur du conteneur */
+}
+
+.create-account-link {
+  color: #B558F6;
+  text-align: center;
+  display: block; /* ou inline-block selon votre disposition */
+  margin-top: 20px;
+  text-decoration: none;
+}
+
+form p input[type='text'],
+form p input[type='password'],
+form p input[type='email'] {
+  background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour les champs de saisie */
+  border: 1px solid #555;
+  color: white;
+  padding: 10px;
+  margin-bottom: 15px;
+  margin-top: 10px;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.back-ground-login{
+  background-image: url('../img/unsplash_pEgsWN0kwbQ.png');
+  background-size: cover; /* Couvre toute la zone disponible */
+  background-position: center; /* Centre l'image dans la page */
+  background-repeat: no-repeat; /* N'autorise pas la répétition de l'image */
 }

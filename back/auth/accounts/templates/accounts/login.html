@@ -1,27 +1,41 @@
-<h2><a href="{% url 'Home:index' %}">Home</a></h2>
-
-<h1>Connexion</h1>
-
-{% for messages in messages %}
-    <p>{{ messages }}</p>
-{% endfor %}
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Se connecter">
-</form>
-
-<div>
-    <small>
-        Pas encore inscrit.e?
-        <a href="{% url 'accounts:register_user' %}">
-            S'inscrire
-        </a>
-    <br>
-        Mot de passe oublié ?
-        <a href="{% url 'password_reset' %}">
-            Renouveler mon mot de passe
-        </a>
-    </small>
-</div>
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login ou Register</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" type="text/css">
+</head>
+<body class="back-ground-login">
+    <a href="{% url 'Home:index' %}">
+        <img src="{% static 'img/logoTranscendencenew.png' %}" alt="Logo">
+    </a>
+    <div class="padding-global">
+        <div class="center-container">
+            <div class="login-container">
+                <h1 class="gradient-text">Connexion</h1>
+                
+                {% for messages in messages %}
+                <p>{{ messages }}</p>
+                {% endfor %}
+                
+                <form method="post" >
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" value="Se connecter" class="login-btn">
+                </form>
+                <div>
+                    <small>
+                        <a href="{% url 'accounts:register_user' %}" class="create-account-link">
+                            Creer un compte
+                        </a>
+                        <a href="{% url 'password_reset' %}" class="create-account-link">
+                            Mot de passe oublié ?
+                        </a>
+                    </small>
+                </div>  
+            </div>
+        </div>
+    </div>
+</body>
