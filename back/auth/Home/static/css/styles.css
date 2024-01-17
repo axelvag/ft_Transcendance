@@ -9,6 +9,13 @@ body{
 H1{
   /* margin-top: 15%; */
   /* text-align: center; */
+  color: white;
+}
+
+.white-mode H1{
+  /* margin-top: 15%; */
+  /* text-align: center; */
+  color: rgb(0, 0, 0);
 }
 
 .play-now-btn {
@@ -62,12 +69,16 @@ H1{
 }
 
 .gradient-text {
-  background: linear-gradient(to right, purple, blue); /* Définissez vos couleurs ici */
+  /* background: linear-gradient(to right, #B558F6, #0EA3D2); /* Définissez vos couleurs ici */
+  /* -webkit-background-clip: text; */
+  /* color: transparent; */
+  /* display: inline-block; */
+  /* font-size: 30px; */
+  /* font-weight: bold;  */
+  background: -webkit-linear-gradient(315deg,#B558F6 ,#0EA3D2);
+  background-clip: text;
   -webkit-background-clip: text;
-  color: transparent;
-  display: inline-block;
-  font-size: 30px;
-  font-weight: bold; */
+  -webkit-text-fill-color: transparent;
 }
 
 .margin_top{
