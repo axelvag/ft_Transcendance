@@ -1,6 +1,6 @@
 import PongGame from '../game/PongGame.js';
 
-const template = game => `
+const template = `
 <div class="pong">
   <div class="pong-modal">
     <div class="pong-title"></div>
@@ -12,92 +12,7 @@ const template = game => `
       <button class="pong-btn pong-newGame">New game</button>
     </div>
   </div>
-  <svg
-    class="pong-renderer"
-    viewBox="0 0 ${game.width} ${game.height}"
-  >
-
-    <!-- Walls -->
-    <rect
-      class="pong-wall pong-wall-top"
-      x="${game.wallThickness / 2}"
-      y="${game.wallThickness / 2}"
-      width="${game.width - game.wallThickness}"
-      height="${game.height - game.wallThickness}"
-      stroke-width="${game.wallThickness}"
-      stroke="#fff"
-      fill="rgba(0, 0, 0, 0)"
-    ></rect>
-
-    <!-- Middle line -->
-    <line
-      class="pong-middle"
-      x1="${game.width / 2}"
-      y1="${game.wallThickness}"
-      x2="${game.width / 2}"
-      y2="${game.height - game.wallThickness}"
-      stroke-width="${game.wallThickness}"
-      stroke-dasharray="${game.wallThickness}, ${game.wallThickness * 1.5}"
-      stroke="#fff"
-    ></line>
-
-    <!-- Left score -->
-    <text
-      class="pong-score pong-score-left"
-      font-family="Silkscreen, sans-serif"
-      font-size="${game.scoreFontSize}"
-      text-anchor="middle"
-      x="${game.width / 4}"
-      y="${game.wallThickness}"
-      dx="0"
-      dy="${game.scoreFontSize}"
-      fill="#fff"
-    >0</text>
-
-    <!-- Right score -->
-    <text
-      class="pong-score pong-score-right"
-      font-family="Silkscreen, sans-serif"
-      font-size="${game.scoreFontSize}"
-      text-anchor="middle"
-      x="${(game.width * 3) / 4}"
-      y="${game.wallThickness}"
-      dx="0"
-      dy="${game.scoreFontSize}"
-      fill="#fff"
-    >0</text>
-
-    <!-- Left paddle -->
-    <rect
-      class="pong-paddle pong-paddle-left"
-      x="${game.width / 2 + game.paddleLeft.left()}"
-      y="${game.height / 2 - game.paddleLeft.top()}"
-      width="${game.paddleLeft.width}"
-      height="${game.paddleLeft.height}"
-      fill="#fff"
-    ></rect>
-
-    <!-- Right paddle -->
-    <rect
-      class="pong-paddle pong-paddle-right"
-      x="${game.width / 2 + game.paddleRight.left()}"
-      y="${game.height / 2 - game.paddleRight.top()}"
-      width="${game.paddleRight.width}"
-      height="${game.paddleRight.height}"
-      fill="#fff"
-    ></rect>
-
-    <!-- Ball -->
-    <rect
-      class="pong-ball"
-      x="${game.width / 2 + game.ball.left()}"
-      y="${game.height / 2 - game.ball.top()}"
-      width="${game.ball.width}"
-      height="${game.ball.height}"
-      fill="#fff"
-    ></rect>
-
-  </svg>
+  <game-renderer-2d class="pong-renderer"></game-renderer-2d>
 </div>
 `;
 
@@ -181,7 +96,6 @@ const style = `
 	height: 600px;
 	user-select: none;
 }
-</style>
 `;
 
 class ViewGame extends HTMLElement {
@@ -204,7 +118,7 @@ class ViewGame extends HTMLElement {
       <style>
         ${style}
       </style>
-      ${template(this.game)}
+      ${template}
     `;
 
     // Modal
@@ -231,12 +145,9 @@ class ViewGame extends HTMLElement {
       this.render();
     });
 
-    // Elements
-    this.ballEl = this.shadowRoot.querySelector('.pong-ball');
-    this.paddleLeftEl = this.shadowRoot.querySelector('.pong-paddle-left');
-    this.paddleRightEl = this.shadowRoot.querySelector('.pong-paddle-right');
-    this.scoreLeftEl = this.shadowRoot.querySelector('.pong-score-left');
-    this.scoreRightEl = this.shadowRoot.querySelector('.pong-score-right');
+    // Renderer
+    this.rendererEl = this.shadowRoot.querySelector('.pong-renderer');
+    this.rendererEl.init(this.game);
 
     // Events
     document.addEventListener('keydown', this.handleKeyDown);
@@ -269,11 +180,8 @@ class ViewGame extends HTMLElement {
     this.newGameBtn.hidden = this.game.status !== 'finished';
 
     // Elements
-    this.#setBallPosition(this.game.ball.center());
-    this.#setPaddleLeftPosition(this.game.paddleLeft.center());
-    this.#setPaddleRightPosition(this.game.paddleRight.center());
-    this.#setScoreLeft(this.game.scoreLeft);
-    this.#setScoreRight(this.game.scoreRight);
+    this.rendererEl.update(this.game);
+    this.rendererEl.render();
 
     if (this.game.status !== 'finished') {
       requestAnimationFrame(this.render);
@@ -303,37 +211,6 @@ class ViewGame extends HTMLElement {
     }
 
     this.titleEl.textContent = title;
-  }
-
-  #setBallPosition(ballPos) {
-    const newX = this.game.width / 2 + ballPos.x - this.game.ball.width / 2;
-    this.ballEl?.setAttribute('x', newX);
-    const newY = this.game.height / 2 - ballPos.y - this.game.ball.height / 2;
-    this.ballEl?.setAttribute('y', newY);
-  }
-
-  #setPaddleLeftPosition(paddlePos) {
-    const newX = this.game.width / 2 + paddlePos.x - this.game.paddleLeft.width / 2;
-    this.paddleLeftEl?.setAttribute('x', newX);
-    const newY = this.game.height / 2 - paddlePos.y - this.game.paddleLeft.height / 2;
-    this.paddleLeftEl?.setAttribute('y', newY);
-  }
-
-  #setPaddleRightPosition(paddlePos) {
-    const newX = this.game.width / 2 + paddlePos.x - this.game.paddleRight.width / 2;
-    this.paddleRightEl?.setAttribute('x', newX);
-    const newY = this.game.height / 2 - paddlePos.y - this.game.paddleRight.height / 2;
-    this.paddleRightEl?.setAttribute('y', newY);
-  }
-
-  #setScoreLeft(score) {
-    if (!this.scoreLeftEl) return;
-    this.scoreLeftEl.textContent = score;
-  }
-
-  #setScoreRight(score) {
-    if (!this.scoreRightEl) return;
-    this.scoreRightEl.textContent = score;
   }
 
   handleKeyDown(event) {
