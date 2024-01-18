@@ -3,7 +3,7 @@ import GameLocalApi from './localApi/GameLocalApi.js';
 
 const template = `
 <div class="pong">
-  <div class="pong-modal">
+  <div class="pong-dialog">
     <div class="pong-title"></div>
     <div class="pong-controls">
       <button class="pong-btn pong-start" hidden>Start</button>
@@ -44,7 +44,7 @@ const style = `
 	gap: 2rem;
 }
 
-.pong-modal {
+.pong-dialog {
 	position: absolute;
 	inset: 0;
 
@@ -109,7 +109,7 @@ class ViewGame extends HTMLElement {
 
     this.gameApi = new GameLocalApi();
 
-    this.render = this.render.bind(this);
+    this.renderDialog = this.renderDialog.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
   }
@@ -122,8 +122,8 @@ class ViewGame extends HTMLElement {
       ${template}
     `;
 
-    // Modal
-    this.modalEl = this.shadowRoot.querySelector('.pong-modal');
+    // Dialog
+    this.dialogEl = this.shadowRoot.querySelector('.pong-dialog');
 
     // Title
     this.titleEl = this.shadowRoot.querySelector('.pong-title');
@@ -147,14 +147,14 @@ class ViewGame extends HTMLElement {
     this.quitBtn = this.shadowRoot.querySelector('.pong-quit');
     this.quitBtn?.addEventListener('click', () => {
       this.gameApi.emit('reset');
-      this.render();
+      this.renderDialog();
     });
 
     this.newGameBtn = this.shadowRoot.querySelector('.pong-newGame');
     this.newGameBtn?.addEventListener('click', () => {
       this.gameApi.emit('reset');
       this.gameApi.emit('start');
-      this.render();
+      this.renderDialog();
     });
 
     // Renderer
@@ -163,8 +163,9 @@ class ViewGame extends HTMLElement {
     this.gameApi.on('init', data => {
       // todo: validate data
       this.#gameState = JSON.parse(data);
+      this.renderDialog();
       this.rendererEl.init(this.#gameState);
-      this.render();
+      this.rendererEl.start();
     });
     this.gameApi.on('update', data => {
       // todo: validate data
@@ -173,7 +174,11 @@ class ViewGame extends HTMLElement {
         ...this.#gameState,
         ...updates,
       };
+      this.renderDialog();
       this.rendererEl.update(updates);
+      if (updates.status === 'finished') {
+        this.rendererEl.stop();
+      }
     });
 
     // Events
@@ -188,53 +193,40 @@ class ViewGame extends HTMLElement {
     document.removeEventListener('click', this.handleClick);
   }
 
-  render() {
-    if (!this.shadowRoot) return;
+  renderDialog() {
+    let isVisible = false;
+    let title = '';
+    let actions = [];
 
-    // Modal's visibility
-    this.modalEl.hidden = !['initialized', 'paused', 'finished'].includes(this.#gameState?.status);
-
-    // Title
-    this.#updateTitle();
-
-    // Controls' visibility
-    this.startBtn.hidden = this.#gameState?.status !== 'initialized';
-    this.pauseBtn.hidden = this.#gameState?.status !== 'running';
-    this.resumeBtn.hidden = this.#gameState?.status !== 'paused';
-    this.quitBtn.hidden = !['running', 'paused'].includes(this.#gameState?.status);
-    this.newGameBtn.hidden = this.#gameState?.status !== 'finished';
-
-    // Elements
-    this.rendererEl.render();
-
-    if (this.#gameState.status !== 'finished') {
-      requestAnimationFrame(this.render);
-    }
-  }
-
-  #updateTitle() {
-    if (!this.titleEl) return;
-
-    let title;
     switch (this.#gameState.status) {
       case 'initialized':
+        isVisible = true;
         title = 'New game';
+        actions = ['start'];
         break;
       case 'running':
-        title = `Round ${this.#gameState.scoreLeft + this.#gameState.scoreRight + 1}`;
+        isVisible = false;
         break;
       case 'paused':
+        isVisible = true;
         title = `Round ${this.#gameState.scoreLeft + this.#gameState.scoreRight + 1} - Paused`;
+        actions = ['resume', 'quit'];
         break;
       case 'finished':
+        isVisible = true;
         const winner = this.#gameState.scoreLeft > this.#gameState.scoreRight ? 'Left' : 'Right';
         title = `${winner} player wins!`;
+        actions = ['newGame'];
         break;
-      default:
-        title = ' ';
     }
 
+    this.dialogEl.hidden = !isVisible;
     this.titleEl.textContent = title;
+    this.startBtn.hidden = !actions.includes('start');
+    this.pauseBtn.hidden = !actions.includes('pause');
+    this.resumeBtn.hidden = !actions.includes('resume');
+    this.quitBtn.hidden = !actions.includes('quit');
+    this.newGameBtn.hidden = !actions.includes('newGame');
   }
 
   handleKeyDown(event) {
@@ -253,7 +245,7 @@ class ViewGame extends HTMLElement {
         case 'finished':
           this.gameApi.emit('reset');
           this.gameApi.emit('start');
-          this.render();
+          this.renderDialog();
           return;
       }
     }

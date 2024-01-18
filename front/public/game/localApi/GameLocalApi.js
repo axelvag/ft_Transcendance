@@ -331,16 +331,15 @@ class GameLocalApi {
   #start() {
     if (this.#status !== 'initialized') {
       this.#notify('update', { status: this.#status });
-      return this;
+      return;
     }
     this.#startNewRound('left');
-    return this;
   }
 
   #pause() {
     if (this.#status !== 'running') {
       this.#notify('update', { status: this.#status });
-      return this;
+      return;
     }
     this.#timer.pause();
 
@@ -355,13 +354,12 @@ class GameLocalApi {
       ball: this.#ball,
       status: this.#status,
     });
-    return this;
   }
 
   #resume() {
     if (this.#status !== 'paused') {
       this.#notify('update', { status: this.#status });
-      return this;
+      return;
     }
 
     this.#ball.speed = this.#ballSpeedOnPause;
@@ -375,18 +373,16 @@ class GameLocalApi {
       ball: this.#ball,
       status: this.#status,
     });
-    return this;
   }
 
   #reset() {
     this.#init();
-    return this;
   }
 
   #updatePaddleLeftMove(dir) {
     if (this.#status !== 'running') {
       this.#notify('update', { status: this.#status });
-      return this;
+      return;
     }
 
     this.#paddleLeft.startCenter = this.#paddleLeft.center();
@@ -394,13 +390,12 @@ class GameLocalApi {
     this.#paddleLeft.dir.y = dir >= 0 ? 1 : -1;
     this.#paddleLeft.speed = dir !== 0 ? this.#paddleSpeed : 0;
     this.#notify('update', { paddleLeft: this.#paddleLeft });
-    return this;
   }
 
   #updatePaddleRightMove(dir) {
     if (this.#status !== 'running') {
       this.#notify('update', { status: this.#status });
-      return this;
+      return;
     }
 
     this.#paddleRight.startCenter = this.#paddleRight.center();
@@ -408,7 +403,6 @@ class GameLocalApi {
     this.#paddleRight.dir.y = dir >= 0 ? 1 : -1;
     this.#paddleRight.speed = dir !== 0 ? this.#paddleSpeed : 0;
     this.#notify('update', { paddleRight: this.#paddleRight });
-    return this;
   }
 
   on(eventName, callback) {

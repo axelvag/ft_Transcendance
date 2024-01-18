@@ -1,6 +1,8 @@
 class GameRenderer2D extends HTMLElement {
   #isReady = false;
   #gameState = null;
+  #animationId = null;
+
   #ballEl = null;
   #paddleLeftEl = null;
   #paddleRightEl = null;
@@ -11,6 +13,13 @@ class GameRenderer2D extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.render = this.render.bind(this);
+    this.loop = this.loop.bind(this);
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
+  }
+
+  disconnectedCallback() {
+    this.stop();
   }
 
   init(gameState) {
@@ -118,7 +127,6 @@ class GameRenderer2D extends HTMLElement {
     this.#scoreRightEl = this.shadowRoot.querySelector('.pong-score-right');
 
     this.#isReady = true;
-    this.render();
   }
 
   update(newState) {
@@ -131,13 +139,28 @@ class GameRenderer2D extends HTMLElement {
 
   render() {
     if (!this.#isReady) return;
-
-    // Elements
     this.#setBallPosition(this.#getCenter(this.#gameState.ball));
     this.#setPaddleLeftPosition(this.#getCenter(this.#gameState.paddleLeft));
     this.#setPaddleRightPosition(this.#getCenter(this.#gameState.paddleRight));
     this.#setScoreLeft(this.#gameState.scoreLeft);
     this.#setScoreRight(this.#gameState.scoreRight);
+  }
+
+  loop() {
+    if (!this.#isReady) return;
+    this.render();
+    this.#animationId = requestAnimationFrame(this.loop);
+  }
+
+  start() {
+    if (!this.#isReady || this.#animationId) return;
+    this.loop();
+  }
+
+  stop() {
+    if (!this.#animationId) return;
+    cancelAnimationFrame(this.#animationId);
+    this.#animationId = null;
   }
 
   #getCenter(rect, time) {
