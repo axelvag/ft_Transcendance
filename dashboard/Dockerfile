@@ -6,7 +6,10 @@ FROM python:3.12-bookworm
 
 WORKDIR /app
 
-COPY dashback/requirements.txt /app/
+COPY requirements.txt /app/
+
+# # Pour fix le probleme backports.zoneinfo
+# RUN pip install --upgrade pip setuptools wheel
 
 # Mise a jour pip et install les dependances
 RUN pip install --upgrade pip \
