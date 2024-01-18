@@ -6,7 +6,7 @@ FROM python:3.12-bookworm
 
 WORKDIR /app
 
-COPY dashBack/requirements.txt /app/
+COPY dashback/requirements.txt /app/
 
 # Mise a jour pip et install les dependances
 RUN pip install --upgrade pip \
@@ -23,7 +23,7 @@ COPY . /app/
 # Exposer le port sur lequel l'application Django écoute à l'intérieur du conteneur
 EXPOSE 8000
 
-WORKDIR /app/dashBack
+WORKDIR /app/dashback
 
 # Commande pour lancer l'application Django
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
