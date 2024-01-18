@@ -5,11 +5,11 @@ const template = `
   <div class="pong-modal">
     <div class="pong-title"></div>
     <div class="pong-controls">
-      <button class="pong-btn pong-start">Start</button>
-      <button class="pong-btn pong-pause">Pause</button>
-      <button class="pong-btn pong-resume">Resume</button>
-      <button class="pong-btn pong-quit">Quit</button>
-      <button class="pong-btn pong-newGame">New game</button>
+      <button class="pong-btn pong-start" hidden>Start</button>
+      <button class="pong-btn pong-pause" hidden>Pause</button>
+      <button class="pong-btn pong-resume" hidden>Resume</button>
+      <button class="pong-btn pong-quit" hidden>Quit</button>
+      <button class="pong-btn pong-newGame" hidden>New game</button>
     </div>
   </div>
   <game-renderer-2d class="pong-renderer"></game-renderer-2d>
@@ -100,13 +100,13 @@ const style = `
 
 class ViewGame extends HTMLElement {
   #keys = {};
+  #gameState = null;
 
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
 
     this.game = new PongGame();
-    this.game.scoreFontSize = this.game.height * 0.15;
 
     this.render = this.render.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -129,32 +129,56 @@ class ViewGame extends HTMLElement {
 
     // Controls
     this.startBtn = this.shadowRoot.querySelector('.pong-start');
-    this.startBtn?.addEventListener('click', this.game.start);
+    this.startBtn?.addEventListener('click', () => {
+      this.game.emit('start');
+    });
+
     this.pauseBtn = this.shadowRoot.querySelector('.pong-pause');
-    this.pauseBtn?.addEventListener('click', this.game.pause);
+    this.pauseBtn?.addEventListener('click', () => {
+      this.game.emit('pause');
+    });
+
     this.resumeBtn = this.shadowRoot.querySelector('.pong-resume');
-    this.resumeBtn?.addEventListener('click', this.game.resume);
+    this.resumeBtn?.addEventListener('click', () => {
+      this.game.emit('resume');
+    });
+
     this.quitBtn = this.shadowRoot.querySelector('.pong-quit');
     this.quitBtn?.addEventListener('click', () => {
-      this.game.reset();
+      this.game.emit('reset');
       this.render();
     });
+
     this.newGameBtn = this.shadowRoot.querySelector('.pong-newGame');
     this.newGameBtn?.addEventListener('click', () => {
-      this.game.reset().start();
+      this.game.emit('reset');
+      this.game.emit('start');
       this.render();
     });
 
     // Renderer
     this.rendererEl = this.shadowRoot.querySelector('.pong-renderer');
-    this.rendererEl.init(this.game);
+
+    this.game.on('init', data => {
+      // todo: validate data
+      this.#gameState = JSON.parse(data);
+      this.rendererEl.init(this.#gameState);
+      this.render();
+    });
+    this.game.on('update', data => {
+      // todo: validate data
+      const updates = JSON.parse(data);
+      this.#gameState = {
+        ...this.#gameState,
+        ...updates,
+      };
+      this.rendererEl.update(updates);
+    });
 
     // Events
     document.addEventListener('keydown', this.handleKeyDown);
     document.addEventListener('keyup', this.handleKeyUp);
     document.addEventListener('click', this.handleClick);
-
-    this.render();
   }
 
   disconnectedCallback() {
@@ -167,23 +191,22 @@ class ViewGame extends HTMLElement {
     if (!this.shadowRoot) return;
 
     // Modal's visibility
-    this.modalEl.hidden = !['initialized', 'paused', 'finished'].includes(this.game.status);
+    this.modalEl.hidden = !['initialized', 'paused', 'finished'].includes(this.#gameState?.status);
 
     // Title
     this.#updateTitle();
 
     // Controls' visibility
-    this.startBtn.hidden = this.game.status !== 'initialized';
-    this.pauseBtn.hidden = this.game.status !== 'running';
-    this.resumeBtn.hidden = this.game.status !== 'paused';
-    this.quitBtn.hidden = !['running', 'paused'].includes(this.game.status);
-    this.newGameBtn.hidden = this.game.status !== 'finished';
+    this.startBtn.hidden = this.#gameState?.status !== 'initialized';
+    this.pauseBtn.hidden = this.#gameState?.status !== 'running';
+    this.resumeBtn.hidden = this.#gameState?.status !== 'paused';
+    this.quitBtn.hidden = !['running', 'paused'].includes(this.#gameState?.status);
+    this.newGameBtn.hidden = this.#gameState?.status !== 'finished';
 
     // Elements
-    this.rendererEl.update(this.game);
     this.rendererEl.render();
 
-    if (this.game.status !== 'finished') {
+    if (this.#gameState.status !== 'finished') {
       requestAnimationFrame(this.render);
     }
   }
@@ -192,18 +215,18 @@ class ViewGame extends HTMLElement {
     if (!this.titleEl) return;
 
     let title;
-    switch (this.game.status) {
+    switch (this.#gameState.status) {
       case 'initialized':
         title = 'New game';
         break;
       case 'running':
-        title = `Round ${this.game.scoreLeft + this.game.scoreRight + 1}`;
+        title = `Round ${this.#gameState.scoreLeft + this.#gameState.scoreRight + 1}`;
         break;
       case 'paused':
-        title = `Round ${this.game.scoreLeft + this.game.scoreRight + 1} - Paused`;
+        title = `Round ${this.#gameState.scoreLeft + this.#gameState.scoreRight + 1} - Paused`;
         break;
       case 'finished':
-        const winner = this.game.scoreLeft > this.game.scoreRight ? 'Left' : 'Right';
+        const winner = this.#gameState.scoreLeft > this.#gameState.scoreRight ? 'Left' : 'Right';
         title = `${winner} player wins!`;
         break;
       default:
@@ -216,18 +239,19 @@ class ViewGame extends HTMLElement {
   handleKeyDown(event) {
     // space
     if (event.code === 'Space') {
-      switch (this.game.status) {
+      switch (this.#gameState.status) {
         case 'initialized':
-          this.game.start();
+          this.game.emit('start');
           return;
         case 'running':
-          this.game.pause();
+          this.game.emit('pause');
           return;
         case 'paused':
-          this.game.resume();
+          this.game.emit('resume');
           return;
         case 'finished':
-          this.game.reset().start();
+          this.game.emit('reset');
+          this.game.emit('start');
           this.render();
           return;
       }
@@ -240,9 +264,11 @@ class ViewGame extends HTMLElement {
     this.#keys[event.key] = true;
 
     if (['w', 's'].includes(event.key)) {
-      this.game.updatePaddleLeftMove(Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s)));
+      const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
+      this.game.emit('updatePaddleLeftMove', dir);
     } else {
-      this.game.updatePaddleRightMove(Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown)));
+      const dir = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
+      this.game.emit('updatePaddleRightMove', dir);
     }
   }
 
@@ -253,9 +279,11 @@ class ViewGame extends HTMLElement {
     this.#keys[event.key] = false;
 
     if (['w', 's'].includes(event.key)) {
-      this.game.updatePaddleLeftMove(Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s)));
+      const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
+      this.game.emit('updatePaddleLeftMove', dir);
     } else {
-      this.game.updatePaddleRightMove(Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown)));
+      const dir = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
+      this.game.emit('updatePaddleRightMove', dir);
     }
   }
 }
