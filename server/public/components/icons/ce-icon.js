@@ -1,4 +1,4 @@
-import { icons } from './ce-icons.config.js';
+import { icons } from './icons.js';
 
 class CeIcon extends HTMLElement {
   static #fallbackIcon = `
@@ -59,6 +59,6 @@ class CeIcon extends HTMLElement {
   }
 }
 
-customElements.define('ce-icon', CeIcon);
+customElements.define('ui-icon', CeIcon);
 
 export default CeIcon;
