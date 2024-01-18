@@ -424,7 +424,6 @@ class PongGame {
   }
 
   emit(eventName, data) {
-    console.log(eventName, data);
     switch (eventName) {
       case 'start':
         this.#start();

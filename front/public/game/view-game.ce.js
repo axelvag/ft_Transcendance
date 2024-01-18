@@ -1,4 +1,5 @@
-import PongGame from '../game/PongGame.js';
+import './components/game-renderer-2d.ce.js';
+import PongGame from './localApi/PongGame.js';
 
 const template = `
 <div class="pong">

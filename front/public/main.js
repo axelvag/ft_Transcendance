@@ -1,9 +1,8 @@
 // components
 import './components/icons/ui-icon.ce.js';
-import './components/game/game-renderer-2d.ce.js';
 
 // views
-import './views/view-game.ce.js';
+import './game/view-game.ce.js';
 
 // templates
 import friends from './views/friends.js';
