@@ -2,7 +2,7 @@ import Vec2 from './Vec2.js';
 import MovableRect from './MovableRect.js';
 import PausableTimeout from './PausableTimeout.js';
 
-class PongGame {
+class GameLocalApi {
   #width = 800;
   #height = 600;
   #wallThickness = 10;
@@ -447,4 +447,4 @@ class PongGame {
   }
 }
 
-export default PongGame;
+export default GameLocalApi;

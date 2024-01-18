@@ -1,5 +1,5 @@
 import './components/game-renderer-2d.ce.js';
-import PongGame from './localApi/PongGame.js';
+import GameLocalApi from './localApi/GameLocalApi.js';
 
 const template = `
 <div class="pong">
@@ -107,7 +107,7 @@ class ViewGame extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
 
-    this.game = new PongGame();
+    this.gameApi = new GameLocalApi();
 
     this.render = this.render.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -131,42 +131,42 @@ class ViewGame extends HTMLElement {
     // Controls
     this.startBtn = this.shadowRoot.querySelector('.pong-start');
     this.startBtn?.addEventListener('click', () => {
-      this.game.emit('start');
+      this.gameApi.emit('start');
     });
 
     this.pauseBtn = this.shadowRoot.querySelector('.pong-pause');
     this.pauseBtn?.addEventListener('click', () => {
-      this.game.emit('pause');
+      this.gameApi.emit('pause');
     });
 
     this.resumeBtn = this.shadowRoot.querySelector('.pong-resume');
     this.resumeBtn?.addEventListener('click', () => {
-      this.game.emit('resume');
+      this.gameApi.emit('resume');
     });
 
     this.quitBtn = this.shadowRoot.querySelector('.pong-quit');
     this.quitBtn?.addEventListener('click', () => {
-      this.game.emit('reset');
+      this.gameApi.emit('reset');
       this.render();
     });
 
     this.newGameBtn = this.shadowRoot.querySelector('.pong-newGame');
     this.newGameBtn?.addEventListener('click', () => {
-      this.game.emit('reset');
-      this.game.emit('start');
+      this.gameApi.emit('reset');
+      this.gameApi.emit('start');
       this.render();
     });
 
     // Renderer
     this.rendererEl = this.shadowRoot.querySelector('.pong-renderer');
 
-    this.game.on('init', data => {
+    this.gameApi.on('init', data => {
       // todo: validate data
       this.#gameState = JSON.parse(data);
       this.rendererEl.init(this.#gameState);
       this.render();
     });
-    this.game.on('update', data => {
+    this.gameApi.on('update', data => {
       // todo: validate data
       const updates = JSON.parse(data);
       this.#gameState = {
@@ -242,17 +242,17 @@ class ViewGame extends HTMLElement {
     if (event.code === 'Space') {
       switch (this.#gameState.status) {
         case 'initialized':
-          this.game.emit('start');
+          this.gameApi.emit('start');
           return;
         case 'running':
-          this.game.emit('pause');
+          this.gameApi.emit('pause');
           return;
         case 'paused':
-          this.game.emit('resume');
+          this.gameApi.emit('resume');
           return;
         case 'finished':
-          this.game.emit('reset');
-          this.game.emit('start');
+          this.gameApi.emit('reset');
+          this.gameApi.emit('start');
           this.render();
           return;
       }
@@ -266,10 +266,10 @@ class ViewGame extends HTMLElement {
 
     if (['w', 's'].includes(event.key)) {
       const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
-      this.game.emit('updatePaddleLeftMove', dir);
+      this.gameApi.emit('updatePaddleLeftMove', dir);
     } else {
       const dir = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
-      this.game.emit('updatePaddleRightMove', dir);
+      this.gameApi.emit('updatePaddleRightMove', dir);
     }
   }
 
@@ -281,10 +281,10 @@ class ViewGame extends HTMLElement {
 
     if (['w', 's'].includes(event.key)) {
       const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
-      this.game.emit('updatePaddleLeftMove', dir);
+      this.gameApi.emit('updatePaddleLeftMove', dir);
     } else {
       const dir = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
-      this.game.emit('updatePaddleRightMove', dir);
+      this.gameApi.emit('updatePaddleRightMove', dir);
     }
   }
 }
