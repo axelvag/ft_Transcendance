@@ -1,10 +1,10 @@
-import "./view-sidebar.js";
-import "./view-profil.js";
+import './view-sidebar.js';
+import './view-profil.js';
 
 const template = `
       <div class="layout">
-            <view-sidebar></view-sidebar>
-            <view-profil></view-profil>
+            <view-sidebar class="layout-sidebar"></view-sidebar>
+            <view-profil class="layout-main"></view-profil>
       </div>
 `;
 
