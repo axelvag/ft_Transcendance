@@ -1,0 +1,4 @@
+# config/routing.yaml
+/user: http://service1:5000
+/profile: http://service2:5001
+/friendship: http://service3:5002
