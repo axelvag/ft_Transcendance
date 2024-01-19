@@ -5,26 +5,40 @@ services:
     # Serveur web
     nginx:
       build:
-        context: ./front/Docker
+        context: ./server/Docker
         dockerfile: Dockerfile
       ports:
-        - "8800:80"
-        - "8443:443"
+        - "8000:8000"
+      networks:
+        - server
+      depends_on:
+        - authentification
+      restart: on-failure
+
+    # Django Lucas
+    authentification:
+      build:
+        context: ./authentification/Docker
+        dockerfile: Dockerfile
+      ports:
+        - "8001:8000"
+      volumes:
+        - ./authentification:/app
       networks:
         - front
       depends_on:
-        - back
+        - dashboard
       restart: on-failure
 
-    # Django
-    back:
+    # Alessio
+    dashboard:
       build:
-        context: ./back/Docker
+        context: ./dashboard
         dockerfile: Dockerfile
-      volumes:
-        - ./back:/app
+      ports:
+        - "8002:8000"
       networks:
-        - back
+        - front
       depends_on:
         - data_base
       restart: on-failure
@@ -35,12 +49,14 @@ services:
       build:
         context: ./data_base/Docker
         dockerfile: Dockerfile
+      env_file:
+        - .env
       volumes:
         - data_base:/var/lib/postgresql/data
-      environment:
-        POSTGRES_DB: data_base
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: password
+      # environment:
+      #   - POSTGRES_DB: $POSTGRES_DB
+      #   - POSTGRES_USER: $POSTGRES_USER
+      #   - POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       networks:
         - data_base
       restart: on-failure
@@ -55,9 +71,9 @@ volumes:
       device: data_base
 
 networks:
-  front:
+  server:
     driver: bridge
-  back:
+  front:
     driver: bridge
   data_base:
     driver: bridge
