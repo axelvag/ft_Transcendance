@@ -61,6 +61,18 @@ services:
         - data_base
       restart: on-failure
 
+
+    api_gateway:
+      build:
+        context: ./api_gateway
+        dockerfile: Dockerfile
+      ports:
+        - "5000:5000"
+      depends_on:
+        - dashboard
+        - authentification
+      restart: on-failure
+
 volumes:
   data_base:
     name: data_base
