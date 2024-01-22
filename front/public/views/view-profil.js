@@ -1,11 +1,16 @@
 class ViewProfil extends HTMLElement {
+  constructor() {
+    super();
+    this.selectedAvatarFile = null;
+  }
+
   connectedCallback() {
     this.innerHTML = `
         <main class="profile-container">
             <div class="profile-card">
 
                 <section class="profile-header">
-                    <img id="avatar-preview" src="path_to_default_avatar_image" alt="Modify Avatar"">
+                    <img id="avatar-preview" alt="Modify Avatar"">
                     <input type="file" id="avatar-input" style="display: none;" accept="image/*">
                     <button class="avatar-button">Change avatar</button>
                 </section>
@@ -46,67 +51,77 @@ class ViewProfil extends HTMLElement {
       profileForm.reset(); // Réinitialise le formulaire
     });
 
-    profileForm.addEventListener('submit', this.saveProfile);
+    // profileForm.addEventListener('submit', this.saveProfile);
+    profileForm.addEventListener('submit', (event) => this.saveProfile(event));
+
 
     avatarButton.addEventListener('click', () => {
-        avatarInput.click(); // Déclenche le clic sur le input caché
-      });
-
-
-      avatarInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader(); // objet js pour lire les contenu des fichier stocke
-            reader.onload = (e) => {
-                const preview = document.getElementById('avatar-preview');
-                console.log("test==",preview);
-                preview.src = e.target.result; // Met à jour la source de l'élément img
-            };
-            reader.readAsDataURL(file); // Lit le fichier et déclenche l'événement onload
-        }
+      avatarInput.click(); // Déclenche le clic sur le input caché
     });
-    
-  }
 
-  
+    avatarInput.addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (file) {
+        this.selectedAvatarFile = file;
+        const reader = new FileReader(); // objet js pour lire les contenu des fichier stocke
+        reader.onload = e => {
+          const preview = document.getElementById('avatar-preview');
+          console.log('test==', preview);
+          preview.src = e.target.result; // Met à jour la source de l'élément img
+        };
+        reader.readAsDataURL(file); // Lit le fichier et déclenche l'événement onload
+      }
+    });
+  }
 
   saveProfile(event) {
     event.preventDefault();
-
+    
     const firstName = this.querySelector('#first-name').value;
     const lastName = this.querySelector('#last-name').value;
     const email = this.querySelector('#email').value;
     const password = this.querySelector('#password').value;
+    const img = this.selectedAvatarFile;
 
-    //Tests
-    console.log('First Name:', firstName);
-    console.log('Last Name:', lastName);
-    console.log('Email:', email);
-    console.log('Password:', password);
+    const profileData = {
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password,
+      img: img,
+    };
 
-    // Ici, vous pouvez appeler la méthode fetch pour envoyer les données
-    // à votre serveur
-    // fetch('/path_to_your_server_endpoint', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         firstName: firstName,
-    //         lastName: lastName,
-    //         email: email,
-    //         password: password
-    //     })
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     // Traiter la réponse ici
-    //     console.log('Success:', data);
-    // })
-    // .catch((error) => {
-    //     console.error('Error:', error);
-    // });
+    console.log(profileData);
+
+    //Send to sever
+
+    // reset form
+    const profileForm = this.querySelector('.profile-form');
+    profileForm.reset();
   }
 }
 
 customElements.define('view-profil', ViewProfil);
+
+// Ici, vous pouvez appeler la méthode fetch pour envoyer les données
+// à votre serveur
+// fetch('/path_to_your_server_endpoint', {
+//     method: 'POST',
+//     headers: {
+//         'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({
+//         firstName: firstName,
+//         lastName: lastName,
+//         email: email,
+//         password: password
+//     })
+// })
+// .then(response => response.json())
+// .then(data => {
+//     // Traiter la réponse ici
+//     console.log('Success:', data);
+// })
+// .catch((error) => {
+//     console.error('Error:', error);
+// });

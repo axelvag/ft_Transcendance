@@ -20,7 +20,7 @@ const routes = {
   '/logout': { title: 'Logout', template: logout },
 };
 
-function updateActiveNavLink() {
+const updateActiveNavLink = () => {
   const links = document.querySelectorAll('[data-link]');
   const currentPath = useHash
     ? // with hash
@@ -39,7 +39,7 @@ function updateActiveNavLink() {
   }
 }
 
-function router(e) {
+const router = (e) => {
   const relativePath = useHash
     ? // with hash
       (window.location.hash || '#/').substring(1)
