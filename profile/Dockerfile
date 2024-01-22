@@ -1,4 +1,4 @@
-# Dockerfile du service dashboard
+# Dockerfile du service profile
 
 FROM python:3.12-bookworm
 

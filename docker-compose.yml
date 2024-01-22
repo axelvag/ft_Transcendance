@@ -27,13 +27,13 @@ services:
       networks:
         - front
       depends_on:
-        - dashboard
+        - profile
       restart: on-failure
 
     # Alessio
-    dashboard:
+    profile:
       build:
-        context: ./dashboard
+        context: ./profile
         dockerfile: Dockerfile
       ports:
         - "8002:8000"
@@ -70,7 +70,7 @@ services:
         - "5000:5000"
       depends_on:
         - authentification
-        - dashboard
+        - profile
       restart: on-failure
 
 volumes:

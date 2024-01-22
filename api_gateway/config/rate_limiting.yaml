@@ -2,6 +2,6 @@
 /authentification:
   limit: 1000
   interval: 3600
-/dashboard:
+/profile:
   limit: 500
   interval: 3600

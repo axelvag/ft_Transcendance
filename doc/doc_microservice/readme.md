@@ -19,7 +19,7 @@ AUTHENTIFICATION:
     - Docker Python
     - Django (requirement.txt, env, auth)
 
-DASHBOARD:
+PROFILE:
     - Docker Python
     - Django (requirement.txt, env, auth)
 
