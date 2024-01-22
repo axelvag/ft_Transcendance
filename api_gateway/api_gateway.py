@@ -43,6 +43,7 @@ def forward_request(service_url, route, request):
         app.logger.debug(f"request.headers {request.headers}")
         app.logger.debug(f"request.get_data() {request.get_data()}")
         app.logger.debug(f"request.args {request.args}")
+
         response = requests.request(
             method=request.method,
             url=forward_url,
@@ -50,8 +51,15 @@ def forward_request(service_url, route, request):
             data=request.get_data(),
             params=request.args,
         )
+        app.logger.debug(f"333333333333333333 {response}")
         return response.content, response.status_code, response.headers.items()
     except requests.RequestException as e:
+        # app.logger.exception("An error occurred during request forwarding:")
+        # app.logger.debug(f"method {method}")
+        # app.logger.debug(f"url {url}")
+        # app.logger.debug(f"headers {headers}")
+        # app.logger.debug(f"data {data}")
+        # app.logger.debug(f"params {params}")
         abort(500, f"Failed to forward request to {forward_url} : {str(e)}")
 
 @app.route('/<path:route>', methods=['GET', 'POST', 'PUT', 'DELETE'])
