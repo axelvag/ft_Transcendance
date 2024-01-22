@@ -1,7 +1,5 @@
 # config/authentication.yaml
-/user:
+/authentification:
   required_roles: [user, admin]
-/profile:
-  required_roles: [user]
-/friendship:
+/dashboard:
   required_roles: [user]

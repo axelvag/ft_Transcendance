@@ -7,6 +7,8 @@ WORKDIR /app
 # Copiez le contenu de votre répertoire API Gateway dans le conteneur
 COPY . /app/api_gateway
 
+COPY config /app/api_gateway/config
+
 # Installez les dépendances
 RUN pip install --no-cache-dir -r /app/api_gateway/requirements.txt
 

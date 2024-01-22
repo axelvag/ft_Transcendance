@@ -69,8 +69,8 @@ services:
       ports:
         - "5000:5000"
       depends_on:
-        - dashboard
         - authentification
+        - dashboard
       restart: on-failure
 
 volumes:
