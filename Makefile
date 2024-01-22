@@ -7,7 +7,7 @@ build:
 
 up:
 		docker-compose -f docker-compose.yml --env-file .env up -d
-		# cd server && npm start
+		# cd front && npm start
 
 stop:
 		docker-compose -f docker-compose.yml --env-file .env stop

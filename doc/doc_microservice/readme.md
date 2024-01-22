@@ -10,7 +10,7 @@ Separate the files so that everything is encapsulated in very distinct modules a
 
 DOCKER-COMPOSE: which brings together everything
 
-SERVER :
+FRONT :
     - Docker Nginx
     - Static files (html, js, bootstrap)
     - Node.js to use npm

@@ -12,19 +12,18 @@ with open('/app/api_gateway/config/routing.yaml', 'r') as file:
 with open('/app/api_gateway/config/rate_limiting.yaml', 'r') as file:
     rate_limiting_config = yaml.safe_load(file)
 
-# Application des middlewares
 from middleware import logging, error_handling
 
 app.register_blueprint(logging.logging_bp)
 app.register_error_handler(HTTPException, error_handling.handle_http_exception)
 
 def get_service_url(route):
-    return routing_config.get(route)
+    service_url = routing_config.get(route)
+    print(f"Route: {route}, Service URL: {service_url}")
+    return service_url
 
 def forward_request(service_url, route, request):
-    # Implement logic to forward requests to the appropriate service
-    # This can involve authentication, rate limiting, etc.
-    # For demonstration purposes, let's just forward the request using requests library
+    print(f"Forwarding request to {service_url}{request.path}")
     try:
         response = requests.request(
             method=request.method,
@@ -55,7 +54,6 @@ def proxy(route):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-
 
 
 

@@ -5,12 +5,12 @@ services:
     # Serveur web
     nginx:
       build:
-        context: ./server/Docker
+        context: ./front/Docker
         dockerfile: Dockerfile
       ports:
         - "8000:8000"
       networks:
-        - server
+        - front
       depends_on:
         - authentification
       restart: on-failure
@@ -25,7 +25,7 @@ services:
       volumes:
         - ./authentification:/app
       networks:
-        - front
+        - back
       depends_on:
         - profile
       restart: on-failure
@@ -38,7 +38,7 @@ services:
       ports:
         - "8002:8000"
       networks:
-        - front
+        - back
       depends_on:
         - data_base
       restart: on-failure
@@ -68,9 +68,9 @@ services:
         dockerfile: Dockerfile
       ports:
         - "5000:5000"
-      depends_on:
-        - authentification
-        - profile
+      # depends_on:
+      #   - authentification
+      #   - profile
       restart: on-failure
 
 volumes:
@@ -83,9 +83,9 @@ volumes:
       device: data_base
 
 networks:
-  server:
-    driver: bridge
   front:
+    driver: bridge
+  back:
     driver: bridge
   data_base:
     driver: bridge
