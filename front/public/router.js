@@ -1,23 +1,28 @@
 // templates
+import login from './views/login.js';
+import signup from './views/signup.js';
 import friends from './views/friends.js';
 import careers from './views/careers.js';
 import profil from './views/profil.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
-import logout from './views/logout.js';
 
 const useHash = true;
 
 const baseUrl = '/front/public';
 
 const routes = {
+  // public
+  '/login': { title: 'Login', template: login },
+  '/signup': { title: 'Login', template: signup },
+  // logged
   '/': { title: 'Profil', template: profil },
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
-  '/not-found': { title: 'Not Found', template: notFound },
   '/game': { title: 'Game', template: '<view-game></view-game>' },
-  '/logout': { title: 'Logout', template: logout },
+  // not found
+  '/not-found': { title: 'Not Found', template: notFound },
 };
 
 function updateActiveNavLink() {

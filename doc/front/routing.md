@@ -2,10 +2,10 @@
 
 ```
 The term "SPA"
-stands for "Single Page Application". It is a 
+stands for "Single Page Application". It is a
 development concept in which a single HTML page is loaded into the browser
-in the browser, and all subsequent interactions with the 
-the user take place on that page. Here are the main aspects 
+in the browser, and all subsequent interactions with the
+the user take place on that page. Here are the main aspects
 of how SPAs work:
 ```
 
@@ -36,7 +36,7 @@ document.addEventListener("click", e => {
 });
 
 "document" represents the all DOM.
-"addEventListener" is a method that take two arguments: a type listen event (here, "click") and a fonctions a execute when events is ready 
+"addEventListener" is a method that take two arguments: a type listen event (here, "click") and a fonctions a execute when events is ready
 "e.preventDefault()" cancel the comportement by default
 ```
 
@@ -72,9 +72,10 @@ This startegy Custom Element (Web Components) allows to create our own comportem
 And allows to create nested componants
 ```
 
------------------------------------------------------
+---
 
 style.css for surcharge of Bootstrap !
+
 ```
 .custom-nav {
     display: flex;
@@ -128,30 +129,30 @@ button.btn-primary:hover {
 
 #app {
     display: flex;
-} 
+}
 ```
 
----------------------------------------
+---
 
 Explain Custom Element with Bootstrap
 
 ```
-Custom Elements 
+Custom Elements
 class ViewSidebar extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
         <div class="container-fluid h-100">
-      
+
           <div class="row h-100">
-      
+
             <!-- Sidebar -->
             <div class="col-md-6 p-4 sidebar vh-100 d-flex flex-column">
-      
+
               <!-- LOGO could be an image or text -->
-              <img src="front/asset/pong-logo.png" alt="Logo" class="mb-4" style="max-width: 100%; height: auto;">
-      
+              <img src="./assets/img/pong-logo.png" alt="Logo" class="mb-4" style="max-width: 100%; height: auto;">
+
               <button class="btn btn-outline-light w-100 mb-4 violet-border custom-button-large-text">Start a Game</button>
-      
+
               <!-- Navigation links -->
               <nav class="nav flex-column custom-nav flex-grow-1">
                 <a class="nav-link active" href="/" data-link><i class="bi bi-person"></i> Profile</a>
@@ -159,7 +160,7 @@ class ViewSidebar extends HTMLElement {
                 <a class="nav-link" href="/careers" data-link><i class="bi bi-briefcase"></i> Careers</a>
                 <a class="nav-link" href="/settings" data-link><i class="bi bi-gear"></i> Settings</a>
               </nav>
-                
+
               <a class="nav-link logout-large-text" href="/logout" data-link><i class="bi bi-box-arrow-right"></i> Logout</a>
             </div>
           </div>
