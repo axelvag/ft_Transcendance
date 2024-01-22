@@ -5,7 +5,8 @@ class ViewProfil extends HTMLElement {
             <div class="profile-card">
 
                 <section class="profile-header">
-                    <h1>Edit profile</h1>
+                    <img id="avatar-preview" src="path_to_default_avatar_image" alt="Modify Avatar"">
+                    <input type="file" id="avatar-input" style="display: none;" accept="image/*">
                     <button class="avatar-button">Change avatar</button>
                 </section>
 
@@ -38,13 +39,36 @@ class ViewProfil extends HTMLElement {
 
     const cancelButton = this.querySelector('.cancel-button');
     const profileForm = this.querySelector('.profile-form');
+    const avatarButton = this.querySelector('.avatar-button');
+    const avatarInput = this.querySelector('#avatar-input');
 
     cancelButton.addEventListener('click', () => {
       profileForm.reset(); // Réinitialise le formulaire
     });
 
     profileForm.addEventListener('submit', this.saveProfile);
+
+    avatarButton.addEventListener('click', () => {
+        avatarInput.click(); // Déclenche le clic sur le input caché
+      });
+
+
+      avatarInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader(); // objet js pour lire les contenu des fichier stocke
+            reader.onload = (e) => {
+                const preview = document.getElementById('avatar-preview');
+                console.log("test==",preview);
+                preview.src = e.target.result; // Met à jour la source de l'élément img
+            };
+            reader.readAsDataURL(file); // Lit le fichier et déclenche l'événement onload
+        }
+    });
+    
   }
+
+  
 
   saveProfile(event) {
     event.preventDefault();
