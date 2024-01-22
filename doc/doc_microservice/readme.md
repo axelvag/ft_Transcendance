@@ -6,6 +6,13 @@
 
 Separate the files so that everything is encapsulated in very distinct modules and thus modify them without touching the rest!
 
+## PATH Idea
+
+Je n'ai pas arreter de changer ma structure des microservices en SPA a force de me documenter
+voici l'evolution:
+
+![image_microservice](../image/microservices.png)
+
 ## Folders
 
 DOCKER-COMPOSE: which brings together everything

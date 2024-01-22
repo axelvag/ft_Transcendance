@@ -1,3 +1,3 @@
 # config/routing.yaml
-/authentification: http://127.0.0.1:8001/Home
-/profile: http://127.0.0.1:8002/pages
+authentification: http://127.0.0.1:8001/Home
+profile: http://127.0.0.1:8002/pages

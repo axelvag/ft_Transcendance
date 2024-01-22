@@ -19,28 +19,50 @@ app.register_error_handler(HTTPException, error_handling.handle_http_exception)
 
 def get_service_url(route):
     service_url = routing_config.get(route)
-    print(f"Route: {route}, Service URL: {service_url}")
+    # service_url = "http://127.0.0.1:8002/pages"
+    # if not service_url:
+    #     app.logger.error(f"No service found for route: {route}")
+    #     return None
+
+    app.logger.debug(f"Route: {route}, Service URL: {service_url}")
     return service_url
 
 def forward_request(service_url, route, request):
-    print(f"Forwarding request to {service_url}{request.path}")
+    # Ne pas ajouter "/profile" à la fin de l'URL
+    forward_url = f"{service_url}"
+
+    # app.logger.debug(f"SERVICE URL {service_url}")
+    # app.logger.debug(f"ROUTE {route}")
+    # app.logger.debug(f"REQUEST.PATH {request.path}")
+    app.logger.debug(f"Forwarding request to {forward_url}")
+    app.logger.debug(f"22222222222222222")
+
     try:
+        app.logger.debug(f"request.Methode {request.method}")
+        app.logger.debug(f"forward_url {forward_url}")
+        app.logger.debug(f"request.headers {request.headers}")
+        app.logger.debug(f"request.get_data() {request.get_data()}")
+        app.logger.debug(f"request.args {request.args}")
         response = requests.request(
             method=request.method,
-            url=f"{service_url}{request.path}",
+            url=forward_url,
             headers=request.headers,
             data=request.get_data(),
             params=request.args,
         )
         return response.content, response.status_code, response.headers.items()
     except requests.RequestException as e:
-        abort(500, f"Failed to forward request to {service_url}: {str(e)}")
+        abort(500, f"Failed to forward request to {forward_url} : {str(e)}")
 
 @app.route('/<path:route>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def proxy(route):
     service_url = get_service_url(route)
+    # app.logger.debug("111111111111111111")
+    # app.logger.debug(f"service_url: {service_url}")
     if not service_url:
+        app.logger.error(f"No service found for route: {route}")
         abort(404, f"No service found for route: {route}")
+
 
     response_data, status_code, headers = forward_request(service_url, route, request)
 
@@ -54,6 +76,7 @@ def proxy(route):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 
 
