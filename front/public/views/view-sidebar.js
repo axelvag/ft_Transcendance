@@ -20,4 +20,3 @@ class ViewSidebar extends HTMLElement {
 }
 
 customElements.define('view-sidebar', ViewSidebar);
-
