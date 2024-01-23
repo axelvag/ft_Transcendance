@@ -22,16 +22,16 @@ const template = `
         <label class="form-label opacity-50" for="password">
           Choose your password
         </label>
-        <input class="form-control form-control-lg" type="password" id="password" name="password" required />
+        <input class="form-control form-control-lg" type="password" id="password1" name="password1" required />
       </div>
       <div class="mb-4">
         <label class="form-label opacity-50" for="password">
           Repeat your password
         </label>
-        <input class="form-control form-control-lg" type="password" id="password" name="password" required />
+        <input class="form-control form-control-lg" type="password" id="password2" name="password2" required />
       </div>
       <div class="d-grid pt-3">
-        <button type="submit" data-link="/" class="btn btn-primary btn-lg fw-bold">
+        <button type="submit" class="btn btn-primary btn-lg fw-bold">
           Sign up
         </button>
         <div class="text-center pt-4">
@@ -45,34 +45,68 @@ const template = `
 `;
 
 document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('signup-form');
-  form.addEventListener('submit', function(event) {
-    event.preventDefault();
-    sendFormData();
-  });
+  const container = document.getElementById('signup-form-container');
+  if (container) {
+    container.innerHTML = template;
+    console.log("ici");
+    // Maintenant que le formulaire est ajouté au DOM, attachez l'écouteur d'événements.
+    const form = document.getElementById('signup-form');
+    if (form) {
+      form.addEventListener('submit', function(event) {
+        console.log("ici");
+        event.preventDefault();
+        sendFormData();
+      });
+    } else {
+      console.error('Le formulaire ne peut pas être trouvé après son insertion dans le DOM.');
+    }
+  } else {
+    console.error('Le conteneur pour insérer le formulaire n\'existe pas.');
+  }
 });
 
 function sendFormData() {
   const formData = new FormData(document.getElementById('signup-form'));
-  const csrftoken = getCookie('csrftoken'); // Fonction pour obtenir le cookie CSRF
-  fetch('/accounts/register/', {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'X-CSRFToken': csrftoken,
-    },
-  })
-  .then(response => response.json())
-  .then(data => {
-    if(data.success) {
-      // Gérer la réussite, par exemple rediriger vers la page de connexion
-      window.location.href = '/login';
-    } else {
-      // Afficher le message d'erreur
-      alert(data.message);
+  console.log(formData);
+  fetch(
+    "https://127.0.0.1:8000/accounts/get-csrf-token/",
+    {
+        method: "GET",
+        credentials: "include",
     }
-  })
-  .catch(error => console.error('Error:', error));
+)
+    .then((response) => response.json())
+    .then((data) => {
+        const csrfToken = data.csrfToken;
+        console.log(csrfToken)
+        fetch(
+            "https://127.0.0.1:8000/accounts/register/",
+            {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    userData,
+                }),
+            }
+        )
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+            })
+            .catch((error) => {
+                console.error("Login failed", error);
+                // Handle login failure (show error message, etc.)
+            });
+    })
+    .catch((error) => {
+        console.error("get csrf token fail", error);
+    });
 }
 
 function getCookie(name) {

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.middleware.csrf import get_token
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.template import loader
@@ -15,6 +16,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import EmailMessage
 from .tokens import account_activation_token
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.views.decorators.http import require_POST
 # Create your views here.
 User = get_user_model()
 
@@ -164,6 +166,15 @@ def register_user(request):
             activateEmail(request, user, form.cleaned_data.get('email'))
             return JsonResponse({"success": True, "message": "Registration successful. Please check your email to activate your account."}, status=200)
         else:
+            print("yo")
             return JsonResponse({"success": False, "message": "Invalid form data."}, status=HttpResponseBadRequest.status_code)
     else:
+        print("yoo")
         return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
+
+def get_csrf_token(request):
+    """
+    Vue pour obtenir le jeton CSRF et le renvoyer sous forme de réponse JSON.
+    """
+    csrf_token = get_token(request)
+    return JsonResponse({"csrfToken": csrf_token})
