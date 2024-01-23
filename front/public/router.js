@@ -1,17 +1,19 @@
 // templates
 import friends from './views/friends.js';
 import careers from './views/careers.js';
-import profil from './views/profil.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
 import logout from './views/logout.js';
+import home from './views/home.js';
+import profil from './views/profil.js';
 
 const useHash = true;
 
 const baseUrl = '/front/public';
 
 const routes = {
-  '/': { title: 'Profil', template: profil },
+  '/': { title: 'Home', template: home },
+  '/profil': { title: 'Profil', template: profil },
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
