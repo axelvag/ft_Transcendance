@@ -11,6 +11,7 @@ class ViewSidebar extends HTMLElement {
           <a class="nav-item" data-link="/friends"><i class="bi bi-people"></i> Friends</a>
           <a class="nav-item" data-link="/careers"><i class="bi bi-briefcase"></i> Careers</a>
           <a class="nav-item" data-link="/settings"><i class="bi bi-gear"></i> Settings</a>
+          <a class="nav-item" data-link="/home"><i class="bi bi-gear"></i> Home</a>
         </nav>
 
         <a class="logout" data-link="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>

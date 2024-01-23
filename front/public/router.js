@@ -5,13 +5,15 @@ import profil from './views/profil.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
 import logout from './views/logout.js';
+import home from './views/home.js';
 
 const useHash = true;
 
 const baseUrl = '/front/public';
 
 const routes = {
-  '/': { title: 'Profil', template: profil },
+  '/profil': { title: 'Profil', template: profil },
+  '/': { title: 'Home', template: home },
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
