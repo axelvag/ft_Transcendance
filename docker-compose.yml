@@ -51,7 +51,7 @@ services:
       env_file:
         - .env
       volumes:
-        - ./postgres_data:/var/lib/postgresql/data
+        - data_base:/custom_postgres_data
       ports:
         - "5432:5432"
       networks:
@@ -67,9 +67,10 @@ services:
         - "5000:5000"
       networks:
         - back
-      # depends_on:
-      #   - authentification
-      #   - profile
+      depends_on:
+        - authentification
+        - profile
+        - data_base
       restart: on-failure
 
 volumes:
