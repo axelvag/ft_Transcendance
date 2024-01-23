@@ -18,7 +18,7 @@ RUN pip install --upgrade pip \
 # copie du contenu de Django de l'appli dans le conteneur
 COPY . /app/
 
-EXPOSE 8000
+EXPOSE 8001
 
 WORKDIR /app/auth
 

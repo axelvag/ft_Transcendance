@@ -17,6 +17,10 @@ from middleware import logging, error_handling
 app.register_blueprint(logging.logging_bp)
 app.register_error_handler(HTTPException, error_handling.handle_http_exception)
 
+# debug
+@app.route('/Home')
+def home():
+    import pdb; pdb.set_trace()
 
 # Si 127.0.0.1:5000 redirige vers 127.0.0.1:5000/authentification
 @app.route('/')
@@ -33,13 +37,11 @@ def get_service_url(route):
     app.logger.debug(f"Route: {route}, Service URL: {service_url}")
     return service_url
 
+# Ajoutez une logique pour gérer la redirection dans forward_request
 def forward_request(service_url, route, request):
     # Ne pas ajouter "/profile" à la fin de l'URL
     forward_url = f"{service_url}"
 
-    # app.logger.debug(f"SERVICE URL {service_url}")
-    # app.logger.debug(f"ROUTE {route}")
-    # app.logger.debug(f"REQUEST.PATH {request.path}")
     app.logger.debug(f"Forwarding request to {forward_url}")
     app.logger.debug(f"22222222222222222")
 
@@ -57,16 +59,62 @@ def forward_request(service_url, route, request):
             data=request.get_data(),
             params=request.args,
         )
+
+        # Ajoutez une logique pour suivre la redirection si nécessaire
+        if response.status_code == 301 or response.status_code == 302:
+            location = response.headers.get('Location')
+            if location:
+                forward_url = location
+                app.logger.debug(f"4 Following redirection to: {forward_url}")
+                # Refaites la demande avec la nouvelle URL
+                response = requests.request(
+                    method=request.method,
+                    url=forward_url,
+                    headers=request.headers,
+                    data=request.get_data(),
+                    params=request.args,
+                )
+
         app.logger.debug(f"333333333333333333 {response}")
         return response.content, response.status_code, response.headers.items()
     except requests.RequestException as e:
-        # app.logger.exception("An error occurred during request forwarding:")
-        # app.logger.debug(f"method {method}")
-        # app.logger.debug(f"url {url}")
-        # app.logger.debug(f"headers {headers}")
-        # app.logger.debug(f"data {data}")
-        # app.logger.debug(f"params {params}")
         abort(500, f"Failed to forward request to {forward_url} : {str(e)}")
+
+
+# def forward_request(service_url, route, request):
+#     # Ne pas ajouter "/profile" à la fin de l'URL
+#     forward_url = f"{service_url}"
+
+#     # app.logger.debug(f"SERVICE URL {service_url}")
+#     # app.logger.debug(f"ROUTE {route}")
+#     # app.logger.debug(f"REQUEST.PATH {request.path}")
+#     app.logger.debug(f"Forwarding request to {forward_url}")
+#     app.logger.debug(f"22222222222222222")
+
+#     try:
+#         app.logger.debug(f"request.Methode {request.method}")
+#         app.logger.debug(f"forward_url {forward_url}")
+#         app.logger.debug(f"request.headers {request.headers}")
+#         app.logger.debug(f"request.get_data() {request.get_data()}")
+#         app.logger.debug(f"request.args {request.args}")
+
+#         response = requests.request(
+#             method=request.method,
+#             url=forward_url,
+#             headers=request.headers,
+#             data=request.get_data(),
+#             params=request.args,
+#         )
+#         app.logger.debug(f"333333333333333333 {response}")
+#         return response.content, response.status_code, response.headers.items()
+#     except requests.RequestException as e:
+#         # app.logger.exception("An error occurred during request forwarding:")
+#         # app.logger.debug(f"method {method}")
+#         # app.logger.debug(f"url {url}")
+#         # app.logger.debug(f"headers {headers}")
+#         # app.logger.debug(f"data {data}")
+#         # app.logger.debug(f"params {params}")
+#         abort(500, f"Failed to forward request to {forward_url} : {str(e)}")
 
 @app.route('/<path:route>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def proxy(route):

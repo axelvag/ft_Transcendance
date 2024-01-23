@@ -43,7 +43,6 @@ services:
         - data_base
       restart: on-failure
 
-
     # Data base PostGreSQL
     data_base:
       build:
@@ -52,11 +51,9 @@ services:
       env_file:
         - .env
       volumes:
-        - data_base:/var/lib/postgresql/data
-      # environment:
-      #   - POSTGRES_DB: $POSTGRES_DB
-      #   - POSTGRES_USER: $POSTGRES_USER
-      #   - POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+        - ./postgres_data:/var/lib/postgresql/data
+      ports:
+        - "5432:5432"
       networks:
         - data_base
       restart: on-failure
@@ -68,6 +65,8 @@ services:
         dockerfile: Dockerfile
       ports:
         - "5000:5000"
+      networks:
+        - back
       # depends_on:
       #   - authentification
       #   - profile
