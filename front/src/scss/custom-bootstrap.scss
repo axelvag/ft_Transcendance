@@ -1,0 +1,10 @@
+$primary: #b558f6;
+$secondary: #0ea3d2;
+
+@import '../../node_modules/bootstrap/scss/bootstrap';
+
+.text-gradient {
+  background: linear-gradient(to right, $primary, $secondary) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}

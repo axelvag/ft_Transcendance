@@ -1,9 +1,11 @@
 // templates
+import login from './views/login.js';
+import signup from './views/signup.js';
 import friends from './views/friends.js';
 import careers from './views/careers.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
-import logout from './views/logout.js';
+// import logout from './views/logout.js';
 import home from './views/home.js';
 import profil from './views/profil.js';
 
@@ -14,12 +16,16 @@ const baseUrl = '/front/public';
 const routes = {
   '/': { title: 'Home', template: home },
   '/profil': { title: 'Profil', template: profil },
+  // public
+  '/login': { title: 'Login', template: login },
+  '/signup': { title: 'Login', template: signup },
+  // logged
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
-  '/not-found': { title: 'Not Found', template: notFound },
   '/game': { title: 'Game', template: '<view-game></view-game>' },
-  '/logout': { title: 'Logout', template: logout },
+  // not found
+  '/not-found': { title: 'Not Found', template: notFound },
 };
 
 const updateActiveNavLink = () => {

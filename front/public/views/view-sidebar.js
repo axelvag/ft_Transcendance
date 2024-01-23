@@ -3,7 +3,7 @@ class ViewSidebar extends HTMLElement {
     this.innerHTML = `
       <div class="sidebar">
 
-        <img src="asset/pong-logo.png" alt="Logo" class="logo">
+        <img src="./assets/img/pong-logo.png" alt="Logo" class="logo">
         <button class="start-game" data-link="/game">Start a Game</button>
 
         <nav class="custom-nav">
@@ -13,7 +13,7 @@ class ViewSidebar extends HTMLElement {
           <a class="nav-item" data-link="/settings"><i class="bi bi-gear"></i> Settings</a>
         </nav>
 
-        <a class="logout" data-link="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        <a class="logout" href="#" data-link="/login"><i class="bi bi-box-arrow-right"></i> Log out</a>
       </div>
     `;
   }
