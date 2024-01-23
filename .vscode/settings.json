@@ -4,5 +4,8 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "files.eol": "\n",
-  "editor.formatOnPaste": false
+  "editor.formatOnPaste": false,
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  }
 }
