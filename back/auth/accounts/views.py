@@ -164,8 +164,6 @@ def register_user(request):
             activateEmail(request, user, form.cleaned_data.get('email'))
             return JsonResponse({"success": True, "message": "Registration successful. Please check your email to activate your account."}, status=200)
         else:
-            print("111111111")
             return JsonResponse({"success": False, "message": "Invalid form data."}, status=HttpResponseBadRequest.status_code)
     else:
-        print("22222222222")
         return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)

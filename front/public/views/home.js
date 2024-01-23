@@ -9,14 +9,15 @@ const template = `
 </head>
 <body>
   <div class="navbar">
-    <img src="asset/logoTranscendencenew.png" alt="Description de l'image" class="img-home">
+    <img src="asset/img/logoTranscendencenew.png" alt="Description de l'image" class="img-home">
     <div class="flex">
       <label class="switch">
         <input type="checkbox" id="toggle-example" onchange="toggleTheme()">
         <span class="slider round"></span>
       </label>
-        <p class="margin_left"><a href="" class="play-now-btn">Connexion</a></p>
-        <p class="margin_left"><a href="" class="play-now-btn">Inscription</a></p>
+        <p class="margin_left"><a data-link="/login" class="play-now-btn">Connexion</a></p>
+        <p class="margin_left"><a data-link="/profil" class="play-now-btn">Profil</a></p>
+        <p class="margin_left"><a data-link="/signup" class="play-now-btn">Inscription</a></p>
     </div>
   </div>
   <div class="bottom_navbar"></div>

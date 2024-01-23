@@ -1,153 +1,131 @@
-/* .profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin-left: 250px;
-    padding: 20px;
-  }
-  
-  .profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+/* layout */
 
-  
-  .profile-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 20px;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group label {
-    margin-bottom: 5px;
-  }
-  
-  .form-group input[type="text"],
-  .form-group input[type="email"],
-  .form-group input[type="password"] {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-  
-  .cancel-button,
-  .save-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .save-button {
-    background-color: #8a2be2;
-    color: white;
-  } */
-  
-  /* ------------------------------------------------ */
+.layout {
+  color: #ffffff;
+  display: flex;
+  background-color: #252529;
+  height: 100vh;
+}
 
-  .layout {
-    color: #ffffff;
-    display: flex;
-    background-color: #252529;
-  }
+.layout-sidebar {
+  flex: 0 0 auto;
+  position: relative;
+}
 
-  .profile-container {
-    padding: 20px;
-  }
+.layout-main {
+  min-width: 0;
+  flex: 1 1 100%;
+  position: relative;
+}
+
+/* profile */
+
+.profile-container {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
+
+.profile-card {
+  flex: 0 1 auto;
+  padding: 2rem;
+  width: 480px;
+}
 
 .profile-header {
-    text-align: center;
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    color: #ffffff;
+  text-align: center;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
 }
 
 .profile-header h1 {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .avatar-button {
-    background-color: #B558F6;
-    border: none;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
+  background-color: #B558F6;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 35px;
 }
 
 .avatar-button:hover {
-    background-color: #B558F6;
-    border: 2px solid #ffffff;
+  background-color: #B558F6;
+  border: 2px solid #ffffff;
 }
 
 .profile-form .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .profile-form .form-group label {
-    display: block;
-    margin-bottom: 5px;
+  display: block;
+  margin-bottom: 5px;
 }
 
 .profile-form .form-group input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #4A5568;
-    background-color: #1A202C;
-    color: #E2E8F0;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #4A5568;
+  background-color: #1A202C;
+  color: #E2E8F0;
 }
 
 .profile-form .form-group input:focus {
-    outline: none;
-    border-color: #B558F6;
+  outline: none;
+  border-color: #B558F6;
 }
 
 .form-actions {
-    text-align: right;
+  text-align: right;
 }
 
 .cancel-button,
 .save-button {
-    padding: 8px 16px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
 }
 
 .cancel-button {
-    background-color: #4A5568;
-    color: white;
+  background-color: #4A5568;
+  color: white;
 }
 
 .save-button {
-    background-color: #B558F6;
-    color: white;
-    margin-left: 10px;
+  background-color: #B558F6;
+  color: white;
+  margin-left: 10px;
 }
 
 .cancel-button:hover {
-    background-color: #B558F6;
-    border: 2px solid #ffffff;
-  }
-  
-  .save-button:hover {
-    background-color: #B558F6;
-    border: 2px solid #ffffff;
+  background-color: #B558F6;
+  border: 2px solid #ffffff;
+}
+
+.save-button:hover {
+  background-color: #B558F6;
+  border: 2px solid #ffffff;
+}
+
+#avatar-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #B558F6;
+  object-fit: cover;
+  display: flex; /* Utilise Flexbox pour le centrage vertical */
+  flex-direction: column; /* Aligne le texte en colonne */
+  justify-content: center; /* Centre le texte verticalement */
+  text-align: center; /* Centre le texte horizontalement */
 }

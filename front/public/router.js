@@ -1,28 +1,34 @@
 // templates
+import login from './views/login.js';
+import signup from './views/signup.js';
 import friends from './views/friends.js';
 import careers from './views/careers.js';
-import profil from './views/profil.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
-import logout from './views/logout.js';
+// import logout from './views/logout.js';
 import home from './views/home.js';
+import profil from './views/profil.js';
 
 const useHash = true;
 
 const baseUrl = '/front/public';
 
 const routes = {
-  '/profil': { title: 'Profil', template: profil },
   '/': { title: 'Home', template: home },
+  '/profil': { title: 'Profil', template: profil },
+  // public
+  '/login': { title: 'Login', template: login },
+  '/signup': { title: 'Login', template: signup },
+  // logged
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
-  '/not-found': { title: 'Not Found', template: notFound },
   '/game': { title: 'Game', template: '<view-game></view-game>' },
-  '/logout': { title: 'Logout', template: logout },
+  // not found
+  '/not-found': { title: 'Not Found', template: notFound },
 };
 
-function updateActiveNavLink() {
+const updateActiveNavLink = () => {
   const links = document.querySelectorAll('[data-link]');
   const currentPath = useHash
     ? // with hash
@@ -41,7 +47,7 @@ function updateActiveNavLink() {
   }
 }
 
-function router(e) {
+const router = (e) => {
   const relativePath = useHash
     ? // with hash
       (window.location.hash || '#/').substring(1)
