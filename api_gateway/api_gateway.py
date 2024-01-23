@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, redirect
 from werkzeug.exceptions import HTTPException
 import logging
 import yaml
@@ -16,6 +16,12 @@ from middleware import logging, error_handling
 
 app.register_blueprint(logging.logging_bp)
 app.register_error_handler(HTTPException, error_handling.handle_http_exception)
+
+
+# Si 127.0.0.1:5000 redirige vers 127.0.0.1:5000/authentification
+@app.route('/')
+def redirect_to_authentication():
+    return redirect('/authentification')
 
 def get_service_url(route):
     service_url = routing_config.get(route)
