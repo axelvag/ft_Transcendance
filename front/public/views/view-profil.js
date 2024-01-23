@@ -69,7 +69,7 @@ class ViewProfil extends HTMLElement {
           console.log('test==', preview);
           preview.src = e.target.result; // Met à jour la source de l'élément img
         };
-        reader.readAsDataURL(file); // Lit le fichier et déclenche l'événement onload
+        reader.readAsDataURL(file);
       }
     });
   }
