@@ -5,7 +5,7 @@ const template = `
     <h1 class="fw-bold py-2 mb-4">
       <span class="text-gradient">Sign up</span>
     </h1>
-    <form>
+    <form id="signup-form">
     <div class="mb-4">
       <label class="form-label opacity-50" for="email">
         Your email
@@ -43,5 +43,51 @@ const template = `
     </form>
   </login-layout>
 `;
+
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('signup-form');
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    sendFormData();
+  });
+});
+
+function sendFormData() {
+  const formData = new FormData(document.getElementById('signup-form'));
+  const csrftoken = getCookie('csrftoken'); // Fonction pour obtenir le cookie CSRF
+  fetch('/accounts/register/', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': csrftoken,
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    if(data.success) {
+      // Gérer la réussite, par exemple rediriger vers la page de connexion
+      window.location.href = '/login';
+    } else {
+      // Afficher le message d'erreur
+      alert(data.message);
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
 
 export default template;

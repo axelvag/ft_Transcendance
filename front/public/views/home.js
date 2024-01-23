@@ -9,7 +9,7 @@ const template = `
 </head>
 <body>
   <div class="navbar">
-    <img src="asset/img/logoTranscendencenew.png" alt="Description de l'image" class="img-home">
+    <img src="assets/img/logoTranscendencenew.png" alt="Description de l'image" class="img-home">
     <div class="flex">
       <label class="switch">
         <input type="checkbox" id="toggle-example" onchange="toggleTheme()">
