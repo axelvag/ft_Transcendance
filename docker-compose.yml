@@ -8,39 +8,52 @@ services:
         context: ./front/Docker
         dockerfile: Dockerfile
       ports:
-        - "8800:80"
-        - "8443:443"
+        - "8000:8000"
       networks:
         - front
       depends_on:
-        - back
+        - authentification
       restart: on-failure
 
-    # Django
-    back:
+    # Django Lucas
+    authentification:
       build:
-        context: ./back/Docker
+        context: ./authentification/Docker
         dockerfile: Dockerfile
+      ports:
+        - "8001:8000"
       volumes:
-        - ./back:/app
+        - ./authentification:/app
+      networks:
+        - back
+      depends_on:
+        - profile
+      restart: on-failure
+
+    # Alessio
+    profile:
+      build:
+        context: ./profile
+        dockerfile: Dockerfile
+      ports:
+        - "8002:8000"
       networks:
         - back
       depends_on:
         - data_base
       restart: on-failure
 
-
     # Data base PostGreSQL
     data_base:
       build:
         context: ./data_base/Docker
         dockerfile: Dockerfile
+      env_file:
+        - .env
       volumes:
-        - data_base:/var/lib/postgresql/data
-      environment:
-        POSTGRES_DB: data_base
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: password
+        - data_base:/custom_postgres_data
+      ports:
+        - "5432:5432"
       networks:
         - data_base
       restart: on-failure
