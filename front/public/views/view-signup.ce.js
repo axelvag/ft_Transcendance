@@ -1,5 +1,5 @@
 import '../components/layouts/auth-layout.ce.js';
-import { redirectTo } from './../router.js';
+import { redirectTo } from '../router.js';
 
 class ViewSigUp extends HTMLElement {
   connectedCallback() {
@@ -8,7 +8,7 @@ class ViewSigUp extends HTMLElement {
         <h1 class="fw-bold py-2 mb-4">
           <span class="text-gradient">Sign up</span>
         </h1>
-        <form>
+        <form id="signup-form">
         <div class="mb-4">
           <label class="form-label opacity-50" for="email">
             Your email
@@ -47,7 +47,7 @@ class ViewSigUp extends HTMLElement {
       </login-layout>
     `;
 
-    this.querySelector('form').addEventListener('submit', this.submitForm.bind(this));
+    this.querySelector('#signup-form').addEventListener('submit', this.submitForm.bind(this));
   }
 
   submitForm(event) {
@@ -57,9 +57,8 @@ class ViewSigUp extends HTMLElement {
     // const formData = new FormData(form);
     // const csrfToken = this.getCSRFToken();
 
-    
     setTimeout(() => {
-      console.log("Test");
+      console.log('Test');
       redirectTo('/profil');
     }, 2000);
   }
@@ -86,13 +85,13 @@ customElements.define('view-signup', ViewSigUp);
 //     console.error('Error during fetch:', error);
 //   });
 
-  // getCSRFToken() {
-  //   const cookies = document.cookie.split(';');
-  //   for (let i = 0; i < cookies.length; i++) {
-  //     let cookie = cookies[i].trim();
-  //     if (cookie.startsWith('csrftoken=')) {
-  //       return cookie.substring('csrftoken='.length);
-  //     }
-  //   }
-  //   return '';
-  // }
+// getCSRFToken() {
+//   const cookies = document.cookie.split(';');
+//   for (let i = 0; i < cookies.length; i++) {
+//     let cookie = cookies[i].trim();
+//     if (cookie.startsWith('csrftoken=')) {
+//       return cookie.substring('csrftoken='.length);
+//     }
+//   }
+//   return '';
+// }

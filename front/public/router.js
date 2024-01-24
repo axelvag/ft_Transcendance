@@ -1,13 +1,10 @@
 // templates
 import login from './views/login.js';
-import signup from './views/signup.js';
 import friends from './views/friends.js';
 import careers from './views/careers.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
-// import logout from './views/logout.js';
 import home from './views/home.js';
-import profil from './views/profil.js';
 
 const useHash = true;
 
@@ -15,10 +12,10 @@ const baseUrl = '/front/public';
 
 const routes = {
   '/': { title: 'Home', template: home },
-  '/profil': { title: 'Profil', template: profil },
+  '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
   '/login': { title: 'Login', template: login },
-  '/signup': { title: 'Login', template: signup },
+  '/signup': { title: 'Login', template: '<view-signup></view-signup>' },
   // logged
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
