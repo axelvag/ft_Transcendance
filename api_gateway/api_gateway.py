@@ -68,7 +68,6 @@ def forward_request(service_url, route, request):
         return response_data, response.status_code, response.headers.items()
     except requests.RequestException as e:
         abort(500, f"Failed to forward request to {forward_url} : {str(e)}")
-00, f"Failed to forward request to {forward_url} : {str(e)}")
 
 
 @app.route('/<path:route>', methods=['GET', 'POST', 'PUT', 'DELETE'])
