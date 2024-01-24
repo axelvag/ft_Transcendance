@@ -24,11 +24,11 @@ COPY . /app/
 # COPY ./authentification/auth/ /app/auth/
 
 # Exposer le port sur lequel l'application Django écoute à l'intérieur du conteneur
-EXPOSE 8000
+EXPOSE 8002
 
 WORKDIR /app/dashback
 
 # Commande pour lancer l'application Django
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8002"]
 
 # CMD ["tail", "-f", "/dev/null"]

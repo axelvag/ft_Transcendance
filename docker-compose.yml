@@ -20,8 +20,9 @@ services:
       build:
         context: ./authentification/Docker
         dockerfile: Dockerfile
+      container_name: authentification
       ports:
-        - "8001:8000"
+        - "8001:8001"
       volumes:
         - ./authentification:/app
       networks:
@@ -35,8 +36,9 @@ services:
       build:
         context: ./profile
         dockerfile: Dockerfile
+      container_name: profile
       ports:
-        - "8002:8000"
+        - "8002:8002"
       networks:
         - back
       depends_on:
@@ -63,6 +65,7 @@ services:
       build:
         context: ./api_gateway
         dockerfile: Dockerfile
+      container_name: api_gateway
       ports:
         - "5000:5000"
       networks:

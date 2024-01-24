@@ -23,4 +23,4 @@ EXPOSE 8001
 WORKDIR /app/auth
 
 # lancer l'appli Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
