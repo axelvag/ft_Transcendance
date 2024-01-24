@@ -45,9 +45,9 @@ const updateActiveNavLink = () => {
 
     index++;
   }
-}
+};
 
-const router = (e) => {
+const router = () => {
   const relativePath = useHash
     ? // with hash
       (window.location.hash || '#/').substring(1)
@@ -63,10 +63,10 @@ const router = (e) => {
     appEl.innerHTML = view.template;
     updateActiveNavLink();
   } else {
-    document.title = routes['#/not-found'].title;
-    appEl.innerHTML = routes['#/not-found'].template;
+    document.title = routes['/not-found'].title;
+    appEl.innerHTML = routes['/not-found'].template;
   }
-}
+};
 
 document.addEventListener('click', e => {
   if (e.target.matches('[data-link]')) {
@@ -81,7 +81,19 @@ document.addEventListener('click', e => {
   }
 });
 
+const redirectTo = pathKey => {
+  const path = useHash
+    ? // with hash
+      '/#' + pathKey
+    : // without hash
+      pathKey;
+  history.pushState('', '', baseUrl + path);
+  router();
+};
+
 window.addEventListener('popstate', router);
 window.addEventListener('DOMContentLoaded', router);
 // Écouteur d'événements pour les changements de hash
 window.addEventListener('hashchange', router);
+
+export { redirectTo };
