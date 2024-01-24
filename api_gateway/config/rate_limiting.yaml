@@ -1,7 +1,0 @@
-# config/rate_limiting.yaml
-/authentification:
-  limit: 1000
-  interval: 3600
-/profile:
-  limit: 500
-  interval: 3600
