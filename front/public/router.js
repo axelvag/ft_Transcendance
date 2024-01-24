@@ -1,13 +1,10 @@
 // templates
 import login from './views/login.js';
-import signup from './views/signup.js';
 import friends from './views/friends.js';
 import careers from './views/careers.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
-// import logout from './views/logout.js';
 import home from './views/home.js';
-import profil from './views/profil.js';
 
 const useHash = true;
 
@@ -15,10 +12,10 @@ const baseUrl = '/front/public';
 
 const routes = {
   '/': { title: 'Home', template: home },
-  '/profil': { title: 'Profil', template: profil },
+  '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
   '/login': { title: 'Login', template: login },
-  '/signup': { title: 'Login', template: signup },
+  '/signup': { title: 'Login', template: '<view-signup></view-signup>' },
   // logged
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
@@ -45,9 +42,9 @@ const updateActiveNavLink = () => {
 
     index++;
   }
-}
+};
 
-const router = (e) => {
+const router = () => {
   const relativePath = useHash
     ? // with hash
       (window.location.hash || '#/').substring(1)
@@ -63,10 +60,10 @@ const router = (e) => {
     appEl.innerHTML = view.template;
     updateActiveNavLink();
   } else {
-    document.title = routes['#/not-found'].title;
-    appEl.innerHTML = routes['#/not-found'].template;
+    document.title = routes['/not-found'].title;
+    appEl.innerHTML = routes['/not-found'].template;
   }
-}
+};
 
 document.addEventListener('click', e => {
   if (e.target.matches('[data-link]')) {
@@ -81,7 +78,19 @@ document.addEventListener('click', e => {
   }
 });
 
+const redirectTo = pathKey => {
+  const path = useHash
+    ? // with hash
+      '/#' + pathKey
+    : // without hash
+      pathKey;
+  history.pushState('', '', baseUrl + path);
+  router();
+};
+
 window.addEventListener('popstate', router);
 window.addEventListener('DOMContentLoaded', router);
 // Écouteur d'événements pour les changements de hash
 window.addEventListener('hashchange', router);
+
+export { redirectTo };

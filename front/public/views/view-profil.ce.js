@@ -1,46 +1,54 @@
+import './view-sidebar.ce.js';
+
 class ViewProfil extends HTMLElement {
   constructor() {
     super();
+    this.saveProfile = this.saveProfile.bind(this); // Pour l'instance de this et pas avoir de prbl
     this.selectedAvatarFile = null;
   }
 
   connectedCallback() {
     this.innerHTML = `
-        <main class="profile-container">
-            <div class="profile-card">
+      <div class="layout">
+        <view-sidebar class="layout-sidebar"></view-sidebar>
+        <div class="layout-main">
+          <main class="profile-container">
+              <div class="profile-card">
 
-                <section class="profile-header">
-                    <img id="avatar-preview" alt="Modify Avatar"">
-                    <input type="file" id="avatar-input" style="display: none;" accept="image/*">
-                    <button class="avatar-button">Change avatar</button>
-                </section>
+                  <section class="profile-header">
+                      <img id="avatar-preview" alt="Modify Avatar"">
+                      <input type="file" id="avatar-input" style="display: none;" accept="image/*">
+                      <button class="avatar-button">Change avatar</button>
+                  </section>
 
-                <form class="profile-form">
-                
-                    <div class="form-group">
-                        <label for="first-name">First Name</label>
-                        <input type="text" id="first-name" value="" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="last-name">Last Name</label>
-                        <input type="text" id="last-name" value="" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" value="" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" value="" required>
-                    </div>
-                    <div class="form-actions">
-                        <button type="cancel-button" class="cancel-button">Annuler</button>
-                        <button type="submit" class="save-button">Sauvegarder</button>
-                    </div>
-                </form>
-            </div>
-        </main>
-        `;
+                  <form class="profile-form">
+                  
+                      <div class="form-group">
+                          <label for="first-name">First Name</label>
+                          <input type="text" id="first-name" value="" required>
+                      </div>
+                      <div class="form-group">
+                          <label for="last-name">Last Name</label>
+                          <input type="text" id="last-name" value="" required>
+                      </div>
+                      <div class="form-group">
+                          <label for="email">Email</label>
+                          <input type="email" id="email" value="" required>
+                      </div>
+                      <div class="form-group">
+                          <label for="password">Password</label>
+                          <input type="password" id="password" value="" required>
+                      </div>
+                      <div class="form-actions">
+                          <button type="cancel-button" class="cancel-button">Annuler</button>
+                          <button type="submit" class="save-button">Sauvegarder</button>
+                      </div>
+                  </form>
+              </div>
+          </main>
+        </div>
+      </div>
+    `;
 
     const cancelButton = this.querySelector('.cancel-button');
     const profileForm = this.querySelector('.profile-form');
@@ -51,15 +59,14 @@ class ViewProfil extends HTMLElement {
       profileForm.reset(); // Réinitialise le formulaire
     });
 
-    // profileForm.addEventListener('submit', this.saveProfile);
-    profileForm.addEventListener('submit', (event) => this.saveProfile(event));
-
+    profileForm.addEventListener('submit', this.saveProfile);
+    // profileForm.addEventListener('submit', (event) => this.saveProfile(event));
 
     avatarButton.addEventListener('click', () => {
       avatarInput.click(); // Déclenche le clic sur le input caché
     });
 
-    avatarInput.addEventListener('change', event => {
+    avatarInput.addEventListener('input', event => {
       const file = event.target.files[0];
       if (file) {
         this.selectedAvatarFile = file;
@@ -75,8 +82,9 @@ class ViewProfil extends HTMLElement {
   }
 
   saveProfile(event) {
+    console.log(event);
     event.preventDefault();
-    
+
     const firstName = this.querySelector('#first-name').value;
     const lastName = this.querySelector('#last-name').value;
     const email = this.querySelector('#email').value;
