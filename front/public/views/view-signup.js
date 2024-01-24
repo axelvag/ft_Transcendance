@@ -53,12 +53,13 @@ class ViewSigUp extends HTMLElement {
   submitForm(event) {
     console.log('Click submit !');
     event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-    const csrfToken = this.getCSRFToken();
+    // const form = event.target;
+    // const formData = new FormData(form);
+    // const csrfToken = this.getCSRFToken();
 
     
     setTimeout(() => {
+      console.log("Test");
       redirectTo('/profil');
     }, 2000);
   }

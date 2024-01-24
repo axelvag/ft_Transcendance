@@ -8,7 +8,7 @@ class ViewSidebar extends HTMLElement {
 
         <nav class="custom-nav">
           <a class="nav-item active" data-link="/profil">
-            <ui-icon name="person"></ui-icon>
+            <ui-icon name="home"></ui-icon>
             Profile
           </a>
           <a class="nav-item" data-link="/friends">
@@ -23,13 +23,9 @@ class ViewSidebar extends HTMLElement {
             <ui-icon name="settings"></ui-icon>
             Settings
           </a>
-          <a class="nav-item" data-link="/home">
-            <ui-icon name="home"></ui-icon> 
-            Home
-          </a>
         </nav>
 
-        <a class="logout" href="#" data-link="/login">
+        <a class="logout" href="#" data-link="/">
           <ui-icon name="logout"></ui-icon> 
           Log out
         </a>
