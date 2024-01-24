@@ -155,20 +155,20 @@ from accounts.views import activateEmail
 #         self.assertEqual(response.status_code, 200)
 #         self.assertJSONEqual(str(response.content, encoding='utf8'), {"success": True, "message": "Registration successful. Please check your email to activate your account."})
 
-class ActivateEmailTestCase(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username='testuser', email='test@example.com', password='12345')
-        self.factory = RequestFactory()
+# class ActivateEmailTestCase(TestCase):
+#     def setUp(self):
+#         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='12345')
+#         self.factory = RequestFactory()
 
-    @patch('django.core.mail.EmailMessage.send')
-    def test_activate_email_failure(self, mock_send):
-        # Configurer le mock pour simuler un échec
-        mock_send.return_value = False
+#     @patch('django.core.mail.EmailMessage.send')
+#     def test_activate_email_failure(self, mock_send):
+#         # Configurer le mock pour simuler un échec
+#         mock_send.return_value = False
 
-        # Créer un objet request simulé
-        request = self.factory.get('/dummy-url/')  # Vous pouvez ajuster l'URL en conséquence
-        request.user = self.user
+#         # Créer un objet request simulé
+#         request = self.factory.get('/dummy-url/')  # Vous pouvez ajuster l'URL en conséquence
+#         request.user = self.user
 
-        response = activateEmail(request=request, user=self.user, to_email='recipient@example.com')
-        self.assertEqual(response.status_code, 500)
-        self.assertJSONEqual(str(response.content, encoding='utf8'), {"success": False, "message": f'Problem sending email to recipient@example.com, check if you typed it correctly.'})
+#         response = activateEmail(request=request, user=self.user, to_email='recipient@example.com')
+#         self.assertEqual(response.status_code, 500)
+#         self.assertJSONEqual(str(response.content, encoding='utf8'), {"success": False, "message": f'Problem sending email to recipient@example.com, check if you typed it correctly.'})

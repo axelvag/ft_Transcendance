@@ -53,58 +53,52 @@ class ViewSigUp extends HTMLElement {
     console.log("Click submit !");
     event.preventDefault();
     const form = event.target;
-    const formData = new FormData(form);
-    // const formData = {
-    //   'username': 'registerUser',
-    //   'password1': 'Testpassword69',
-    //   'password2': 'Testpassword69',
-    //   'email': 'test@gmail.com'
-    //   // autres champs nécessaires...
-    // };
-    // const dataToSend = JSON.stringify(formData);
-    console.log(formData);
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    const password1 = document.getElementById("password1").value;
+    const password2 = document.getElementById("password2").value;
+    const formData = {
+      username: username,
+      email: email,
+      password1: password1,
+      password2: password2,
+  };
+    console.log(JSON.stringify(formData));
+    //to do
     // const csrfToken = this.getCSRFToken();
-    const response = await fetch(
-      "http://127.0.0.1:8000/accounts/get-csrf-token/",
-      {
-          method: "GET",
-          credentials: "include",
-      }
-    )
-    console.log('response', response);
-    const data = await response.json();
-    const csrfToken = data.csrfToken;
-      // .then((response) => response.json())
-      // .then((data) => {
+    // const response = await fetch(
+    //   "http://127.0.0.1:8000/accounts/get-csrf-token/",
+    //   {
+      //       method: "GET",
+    //       credentials: "include",
+    //   }
+    // )
+    // console.log('response', response);
+    // const data = await response.json();
+    // const csrfToken = data.csrfToken;
+    // .then((response) => response.json())
+    // .then((data) => {
       //     const csrfToken = data.csrfToken;
       //     console.log(csrfToken)
-
-    // Perform the AJAX request
-    console.log(csrfToken)
-    fetch("http://127.0.0.1:8000/accounts/register/", {
-      method: 'POST',
+      
+      // Perform the AJAX request
+      // console.log(csrfToken)
+    const response = await fetch("http://127.0.0.1:8000/accounts/register/", {
+        method: 'POST',
       headers: {
         "Content-Type": "application/json",
         // 'X-CSRFToken': csrfToken,
       },
       credentials: "include",
-      body: JSON.stringify({
-        formData,
-      }),
+      body: JSON.stringify(formData),
     })
-    .then(response => {
-      console.log(response)
-      return response.json()
-    })
-    .then(data => {
-      if (data.success)
-        console.log('Registration successful:', data.message);
-      else
-        console.error('Registration failed:', data.message);
-    })
-    .catch(error => {
-      console.error('Error during fetch:', error);
-    });
+    const data =  await response.json();
+    if (data.success) {
+        alert('success');
+    } else {
+      alert('errors');
+      console.log(data.errors);
+    }
   }
 
   getCSRFToken() {
