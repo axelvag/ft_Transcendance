@@ -17,6 +17,7 @@ from django.core.mail import EmailMessage
 from .tokens import account_activation_token
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 User = get_user_model()
 
@@ -156,6 +157,7 @@ def logout_user(request):
     logout(request)
     return JsonResponse({"success": True, "message": "You have been logged out successfully."}, status=200)
 
+@csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         form = UserCreationFormWithEmail(request.POST)
@@ -167,7 +169,7 @@ def register_user(request):
             return JsonResponse({"success": True, "message": "Registration successful. Please check your email to activate your account."}, status=200)
         else:
             print("yo")
-            return JsonResponse({"success": False, "message": "Invalid form data."}, status=HttpResponseBadRequest.status_code)
+            return JsonResponse({"success": False, "errors": form.errors}, status=400)
     else:
         print("yoo")
         return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
