@@ -87,7 +87,7 @@ class ViewSigUp extends HTMLElement {
         method: 'POST',
       headers: {
         "Content-Type": "application/json",
-        // 'X-CSRFToken': csrfToken,
+        // 'X-CSRFToken': csrfToken
       },
       credentials: "include",
       body: JSON.stringify(formData),
