@@ -134,8 +134,14 @@ def activateEmail(request, user, to_email):
 
 def login_user(request):
     if request.method == 'POST':
-        username_or_email = request.POST["username"]
-        password = request.POST["password"]
+        print("iciiiiiiiiiiii")
+        try:
+            data = json.loads(request.body.decode('utf8'))
+            print("Received data:", data)
+        except json.JSONDecodeError:
+            return JsonResponse(data={'errors': "Invalid JSON format"}, status=406)
+        username_or_email = data["username"]
+        password = data["password"]
         user = None
 
         if '@' in username_or_email:

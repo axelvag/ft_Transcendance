@@ -134,14 +134,16 @@ EMAIL_HOST_USER = 'transcendence42lyon@gmail.com'
 EMAIL_HOST_PASSWORD = 'zotbqnassvkvftvk'
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5500",  # Remplacez par l'URL de votre frontend
-    "http://127.0.0.1:8000",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://127.0.0.1:5500",  # Remplacez par l'URL de votre frontend
+#     "http://127.0.0.1:8000",
+# ]
 
 CORS_ORIGINS_ALLOWED_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ALLOWED_HOSTS=['*']
 
