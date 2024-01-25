@@ -3,12 +3,12 @@ version: '3'
 services:
 
     # Serveur web
-    nginx:
+    front:
       build:
-        context: ./front/Docker
+        context: ./front
         dockerfile: Dockerfile
       ports:
-        - "8000:8000"
+        - "8000:80"
       networks:
         - front
       depends_on:
