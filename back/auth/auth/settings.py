@@ -44,13 +44,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'auth.urls'
@@ -134,12 +134,12 @@ EMAIL_HOST_USER = 'transcendence42lyon@gmail.com'
 EMAIL_HOST_PASSWORD = 'zotbqnassvkvftvk'
 
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://127.0.0.1:5500",  # Remplacez par l'URL de votre frontend
-#     "http://127.0.0.1:8000",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5500",  # Remplacez par l'URL de votre frontend
+    "http://127.0.0.1:8000",
+]
 
-CORS_ORIGINS_ALLOWED_ALL = True
+# CORS_ORIGINS_ALLOWED_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
 
