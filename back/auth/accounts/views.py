@@ -148,11 +148,13 @@ def login_user(request):
 
         if user is not None:
             login(request, user)
+            print("login success")
             return JsonResponse({"success": True, "message": "Login successful."}, status=200)
         else:
-            return JsonResponse({"success": False, "message": "Invalid username or password."}, status=HttpResponseBadRequest.status_code)
+            print("login failled")
+            return JsonResponse({"success": False, "message": "Invalid username or password."}, status=2 )#status=HttpResponseBadRequest.status_code)
 
-    return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
+    return JsonResponse({"success": False, "message": "Invalid request method."}, status=3 )#status=HttpResponseBadRequest.status_code)
 
 def logout_user(request):
     logout(request)

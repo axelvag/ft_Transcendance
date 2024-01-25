@@ -1,5 +1,5 @@
 // templates
-import login from './views/login.js';
+// import login from './views/login.js';
 import friends from './views/friends.js';
 import careers from './views/careers.js';
 import settings from './views/settings.js';
@@ -14,7 +14,7 @@ const routes = {
   '/': { title: 'Home', template: home },
   '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
-  '/login': { title: 'Login', template: login },
+  '/login': { title: 'Login', template: '<view-signin></view-signin>' },
   '/signup': { title: 'Login', template: '<view-signup></view-signup>' },
   // logged
   '/friends': { title: 'Friends', template: friends },
