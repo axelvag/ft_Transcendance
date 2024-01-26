@@ -3,6 +3,16 @@ import GameLocalApi from './localApi/GameLocalApi.js';
 
 const template = `
 <div class="pong">
+  <div class="pong-player pong-player-left">
+    <img class="pong-player-avatar" src="https://sfgalleries.net/art/sf3/sf3-3soe/avatars/sf33soe-avatar-ryu.png" alt="Ryu" />
+    <div class="pong-player-name">Ryu</div>
+    <div class="pong-player-score">3</div>
+  </div>
+  <div class="pong-player pong-player-right">
+    <img class="pong-player-avatar" src="https://sfgalleries.net/art/sf3/sf3-3soe/avatars/sf33soe-avatar-chun-li.png" alt="Ryu" />
+    <div class="pong-player-name">Chun-Li</div>
+    <div class="pong-player-score">1</div>
+  </div>
   <div class="pong-dialog">
     <div class="pong-title"></div>
     <div class="pong-controls">
@@ -96,6 +106,47 @@ const style = `
 	max-width: 800px;
 	height: 600px;
 	user-select: none;
+}
+
+.pong-player-left {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  margin: 1rem;
+}
+.pong-player-right {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  right: 0;
+  margin: 1rem;
+}
+
+.pong-player-avatar {
+  display: block;
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  border: 4px solid #fff;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.pong-player-name {
+  font-weight: bold;
+  white-space: nowrap;
+  max-width: 5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: absolute;
+  top: 0;
+}
+.pong-player-left .pong-player-name {
+  left: 6rem;
+}
+.pong-player-right .pong-player-name {
+  right: 6rem;
 }
 `;
 
