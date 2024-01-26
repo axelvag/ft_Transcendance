@@ -10,7 +10,7 @@ services:
       ports:
         - "8000:80"
       networks:
-        - front
+        - back
       depends_on:
         - authentification
       restart: on-failure

@@ -4,6 +4,11 @@ import logging
 import yaml
 import requests
 import base64
+# from flask_cors import CORS  # Importez l'extension CORS
+
+# app = Flask(__name__)
+# CORS(app, resources={r"/*": {"origins": "*"}})  # Activez CORS pour toutes les routes
+
 
 app = Flask(__name__)
 

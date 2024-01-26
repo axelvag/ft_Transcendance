@@ -1,3 +1,7 @@
 # config/routing.yaml
-authentification: http://authentification:8001/Home
-profile: http://profile:8002/pages
+authentification: http://front:80/
+profile: http://front:80/front/public/#/profil
+a: http://front:80/front/public/
+b: http://127.0.0.1:80/front/public
+# authentification: http://authentification:8001/Home
+# profile: http://profile:8002/pages
