@@ -1,22 +1,22 @@
 // templates
 import login from './views/login.js';
-import signup from './views/signup.js';
 import friends from './views/friends.js';
 import careers from './views/careers.js';
-import profil from './views/profil.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
+import home from './views/home.js';
 
 const useHash = true;
 
 const baseUrl = '/front/public';
 
 const routes = {
+  '/': { title: 'Home', template: home },
+  '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
   '/login': { title: 'Login', template: login },
-  '/signup': { title: 'Login', template: signup },
+  '/signup': { title: 'Login', template: '<view-signup></view-signup>' },
   // logged
-  '/': { title: 'Profil', template: profil },
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
@@ -25,7 +25,7 @@ const routes = {
   '/not-found': { title: 'Not Found', template: notFound },
 };
 
-function updateActiveNavLink() {
+const updateActiveNavLink = () => {
   const links = document.querySelectorAll('[data-link]');
   const currentPath = useHash
     ? // with hash
@@ -42,9 +42,9 @@ function updateActiveNavLink() {
 
     index++;
   }
-}
+};
 
-function router(e) {
+const router = () => {
   const relativePath = useHash
     ? // with hash
       (window.location.hash || '#/').substring(1)
@@ -60,10 +60,10 @@ function router(e) {
     appEl.innerHTML = view.template;
     updateActiveNavLink();
   } else {
-    document.title = routes['#/not-found'].title;
-    appEl.innerHTML = routes['#/not-found'].template;
+    document.title = routes['/not-found'].title;
+    appEl.innerHTML = routes['/not-found'].template;
   }
-}
+};
 
 document.addEventListener('click', e => {
   if (e.target.matches('[data-link]')) {
@@ -78,7 +78,19 @@ document.addEventListener('click', e => {
   }
 });
 
+const redirectTo = pathKey => {
+  const path = useHash
+    ? // with hash
+      '/#' + pathKey
+    : // without hash
+      pathKey;
+  history.pushState('', '', baseUrl + path);
+  router();
+};
+
 window.addEventListener('popstate', router);
 window.addEventListener('DOMContentLoaded', router);
 // Écouteur d'événements pour les changements de hash
 window.addEventListener('hashchange', router);
+
+export { redirectTo };

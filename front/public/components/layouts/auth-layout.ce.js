@@ -22,7 +22,7 @@ class LoginLayout extends HTMLElement {
         display: block;
         min-width: 0;
         flex: 1 1 0;
-        background: url(./assets/img/login-bg.jpg) no-repeat center center;
+        background: url(./assets/img/wp8986551-dark-purple-4k-wallpapers.jpg) no-repeat center center;
         background-size: cover;
       }
 
