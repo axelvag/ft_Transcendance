@@ -16,6 +16,7 @@ const routes = {
   // public
   '/login': { title: 'Login', template: '<view-signin></view-signin>' },
   '/signup': { title: 'Login', template: '<view-signup></view-signup>' },
+  '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
   // logged
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
@@ -50,7 +51,8 @@ const router = () => {
       (window.location.hash || '#/').substring(1)
     : // without hash
       location.pathname.substring(baseUrl.length);
-  const view = routes[relativePath];
+  const pathname = relativePath.split('?')[0];
+  const view = routes[pathname];
   const appEl = document.querySelector('#app');
 
   if (!appEl) console.error('#app not found');
