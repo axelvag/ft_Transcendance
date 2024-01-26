@@ -34,7 +34,6 @@ class GameLocalApi {
   #paddleLeft = null;
   #paddleRight = null;
 
-  #nextCollision = null;
   #previousCollider = null;
   #timer = null;
   #ballSpeed = 0;
@@ -111,7 +110,6 @@ class GameLocalApi {
     this.#ballDir = new Vec2(0, 0);
     this.#status = 'initialized';
     this.#previousCollider = null;
-    this.#nextCollision = null;
 
     this.#notify('init', this.#getState());
   }
@@ -139,17 +137,13 @@ class GameLocalApi {
       this.#notify('update', { ball: this.#ball });
 
       this.#previousCollider = null;
-      this.#scheduleBallCollision();
     }, this.#startRoundDelay);
   }
 
   #calculateNextCollision() {
     if (this.#status !== 'running') return;
 
-    if (this.#ballSpeed === 0 || (this.#ballDir.x === 0 && this.#ballDir.y === 0)) {
-      this.#nextCollision = null;
-      return;
-    }
+    if (this.#ballSpeed === 0 || (this.#ballDir.x === 0 && this.#ballDir.y === 0)) return;
 
     let nextCollision = {
       side: null,
@@ -221,50 +215,40 @@ class GameLocalApi {
       }
     }
 
-    if (!isFinite(nextCollision.duration)) {
-      this.#nextCollision = null;
-      return;
-    }
+    if (!isFinite(nextCollision.duration)) return;
+    if (this.#status !== 'running') return;
 
     this.#ball.endCenter = nextCollision.ballOnHit;
     this.#ball.endTime = Date.now() + nextCollision.duration;
 
-    this.#nextCollision = nextCollision;
-  }
-
-  #scheduleBallCollision() {
-    if (this.#status !== 'running') return;
     this.#timer.set(() => {
-      this.#onBallCollision();
-    }, this.#nextCollision.duration);
+      this.#onBallCollision(nextCollision);
+    }, nextCollision.duration);
   }
 
-  #onBallCollision() {
-    this.#previousCollider = this.#nextCollision?.side + this.#nextCollision?.type || null;
+  #onBallCollision(collision) {
+    this.#previousCollider = collision?.side + collision?.type || null;
     this.#ball.startTime = this.#ball.endTime;
 
     // wall
-    if (this.#nextCollision.type === 'wall') {
+    if (collision.type === 'wall') {
       this.#ball.startCenter.copy(this.#ball.endCenter);
-      this.#ballDir.reflect(this.#nextCollision.normal);
+      this.#ballDir.reflect(collision.normal);
       this.#calculateNextCollision();
       this.#notify('update', { ball: this.#ball });
-      this.#scheduleBallCollision();
     }
 
     // paddle
-    else if (this.#nextCollision.type === 'paddle') {
+    else if (collision.type === 'paddle') {
       this.#ball.startCenter.copy(this.#ball.endCenter);
       const paddleCenter =
-        this.#nextCollision.side === 'left'
-          ? this.#paddleLeft.center(this.#nextCollision.time)
-          : this.#paddleRight.center(this.#nextCollision.time);
+        collision.side === 'left' ? this.#paddleLeft.center(collision.time) : this.#paddleRight.center(collision.time);
       const hitOnPaddle = this.#ball.startCenter.y - paddleCenter.y;
       if (Math.abs(hitOnPaddle) <= this.#hitOnPaddleMax) {
-        this.#ballDir.reflect(this.#nextCollision.normal);
+        this.#ballDir.reflect(collision.normal);
         this.#ballSpeed = Math.min(this.#ballAcceleration * this.#ballSpeed, this.#ballSpeedMax);
 
-        if (this.#nextCollision.side === 'left') {
+        if (collision.side === 'left') {
           // alter ball direction based on paddle hit position
           const factor = hitOnPaddle / this.#hitOnPaddleMax;
           this.#ballDir.rotate((factor * Math.PI) / 8);
@@ -292,16 +276,15 @@ class GameLocalApi {
       }
       this.#calculateNextCollision();
       this.#notify('update', { ball: this.#ball });
-      this.#scheduleBallCollision();
     }
 
     // score
-    else if (this.#nextCollision.type === 'score') {
+    else if (collision.type === 'score') {
       let isMaxScoreReached;
       this.#ball.stop();
 
       // update score
-      if (this.#nextCollision.side === 'left') {
+      if (collision.side === 'left') {
         this.#scoreRight += 1;
         isMaxScoreReached = this.#scoreRight >= this.#scoreMax;
       } else {
@@ -315,7 +298,7 @@ class GameLocalApi {
       }
       // else, start new round
       else {
-        const playerServing = this.#nextCollision.side;
+        const playerServing = collision.side;
         this.#timer.set(() => {
           this.#startNewRound(playerServing);
         }, this.#endRoundDelay);
@@ -366,7 +349,6 @@ class GameLocalApi {
       ball: this.#ball,
       status: this.#status,
     });
-    this.#scheduleBallCollision();
   }
 
   #reset() {
