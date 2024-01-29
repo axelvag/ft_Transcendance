@@ -3,6 +3,5 @@ Hi {{ user.username }},
 
 Please click on the link below to confirm your registration:
 
-<!-- {{ protocol }}://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %} -->
 http://127.0.0.1:5500/front/public/#/email-confirmation?uidb64={{ uid }}&token={{ token }}
 {% endautoescape %}

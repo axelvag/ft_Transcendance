@@ -15,7 +15,7 @@ const routes = {
   '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
   '/login': { title: 'Login', template: '<view-signin></view-signin>' },
-  '/signup': { title: 'Login', template: '<view-signup></view-signup>' },
+  '/signup': { title: 'signup', template: '<view-signup></view-signup>' },
   '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
   // logged
   '/friends': { title: 'Friends', template: friends },

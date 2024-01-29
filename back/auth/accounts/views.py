@@ -33,8 +33,10 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
+        print("Email Valid")
         return JsonResponse({"success": True, "message": "Thank you for your email confirmation. Now you can login your account."}, status=200)
     else:
+        print("Email Invalid")
         return JsonResponse({"success": False, "message": "Activation link is invalid!"}, status=HttpResponseBadRequest.status_code)
 
 def activateEmail(request, user, to_email):
@@ -115,3 +117,19 @@ def get_csrf_token(request):
     """
     csrf_token = get_token(request)
     return JsonResponse({"csrfToken": csrf_token})
+
+def is_user_active(request, uidb64, token):
+    print("je passe")
+    User = get_user_model()
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": "Invalid activation link."}, status=HttpResponseBadRequest.status_code)
+    # Vérifiez si l'utilisateur est connecté et actif
+    if user.is_active:
+        print("user actif")
+        return JsonResponse({"success": True, "message": "user actif."}, status=200)
+    else:
+        print("user pas actif")
+        return JsonResponse({"success": False, "message": "user non actif."}, status=400)

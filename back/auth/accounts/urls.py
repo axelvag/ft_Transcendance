@@ -9,4 +9,5 @@ urlpatterns = [
     path('register/', views.register_user, name='register_user'),
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
     path('get-csrf-token/', views.get_csrf_token, name='get_csrf_token'),
+    path('is_user_active/<uidb64>/<token>', views.is_user_active, name='is_user_active'),
 ]
