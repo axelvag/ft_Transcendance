@@ -59,12 +59,20 @@ def forward_request(service_url, route, request):
         response = requests.request(
             method=request.method,
             url=forward_url,
-            headers=request.headers,
+            headers={
+                'Accept': 'application/json',  # Spécifiez que vous attendez une réponse JSON
+                'Content-Type': 'application/json',
+                **request.headers,  # Passez les autres en-têtes de la requête d'origine
+            },
             data=request.get_data(),
             params=request.args,
         )
 
         app.logger.debug(f"333333333333333333 {response}")
+
+        response_data_raw = response.content
+        app.logger.debug(f"Raw response data: {response_data_raw}")
+        response_data = response_data_raw.decode('utf-8')
 
         # Convertir les données de type bytes en str pour jsonify
         # Pour fixe une erreur "TypeError: Object of type bytes is not JSON serializable"
