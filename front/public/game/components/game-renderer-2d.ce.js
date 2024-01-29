@@ -4,11 +4,8 @@ class GameRenderer2D extends HTMLElement {
   #animationId = null;
 
   #ballEl = null;
-  #ballMoveEl = null;
   #paddleLeftEl = null;
   #paddleRightEl = null;
-  #scoreLeftEl = null;
-  #scoreRightEl = null;
 
   constructor() {
     super();
@@ -26,7 +23,6 @@ class GameRenderer2D extends HTMLElement {
   init(gameState) {
     // todo: validate gameState
     this.#gameState = gameState;
-    const scoreFontSize = this.#gameState.height * 0.15;
     this.shadowRoot.innerHTML = `
       <style>
         svg {
@@ -34,20 +30,20 @@ class GameRenderer2D extends HTMLElement {
           height: 100%;
           user-select: none;
         }
+        .pong-paddle-left {
+          fill: var(--bs-primary);
+        }
+        .pong-paddle-right {
+          fill: var(--bs-secondary);
+        }
+        .pong-wall {
+          stroke: var(--bs-gray-900);
+        }
+        .pong-middle {
+          stroke: var(--bs-gray-900);
+        }
       </style>
       <svg viewBox="0 0 ${this.#gameState.width} ${this.#gameState.height}">
-      
-        <!-- Walls -->
-        <rect
-          class="pong-wall pong-wall-top"
-          x="${this.#gameState.wallThickness / 2}"
-          y="${this.#gameState.wallThickness / 2}"
-          width="${this.#gameState.width - this.#gameState.wallThickness}"
-          height="${this.#gameState.height - this.#gameState.wallThickness}"
-          stroke-width="${this.#gameState.wallThickness}"
-          stroke="#fff"
-          fill="rgba(0, 0, 0, 0)"
-        />
       
         <!-- Middle line -->
         <line
@@ -56,36 +52,20 @@ class GameRenderer2D extends HTMLElement {
           y1="${this.#gameState.wallThickness}"
           x2="${this.#gameState.width / 2}"
           y2="${this.#gameState.height - this.#gameState.wallThickness}"
-          stroke-width="${this.#gameState.wallThickness}"
-          stroke-dasharray="${this.#gameState.wallThickness}, ${this.#gameState.wallThickness * 1.5}"
+          stroke-width="4"
+          stroke-dasharray="4, 6"
           stroke="#fff"
         />
-      
-        <!-- Left score -->
-        <text
-          class="pong-score pong-score-left"
-          font-family="Silkscreen, sans-serif"
-          font-size="${scoreFontSize}"
-          text-anchor="middle"
-          x="${this.#gameState.width / 4}"
-          y="${this.#gameState.wallThickness}"
-          dx="0"
-          dy="${scoreFontSize}"
+
+        <!-- Ball -->
+        <rect
+          class="pong-ball"
+          x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.ball)}"
+          y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.ball)}"
+          width="${this.#gameState.ball.width}"
+          height="${this.#gameState.ball.height}"
           fill="#fff"
-        >0</text>
-      
-        <!-- Right score -->
-        <text
-          class="pong-score pong-score-right"
-          font-family="Silkscreen, sans-serif"
-          font-size="${scoreFontSize}"
-          text-anchor="middle"
-          x="${(this.#gameState.width * 3) / 4}"
-          y="${this.#gameState.wallThickness}"
-          dx="0"
-          dy="${scoreFontSize}"
-          fill="#fff"
-        >0</text>
+        />
 
         <!-- Left paddle -->
         <rect
@@ -106,25 +86,18 @@ class GameRenderer2D extends HTMLElement {
           height="${this.#gameState.paddleRight.height}"
           fill="#fff"
         />
-
-        <!-- Ball -->
+      
+        <!-- Walls -->
         <rect
-          class="pong-ball"
-          x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.ball)}"
-          y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.ball)}"
-          width="${this.#gameState.ball.width}"
-          height="${this.#gameState.ball.height}"
-          fill="#fff"
-        />
-
-        <!-- Ball move -->
-        <line
-          class="pong-ball-move"
-          x1="${this.#gameState.width / 2 + this.#gameState.ball.startCenter.x}"
-          y1="${this.#gameState.height / 2 - this.#gameState.ball.startCenter.y}"
-          x2="${this.#gameState.width / 2 + this.#gameState.ball.endCenter.x}"
-          y2="${this.#gameState.height / 2 - this.#gameState.ball.endCenter.y}"
-          stroke="red"
+          class="pong-wall pong-wall-top"
+          x="${this.#gameState.wallThickness / 2}"
+          y="${this.#gameState.wallThickness / 2}"
+          rx="${this.#gameState.wallThickness * 2}"
+          width="${this.#gameState.width - this.#gameState.wallThickness}"
+          height="${this.#gameState.height - this.#gameState.wallThickness}"
+          stroke-width="${this.#gameState.wallThickness}"
+          stroke="#fff"
+          fill="transparent"
         />
 
       </svg>
@@ -132,11 +105,8 @@ class GameRenderer2D extends HTMLElement {
 
     // Elements
     this.#ballEl = this.shadowRoot.querySelector('.pong-ball');
-    this.#ballMoveEl = this.shadowRoot.querySelector('.pong-ball-move');
     this.#paddleLeftEl = this.shadowRoot.querySelector('.pong-paddle-left');
     this.#paddleRightEl = this.shadowRoot.querySelector('.pong-paddle-right');
-    this.#scoreLeftEl = this.shadowRoot.querySelector('.pong-score-left');
-    this.#scoreRightEl = this.shadowRoot.querySelector('.pong-score-right');
 
     this.#isReady = true;
   }
@@ -152,11 +122,8 @@ class GameRenderer2D extends HTMLElement {
   render() {
     if (!this.#isReady) return;
     this.#setBallPosition(this.#getCenter(this.#gameState.ball));
-    this.#setBallMove(this.#gameState.ball);
     this.#setPaddleLeftPosition(this.#getCenter(this.#gameState.paddleLeft));
     this.#setPaddleRightPosition(this.#getCenter(this.#gameState.paddleRight));
-    this.#setScoreLeft(this.#gameState.scoreLeft);
-    this.#setScoreRight(this.#gameState.scoreRight);
   }
 
   loop() {
@@ -210,14 +177,6 @@ class GameRenderer2D extends HTMLElement {
     this.#ballEl.setAttribute('y', newY);
   }
 
-  #setBallMove(ball) {
-    if (!this.#ballMoveEl || !ball) return;
-    this.#ballMoveEl.setAttribute('x1', this.#gameState.width / 2 + ball.startCenter.x);
-    this.#ballMoveEl.setAttribute('y1', this.#gameState.height / 2 - ball.startCenter.y);
-    this.#ballMoveEl.setAttribute('x2', this.#gameState.width / 2 + ball.endCenter.x);
-    this.#ballMoveEl.setAttribute('y2', this.#gameState.height / 2 - ball.endCenter.y);
-  }
-
   #setPaddleLeftPosition(paddlePos) {
     if (!this.#paddleLeftEl || !paddlePos) return;
     const newX = this.#gameState.width / 2 + paddlePos.x - this.#gameState.paddleLeft.width / 2;
@@ -232,16 +191,6 @@ class GameRenderer2D extends HTMLElement {
     this.#paddleRightEl.setAttribute('x', newX);
     const newY = this.#gameState.height / 2 - paddlePos.y - this.#gameState.paddleRight.height / 2;
     this.#paddleRightEl.setAttribute('y', newY);
-  }
-
-  #setScoreLeft(score) {
-    if (!this.#scoreLeftEl) return;
-    this.#scoreLeftEl.textContent = score;
-  }
-
-  #setScoreRight(score) {
-    if (!this.#scoreRightEl) return;
-    this.#scoreRightEl.textContent = score;
   }
 }
 

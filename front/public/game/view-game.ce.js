@@ -1,43 +1,71 @@
 import './components/game-renderer-2d.ce.js';
+import './components/game-player.ce.js';
+import './components/game-scoreboard.ce.js';
 import GameLocalApi from './localApi/GameLocalApi.js';
 
 const template = `
 <div class="pong">
-  <div class="pong-player pong-player-left">
-    <img class="pong-player-avatar" src="https://sfgalleries.net/art/sf3/sf3-3soe/avatars/sf33soe-avatar-ryu.png" alt="Ryu" />
-    <div class="pong-player-name">Ryu</div>
-    <div class="pong-player-score">3</div>
+  <div class="pong-header">
+    <game-scoreboard></game-scoreboard>
   </div>
-  <div class="pong-player pong-player-right">
-    <img class="pong-player-avatar" src="https://sfgalleries.net/art/sf3/sf3-3soe/avatars/sf33soe-avatar-chun-li.png" alt="Ryu" />
-    <div class="pong-player-name">Chun-Li</div>
-    <div class="pong-player-score">1</div>
-  </div>
-  <div class="pong-dialog">
-    <div class="pong-title"></div>
-    <div class="pong-controls">
-      <button class="pong-btn pong-start" hidden>Start</button>
-      <button class="pong-btn pong-pause" hidden>Pause</button>
-      <button class="pong-btn pong-resume" hidden>Resume</button>
-      <button class="pong-btn pong-quit" hidden>Quit</button>
-      <button class="pong-btn pong-newGame" hidden>New game</button>
+  <div class="pong-body">
+    <div class="pong-body-left">
+      <game-player
+        avatar="https://sfgalleries.net/art/sf3/sf3-3soe/avatars/sf33soe-avatar-ryu.png"
+        name="Ryu"
+        score="0"
+        score-max="5"
+      ></game-player>
+    </div>
+    <div class="pong-body-center">
+      <game-renderer-2d class="pong-renderer"></game-renderer-2d>
+    </div>
+    <div class="pong-body-right">
+      <game-player
+        avatar="https://sfgalleries.net/art/sf3/sf3-3soe/avatars/sf33soe-avatar-chun-li.png"
+        name="Chun-Li"
+        score="0"
+        score-max="5"
+        right
+      ></game-player>
     </div>
   </div>
-  <game-renderer-2d class="pong-renderer"></game-renderer-2d>
+  <div class="pong-footer">
+    <div class="pong-tip">
+      <span class="pong-tip-icon">
+        <ui-icon name="bulb"></ui-icon>
+      </span>
+      <span class="pong-tip-text">Press Spacebar to pause / resume the game.</span>
+    </div>
+  </div>
+  <div class="pong-dialog">
+    <div class="pong-dialog-wrapper">
+      <div class="pong-dialog-content">
+        <div class="pong-dialog-title"></div>
+        <div class="pong-dialog-controls">
+          <button class="pong-dialog-btn fs-2 pong-start" hidden>
+            <ui-icon name="play" scale="1.25"></ui-icon>
+          </button>
+          <button class="pong-dialog-btn pong-pause" hidden>
+            <ui-icon name="pause"></ui-icon>
+          </button>
+          <button class="pong-dialog-btn pong-newGame" hidden>
+            <ui-icon name="restart"></ui-icon>
+          </button>
+          <button class="pong-dialog-btn fs-1 pong-resume" hidden>
+            <ui-icon name="play" scale="1.25"></ui-icon>
+          </button>
+          <button class="pong-dialog-btn pong-quit" hidden>
+            <ui-icon name="quit"></ui-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 `;
 
 const style = `
-*,
-*::before,
-*::after {
-	box-sizing: border-box;
-}
-
-[hidden] {
-	display: none !important;
-}
-
 .pong {
 	color: white;
 	background-color: black;
@@ -47,106 +75,119 @@ const style = `
 
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+	align-items: stretch;
+  overflow: hidden;
+}
 
-	padding: 3rem;
-	gap: 2rem;
+.pong-header {
+  flex: 0 0 auto;
+  padding: 1.5rem;
+}
+
+.pong-body {
+  flex: 1 1 0;
+  overflow: hidden;
+  display: flex;
+}
+
+.pong-body-center {
+  flex: 0 1 auto;
+  padding: 0 1rem;
+}
+
+.pong-body-left,
+.pong-body-right {
+  flex: 1 1 0;
+  padding: 3rem;
+}
+
+.pong-footer {
+  flex: 0 0 auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.pong-tip {
+  font-size: 0.875rem;
+  color: var(--bs-gray-600);
+}
+
+.pong-tip-icon {
+  flex: 0 0 auto;
+  font-size: 1.25rem;
 }
 
 .pong-dialog {
-	position: absolute;
+	position: fixed;
 	inset: 0;
+  z-index: 9999;
+	background: rgba(0, 0, 0, 0.75);
 
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-
-	padding: 3rem;
-	gap: 2rem;
-
-	background-color: rgba(0, 0, 0, 0.75);
-	backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
 }
 
-.pong-title {
+.pong-dialog-wrapper {
+  flex: 1 1 0;
+  background: #000;
+  background-image: linear-gradient(
+    to right,
+    rgba(var(--bs-primary-rgb), 0.5) 0%,
+    rgba(var(--bs-secondary-rgb), 0.5) 100%
+  );
+  border: 1px solid #fff;
+  border-width: 2px 0;
+
+  display: flex;
+  justify-content: center;
+}
+
+.pong-dialog-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pong-dialog-title {
 	font-weight: bold;
-	font-size: 1.5rem;
+	font-size: 2.25rem;
+  text-transform: uppercase;
+  font-family: Orbitron, sans-serif;
 }
 
-.pong-controls {
+.pong-dialog-controls {
 	display: flex;
-	gap: 0.75rem;
+  align-items: center;
+	gap: 1.5rem;
 }
 
-.pong-btn {
-	/* Reset */
-	outline: none !important;
-
-	background: transparent;
-	color: white;
-	border: 1px solid white;
-	padding: 0.375em 0.75em;
-	font-size: 0.875rem;
-	vertical-align: -0.2em;
-	cursor: pointer;
-}
-
-.pong-btn:hover {
+.pong-dialog-btn {
+  width: 2em;
+  height: 2em;
+  border-radius: 100%;
+  outline: none !important;
+  border: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
   background-color: white;
   color: black;
+	cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.pong-dialog-btn:hover {
+  opacity: 1;
 }
 
 .pong-renderer {
-	max-width: 800px;
-	height: 600px;
+  flex: 1 1 0;
 	user-select: none;
-}
-
-.pong-player-left {
-  position: fixed;
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  margin: 1rem;
-}
-.pong-player-right {
-  position: fixed;
-  z-index: 9999;
-  top: 0;
-  right: 0;
-  margin: 1rem;
-}
-
-.pong-player-avatar {
-  display: block;
-  width: 5rem;
-  height: 5rem;
-  object-fit: cover;
-  border: 4px solid #fff;
-  background: #fff;
-  border-radius: 8px;
-}
-
-.pong-player-name {
-  font-weight: bold;
-  white-space: nowrap;
-  max-width: 5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: absolute;
-  top: 0;
-}
-.pong-player-left .pong-player-name {
-  left: 6rem;
-}
-.pong-player-right .pong-player-name {
-  right: 6rem;
 }
 `;
 
@@ -156,7 +197,6 @@ class ViewGame extends HTMLElement {
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
 
     this.gameApi = new GameLocalApi();
 
@@ -166,7 +206,7 @@ class ViewGame extends HTMLElement {
   }
 
   connectedCallback() {
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>
         ${style}
       </style>
@@ -174,34 +214,34 @@ class ViewGame extends HTMLElement {
     `;
 
     // Dialog
-    this.dialogEl = this.shadowRoot.querySelector('.pong-dialog');
+    this.dialogEl = this.querySelector('.pong-dialog');
 
     // Title
-    this.titleEl = this.shadowRoot.querySelector('.pong-title');
+    this.titleEl = this.querySelector('.pong-dialog-title');
 
     // Controls
-    this.startBtn = this.shadowRoot.querySelector('.pong-start');
+    this.startBtn = this.querySelector('.pong-start');
     this.startBtn?.addEventListener('click', () => {
       this.gameApi.emit('start');
     });
 
-    this.pauseBtn = this.shadowRoot.querySelector('.pong-pause');
+    this.pauseBtn = this.querySelector('.pong-pause');
     this.pauseBtn?.addEventListener('click', () => {
       this.gameApi.emit('pause');
     });
 
-    this.resumeBtn = this.shadowRoot.querySelector('.pong-resume');
+    this.resumeBtn = this.querySelector('.pong-resume');
     this.resumeBtn?.addEventListener('click', () => {
       this.gameApi.emit('resume');
     });
 
-    this.quitBtn = this.shadowRoot.querySelector('.pong-quit');
+    this.quitBtn = this.querySelector('.pong-quit');
     this.quitBtn?.addEventListener('click', () => {
       this.gameApi.emit('reset');
       this.renderDialog();
     });
 
-    this.newGameBtn = this.shadowRoot.querySelector('.pong-newGame');
+    this.newGameBtn = this.querySelector('.pong-newGame');
     this.newGameBtn?.addEventListener('click', () => {
       this.gameApi.emit('reset');
       this.gameApi.emit('start');
@@ -209,7 +249,7 @@ class ViewGame extends HTMLElement {
     });
 
     // Renderer
-    this.rendererEl = this.shadowRoot.querySelector('.pong-renderer');
+    this.rendererEl = this.querySelector('.pong-renderer');
 
     this.gameApi.on('init', data => {
       // todo: validate data
@@ -225,10 +265,24 @@ class ViewGame extends HTMLElement {
         ...this.#gameState,
         ...updates,
       };
+
+      // dialog
       this.renderDialog();
+
+      // renderer
       this.rendererEl.update(updates);
       if (updates.status === 'finished') {
         this.rendererEl.stop();
+      }
+
+      // players ans board
+      if (updates.scoreLeft != null) {
+        this.querySelector('game-player:not([right])')?.setAttribute('score', updates.scoreLeft);
+        this.querySelector('game-scoreboard')?.setAttribute('score-left', updates.scoreLeft);
+      }
+      if (updates.scoreRight != null) {
+        this.querySelector('game-player[right]')?.setAttribute('score', updates.scoreRight);
+        this.querySelector('game-scoreboard')?.setAttribute('score-right', updates.scoreRight);
       }
     });
 
@@ -260,14 +314,14 @@ class ViewGame extends HTMLElement {
         break;
       case 'paused':
         isVisible = true;
-        title = `Round ${this.#gameState.scoreLeft + this.#gameState.scoreRight + 1} - Paused`;
-        actions = ['resume', 'quit'];
+        title = `Paused`;
+        actions = ['newGame', 'resume', 'quit'];
         break;
       case 'finished':
         isVisible = true;
         const winner = this.#gameState.scoreLeft > this.#gameState.scoreRight ? 'Left' : 'Right';
         title = `${winner} player wins!`;
-        actions = ['newGame'];
+        actions = ['newGame', 'quit'];
         break;
     }
 
