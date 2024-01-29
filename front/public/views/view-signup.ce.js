@@ -136,6 +136,22 @@ class ViewSigUp extends HTMLElement {
       body: JSON.stringify(formData),
     });
 
+      // const data = await response.json();
+      // // console.log("test");
+      // if (response.ok){
+      //   const successNotification = document.getElementById('success-notification');
+      //   console.log("var-->", successNotification);
+      //   if (successNotification)
+      //     successNotification.style.display = 'block';
+      // }
+      // else if (data.errors.email){
+      //   this.emailError.textContent = data.errors.email[0];
+      //   this.email.classList.add('is-invalid');
+      // }
+      // else if (data.errors.password2){
+      //   this.usernameError.textContent = data.errors.password2[0];
+      //   this.username.classList.add('is-valid');
+      // }
     const data = await response.json(); 
     console.log("data", data);
 
@@ -146,11 +162,10 @@ class ViewSigUp extends HTMLElement {
     }
     else if (data.errors.password2){
         console.log("puddwdwdwdwssy");
-        this.usernameError.textContent = data.error.password2[0];
+        this.usernameError.textContent = data.errors.password2[0];
         this.username.classList.add('is-valid');
     }
     else{
-        setTimeout(5000);
         console.log("Formulaire --> Sucess");
         const successNotification = document.getElementById('success-notification');
         // successNotification.classList.remove('alert-success');
@@ -216,3 +231,5 @@ class ViewSigUp extends HTMLElement {
       //   if (input) input.classList.remove('is-invalid');
       //   if (errorElement) errorElement.textContent = '';
       // });
+
+//Qwertyuiop123.
