@@ -42,7 +42,7 @@ class ViewSigUp extends HTMLElement {
                 Sign up
               </button>
             
-              <div id="success-notification" class="alert alert-success" style="display: none;">
+              <div id="success-notification" class="alert alert-success mt-3" style="display: none;">
                 <strong>Success!</strong> Registration successful! Please check your email for further instructions.
               </div>
 
@@ -56,8 +56,11 @@ class ViewSigUp extends HTMLElement {
       </login-layout>
     `;
     
+    //For function
     this.passwordVerification = this.passwordVerification.bind(this);
     this.resetError = this.resetError.bind(this);
+
+    //Variable
     this.username = document.getElementById('username');
     this.email = document.getElementById('email');
     this.emailError = document.getElementById('email-error');
@@ -65,6 +68,8 @@ class ViewSigUp extends HTMLElement {
     this.password1 = document.getElementById('password1');
     this.password2 = document.getElementById('password2');
     this.passwordError = document.getElementById('password-error');
+
+    //Event
     // this.displayFormErrors = this.displayFormErrors.bind(this);
     this.querySelector('#signup-form').addEventListener('submit', this.submitForm.bind(this));
   }
@@ -131,66 +136,51 @@ class ViewSigUp extends HTMLElement {
       body: JSON.stringify(formData),
     });
 
-    const data = await response.json();
-
-    // console.log("data", data);
-    console.log("errors", data.errors);
-    // console.log("object.key", Object.keys(data.errors).length);
-    // if (Object.keys(data.errors).length === 1){
-    //   this.displayFormsErrors(data.errors);
-    // }
-
+    const data = await response.json(); 
+    console.log("data", data);
 
     if (data.errors.email){
-      console.log("pussy");
+        console.log("pussy");
       this.emailError.textContent = data.errors.email[0];
       this.email.classList.add('is-invalid');
     }
     else if (data.errors.password2){
-      console.log("puddwdwdwdwssy");
-      this.usernameError.textContent = data.error.password2[0];
-      this.username.classList.add('is-valid');
+        console.log("puddwdwdwdwssy");
+        this.usernameError.textContent = data.error.password2[0];
+        this.username.classList.add('is-valid');
     }
     else{
-      console.log("salut");
-      const successNotification = document.getElementById('success-notification');
-      console.log("var-->", successNotification);
-      if (successNotification)
-        successNotification.style.display = 'block';
+        setTimeout(5000);
+        console.log("Formulaire --> Sucess");
+        const successNotification = document.getElementById('success-notification');
+        // successNotification.classList.remove('alert-success');
+        console.log("var-->", successNotification);
+        if (successNotification)
+          successNotification.style.display = 'block';
     }
-      
+    
     }
     
     resetError = () => {
       this.email.classList.remove('is-invalid');
       this.password1.classList.remove('is-invalid');
       this.password2.classList.remove('is-invalid');
-      this.username.classList.remove('is-valid');
+      this.usernameError.classList.remove('is-valid');
+
+      this.emailError.textContent = '';
+      this.usernameError.textContent = '';
+      this.passwordError.textContent = '';
     }
-    
-    // displayFormErrors(errors) {
-    // console.log("test");
-    // for (const field in errors) {
-    //   console.log("field", field);
-    //   const errorElement = this.querySelector(`#${field}-error`);
-    //   console.log("errorElement" ,errorElement);
-    //   if (errorElement) {
-    //     errorElement.textContent = errors[field].join(' ');
-    //     errorElement.classList.add('is-invalid');
-    //   }
-    // }
-  // }
+  }
 
-}
+  customElements.define('view-signup', ViewSigUp);
 
-customElements.define('view-signup', ViewSigUp);
-
-
-//to do
-// [x] Gestions des mots de passes (Les deux egaux)
-// [ ] Verifier que l'adresse mail n'est pas utilise
-// [ ] Verifier que l'adress mail contient bien un @
-// [ ] Tous les champs sont rempli
+  
+  //to do
+  // [x] Gestions des mots de passes (Les deux egaux)
+// [x] Verifier que l'adresse mail n'est pas utilise
+// [x] Verifier que l'adress mail contient bien un @
+// [x] Tous les champs sont rempli
 
 // [x] Verifier que le mot de passe contient : 8 caractere, 1 lettre minuscule, 1 lettre majuscule, et un carcatere special et un chiffre
 //       - 8 caractere
@@ -198,3 +188,31 @@ customElements.define('view-signup', ViewSigUp);
 //       - 1 lettre majuscule
 //       - un carcatere special
 //       - un chiffre
+
+// [x] Gerer erreur mdp errone plus juste mais mauvaise adress mail, le message d'erreur des mdp est encore la
+// [x!] Gerer quand ca sucess de mettre un message comme quoi ca a marche
+// [x!] Mettre un message check your emai
+// [] Si form a des erreurs avant, et que ensuite ca sucess, le message de sucess ne s'affiche pas
+
+
+// if (data.errors) {
+//   Object.keys(data.errors).forEach((key) => {
+  //     console.log("key ", key);
+  //     const errorElement = this.querySelector(`#${key}-error`);
+  //     if (errorElement) {
+    //       errorElement.textContent = data.errors[key][0];
+    //       this[key].classList.add('is-invalid');
+    //     }
+    //   });
+    // } else {
+      //   // Afficher le message de succès si aucune erreur n'est retournée
+      //   const successNotification = document.getElementById('success-notification');
+      //   if (successNotification) successNotification.style.display = 'block';
+      // }
+
+      // ['email', 'password1', 'password2', 'username'].forEach((field) => {
+      //   const input = this[field];
+      //   const errorElement = this.querySelector(`#${field}-error`);
+      //   if (input) input.classList.remove('is-invalid');
+      //   if (errorElement) errorElement.textContent = '';
+      // });
