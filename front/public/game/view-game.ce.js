@@ -2,6 +2,7 @@ import './components/game-renderer-2d.ce.js';
 import './components/game-player.ce.js';
 import './components/game-scoreboard.ce.js';
 import GameLocalApi from './localApi/GameLocalApi.js';
+import { redirectTo } from '../router.js';
 
 const sounds = {
   collision: new Audio('./assets/sounds/hit.wav'),
@@ -20,24 +21,13 @@ const template = `
   </div>
   <div class="pong-body">
     <div class="pong-body-left">
-      <game-player
-        avatar="https://sfgalleries.net/art/sf3/sf3-3soe/avatars/sf33soe-avatar-ryu.png"
-        name="Ryu"
-        score="0"
-        score-max="5"
-      ></game-player>
+      <game-player class="pong-player-left"></game-player>
     </div>
     <div class="pong-body-center">
       <game-renderer-2d class="pong-renderer"></game-renderer-2d>
     </div>
     <div class="pong-body-right">
-      <game-player
-        avatar="https://sfgalleries.net/art/sf3/sf3-3soe/avatars/sf33soe-avatar-chun-li.png"
-        name="Chun-Li"
-        score="0"
-        score-max="5"
-        right
-      ></game-player>
+      <game-player class="pong-player-right"></game-player>
     </div>
   </div>
   <div class="pong-footer">
@@ -247,8 +237,7 @@ class ViewGame extends HTMLElement {
 
     this.quitBtn = this.querySelector('.pong-quit');
     this.quitBtn?.addEventListener('click', () => {
-      this.gameApi.emit('reset');
-      this.renderDialog();
+      redirectTo('/profil');
     });
 
     this.newGameBtn = this.querySelector('.pong-newGame');
@@ -265,6 +254,7 @@ class ViewGame extends HTMLElement {
       const json = JSON.parse(data);
       // todo: validate data
       this.#gameState = json?.state;
+      this.renderPlayers();
       this.renderDialog();
       this.renderScores();
       this.rendererEl.init(this.#gameState);
@@ -314,6 +304,21 @@ class ViewGame extends HTMLElement {
     document.removeEventListener('keyup', this.handleKeyUp);
     document.removeEventListener('click', this.handleClick);
     this.gameApi.emit('reset');
+  }
+
+  renderPlayers() {
+    this.playerLeftEl = this.querySelector('.pong-player-left');
+    this.playerLeftEl?.setAttribute('name', this.#gameState.playerLeft.name);
+    this.playerLeftEl?.setAttribute('avatar', './assets/img/' + this.#gameState.playerLeft.avatar);
+    this.playerLeftEl?.setAttribute('score', 0);
+    this.playerLeftEl?.setAttribute('score-max', this.#gameState.scoreMax);
+
+    this.playerRightEl = this.querySelector('.pong-player-right');
+    this.playerRightEl?.setAttribute('name', this.#gameState.playerRight.name);
+    this.playerRightEl?.setAttribute('avatar', './assets/img/' + this.#gameState.playerRight.avatar);
+    this.playerRightEl?.setAttribute('score', 0);
+    this.playerRightEl?.setAttribute('score-max', this.#gameState.scoreMax);
+    this.playerRightEl?.setAttribute('direction', 'right');
   }
 
   renderScores() {

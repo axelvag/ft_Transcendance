@@ -1,8 +1,12 @@
 import Vec2 from './Vec2.js';
 import MovableRect from './MovableRect.js';
 import PausableTimeout from './PausableTimeout.js';
+import { getRandomCharacter } from './characters.js';
 
 class GameLocalApi {
+  #playerLeft = null;
+  #playerRight = null;
+
   #width = 800;
   #height = 600;
   #wallThickness = 10;
@@ -41,11 +45,15 @@ class GameLocalApi {
   #eventListeners = {};
 
   constructor() {
+    this.#playerLeft = getRandomCharacter();
+    this.#playerRight = getRandomCharacter();
     this.#init();
   }
 
   #getState() {
     return {
+      playerLeft: this.#playerLeft,
+      playerRight: this.#playerRight,
       width: this.#width,
       height: this.#height,
       wallThickness: this.#wallThickness,
