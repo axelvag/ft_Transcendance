@@ -322,9 +322,9 @@ class ViewGame extends HTMLElement {
   }
 
   renderScores() {
-    this.querySelector('game-player:not([right])')?.setAttribute('score', this.#gameState.scoreLeft || 0);
+    this.querySelector('.pong-player-left')?.setAttribute('score', this.#gameState.scoreLeft || 0);
     this.querySelector('game-scoreboard')?.setAttribute('score-left', this.#gameState.scoreLeft || 0);
-    this.querySelector('game-player[right]')?.setAttribute('score', this.#gameState.scoreRight || 0);
+    this.querySelector('.pong-player-right')?.setAttribute('score', this.#gameState.scoreRight || 0);
     this.querySelector('game-scoreboard')?.setAttribute('score-right', this.#gameState.scoreRight || 0);
   }
 
