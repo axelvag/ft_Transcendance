@@ -158,3 +158,5 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+PASSWORD_RESET_TIMEOUT = 1
