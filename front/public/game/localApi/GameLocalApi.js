@@ -42,6 +42,7 @@ class GameLocalApi {
   #timer = null;
   #ballSpeed = 0;
   #ballDir = null;
+  #isBallMovingBeforePause = false;
   #eventListeners = {};
 
   constructor() {
@@ -349,13 +350,19 @@ class GameLocalApi {
 
   #pause() {
     if (this.#status !== 'running') return;
-    this.#timer.clear();
 
-    this.#ball.stop();
-    this.#paddleLeft.stop();
-    this.#paddleRight.stop();
+    this.#isBallMovingBeforePause = this.#ball.startCenter.x === this.#ball.endCenter.x;
+    if (this.#isBallMovingBeforePause) {
+      this.#timer.pause();
+    } else {
+      this.#timer.clear();
+
+      this.#ball.stop();
+      this.#paddleLeft.stop();
+      this.#paddleRight.stop();
+    }
+
     this.#status = 'paused';
-
     this.#notify('update', {
       state: {
         ball: this.#ball,
@@ -370,8 +377,12 @@ class GameLocalApi {
     if (this.#status !== 'paused') return;
     this.#status = 'running';
 
-    this.#ball.startTime = Date.now();
-    this.#calculateNextCollision();
+    if (this.#isBallMovingBeforePause) {
+      this.#timer.resume();
+    } else {
+      this.#ball.startTime = Date.now();
+      this.#calculateNextCollision();
+    }
     this.#notify('update', {
       state: {
         ball: this.#ball,
