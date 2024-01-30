@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Service</title>
+    <link href="style.css" rel="stylesheet">
+    <style>
+      body {
+          font-family: 'Arial', sans-serif;
+          background-color: #f5f5f5;
+          margin: 0;
+          padding: 0;
+      }
+
+      #messages {
+          list-style-type: none;
+          margin: 0;
+          background-color: #fff;
+          border-radius: 5px;
+          max-width: 400px;
+          margin: 20px auto;
+      }
+
+      #m {
+          width: 70%;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px 0 0 5px;
+          font-size: 16px;
+      }
+
+      #sendButton {
+          position: absolute;
+          bottom: 0;
+          right: 0; /* Ajout de right: 0 pour le positionner à droite */
+          padding: 10px 20px;
+          background-color: #3498db;
+          color: #fff;
+          border: none;
+          border-radius: 0 5px 5px 0;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background-color 0.3s ease;
+      }
+
+      #sendButton:hover {
+          background-color: #2980b9;
+      }
+  </style>
+</head>
+<body>
+  <script src='/socket.io/socket.io.js'></script>
+  <h1>WebSocket Service</h1>
+  
+  <div>
+    <ul id="messages"></ul>
+    <input id="m" /> <button>Send</button>
+  </div>
+
+</body>
+</html>
