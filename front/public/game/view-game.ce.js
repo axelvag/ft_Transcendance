@@ -15,47 +15,47 @@ Object.values(sounds).forEach(sound => {
 });
 
 const template = `
-<div class="pong">
-  <div class="pong-header">
+<div class="viewGame">
+  <div class="viewGame-header">
     <game-scoreboard></game-scoreboard>
   </div>
-  <div class="pong-body">
-    <div class="pong-body-left">
-      <game-player class="pong-player-left"></game-player>
+  <div class="viewGame-body">
+    <div class="viewGame-body-left">
+      <game-player class="viewGame-player-left"></game-player>
     </div>
-    <div class="pong-body-center">
-      <game-renderer-2d class="pong-renderer"></game-renderer-2d>
+    <div class="viewGame-body-center">
+      <game-renderer-2d class="viewGame-renderer"></game-renderer-2d>
     </div>
-    <div class="pong-body-right">
-      <game-player class="pong-player-right"></game-player>
+    <div class="viewGame-body-right">
+      <game-player class="viewGame-player-right"></game-player>
     </div>
   </div>
-  <div class="pong-footer">
-    <div class="pong-tip">
-      <span class="pong-tip-icon">
+  <div class="viewGame-footer">
+    <div class="viewGame-tip">
+      <span class="viewGame-tip-icon">
         <ui-icon name="bulb"></ui-icon>
       </span>
-      <span class="pong-tip-text">Press Spacebar to pause / resume the game.</span>
+      <span class="viewGame-tip-text">Press Spacebar to pause / resume the game.</span>
     </div>
   </div>
-  <div class="pong-dialog">
-    <div class="pong-dialog-wrapper">
-      <div class="pong-dialog-content">
-        <div class="pong-dialog-title"></div>
-        <div class="pong-dialog-controls">
-          <button class="pong-dialog-btn fs-2 pong-start" hidden>
+  <div class="viewGame-dialog">
+    <div class="viewGame-dialog-wrapper">
+      <div class="viewGame-dialog-content">
+        <div class="viewGame-dialog-title"></div>
+        <div class="viewGame-dialog-controls">
+          <button class="viewGame-dialog-btn fs-2 viewGame-start" hidden>
             <ui-icon name="play" scale="1.25"></ui-icon>
           </button>
-          <button class="pong-dialog-btn pong-pause" hidden>
+          <button class="viewGame-dialog-btn viewGame-pause" hidden>
             <ui-icon name="pause"></ui-icon>
           </button>
-          <button class="pong-dialog-btn pong-newGame" hidden>
+          <button class="viewGame-dialog-btn viewGame-newGame" hidden>
             <ui-icon name="restart"></ui-icon>
           </button>
-          <button class="pong-dialog-btn fs-1 pong-resume" hidden>
+          <button class="viewGame-dialog-btn fs-1 viewGame-resume" hidden>
             <ui-icon name="play" scale="1.25"></ui-icon>
           </button>
-          <button class="pong-dialog-btn pong-quit" hidden>
+          <button class="viewGame-dialog-btn viewGame-quit" hidden>
             <ui-icon name="quit"></ui-icon>
           </button>
         </div>
@@ -66,7 +66,7 @@ const template = `
 `;
 
 const style = `
-.pong {
+.viewGame {
 	color: white;
 	background-color: black;
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -79,46 +79,46 @@ const style = `
   overflow: hidden;
 }
 
-.pong-header {
+.viewGame-header {
   flex: 0 0 auto;
   padding: 1.5rem;
 }
 
-.pong-body {
+.viewGame-body {
   flex: 1 1 0;
   overflow: hidden;
   display: flex;
 }
 
-.pong-body-center {
+.viewGame-body-center {
   flex: 0 1 auto;
   padding: 0 1rem;
 }
 
-.pong-body-left,
-.pong-body-right {
+.viewGame-body-left,
+.viewGame-body-right {
   flex: 1 1 0;
   padding: 3rem;
 }
 
-.pong-footer {
+.viewGame-footer {
   flex: 0 0 auto;
   padding: 1rem;
   display: flex;
   justify-content: center;
 }
 
-.pong-tip {
+.viewGame-tip {
   font-size: 0.875rem;
   color: var(--bs-gray-600);
 }
 
-.pong-tip-icon {
+.viewGame-tip-icon {
   flex: 0 0 auto;
   font-size: 1.25rem;
 }
 
-.pong-dialog {
+.viewGame-dialog {
 	position: fixed;
 	inset: 0;
   z-index: 9999;
@@ -128,7 +128,7 @@ const style = `
   align-items: center;
 }
 
-.pong-dialog-wrapper {
+.viewGame-dialog-wrapper {
   flex: 1 1 0;
   background: #000;
   background-image: linear-gradient(
@@ -143,7 +143,7 @@ const style = `
   justify-content: center;
 }
 
-.pong-dialog-content {
+.viewGame-dialog-content {
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -151,20 +151,20 @@ const style = `
   gap: 1rem;
 }
 
-.pong-dialog-title {
+.viewGame-dialog-title {
 	font-weight: bold;
 	font-size: 2.25rem;
   text-transform: uppercase;
   font-family: Orbitron, sans-serif;
 }
 
-.pong-dialog-controls {
+.viewGame-dialog-controls {
 	display: flex;
   align-items: center;
 	gap: 1.5rem;
 }
 
-.pong-dialog-btn {
+.viewGame-dialog-btn {
   width: 2em;
   height: 2em;
   border-radius: 100%;
@@ -181,11 +181,11 @@ const style = `
   transition: opacity 0.15s ease-in-out;
 }
 
-.pong-dialog-btn:hover {
+.viewGame-dialog-btn:hover {
   opacity: 1;
 }
 
-.pong-renderer {
+.viewGame-renderer {
   flex: 1 1 0;
 	user-select: none;
 }
@@ -214,33 +214,33 @@ class ViewGame extends HTMLElement {
     `;
 
     // Dialog
-    this.dialogEl = this.querySelector('.pong-dialog');
+    this.dialogEl = this.querySelector('.viewGame-dialog');
 
     // Title
-    this.titleEl = this.querySelector('.pong-dialog-title');
+    this.titleEl = this.querySelector('.viewGame-dialog-title');
 
     // Controls
-    this.startBtn = this.querySelector('.pong-start');
+    this.startBtn = this.querySelector('.viewGame-start');
     this.startBtn?.addEventListener('click', () => {
       this.gameApi.emit('start');
     });
 
-    this.pauseBtn = this.querySelector('.pong-pause');
+    this.pauseBtn = this.querySelector('.viewGame-pause');
     this.pauseBtn?.addEventListener('click', () => {
       this.gameApi.emit('pause');
     });
 
-    this.resumeBtn = this.querySelector('.pong-resume');
+    this.resumeBtn = this.querySelector('.viewGame-resume');
     this.resumeBtn?.addEventListener('click', () => {
       this.gameApi.emit('resume');
     });
 
-    this.quitBtn = this.querySelector('.pong-quit');
+    this.quitBtn = this.querySelector('.viewGame-quit');
     this.quitBtn?.addEventListener('click', () => {
       redirectTo('/profil');
     });
 
-    this.newGameBtn = this.querySelector('.pong-newGame');
+    this.newGameBtn = this.querySelector('.viewGame-newGame');
     this.newGameBtn?.addEventListener('click', () => {
       this.gameApi.emit('reset');
       this.gameApi.emit('start');
@@ -248,7 +248,7 @@ class ViewGame extends HTMLElement {
     });
 
     // Renderer
-    this.rendererEl = this.querySelector('.pong-renderer');
+    this.rendererEl = this.querySelector('.viewGame-renderer');
 
     this.gameApi.on('init', data => {
       const json = JSON.parse(data);
@@ -307,13 +307,13 @@ class ViewGame extends HTMLElement {
   }
 
   renderPlayers() {
-    this.playerLeftEl = this.querySelector('.pong-player-left');
+    this.playerLeftEl = this.querySelector('.viewGame-player-left');
     this.playerLeftEl?.setAttribute('name', this.#gameState.playerLeft.name);
     this.playerLeftEl?.setAttribute('avatar', './assets/img/' + this.#gameState.playerLeft.avatar);
     this.playerLeftEl?.setAttribute('score', 0);
     this.playerLeftEl?.setAttribute('score-max', this.#gameState.scoreMax);
 
-    this.playerRightEl = this.querySelector('.pong-player-right');
+    this.playerRightEl = this.querySelector('.viewGame-player-right');
     this.playerRightEl?.setAttribute('name', this.#gameState.playerRight.name);
     this.playerRightEl?.setAttribute('avatar', './assets/img/' + this.#gameState.playerRight.avatar);
     this.playerRightEl?.setAttribute('score', 0);
@@ -322,9 +322,9 @@ class ViewGame extends HTMLElement {
   }
 
   renderScores() {
-    this.querySelector('.pong-player-left')?.setAttribute('score', this.#gameState.scoreLeft || 0);
+    this.querySelector('.viewGame-player-left')?.setAttribute('score', this.#gameState.scoreLeft || 0);
     this.querySelector('game-scoreboard')?.setAttribute('score-left', this.#gameState.scoreLeft || 0);
-    this.querySelector('.pong-player-right')?.setAttribute('score', this.#gameState.scoreRight || 0);
+    this.querySelector('.viewGame-player-right')?.setAttribute('score', this.#gameState.scoreRight || 0);
     this.querySelector('game-scoreboard')?.setAttribute('score-right', this.#gameState.scoreRight || 0);
   }
 

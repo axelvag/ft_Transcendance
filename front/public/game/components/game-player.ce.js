@@ -23,17 +23,17 @@ class GamePlayer extends HTMLElement {
     if (oldValue === newValue) return;
     this.#attrs[name] = newValue;
 
-    if (!this.querySelector('.game-player')) return;
+    if (!this.querySelector('.gamePlayer')) return;
 
     if (name === 'avatar') {
-      this.querySelector('.game-player-avatar img').src = newValue || '';
+      this.querySelector('.gamePlayer-avatar img').src = newValue || '';
     } else if (name === 'name') {
-      this.querySelector('.game-player-name').textContent = newValue;
+      this.querySelector('.gamePlayer-name').textContent = newValue;
     } else if (name === 'score' || name === 'score-max') {
       this.#renderScore();
     } else if (name === 'direction') {
-      this.querySelector('.game-player').classList.remove('is-left', 'is-right');
-      this.querySelector('.game-player').classList.add(`is-${this.#getSide()}`);
+      this.querySelector('.gamePlayer').classList.remove('is-left', 'is-right');
+      this.querySelector('.gamePlayer').classList.add(`is-${this.#getSide()}`);
     }
   }
 
@@ -44,21 +44,21 @@ class GamePlayer extends HTMLElement {
   #render() {
     this.innerHTML = `
       <style>
-        .game-player {
+        .gamePlayer {
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
           gap: 0.75rem;
         }
-        .game-player.is-left {
+        .gamePlayer.is-left {
           left: 0;
         }
-        .game-player.is-right {
+        .gamePlayer.is-right {
           right: 0;
         }
         
-        .game-player-avatar {
+        .gamePlayer-avatar {
           flex: 0 0 auto;
           width: 8rem;
           height: 8rem;
@@ -68,23 +68,23 @@ class GamePlayer extends HTMLElement {
           overflow: hidden;
           position: relative;
         }
-        .game-player-avatar img {
+        .gamePlayer-avatar img {
           display: block;
           width: 100%;
           height: 100%;
           object-fit: cover;
         }
-        .game-player.is-right .game-player-avatar {
+        .gamePlayer.is-right .gamePlayer-avatar {
           transform: scale(-1, 1);
           border-color: var(--bs-secondary);
         }
 
-        .game-player-details {
+        .gamePlayer-details {
           flex: 1 1 auto;
           max-width: 20rem;
         }
         
-        .game-player-name {
+        .gamePlayer-name {
           font-size: 1.25rem;
           line-height: 2rem;
           font-weight: bold;
@@ -93,16 +93,16 @@ class GamePlayer extends HTMLElement {
           text-overflow: ellipsis;
         }
 
-        .game-player-score {
+        .gamePlayer-score {
           display: flex;
           gap: 0.375rem;
           margin-top: 0.75rem;
         }
-        .game-player.is-right .game-player-score {
+        .gamePlayer.is-right .gamePlayer-score {
           flex-direction: row-reverse;
         }
 
-        .game-player-score-point {
+        .gamePlayer-score-point {
           flex: 0 0 auto;
           width: 1rem;
           height: 1rem;
@@ -110,20 +110,20 @@ class GamePlayer extends HTMLElement {
           background: var(--bs-gray-900);
         }
 
-        .game-player-score-point.is-active {
+        .gamePlayer-score-point.is-active {
           background: var(--bs-primary);score-max
         }
-        .game-player.is-right .game-player-score-point.is-active {
+        .gamePlayer.is-right .gamePlayer-score-point.is-active {
           background: var(--bs-secondary);
         }
       </style>
-      <div class="game-player is-${this.#getSide()}">
-        <div class="game-player-avatar">
+      <div class="gamePlayer is-${this.#getSide()}">
+        <div class="gamePlayer-avatar">
           <img src="${this.#attrs.avatar}" onerror='this.style.display = "none"' />
         </div>
-        <div class="game-player-details">
-          <div class="game-player-name">${this.#attrs.name || ''}</div>
-          <div class="game-player-score"></div>
+        <div class="gamePlayer-details">
+          <div class="gamePlayer-name">${this.#attrs.name || ''}</div>
+          <div class="gamePlayer-score"></div>
         </div>
       </div>
     `;
@@ -132,10 +132,10 @@ class GamePlayer extends HTMLElement {
   }
 
   #renderScore() {
-    const scoreEl = this.querySelector('.game-player-score');
+    const scoreEl = this.querySelector('.gamePlayer-score');
     if (!scoreEl) return;
 
-    const getPointHtml = isActive => `<div class="game-player-score-point ${isActive ? 'is-active' : ''}"></div>`;
+    const getPointHtml = isActive => `<div class="gamePlayer-score-point ${isActive ? 'is-active' : ''}"></div>`;
     let scoreHtml = '';
     for (let i = 0; i < this.#attrs['score-max']; i++) {
       scoreHtml += getPointHtml(i < this.#attrs.score);
