@@ -111,7 +111,7 @@ class GameLocalApi {
     this.#status = 'initialized';
     this.#previousCollider = null;
 
-    this.#notify('init', this.#getState());
+    this.#notify('init', { state: this.#getState() });
   }
 
   #startNewRound(playerServing) {
@@ -121,8 +121,11 @@ class GameLocalApi {
     this.#ball.startTime = Date.now();
     this.#ball.endTime = this.#ball.startTime;
     this.#notify('update', {
-      status: this.#status,
-      ball: this.#ball,
+      event: 'newRound',
+      state: {
+        status: this.#status,
+        ball: this.#ball,
+      },
     });
 
     this.#timer.set(() => {
@@ -134,7 +137,7 @@ class GameLocalApi {
       this.#ballDir = Vec2.create(xDir, yDir).normalize();
       this.#ballSpeed = this.#ballSpeedOnStart;
       this.#calculateNextCollision();
-      this.#notify('update', { ball: this.#ball });
+      this.#notify('update', { state: { ball: this.#ball } });
 
       this.#previousCollider = null;
     }, this.#startRoundDelay);
@@ -235,7 +238,10 @@ class GameLocalApi {
       this.#ball.startCenter.copy(this.#ball.endCenter);
       this.#ballDir.reflect(collision.normal);
       this.#calculateNextCollision();
-      this.#notify('update', { ball: this.#ball });
+      this.#notify('update', {
+        event: 'collision',
+        state: { ball: this.#ball },
+      });
     }
 
     // paddle
@@ -273,9 +279,17 @@ class GameLocalApi {
             this.#ballDir = Vec2.create(-1, -1).normalize();
           }
         }
+        this.#calculateNextCollision();
+        this.#notify('update', {
+          event: 'collision',
+          state: { ball: this.#ball },
+        });
+      } else {
+        this.#calculateNextCollision();
+        this.#notify('update', {
+          state: { ball: this.#ball },
+        });
       }
-      this.#calculateNextCollision();
-      this.#notify('update', { ball: this.#ball });
     }
 
     // score
@@ -306,17 +320,20 @@ class GameLocalApi {
 
       // send update
       this.#notify('update', {
-        ball: this.#ball,
-        scoreLeft: this.#scoreLeft,
-        scoreRight: this.#scoreRight,
-        status: this.#status,
+        event: isMaxScoreReached ? 'victory' : 'score',
+        state: {
+          ball: this.#ball,
+          scoreLeft: this.#scoreLeft,
+          scoreRight: this.#scoreRight,
+          status: this.#status,
+        },
       });
     }
   }
 
   #start() {
     if (this.#status !== 'initialized') {
-      this.#notify('update', { status: this.#status });
+      this.#notify('update', { state: { status: this.#status } });
       return;
     }
     this.#startNewRound('left');
@@ -332,10 +349,12 @@ class GameLocalApi {
     this.#status = 'paused';
 
     this.#notify('update', {
-      ball: this.#ball,
-      paddleLeft: this.#paddleLeft,
-      paddleRight: this.#paddleRight,
-      status: this.#status,
+      state: {
+        ball: this.#ball,
+        paddleLeft: this.#paddleLeft,
+        paddleRight: this.#paddleRight,
+        status: this.#status,
+      },
     });
   }
 
@@ -346,8 +365,10 @@ class GameLocalApi {
     this.#ball.startTime = Date.now();
     this.#calculateNextCollision();
     this.#notify('update', {
-      ball: this.#ball,
-      status: this.#status,
+      state: {
+        ball: this.#ball,
+        status: this.#status,
+      },
     });
   }
 
@@ -372,7 +393,7 @@ class GameLocalApi {
         this.#paddleLeft.startTime +
         (Math.abs(this.#paddleLeft.endCenter.y - this.#paddleLeft.startCenter.y) / this.#paddleSpeed) * 1000;
     }
-    this.#notify('update', { paddleLeft: this.#paddleLeft });
+    this.#notify('update', { state: { paddleLeft: this.#paddleLeft } });
   }
 
   #updatePaddleRightMove(dir) {
@@ -392,7 +413,7 @@ class GameLocalApi {
         this.#paddleRight.startTime +
         (Math.abs(this.#paddleRight.endCenter.y - this.#paddleRight.startCenter.y) / this.#paddleSpeed) * 1000;
     }
-    this.#notify('update', { paddleRight: this.#paddleRight });
+    this.#notify('update', { state: { paddleRight: this.#paddleRight } });
   }
 
   on(eventName, callback) {
@@ -403,7 +424,7 @@ class GameLocalApi {
 
     // trigger immediately init event
     if (eventName === 'init') {
-      callback(JSON.stringify(this.#getState()));
+      this.#notify('init', { state: this.#getState() });
     }
   }
 

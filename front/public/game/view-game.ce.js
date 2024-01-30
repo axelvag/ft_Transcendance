@@ -3,6 +3,16 @@ import './components/game-player.ce.js';
 import './components/game-scoreboard.ce.js';
 import GameLocalApi from './localApi/GameLocalApi.js';
 
+const sounds = {
+  collision: new Audio('./assets/sounds/hit.wav'),
+  score: new Audio('./assets/sounds/score.wav'),
+  victory: new Audio('./assets/sounds/victory.wav'),
+  defeat: new Audio('./assets/sounds/defeat.wav'),
+};
+Object.values(sounds).forEach(sound => {
+  sound.preload = 'auto';
+});
+
 const template = `
 <div class="pong">
   <div class="pong-header">
@@ -252,15 +262,17 @@ class ViewGame extends HTMLElement {
     this.rendererEl = this.querySelector('.pong-renderer');
 
     this.gameApi.on('init', data => {
+      const json = JSON.parse(data);
       // todo: validate data
-      this.#gameState = JSON.parse(data);
+      this.#gameState = json?.state;
       this.renderDialog();
       this.rendererEl.init(this.#gameState);
       this.rendererEl.start();
     });
     this.gameApi.on('update', data => {
+      const json = JSON.parse(data);
       // todo: validate data
-      const updates = JSON.parse(data);
+      const updates = json?.state;
       this.#gameState = {
         ...this.#gameState,
         ...updates,
@@ -275,7 +287,7 @@ class ViewGame extends HTMLElement {
         this.rendererEl.stop();
       }
 
-      // players ans board
+      // players and board
       if (updates.scoreLeft != null) {
         this.querySelector('game-player:not([right])')?.setAttribute('score', updates.scoreLeft);
         this.querySelector('game-scoreboard')?.setAttribute('score-left', updates.scoreLeft);
@@ -283,6 +295,15 @@ class ViewGame extends HTMLElement {
       if (updates.scoreRight != null) {
         this.querySelector('game-player[right]')?.setAttribute('score', updates.scoreRight);
         this.querySelector('game-scoreboard')?.setAttribute('score-right', updates.scoreRight);
+      }
+
+      // sounds
+      if (json?.event) {
+        const sound = sounds[json.event];
+        if (sound) {
+          sound.currentTime = 0;
+          sound.play();
+        }
       }
     });
 
