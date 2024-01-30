@@ -266,6 +266,7 @@ class ViewGame extends HTMLElement {
       // todo: validate data
       this.#gameState = json?.state;
       this.renderDialog();
+      this.renderScores();
       this.rendererEl.init(this.#gameState);
       this.rendererEl.start();
     });
@@ -288,13 +289,8 @@ class ViewGame extends HTMLElement {
       }
 
       // players and board
-      if (updates.scoreLeft != null) {
-        this.querySelector('game-player:not([right])')?.setAttribute('score', updates.scoreLeft);
-        this.querySelector('game-scoreboard')?.setAttribute('score-left', updates.scoreLeft);
-      }
-      if (updates.scoreRight != null) {
-        this.querySelector('game-player[right]')?.setAttribute('score', updates.scoreRight);
-        this.querySelector('game-scoreboard')?.setAttribute('score-right', updates.scoreRight);
+      if (updates.scoreLeft != null || updates.scoreRight != null) {
+        this.renderScores();
       }
 
       // sounds
@@ -317,6 +313,14 @@ class ViewGame extends HTMLElement {
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);
     document.removeEventListener('click', this.handleClick);
+    this.gameApi.emit('reset');
+  }
+
+  renderScores() {
+    this.querySelector('game-player:not([right])')?.setAttribute('score', this.#gameState.scoreLeft || 0);
+    this.querySelector('game-scoreboard')?.setAttribute('score-left', this.#gameState.scoreLeft || 0);
+    this.querySelector('game-player[right]')?.setAttribute('score', this.#gameState.scoreRight || 0);
+    this.querySelector('game-scoreboard')?.setAttribute('score-right', this.#gameState.scoreRight || 0);
   }
 
   renderDialog() {
