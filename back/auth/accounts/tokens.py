@@ -30,7 +30,7 @@ class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
         print(datetime.datetime.now().timestamp() - ts)
         # print(settings.PASSWORD_RESET_TIMEOUT * 60)
         # Calculer la durée depuis la création du token
-        if (datetime.datetime.now() - datetime.datetime.fromtimestamp(ts)).total_seconds() > 978307230:
+        if (datetime.datetime.now() - datetime.datetime.fromtimestamp(ts)).total_seconds() > 978307800:
             print("Temps Depasse")
             return False
 

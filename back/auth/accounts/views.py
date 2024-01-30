@@ -52,7 +52,7 @@ def activateEmail(request, user, to_email):
     if email.send():
         return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm and complete the registration. Note: Check your spam folder.'}, status=200)
     else:
-        return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
+        return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseBadRequest.status_code)
 
 @csrf_exempt
 def login_user(request):
