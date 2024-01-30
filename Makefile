@@ -24,5 +24,6 @@ rebuild:
 ps:
 		docker-compose ps
 
-re:
-	fclean rebuild all
+re: fclean
+	make rebuild
+	make all
