@@ -15,8 +15,10 @@
 
       #messages {
           list-style-type: none;
+          padding: 10px;
           margin: 0;
           background-color: #fff;
+          border: 1px solid #ccc;
           border-radius: 5px;
           max-width: 400px;
           margin: 20px auto;
@@ -31,9 +33,6 @@
       }
 
       #sendButton {
-          position: absolute;
-          bottom: 0;
-          right: 0; /* Ajout de right: 0 pour le positionner à droite */
           padding: 10px 20px;
           background-color: #3498db;
           color: #fff;
@@ -52,10 +51,29 @@
 <body>
   <script src='/socket.io/socket.io.js'></script>
   <h1>WebSocket Service</h1>
+
+  <script>
+    var socket = io();
+
+    var send = function(){
+      var text = document.getElementById('m').value;
+      socket.emit('chat message', text)
+    }
   
+    var receive = function(msg) {
+      var li = document.createElement('li');
+      li.innerText = msg;
+      document.getElementById('messages').appendChild(li);
+    }
+    socket.on('chat message', receive);
+
+  </script>
+
   <div>
     <ul id="messages"></ul>
-    <input id="m" /> <button>Send</button>
+    <div class="zone_saisie">
+      <input id="m" /> <button onclick="send()">Send</button>
+    </div>
   </div>
 
 </body>

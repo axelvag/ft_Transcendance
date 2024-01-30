@@ -12,7 +12,8 @@ io.on('connection', function(socket){
     console.log('a user is disconnect');
   })
   socket.on('chat message', function(msg){
-    console.log('message recu' + msg);
+    console.log('message recu : ' + msg);
+    io.emit('chat message', msg)
   })
 
 
