@@ -53,18 +53,25 @@
   <h1>WebSocket Service</h1>
 
   <script>
+    // Initialisation de la connexion WebSocket
     var socket = io();
 
+    // Fonction pour envoyer un message au serveur
     var send = function(){
+      // Récupération du texte depuis l'élément avec l'id 'm'
       var text = document.getElementById('m').value;
+      // Émission du message au serveur avec l'événement 'chat message'
       socket.emit('chat message', text)
     }
   
+    // affiche la liste des messages recu
     var receive = function(msg) {
       var li = document.createElement('li');
       li.innerText = msg;
       document.getElementById('messages').appendChild(li);
     }
+
+    // Écoute de l'événement 'chat message' du serveur et appel de la fonction receive
     socket.on('chat message', receive);
 
   </script>
