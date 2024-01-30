@@ -1,83 +1,83 @@
 const characters = [
   {
     name: 'Alex',
-    avatar: 'avatar-alex.jpg',
+    avatar: './assets/img/avatar-alex.jpg',
   },
   {
     name: 'Chun-Li',
-    avatar: 'avatar-chun-li.jpg',
+    avatar: './assets/img/avatar-chun-li.jpg',
   },
   {
     name: 'Dudley',
-    avatar: 'avatar-dudley.jpg',
+    avatar: './assets/img/avatar-dudley.jpg',
   },
   {
     name: 'Elena',
-    avatar: 'avatar-elena.jpg',
+    avatar: './assets/img/avatar-elena.jpg',
   },
   {
     name: 'Gill',
-    avatar: 'avatar-gill.jpg',
+    avatar: './assets/img/avatar-gill.jpg',
   },
   {
     name: 'Gouki',
-    avatar: 'avatar-gouki.jpg',
+    avatar: './assets/img/avatar-gouki.jpg',
   },
   {
     name: 'Hugo',
-    avatar: 'avatar-hugo.jpg',
+    avatar: './assets/img/avatar-hugo.jpg',
   },
   {
     name: 'Ibuki',
-    avatar: 'avatar-ibuki.jpg',
+    avatar: './assets/img/avatar-ibuki.jpg',
   },
   {
     name: 'Ken',
-    avatar: 'avatar-ken.jpg',
+    avatar: './assets/img/avatar-ken.jpg',
   },
   {
     name: 'Makoto',
-    avatar: 'avatar-makoto.jpg',
+    avatar: './assets/img/avatar-makoto.jpg',
   },
   {
     name: 'Necro',
-    avatar: 'avatar-necro.jpg',
+    avatar: './assets/img/avatar-necro.jpg',
   },
   {
     name: 'Oro',
-    avatar: 'avatar-oro.jpg',
+    avatar: './assets/img/avatar-oro.jpg',
   },
   {
     name: 'Q',
-    avatar: 'avatar-q.jpg',
+    avatar: './assets/img/avatar-q.jpg',
   },
   {
     name: 'Remy',
-    avatar: 'avatar-remy.jpg',
+    avatar: './assets/img/avatar-remy.jpg',
   },
   {
     name: 'Ryu',
-    avatar: 'avatar-ryu.jpg',
+    avatar: './assets/img/avatar-ryu.jpg',
   },
   {
     name: 'Sean',
-    avatar: 'avatar-sean.jpg',
+    avatar: './assets/img/avatar-sean.jpg',
   },
   {
     name: 'Twelve',
-    avatar: 'avatar-twelve.jpg',
+    avatar: './assets/img/avatar-twelve.jpg',
   },
   {
     name: 'Urien',
-    avatar: 'avatar-urien.jpg',
+    avatar: './assets/img/avatar-urien.jpg',
   },
   {
     name: 'Yang',
-    avatar: 'avatar-yang.jpg',
+    avatar: './assets/img/avatar-yang.jpg',
   },
   {
     name: 'Yun',
-    avatar: 'avatar-yun.jpg',
+    avatar: './assets/img/avatar-yun.jpg',
   },
 ];
 
