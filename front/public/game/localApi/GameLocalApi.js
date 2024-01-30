@@ -7,7 +7,7 @@ class GameLocalApi {
   #height = 600;
   #wallThickness = 10;
   #ballSize = 20;
-  #ballSpeed = 300;
+  #ballSpeedOnStart = 300;
   #ballAcceleration = 1.05;
   #ballSpeedMax = 500;
   #paddleHeight = 100;
@@ -15,10 +15,17 @@ class GameLocalApi {
   #paddlePadding = 30;
   #paddleSpeed = 300;
   #scoreMax = 5;
+  #startRoundDelay = 500;
+  #endRoundDelay = 500;
 
   #innerWidth = this.#width - this.#wallThickness * 2;
   #innerHeight = this.#height - this.#wallThickness * 2;
   #paddleStartCenterX = this.#innerWidth / 2 - this.#paddlePadding - this.#paddleWidth / 2;
+  #paddleMaxCenterY = this.#innerHeight / 2 - this.#paddleHeight / 2;
+  #ballYOnWallCollision = this.#innerHeight / 2 - this.#ballSize / 2;
+  #ballXOnPaddleCollision = this.#paddleStartCenterX - this.#paddleWidth / 2 - this.#ballSize / 2;
+  #ballXOnScore = this.#width / 2 + this.#ballSize;
+  #hitOnPaddleMax = (this.#paddleHeight + this.#ballSize) / 2;
   #scoreLeft = 0;
   #scoreRight = 0;
   #status = 'initialized';
@@ -27,10 +34,10 @@ class GameLocalApi {
   #paddleLeft = null;
   #paddleRight = null;
 
-  #nextCollision = null;
   #previousCollider = null;
   #timer = null;
-  #ballSpeedOnPause = 0;
+  #ballSpeed = 0;
+  #ballDir = null;
   #eventListeners = {};
 
   constructor() {
@@ -43,7 +50,7 @@ class GameLocalApi {
       height: this.#height,
       wallThickness: this.#wallThickness,
       ballSize: this.#ballSize,
-      ballSpeed: this.#ballSpeed,
+      ballSpeedOnStart: this.#ballSpeedOnStart,
       ballAcceleration: this.#ballAcceleration,
       ballSpeedMax: this.#ballSpeedMax,
       paddleHeight: this.#paddleHeight,
@@ -53,13 +60,14 @@ class GameLocalApi {
       scoreMax: this.#scoreMax,
       innerWidth: this.#innerWidth,
       innerHeight: this.#innerHeight,
-      paddleStartCenterX: this.#paddleStartCenterX,
       scoreLeft: this.#scoreLeft,
       scoreRight: this.#scoreRight,
       status: this.#status,
       ball: this.#ball,
       paddleLeft: this.#paddleLeft,
       paddleRight: this.#paddleRight,
+      startRoundDelay: this.#startRoundDelay,
+      endRoundDelay: this.#endRoundDelay,
     };
   }
 
@@ -98,231 +106,209 @@ class GameLocalApi {
     });
     this.#scoreLeft = 0;
     this.#scoreRight = 0;
+    this.#ballSpeed = 0;
+    this.#ballDir = new Vec2(0, 0);
     this.#status = 'initialized';
     this.#previousCollider = null;
-    this.#nextCollision = null;
 
     this.#notify('init', this.#getState());
   }
 
   #startNewRound(playerServing) {
     this.#status = 'running';
-    this.#notify('update', { status: this.#status });
+    this.#ball.startCenter = new Vec2(0, 0);
+    this.#ball.endCenter.copy(this.#ball.startCenter);
+    this.#ball.startTime = Date.now();
+    this.#ball.endTime = this.#ball.startTime;
+    this.#notify('update', {
+      status: this.#status,
+      ball: this.#ball,
+    });
 
     this.#timer.set(() => {
       const xDir = playerServing === 'left' ? 1 : -1;
       const yDir = Math.random() * 2 - 1;
 
       this.#ball.startTime = Date.now();
-      this.#ball.startCenter = new Vec2(0, 0);
-      this.#ball.dir = Vec2.create(xDir, yDir).normalize();
-      this.#ball.speed = this.#ballSpeed;
+      this.#ball.endTime = this.#ball.startTime;
+      this.#ballDir = Vec2.create(xDir, yDir).normalize();
+      this.#ballSpeed = this.#ballSpeedOnStart;
+      this.#calculateNextCollision();
       this.#notify('update', { ball: this.#ball });
 
       this.#previousCollider = null;
-      this.#scheduleBallCollision();
-    }, 500);
+    }, this.#startRoundDelay);
   }
 
   #calculateNextCollision() {
-    if (this.#ball.speed === 0 || this.#ball.dir.lengthSquared() === 0) {
-      this.#nextCollision = null;
-      return;
-    }
-
-    let collider = null;
-    let time = Infinity;
-    let normal = null;
-
-    // top wall
-    if (this.#previousCollider !== 'topWall' && this.#ball.dir.y > 0) {
-      const collisionTime = ((this.#innerHeight / 2 - this.#ball.top()) / (this.#ball.speed * this.#ball.dir.y)) * 1000;
-      if (collisionTime > 0 && collisionTime < time) {
-        collider = 'topWall';
-        time = collisionTime;
-        normal = new Vec2(0, -1);
-      }
-    }
-
-    // bottom wall
-    if (this.#previousCollider !== 'bottomWall' && this.#ball.dir.y < 0) {
-      const collisionTime =
-        ((-this.#innerHeight / 2 - this.#ball.bottom()) / (this.#ball.speed * this.#ball.dir.y)) * 1000;
-      if (collisionTime > 0 && collisionTime < time) {
-        collider = 'bottomWall';
-        time = collisionTime;
-        normal = new Vec2(0, 1);
-      }
-    }
-
-    // left paddle
-    if (this.#previousCollider !== 'leftPaddle' && this.#ball.dir.x < 0) {
-      const paddleBorder = this.#paddleLeft.right();
-      const collisionTime = ((paddleBorder - this.#ball.left()) / (this.#ball.speed * this.#ball.dir.x)) * 1000;
-      if (collisionTime > 0 && collisionTime < time) {
-        collider = 'leftPaddle';
-        time = collisionTime;
-        normal = new Vec2(1, 0);
-      }
-    }
-
-    // left border
-    if (this.#previousCollider !== 'leftBorder' && this.#ball.dir.x < 0) {
-      const leftBorder = -this.#width / 2 - this.#ball.width;
-      const collisionTime = ((leftBorder - this.#ball.left()) / (this.#ball.speed * this.#ball.dir.x)) * 1000;
-      if (collisionTime > 0 && collisionTime < time) {
-        collider = 'leftBorder';
-        time = collisionTime;
-        normal = new Vec2(1, 0);
-      }
-    }
-
-    // right paddle
-    if (this.#previousCollider !== 'rightPaddle' && this.#ball.dir.x > 0) {
-      const paddleBorder = this.#paddleRight.left();
-      const collisionTime = ((paddleBorder - this.#ball.right()) / (this.#ball.speed * this.#ball.dir.x)) * 1000;
-      if (collisionTime > 0 && collisionTime < time) {
-        collider = 'rightPaddle';
-        time = collisionTime;
-        normal = new Vec2(-1, 0);
-      }
-    }
-
-    // right border
-    if (this.#previousCollider !== 'rightBorder' && this.#ball.dir.x > 0) {
-      const rightBorder = this.#width / 2 + this.#ball.width;
-      const collisionTime = ((rightBorder - this.#ball.right()) / (this.#ball.speed * this.#ball.dir.x)) * 1000;
-      if (collisionTime > 0 && collisionTime < time) {
-        collider = 'rightBorder';
-        time = collisionTime;
-        normal = new Vec2(-1, 0);
-      }
-    }
-
-    if (isFinite(time) && time > 0 && collider) {
-      this.#nextCollision = {
-        time: time + this.#ball.startTime,
-        relativeTime: time,
-        collider,
-        normal,
-      };
-      return;
-    }
-    this.#nextCollision = null;
-  }
-
-  #scheduleBallCollision() {
     if (this.#status !== 'running') return;
 
-    this.#calculateNextCollision();
-    if (!this.#nextCollision) {
-      throw new Error('No collision found');
+    if (this.#ballSpeed === 0 || (this.#ballDir.x === 0 && this.#ballDir.y === 0)) return;
+
+    let nextCollision = {
+      side: null,
+      type: null,
+      duration: Infinity,
+      normal: null,
+      ballOnHit: null,
+    };
+
+    // top / bottom
+    if (this.#ballDir.y !== 0) {
+      const side = this.#ballDir.y > 0 ? 'top' : 'bottom';
+      const hitYSign = this.#ballDir.y > 0 ? 1 : -1;
+      const ballYOnHit = this.#ballYOnWallCollision * hitYSign;
+      const duration = ((ballYOnHit - this.#ball.startCenter.y) / (this.#ballSpeed * this.#ballDir.y)) * 1000;
+      if (duration > 0 && duration < nextCollision.duration) {
+        nextCollision = {
+          side,
+          type: 'wall',
+          duration,
+          normal: new Vec2(0, -hitYSign),
+          ballOnHit: new Vec2(
+            this.#ball.startCenter.x + (this.#ballDir.x * this.#ballSpeed * duration) / 1000,
+            ballYOnHit
+          ),
+        };
+      }
     }
+
+    // left / right
+    if (this.#ballDir.x !== 0) {
+      const side = this.#ballDir.x > 0 ? 'right' : 'left';
+      const hitXSign = this.#ballDir.x > 0 ? 1 : -1;
+
+      // paddle
+      if (this.#previousCollider !== side + 'paddle') {
+        const ballXOnHit = this.#ballXOnPaddleCollision * hitXSign;
+        const duration = ((ballXOnHit - this.#ball.startCenter.x) / (this.#ballSpeed * this.#ballDir.x)) * 1000;
+        if (duration > 0 && duration < nextCollision.duration) {
+          nextCollision = {
+            side,
+            type: 'paddle',
+            duration,
+            normal: new Vec2(-hitXSign, 0),
+            ballOnHit: new Vec2(
+              ballXOnHit,
+              this.#ball.startCenter.y + (this.#ballDir.y * this.#ballSpeed * duration) / 1000
+            ),
+          };
+        }
+      }
+
+      // score
+      if (this.#ballXOnPaddleCollision - Math.abs(this.#ball.startCenter.x < 1)) {
+        const ballXOnHit = this.#ballXOnScore * hitXSign;
+        const duration = ((ballXOnHit - this.#ball.startCenter.x) / (this.#ballSpeed * this.#ballDir.x)) * 1000;
+        if (duration > 0 && duration < nextCollision.duration) {
+          nextCollision = {
+            side,
+            type: 'score',
+            duration,
+            normal: new Vec2(-hitXSign, 0),
+            ballOnHit: new Vec2(
+              ballXOnHit,
+              this.#ball.startCenter.y + (this.#ballDir.y * this.#ballSpeed * duration) / 1000
+            ),
+          };
+        }
+      }
+    }
+
+    if (!isFinite(nextCollision.duration)) return;
+    if (this.#status !== 'running') return;
+
+    this.#ball.endCenter = nextCollision.ballOnHit;
+    this.#ball.endTime = Date.now() + nextCollision.duration;
 
     this.#timer.set(() => {
-      this.#onBallCollision();
-    }, this.#nextCollision.relativeTime);
+      this.#onBallCollision(nextCollision);
+    }, nextCollision.duration);
   }
 
-  #onBallCollision() {
-    this.#previousCollider = this.#nextCollision.collider;
+  #onBallCollision(collision) {
+    this.#previousCollider = collision?.side + collision?.type || null;
+    this.#ball.startTime = this.#ball.endTime;
 
-    if (this.#nextCollision.collider === 'topWall' || this.#nextCollision.collider === 'bottomWall') {
-      this.#ball.startCenter = this.#ball.center(this.#nextCollision.time);
-      this.#ball.dir.reflect(this.#nextCollision.normal);
-      this.#ball.startTime = Date.now();
+    // wall
+    if (collision.type === 'wall') {
+      this.#ball.startCenter.copy(this.#ball.endCenter);
+      this.#ballDir.reflect(collision.normal);
+      this.#calculateNextCollision();
       this.#notify('update', { ball: this.#ball });
-      this.#scheduleBallCollision();
-      return;
     }
 
-    if (this.#nextCollision.collider === 'leftPaddle') {
-      const ballCenter = this.#ball.center(this.#nextCollision.time);
-      const paddleCenter = this.#paddleLeft.center(this.#nextCollision.time);
-      const hitOnPaddle = ballCenter.y - paddleCenter.y;
-      const hitOnPaddleMax = (this.#paddleHeight + this.#ball.height) / 2;
-      if (hitOnPaddle < hitOnPaddleMax && hitOnPaddle > -hitOnPaddleMax) {
-        this.#ball.dir.reflect(this.#nextCollision.normal);
-        this.#ball.speed = Math.min(this.#ballAcceleration * this.#ball.speed, this.#ballSpeedMax);
+    // paddle
+    else if (collision.type === 'paddle') {
+      this.#ball.startCenter.copy(this.#ball.endCenter);
+      const paddleCenter =
+        collision.side === 'left' ? this.#paddleLeft.center(collision.time) : this.#paddleRight.center(collision.time);
+      const hitOnPaddle = this.#ball.startCenter.y - paddleCenter.y;
+      if (Math.abs(hitOnPaddle) <= this.#hitOnPaddleMax) {
+        this.#ballDir.reflect(collision.normal);
+        this.#ballSpeed = Math.min(this.#ballAcceleration * this.#ballSpeed, this.#ballSpeedMax);
 
-        // alter ball direction based on paddle hit position
-        const factor = hitOnPaddle / hitOnPaddleMax;
-        this.#ball.dir.rotate((factor * Math.PI) / 8);
+        if (collision.side === 'left') {
+          // alter ball direction based on paddle hit position
+          const factor = hitOnPaddle / this.#hitOnPaddleMax;
+          this.#ballDir.rotate((factor * Math.PI) / 8);
 
-        // clamp ball direction
-        const angle = this.#ball.dir.angle();
-        if (angle > Math.PI / 4) {
-          this.#ball.dir = Vec2.create(1, 0).rotate(Math.PI / 4);
-        } else if (angle < -Math.PI / 4) {
-          this.#ball.dir = Vec2.create(1, 0).rotate(-Math.PI / 4);
+          // clamp ball direction
+          const angle = this.#ballDir.angle();
+          if (angle > Math.PI / 4) {
+            this.#ballDir = Vec2.create(1, 0).rotate(Math.PI / 4);
+          } else if (angle < -Math.PI / 4) {
+            this.#ballDir = Vec2.create(1, 0).rotate(-Math.PI / 4);
+          }
+        } else {
+          // alter ball direction based on paddle hit position
+          const factor = hitOnPaddle / this.#hitOnPaddleMax;
+          this.#ballDir.rotate((-factor * Math.PI) / 8);
+
+          // clamp ball direction
+          let angle = this.#ballDir.angle();
+          if (angle > 0 && angle < (3 * Math.PI) / 4) {
+            this.#ballDir = Vec2.create(-1, 1).normalize();
+          } else if (angle < 0 && angle > (-3 * Math.PI) / 4) {
+            this.#ballDir = Vec2.create(-1, -1).normalize();
+          }
         }
       }
-      this.#ball.startCenter = ballCenter;
-      this.#ball.startTime = Date.now();
+      this.#calculateNextCollision();
       this.#notify('update', { ball: this.#ball });
-      this.#scheduleBallCollision();
-      return;
     }
 
-    if (this.#nextCollision.collider === 'rightPaddle') {
-      const ballCenter = this.#ball.center(this.#nextCollision.time);
-      const paddleCenter = this.#paddleRight.center(this.#nextCollision.time);
-      const hitOnPaddle = ballCenter.y - paddleCenter.y;
-      const hitOnPaddleMax = (this.#paddleHeight + this.#ball.height) / 2;
-      if (hitOnPaddle < hitOnPaddleMax && hitOnPaddle > -hitOnPaddleMax) {
-        this.#ball.dir.reflect(this.#nextCollision.normal);
-        this.#ball.speed = Math.min(this.#ballAcceleration * this.#ball.speed, this.#ballSpeedMax);
-
-        // alter ball direction based on paddle hit position
-        const factor = hitOnPaddle / hitOnPaddleMax;
-        this.#ball.dir.rotate((-factor * Math.PI) / 8);
-
-        // clamp ball direction
-        let angle = this.#ball.dir.angle();
-        if (angle > 0 && angle < (3 * Math.PI) / 4) {
-          this.#ball.dir = Vec2.create(-1, 1).normalize();
-        } else if (angle < 0 && angle > (-3 * Math.PI) / 4) {
-          this.#ball.dir = Vec2.create(-1, -1).normalize();
-        }
-      }
-      this.#ball.startCenter = ballCenter;
-      this.#ball.startTime = Date.now();
-      this.#notify('update', { ball: this.#ball });
-      this.#scheduleBallCollision();
-      return;
-    }
-
-    if (this.#nextCollision.collider === 'leftBorder') {
+    // score
+    else if (collision.type === 'score') {
+      let isMaxScoreReached;
       this.#ball.stop();
-      this.#scoreRight += 1;
-      if (this.#scoreRight < this.#scoreMax) {
-        this.#timer.set(() => {
-          this.#startNewRound('left');
-        }, 500);
+
+      // update score
+      if (collision.side === 'left') {
+        this.#scoreRight += 1;
+        isMaxScoreReached = this.#scoreRight >= this.#scoreMax;
       } else {
+        this.#scoreLeft += 1;
+        isMaxScoreReached = this.#scoreLeft >= this.#scoreMax;
+      }
+
+      // if max score reached, finish game
+      if (isMaxScoreReached) {
         this.#status = 'finished';
       }
-      this.#notify('update', {
-        ball: this.#ball,
-        scoreRight: this.#scoreRight,
-        status: this.#status,
-      });
-      return;
-    }
-
-    if (this.#nextCollision.collider === 'rightBorder') {
-      this.#ball.stop();
-      this.#scoreLeft += 1;
-      if (this.#scoreLeft < this.#scoreMax) {
+      // else, start new round
+      else {
+        const playerServing = collision.side;
         this.#timer.set(() => {
-          this.#startNewRound('right');
-        }, 500);
-      } else {
-        this.#status = 'finished';
+          this.#startNewRound(playerServing);
+        }, this.#endRoundDelay);
       }
+
+      // send update
       this.#notify('update', {
         ball: this.#ball,
         scoreLeft: this.#scoreLeft,
+        scoreRight: this.#scoreRight,
         status: this.#status,
       });
     }
@@ -337,38 +323,28 @@ class GameLocalApi {
   }
 
   #pause() {
-    if (this.#status !== 'running') {
-      this.#notify('update', { status: this.#status });
-      return;
-    }
-    this.#timer.pause();
+    if (this.#status !== 'running') return;
+    this.#timer.clear();
 
-    this.#ballSpeedOnPause = this.#ball.speed;
     this.#ball.stop();
     this.#paddleLeft.stop();
     this.#paddleRight.stop();
-
     this.#status = 'paused';
 
     this.#notify('update', {
       ball: this.#ball,
+      paddleLeft: this.#paddleLeft,
+      paddleRight: this.#paddleRight,
       status: this.#status,
     });
   }
 
   #resume() {
-    if (this.#status !== 'paused') {
-      this.#notify('update', { status: this.#status });
-      return;
-    }
-
-    this.#ball.speed = this.#ballSpeedOnPause;
-    this.#ball.startTime = Date.now();
-    this.#calculateNextCollision();
-
-    this.#timer.resume();
+    if (this.#status !== 'paused') return;
     this.#status = 'running';
 
+    this.#ball.startTime = Date.now();
+    this.#calculateNextCollision();
     this.#notify('update', {
       ball: this.#ball,
       status: this.#status,
@@ -380,28 +356,42 @@ class GameLocalApi {
   }
 
   #updatePaddleLeftMove(dir) {
-    if (this.#status !== 'running') {
-      this.#notify('update', { status: this.#status });
-      return;
-    }
+    if (this.#status !== 'running') return;
 
-    this.#paddleLeft.startCenter = this.#paddleLeft.center();
-    this.#paddleLeft.startTime = Date.now();
-    this.#paddleLeft.dir.y = dir >= 0 ? 1 : -1;
-    this.#paddleLeft.speed = dir !== 0 ? this.#paddleSpeed : 0;
+    // check if paddle is already moving in the same direction
+    let currentDir = 0;
+    if (this.#paddleLeft.endCenter.y > this.#paddleLeft.startCenter.y) currentDir = 1;
+    else if (this.#paddleLeft.endCenter.y < this.#paddleLeft.startCenter.y) currentDir = -1;
+    if (dir === this.currentDir) return;
+
+    // update the move
+    this.#paddleLeft.stop();
+    if (dir !== 0) {
+      this.#paddleLeft.endCenter.y = this.#paddleMaxCenterY * dir;
+      this.#paddleLeft.endTime =
+        this.#paddleLeft.startTime +
+        (Math.abs(this.#paddleLeft.endCenter.y - this.#paddleLeft.startCenter.y) / this.#paddleSpeed) * 1000;
+    }
     this.#notify('update', { paddleLeft: this.#paddleLeft });
   }
 
   #updatePaddleRightMove(dir) {
-    if (this.#status !== 'running') {
-      this.#notify('update', { status: this.#status });
-      return;
-    }
+    if (this.#status !== 'running') return;
 
-    this.#paddleRight.startCenter = this.#paddleRight.center();
-    this.#paddleRight.startTime = Date.now();
-    this.#paddleRight.dir.y = dir >= 0 ? 1 : -1;
-    this.#paddleRight.speed = dir !== 0 ? this.#paddleSpeed : 0;
+    // check if paddle is already moving in the same direction
+    let currentDir = 0;
+    if (this.#paddleRight.endCenter.y > this.#paddleRight.startCenter.y) currentDir = 1;
+    else if (this.#paddleRight.endCenter.y < this.#paddleRight.startCenter.y) currentDir = -1;
+    if (dir === this.currentDir) return;
+
+    // update the move
+    this.#paddleRight.stop();
+    if (dir !== 0) {
+      this.#paddleRight.endCenter.y = this.#paddleMaxCenterY * dir;
+      this.#paddleRight.endTime =
+        this.#paddleRight.startTime +
+        (Math.abs(this.#paddleRight.endCenter.y - this.#paddleRight.startCenter.y) / this.#paddleSpeed) * 1000;
+    }
     this.#notify('update', { paddleRight: this.#paddleRight });
   }
 
