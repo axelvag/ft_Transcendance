@@ -17,6 +17,7 @@ const routes = {
   '/login': { title: 'Login', template: '<view-signin></view-signin>' },
   '/signup': { title: 'signup', template: '<view-signup></view-signup>' },
   '/forget-pass': { title: 'forget pass', template: '<view-forget-pass></view-forget-pass>' },
+  '/new-pass': { title: 'new pass', template: '<view-new-pass></view-new-pass>' },
   '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
   // logged
   '/friends': { title: 'Friends', template: friends },
