@@ -45,7 +45,7 @@ class ViewSigUp extends HTMLElement {
               <div id="success-notification" class="alert alert-success mt-3" style="display: none;">
                 <strong>Success!</strong> Registration successful! Please check your email for further instructions.
               </div>
-
+              <div id="general-error" class="alert alert-danger mt-3" style="display: none;"></div>
               <div class="text-center pt-4">
                 <a href="#" data-link="/login" class="link fw-bold text-decoration-none">
                   I already have an account
@@ -68,6 +68,7 @@ class ViewSigUp extends HTMLElement {
     this.password1 = document.getElementById('password1');
     this.password2 = document.getElementById('password2');
     this.passwordError = document.getElementById('password-error');
+    this.generalError = document.getElementById('general-error');
 
     //Event
     // this.displayFormErrors = this.displayFormErrors.bind(this);
@@ -131,6 +132,7 @@ class ViewSigUp extends HTMLElement {
     });
 
     const data = await response.json();
+    console.log("data", data);
 
     if (data.success) {
       const successNotification = document.getElementById('success-notification');
@@ -140,9 +142,19 @@ class ViewSigUp extends HTMLElement {
       if (data.errors.email) {
         this.emailError.textContent = data.errors.email[0];
         this.email.classList.add('is-invalid');
-      } else if (data.errors.password2) {
-        this.usernameError.textContent = data.error.password2[0];
-        this.username.classList.add('is-valid');
+      }
+      else if (data.errors.password2) {
+        this.passwordError.textContent = data.errors.password2[0];
+        this.password1.classList.add('is-invalid');
+        this.password2.classList.add('is-invalid');
+      }
+      else if (data.errors.username) {
+        this.usernameError.textContent = data.errors.username[0];
+        this.username.classList.add('is-invalid');
+      }
+      else  {
+        this.generalError.textContent = data.errors.non_field_errors[0];
+        this.generalError.style.display = 'block';
       }
     }
   }
@@ -151,7 +163,7 @@ class ViewSigUp extends HTMLElement {
     this.email.classList.remove('is-invalid');
     this.password1.classList.remove('is-invalid');
     this.password2.classList.remove('is-invalid');
-    this.usernameError.classList.remove('is-valid');
+    this.username.classList.remove('is-invalid');
 
     this.emailError.textContent = '';
     this.usernameError.textContent = '';
