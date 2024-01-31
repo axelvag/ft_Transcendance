@@ -1,5 +1,5 @@
 // templates
-import login from './views/login.js';
+// import login from './views/login.js';
 import friends from './views/friends.js';
 import careers from './views/careers.js';
 import settings from './views/settings.js';
@@ -14,8 +14,9 @@ const routes = {
   '/': { title: 'Home', template: home },
   '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
-  '/login': { title: 'Login', template: login },
-  '/signup': { title: 'Login', template: '<view-signup></view-signup>' },
+  '/login': { title: 'Login', template: '<view-signin></view-signin>' },
+  '/signup': { title: 'signup', template: '<view-signup></view-signup>' },
+  '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
   // logged
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
@@ -50,7 +51,8 @@ const router = () => {
       (window.location.hash || '#/').substring(1)
     : // without hash
       location.pathname.substring(baseUrl.length);
-  const view = routes[relativePath];
+  const pathname = relativePath.split('?')[0];
+  const view = routes[pathname];
   const appEl = document.querySelector('#app');
 
   if (!appEl) console.error('#app not found');

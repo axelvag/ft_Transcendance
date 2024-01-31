@@ -48,10 +48,10 @@ class ViewSigUp extends HTMLElement {
 
     this.querySelector('#signup-form').addEventListener('submit', this.submitForm.bind(this));
   }
-
+  
   async submitForm(event) {
-    console.log("Click submit !");
     event.preventDefault();
+    console.log("Click submit !");
     const form = event.target;
     const username = document.getElementById("username").value;
     const email = document.getElementById("email").value;
@@ -62,7 +62,7 @@ class ViewSigUp extends HTMLElement {
       email: email,
       password1: password1,
       password2: password2,
-  };
+    };
     console.log(JSON.stringify(formData));
     //to do
     // const csrfToken = this.getCSRFToken();
@@ -70,8 +70,8 @@ class ViewSigUp extends HTMLElement {
     //   "http://127.0.0.1:8000/accounts/get-csrf-token/",
     //   {
       //       method: "GET",
-    //       credentials: "include",
-    //   }
+      //       credentials: "include",
+      //   }
     // )
     // console.log('response', response);
     // const data = await response.json();
@@ -93,7 +93,11 @@ class ViewSigUp extends HTMLElement {
       body: JSON.stringify(formData),
     })
     const data =  await response.json();
+    console.log(data);
     if (data.success) {
+        // Redirection vers la page de connexion
+        console.log("yoooooooooooooo");
+        // window.location.href = "/login";
         alert('success');
     } else {
       alert('errors');
