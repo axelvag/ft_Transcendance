@@ -7,10 +7,11 @@ services:
       build:
         context: ./front
         dockerfile: Dockerfile
+      container_name: front
       ports:
         - "8000:80"
       networks:
-        - front
+        - back
       depends_on:
         - authentification
       restart: on-failure
@@ -50,6 +51,7 @@ services:
       build:
         context: ./data_base/Docker
         dockerfile: Dockerfile
+      container_name: data_base
       env_file:
         - .env
       volumes:

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Service</title>
+    <link href="style.css" rel="stylesheet">
+    <style>
+      h1 {
+          text-align: center;
+      }
+
+      body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #955fac;
+        background-size: cover; /* Ajuste la taille de l'image pour couvrir tout l'arrière-plan */
+        background-position: center; /* Centre l'image horizontalement */
+        background-repeat: no-repeat; /* Empêche la répétition de l'image */
+
+      }
+
+      .zone_saisie {
+          text-align: center;
+          margin-top: 20px; /* Ajoutez une marge en haut si nécessaire */
+      }
+
+      #messages {
+          list-style-type: none;
+          padding: 10px;
+          margin: 0;
+          background-color: #fff;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          max-width: 400px;
+          margin: 20px auto;
+      }
+
+      #m {
+          width: 70%;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px 0 0 5px;
+          font-size: 16px;
+      }
+
+      #sendButton {
+          padding: 10px 20px;
+          background-color: #3498db;
+          color: #fff;
+          border: none;
+          border-radius: 0 5px 5px 0;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background-color 0.3s ease;
+      }
+
+      #sendButton:hover {
+          background-color: #2980b9;
+      }
+  </style>
+</head>
+<body>
+  <script src='/socket.io/socket.io.js'></script>
+  <h1>WebSocket Service</h1>
+
+  <script>
+    // Initialisation de la connexion WebSocket
+    var socket = io();
+
+    // Fonction pour envoyer un message au serveur
+    var send = function(){
+      // Récupération du texte depuis l'élément avec l'id 'm'
+      var text = document.getElementById('m').value;
+      // Émission du message au serveur avec l'événement 'chat message'
+      socket.emit('chat message', text)
+    }
+  
+    // affiche la liste des messages recu
+    var receive = function(msg) {
+      var li = document.createElement('li');
+      li.innerText = msg;
+      document.getElementById('messages').appendChild(li);
+    }
+
+    // Écoute de l'événement 'chat message' du serveur et appel de la fonction receive
+    socket.on('chat message', receive);
+
+  </script>
+
+  <div>
+    <ul id="messages"></ul>
+    <div class="zone_saisie">
+      <input id="m" /> <button onclick="send()">Send</button>
+    </div>
+  </div>
+
+</body>
+</html>

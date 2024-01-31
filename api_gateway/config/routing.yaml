@@ -1,3 +1,8 @@
 # config/routing.yaml
-authentification: http://authentification:8001/Home
-profile: http://profile:8002/pages
+authentification: http://front:80/
+profile: http://front:80/front/public/#/profil
+playnow: http://front:80/?#
+signup: http://front:80/front/public/#/signup
+
+# authentification: http://authentification:8001/Home
+# profile: http://profile:8002/pages
