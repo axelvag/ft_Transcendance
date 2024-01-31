@@ -1,4 +1,5 @@
 import '../components/layouts/auth-layout.ce.js';
+import { redirectTo } from '../router.js';
 
 class ViewSigUp extends HTMLElement {
   constructor() {
@@ -29,11 +30,11 @@ class ViewSigUp extends HTMLElement {
             
             <div class="mb-4">
               <label class="form-label opacity-50" for="password1">Choose your password</label>
-              <input class="form-control form-control-lg" type="password" id="password1" name="password1" value="Qwertyuiop123." required />
+              <input class="form-control form-control-lg" type="password" id="password1" name="password1" required />
             </div>
             <div class="mb-4">
               <label class="form-label opacity-50" for="password2">Repeat your password</label>
-              <input class="form-control form-control-lg" type="password" id="password2" name="password2" value="Qwertyuiop123." required />
+              <input class="form-control form-control-lg" type="password" id="password2" name="password2"  required />
               <div id="password-error" class="invalid-feedback"></div>
             </div>
             
@@ -102,13 +103,12 @@ class ViewSigUp extends HTMLElement {
       this.passwordError.style.display = 'block';
       return false;
     }
-
     return true;
   };
 
   async submitForm(event) {
     event.preventDefault();
-
+    // debugger;
     this.resetError();
 
     let verif = this.passwordVerification();
@@ -137,6 +137,7 @@ class ViewSigUp extends HTMLElement {
     if (data.success) {
       const successNotification = document.getElementById('success-notification');
       if (successNotification) successNotification.style.display = 'block';
+      redirectTo('/profil');
     } 
     else {
       if (data.errors.email) {
@@ -153,7 +154,7 @@ class ViewSigUp extends HTMLElement {
         this.username.classList.add('is-invalid');
       }
       else  {
-        this.generalError.textContent = data.errors.non_field_errors[0];
+        this.generalError.textContent = data.errors.non_field_errors[0]; // categorie special d'erreur
         this.generalError.style.display = 'block';
       }
     }
