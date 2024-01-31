@@ -1,0 +1,9 @@
+{% autoescape off %}
+Bonjour {{ user.username }},
+
+Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :
+
+http://127.0.0.1:5500/front/public/#/pass-renitialisation?uidb64={{ uid }}&token={{ token }}
+
+Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet e-mail.
+{% endautoescape %}

@@ -161,3 +161,36 @@ def resend_email_confirmation(request, uidb64):
         return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm and complete the registration. Note: Check your spam folder.'}, status=200)
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
+
+
+@csrf_exempt
+def password_reset(request):
+    User = get_user_model()
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            if not email:
+                return JsonResponse({'error': 'Adresse e-mail manquante.'}, status=400)
+            user = User.objects.get(email=email)
+            if user is not None:
+                to_email = user.email
+                mail_subject = "Réinitialisation de votre mot de passe sur Transcendence"
+                message = render_to_string("template_forget_pass.html", {
+                    'user': user.username,
+                    'domain': get_current_site(request).domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': account_activation_token.make_token(user),
+                    "protocol": 'https' if request.is_secure() else 'http'
+                })
+                email = EmailMessage(mail_subject, message, to=[to_email])
+                if email.send():
+                    return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm the renitialisation of your password.'}, status=200)
+                else:
+                    return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
+            else:
+                return JsonResponse({'error': 'Aucun utilisateur trouvé avec cette adresse e-mail.'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Données invalides.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Méthode de requête non autorisée.'}, status=405)
