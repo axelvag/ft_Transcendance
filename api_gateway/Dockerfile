@@ -4,6 +4,8 @@ FROM python:3.9-slim
 # Définissez le répertoire de travail dans le conteneur
 WORKDIR /app
 
+# RUN pip install flask-cors
+
 # Copiez le contenu de votre répertoire API Gateway dans le conteneur
 COPY . /app/api_gateway
 
