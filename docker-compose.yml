@@ -78,6 +78,15 @@ services:
         - data_base
       restart: on-failure
 
+    communication:
+      build:
+        context: ./communication
+        dockerfile: Dockerfile
+      container_name: communication
+      ports:
+        - "3000:3000"
+      restart: on-failure
+
 volumes:
   data_base:
     name: data_base
