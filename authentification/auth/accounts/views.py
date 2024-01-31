@@ -69,17 +69,23 @@ def login_user(request):
         if '@' in username_or_email:
             try:
                 user = User.objects.get(email=username_or_email)
+                if not user.check_password(password):  # Vérifie le mot de passe pour l'email
+                    user = None
             except User.DoesNotExist:
                 pass
         else:
             user = authenticate(request, username=username_or_email, password=password)
 
         if user is not None:
-            login(request, user)
-            print("login success")
-            return JsonResponse({"success": True, "message": "Login successful."}, status=200)
+            if user.is_active:  # Assurez-vous que l'utilisateur est actif
+                login(request, user)
+                print("login success")
+                return JsonResponse({"success": True, "message": "Login successful."}, status=200)
+            else:
+                print("User not active")
+                return JsonResponse({"success": False, "message": "User not active."}, status=HttpResponseBadRequest.status_code)
         else:
-            print("login failled")
+            print("login failed")
             return JsonResponse({"success": False, "message": "Invalid username or password."}, status=HttpResponseBadRequest.status_code)
 
     return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
