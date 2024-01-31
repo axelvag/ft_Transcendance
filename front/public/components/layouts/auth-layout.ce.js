@@ -49,7 +49,7 @@ class LoginLayout extends HTMLElement {
         }
 
         .auth-layout-wrapper {
-          border: 2px solid #fff;
+          border: 2px solid var(--bs-gray-500);
           border-radius: 1.5rem;
         }
       }
@@ -61,7 +61,7 @@ class LoginLayout extends HTMLElement {
         }
       }
     </style>
-    <div class="auth-layout" data-bs-theme="dark">
+    <div class="auth-layout">
       <div class="auth-layout-body">
         <div class="auth-layout-wrapper">
           <slot></slot>

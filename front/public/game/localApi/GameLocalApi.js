@@ -1,8 +1,12 @@
 import Vec2 from './Vec2.js';
 import MovableRect from './MovableRect.js';
 import PausableTimeout from './PausableTimeout.js';
+import { getRandomCharacter } from './characters.js';
 
 class GameLocalApi {
+  #playerLeft = null;
+  #playerRight = null;
+
   #width = 800;
   #height = 600;
   #wallThickness = 10;
@@ -38,14 +42,19 @@ class GameLocalApi {
   #timer = null;
   #ballSpeed = 0;
   #ballDir = null;
+  #isBallMovingBeforePause = false;
   #eventListeners = {};
 
   constructor() {
+    this.#playerLeft = getRandomCharacter();
+    this.#playerRight = getRandomCharacter();
     this.#init();
   }
 
   #getState() {
     return {
+      playerLeft: this.#playerLeft,
+      playerRight: this.#playerRight,
       width: this.#width,
       height: this.#height,
       wallThickness: this.#wallThickness,
@@ -111,7 +120,7 @@ class GameLocalApi {
     this.#status = 'initialized';
     this.#previousCollider = null;
 
-    this.#notify('init', this.#getState());
+    this.#notify('init', { state: this.#getState() });
   }
 
   #startNewRound(playerServing) {
@@ -121,8 +130,11 @@ class GameLocalApi {
     this.#ball.startTime = Date.now();
     this.#ball.endTime = this.#ball.startTime;
     this.#notify('update', {
-      status: this.#status,
-      ball: this.#ball,
+      event: 'newRound',
+      state: {
+        status: this.#status,
+        ball: this.#ball,
+      },
     });
 
     this.#timer.set(() => {
@@ -134,7 +146,7 @@ class GameLocalApi {
       this.#ballDir = Vec2.create(xDir, yDir).normalize();
       this.#ballSpeed = this.#ballSpeedOnStart;
       this.#calculateNextCollision();
-      this.#notify('update', { ball: this.#ball });
+      this.#notify('update', { state: { ball: this.#ball } });
 
       this.#previousCollider = null;
     }, this.#startRoundDelay);
@@ -235,7 +247,10 @@ class GameLocalApi {
       this.#ball.startCenter.copy(this.#ball.endCenter);
       this.#ballDir.reflect(collision.normal);
       this.#calculateNextCollision();
-      this.#notify('update', { ball: this.#ball });
+      this.#notify('update', {
+        event: 'collision',
+        state: { ball: this.#ball },
+      });
     }
 
     // paddle
@@ -273,9 +288,17 @@ class GameLocalApi {
             this.#ballDir = Vec2.create(-1, -1).normalize();
           }
         }
+        this.#calculateNextCollision();
+        this.#notify('update', {
+          event: 'collision',
+          state: { ball: this.#ball },
+        });
+      } else {
+        this.#calculateNextCollision();
+        this.#notify('update', {
+          state: { ball: this.#ball },
+        });
       }
-      this.#calculateNextCollision();
-      this.#notify('update', { ball: this.#ball });
     }
 
     // score
@@ -306,17 +329,20 @@ class GameLocalApi {
 
       // send update
       this.#notify('update', {
-        ball: this.#ball,
-        scoreLeft: this.#scoreLeft,
-        scoreRight: this.#scoreRight,
-        status: this.#status,
+        event: isMaxScoreReached ? 'victory' : 'score',
+        state: {
+          ball: this.#ball,
+          scoreLeft: this.#scoreLeft,
+          scoreRight: this.#scoreRight,
+          status: this.#status,
+        },
       });
     }
   }
 
   #start() {
     if (this.#status !== 'initialized') {
-      this.#notify('update', { status: this.#status });
+      this.#notify('update', { state: { status: this.#status } });
       return;
     }
     this.#startNewRound('left');
@@ -324,18 +350,26 @@ class GameLocalApi {
 
   #pause() {
     if (this.#status !== 'running') return;
-    this.#timer.clear();
 
-    this.#ball.stop();
-    this.#paddleLeft.stop();
-    this.#paddleRight.stop();
+    this.#isBallMovingBeforePause = this.#ball.startCenter.x === this.#ball.endCenter.x;
+    if (this.#isBallMovingBeforePause) {
+      this.#timer.pause();
+    } else {
+      this.#timer.clear();
+
+      this.#ball.stop();
+      this.#paddleLeft.stop();
+      this.#paddleRight.stop();
+    }
+
     this.#status = 'paused';
-
     this.#notify('update', {
-      ball: this.#ball,
-      paddleLeft: this.#paddleLeft,
-      paddleRight: this.#paddleRight,
-      status: this.#status,
+      state: {
+        ball: this.#ball,
+        paddleLeft: this.#paddleLeft,
+        paddleRight: this.#paddleRight,
+        status: this.#status,
+      },
     });
   }
 
@@ -343,11 +377,17 @@ class GameLocalApi {
     if (this.#status !== 'paused') return;
     this.#status = 'running';
 
-    this.#ball.startTime = Date.now();
-    this.#calculateNextCollision();
+    if (this.#isBallMovingBeforePause) {
+      this.#timer.resume();
+    } else {
+      this.#ball.startTime = Date.now();
+      this.#calculateNextCollision();
+    }
     this.#notify('update', {
-      ball: this.#ball,
-      status: this.#status,
+      state: {
+        ball: this.#ball,
+        status: this.#status,
+      },
     });
   }
 
@@ -372,7 +412,7 @@ class GameLocalApi {
         this.#paddleLeft.startTime +
         (Math.abs(this.#paddleLeft.endCenter.y - this.#paddleLeft.startCenter.y) / this.#paddleSpeed) * 1000;
     }
-    this.#notify('update', { paddleLeft: this.#paddleLeft });
+    this.#notify('update', { state: { paddleLeft: this.#paddleLeft } });
   }
 
   #updatePaddleRightMove(dir) {
@@ -392,7 +432,7 @@ class GameLocalApi {
         this.#paddleRight.startTime +
         (Math.abs(this.#paddleRight.endCenter.y - this.#paddleRight.startCenter.y) / this.#paddleSpeed) * 1000;
     }
-    this.#notify('update', { paddleRight: this.#paddleRight });
+    this.#notify('update', { state: { paddleRight: this.#paddleRight } });
   }
 
   on(eventName, callback) {
@@ -403,7 +443,7 @@ class GameLocalApi {
 
     // trigger immediately init event
     if (eventName === 'init') {
-      callback(JSON.stringify(this.#getState()));
+      this.#notify('init', { state: this.#getState() });
     }
   }
 
