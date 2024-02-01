@@ -271,3 +271,18 @@ def resend_email_rest(request, uidb64):
         return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm the renitialisation of your password. Note: Check your spam folder.'}, status=200)
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
+
+
+@csrf_exempt
+def delete_user(request, username):
+
+    try:
+        user = User.objects.get(username=username)
+        user.delete()
+        return JsonResponse({"success": True, "message": "User deleted successfully."}, status=200)
+    except User.DoesNotExist:
+        print("error1")
+        return JsonResponse({"success": False, "message": "User not found."}, status=404)
+    except Exception as e:
+        print("error1")
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
