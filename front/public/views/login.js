@@ -58,7 +58,7 @@ class ViewSignIn extends HTMLElement {
               <label class="form-label opacity-50" for="password">
                 Password
               </label>
-              <a href="#" class="link fw-bold text-decoration-none">
+              <a href="#" data-link="/forget-pass" class="link fw-bold text-decoration-none">
                 Forgot password?
               </a>
             </div>
