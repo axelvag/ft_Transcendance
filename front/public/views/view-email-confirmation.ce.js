@@ -69,20 +69,6 @@ class ViewEmailConfirmation extends HTMLElement {
       // Effectuez une nouvelle demande de confirmation par e-mail
       const response = await fetch(`http://127.0.0.1:8000/accounts/resend_email_confirmation/${uidb64}`);
       const data = await response.json();
-
-      // // Masquez le message "Loading..." après la requête
-      // this.querySelector('#email-confirm-loading').hidden = true;
-
-      // if (data.success) {
-      //   // Affichez le message de succès
-      //   this.querySelector('#email-confirm-success').hidden = false;
-      // } else {
-      //   // Affichez le message d'erreur si la demande a échoué
-      //   if (data.message) {
-      //     this.querySelector('#email-confirm-error-msg').textContent = data.message;
-      //   }
-      //   this.querySelector('#email-confirm-error').hidden = false;
-      // }
     });
   }
 }

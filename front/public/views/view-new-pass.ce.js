@@ -106,9 +106,7 @@ class ViewNewPass extends HTMLElement {
     console.log(data);
     if (data.success) {
       redirectTo("/login");
-        // Redirection vers la page de connexion
         console.log("Success!");
-        // window.location.href = "/login";
         alert('success');
     } else {
       alert('errors');
