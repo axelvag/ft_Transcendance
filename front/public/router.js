@@ -14,9 +14,10 @@ const routes = {
   '/': { title: 'Home', template: home },
   '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
-  '/login': { title: 'Login', template: '<view-signin></view-signin>' },
+  '/login': { title: 'login', template: '<view-signin></view-signin>' },
   '/signup': { title: 'signup', template: '<view-signup></view-signup>' },
   '/forget-pass': { title: 'forget pass', template: '<view-forget-pass></view-forget-pass>' },
+  '/dashboard': { title: 'dashboard', template: '<view-dash></view-dash>' },
   '/new-pass': { title: 'new pass', template: '<view-new-pass></view-new-pass>' },
   '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
   // logged

@@ -1,4 +1,5 @@
 import '../components/layouts/auth-layout.ce.js';
+import { redirectTo } from '../router.js';
 
 class ViewSigUp extends HTMLElement {
   constructor() {
@@ -72,6 +73,12 @@ class ViewSigUp extends HTMLElement {
     //Event
     // this.displayFormErrors = this.displayFormErrors.bind(this);
     this.querySelector('#signup-form').addEventListener('submit', this.submitForm);
+    //Todo a revoir
+    this.querySelector('a[data-link="/login"]').addEventListener('click', function(e) {
+      e.preventDefault();
+      redirectTo('/login');
+    });
+    
     this.querySelector('#signup-form').addEventListener('click', e => e.stopPropagation());
   }
 

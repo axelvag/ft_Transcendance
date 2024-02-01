@@ -1,4 +1,5 @@
 import '../components/layouts/auth-layout.ce.js';
+import { redirectTo } from '../router.js';
 
 // const template = `
 //   <login-layout>
@@ -121,8 +122,11 @@ class ViewSignIn extends HTMLElement {
       body: JSON.stringify(formData),
     })
     const data =  await response.json();
+    console.log(data.username);
     if (data.success) {
         alert('success');
+        localStorage.setItem('username', data.username); 
+        redirectTo("/dashboard");
     } else {
       alert('errors');
       console.log(data.errors);
