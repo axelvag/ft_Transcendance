@@ -132,7 +132,7 @@ const style = `
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8rem;
+  gap: 8vh;
 }
 
 .viewGame-dialog-players {
