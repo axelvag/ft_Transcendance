@@ -281,8 +281,6 @@ def delete_user(request, username):
         user.delete()
         return JsonResponse({"success": True, "message": "User deleted successfully."}, status=200)
     except User.DoesNotExist:
-        print("error1")
         return JsonResponse({"success": False, "message": "User not found."}, status=404)
     except Exception as e:
-        print("error1")
         return JsonResponse({"success": False, "message": str(e)}, status=500)

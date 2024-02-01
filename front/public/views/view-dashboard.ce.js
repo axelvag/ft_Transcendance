@@ -10,6 +10,10 @@ class ViewDash extends HTMLElement {
 
   connectedCallback() {
     const username = localStorage.getItem('username');
+    if(!username){
+      redirectTo("/");
+      return;
+    }
     console.log(username);
     this.innerHTML = `
       <div class="layout">
@@ -41,6 +45,7 @@ class ViewDash extends HTMLElement {
     .then(response => response.json())
     .then(data => {
       if(data.success) {
+        localStorage.removeItem('username');
         // alert('success');// Affiche un message de confirmation
         redirectTo("/"); // Redirige l'utilisateur vers la page d'accueil
       }
