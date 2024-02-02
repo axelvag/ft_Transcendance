@@ -1,4 +1,4 @@
-.PHONY: all build rebuild stop stop volumes fclean
+.PHONY: all build rebuild stop stop volumes fclean sh-%
 
 all: volumes build up
 
@@ -23,6 +23,9 @@ rebuild:
 
 ps:
 		docker-compose ps
+
+sh-%:
+	docker compose -f docker-compose.yml exec $* /bin/sh
 
 re: fclean
 	make rebuild

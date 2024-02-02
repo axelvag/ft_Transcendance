@@ -1,99 +1,112 @@
-version: '3'
+version: "3"
 
 services:
+  # Serveur web
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: front
+    ports:
+      - "8000:80"
+    networks:
+      - back
+    depends_on:
+      - authentification
+    restart: on-failure
 
-    # Serveur web
-    front:
-      build:
-        context: ./front
-        dockerfile: Dockerfile
-      container_name: front
-      ports:
-        - "8000:80"
-      networks:
-        - back
-      depends_on:
-        - authentification
-      restart: on-failure
+  # Django Lucas
+  authentification:
+    build:
+      context: ./authentification/Docker
+      dockerfile: Dockerfile
+    container_name: authentification
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./authentification:/app
+    networks:
+      - back
+    depends_on:
+      - profile
+    restart: on-failure
 
-    # Django Lucas
-    authentification:
-      build:
-        context: ./authentification/Docker
-        dockerfile: Dockerfile
-      container_name: authentification
-      ports:
-        - "8001:8001"
-      volumes:
-        - ./authentification:/app
-      networks:
-        - back
-      depends_on:
-        - profile
-      restart: on-failure
+  # Alessio
+  profile:
+    build:
+      context: ./profile
+      dockerfile: Dockerfile
+    container_name: profile
+    ports:
+      - "8002:8002"
+    networks:
+      - back
+    depends_on:
+      - data_base
+    restart: on-failure
 
-    # Alessio
-    profile:
-      build:
-        context: ./profile
-        dockerfile: Dockerfile
-      container_name: profile
-      ports:
-        - "8002:8002"
-      networks:
-        - back
-      depends_on:
-        - data_base
-      restart: on-failure
+  # Data base PostGreSQL
+  data_base:
+    build:
+      context: ./data_base/Docker
+      dockerfile: Dockerfile
+    container_name: data_base
+    env_file:
+      - .env
+    volumes:
+      - data_base:/custom_postgres_data
+    ports:
+      - "5432:5432"
+    networks:
+      - data_base
+    restart: on-failure
 
-    # Data base PostGreSQL
-    data_base:
-      build:
-        context: ./data_base/Docker
-        dockerfile: Dockerfile
-      container_name: data_base
-      env_file:
-        - .env
-      volumes:
-        - data_base:/custom_postgres_data
-      ports:
-        - "5432:5432"
-      networks:
-        - data_base
-      restart: on-failure
+  api_gateway:
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    ports:
+      - "5000:5000"
+    networks:
+      - back
+    depends_on:
+      - authentification
+      - profile
+      - data_base
+    restart: on-failure
 
+  communication:
+    build:
+      context: ./communication
+      dockerfile: Dockerfile
+    container_name: communication
+    ports:
+      - "3000:3000"
+    restart: on-failure
 
-    api_gateway:
-      build:
-        context: ./api_gateway
-        dockerfile: Dockerfile
-      container_name: api_gateway
-      ports:
-        - "5000:5000"
-      networks:
-        - back
-      depends_on:
-        - authentification
-        - profile
-        - data_base
-      restart: on-failure
-
-    communication:
-      build:
-        context: ./communication
-        dockerfile: Dockerfile
-      container_name: communication
-      ports:
-        - "3000:3000"
-      restart: on-failure
+  game:
+    build:
+      context: ./game
+      dockerfile: Dockerfile
+    container_name: game
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./game/app:/app
+    networks:
+      - back
+    # depends_on:
+    #   - authentification
+    restart: on-failure
 
 volumes:
   data_base:
     name: data_base
     driver: local # ici nous stockons le volume en local
     driver_opts:
-      type: 'none' # aucun type specifique
-      o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
+      type: "none" # aucun type specifique
+      o: "bind" # on monte le volume directement sur le chemin ./src/front/public:/app
       device: data_base
 
 networks:
