@@ -124,9 +124,10 @@ class ViewSignIn extends HTMLElement {
     const data =  await response.json();
     console.log(data.username);
     if (data.success) {
-        alert('success');
-        localStorage.setItem('username', data.username); 
-        redirectTo("/dashboard");
+      localStorage.setItem('username', data.username); 
+      // window.user = { username: data.username };
+      alert('success');
+      redirectTo("/dashboard");
     } else {
       alert('errors');
       console.log(data.errors);

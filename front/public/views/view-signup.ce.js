@@ -30,11 +30,11 @@ class ViewSigUp extends HTMLElement {
             
             <div class="mb-4">
               <label class="form-label opacity-50" for="password1">Choose your password</label>
-              <input class="form-control form-control-lg" type="password" id="password1" name="password1" value="Qwertyuiop123." required />
+              <input class="form-control form-control-lg" type="password" id="password1" name="password1" required />
             </div>
             <div class="mb-4">
               <label class="form-label opacity-50" for="password2">Repeat your password</label>
-              <input class="form-control form-control-lg" type="password" id="password2" name="password2" value="Qwertyuiop123." required />
+              <input class="form-control form-control-lg" type="password" id="password2" name="password2" required />
               <div id="password-error" class="invalid-feedback"></div>
             </div>
             
