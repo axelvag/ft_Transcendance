@@ -80,7 +80,7 @@ services:
 
     communication:
       build:
-        context: ./communication/Node
+        context: ./communication/Django
         dockerfile: Dockerfile
       container_name: communication
       ports:

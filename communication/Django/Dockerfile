@@ -11,7 +11,9 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Exposez le port 4000 sur lequel Django sera en cours d'exécution
-EXPOSE 4000
+# EXPOSE 4000
+
+WORKDIR /app/mywebsite
 
 # Commande pour démarrer le serveur Django lorsqu'un conteneur est lancé
-CMD ["python", "manage.py", "runserver", "0.0.0.0:4000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:3000"]
