@@ -80,7 +80,7 @@ services:
 
     communication:
       build:
-        context: ./communication
+        context: ./communication/Node # ./communication/Django mais requirement.txt est tres long
         dockerfile: Dockerfile
       container_name: communication
       ports:
