@@ -30,7 +30,7 @@ class ViewDash extends HTMLElement {
     });
   }
   suppUser(username) {
-    const url = `http://127.0.0.1:8000/accounts/delete_user/${username}`;
+    const url = `http://127.0.0.1:8001/accounts/delete_user/${username}`;
     fetch(url, {
       method: 'POST',
       headers: {

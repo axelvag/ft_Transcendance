@@ -46,7 +46,7 @@ class ViewSidebar extends HTMLElement {
   }
 
   logoutUser() {
-    fetch('http://127.0.0.1:8000/accounts/logout/', { // Assurez-vous que l'URL correspond à votre configuration Django
+    fetch('http://127.0.0.1:8001/accounts/logout/', { // Assurez-vous que l'URL correspond à votre configuration Django
       method: 'GET', // ou 'POST' selon la méthode attendue par votre backend
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
