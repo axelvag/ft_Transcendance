@@ -1,5 +1,5 @@
 """
-URL configuration for friendship project.
+URL configuration for friendshipApp project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -16,7 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+# from . import views
+from listings import views
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+# ]
 
 urlpatterns = [
+    # ... vos autres routes
     path('admin/', admin.site.urls),
+    path('send-friend-request/<int:user_id>/', views.send_friend_request, name='send_friend_request'),
+    path('accept-friend-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
+    path('decline-friend-request/<int:request_id>/', views.decline_friend_request, name='decline_friend_request'),
 ]
