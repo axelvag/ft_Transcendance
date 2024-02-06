@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from .models import FriendRequest
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 # @login_required
 def send_friend_request(request, user_id):
@@ -31,3 +32,6 @@ def decline_friend_request(request, request_id):
     if friend_request.to_user == request.user:
         friend_request.delete()
     return redirect('some_view_name')
+
+def hello(request):
+    return HttpResponse('<h1>OUEOUEOUEOUEOUEOUE !</h1>')
