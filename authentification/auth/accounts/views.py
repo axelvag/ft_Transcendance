@@ -74,7 +74,8 @@ def login_user(request):
             except User.DoesNotExist:
                 pass
         else:
-            user = authenticate(request, username=username_or_email, password=password)
+            user = User.objects.get(username=username_or_email)
+            # user = authenticate(request, username=username_or_email, password=password)
 
         if user is not None:
             if user.is_active:  # Assurez-vous que l'utilisateur est actif
