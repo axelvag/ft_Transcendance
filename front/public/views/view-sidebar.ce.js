@@ -3,7 +3,7 @@ class ViewSidebar extends HTMLElement {
     this.innerHTML = `
       <div class="sidebar">
 
-        <img src="./assets/img/pong-logo.png" alt="Logo" class="logo">
+        <img src="assets/img/pong-logo.png" alt="Logo" class="logo">
         <button class="start-game" data-link="/game">Start a Game</button>
 
         <nav class="custom-nav">
