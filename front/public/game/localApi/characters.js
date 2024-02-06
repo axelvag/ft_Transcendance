@@ -1,39 +1,39 @@
 const characters = [
   {
     name: 'Alex',
-    avatar: './assets/img/avatar-alex.jpg',
+    avatar: 'assets/img/avatar-alex.jpg',
   },
   {
     name: 'Chun-Li',
-    avatar: './assets/img/avatar-chun-li.jpg',
+    avatar: 'assets/img/avatar-chun-li.jpg',
   },
   {
     name: 'Dudley',
-    avatar: './assets/img/avatar-dudley.jpg',
+    avatar: 'assets/img/avatar-dudley.jpg',
   },
   {
     name: 'Elena',
-    avatar: './assets/img/avatar-elena.jpg',
+    avatar: 'assets/img/avatar-elena.jpg',
   },
   {
     name: 'Gill',
-    avatar: './assets/img/avatar-gill.jpg',
+    avatar: 'assets/img/avatar-gill.jpg',
   },
   {
     name: 'Gouki',
-    avatar: './assets/img/avatar-gouki.jpg',
+    avatar: 'assets/img/avatar-gouki.jpg',
   },
   {
     name: 'Hugo',
-    avatar: './assets/img/avatar-hugo.jpg',
+    avatar: 'assets/img/avatar-hugo.jpg',
   },
   {
     name: 'Ibuki',
-    avatar: './assets/img/avatar-ibuki.jpg',
+    avatar: 'assets/img/avatar-ibuki.jpg',
   },
   {
     name: 'Ken',
-    avatar: './assets/img/avatar-ken.jpg',
+    avatar: 'assets/img/avatar-ken.jpg',
   },
   {
     name: 'Makoto',
