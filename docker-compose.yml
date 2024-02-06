@@ -96,8 +96,6 @@ services:
       - ./game/app:/app
     networks:
       - back
-    # depends_on:
-    #   - authentification
     restart: on-failure
 
 volumes:
