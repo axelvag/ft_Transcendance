@@ -80,7 +80,7 @@ def login_user(request):
             if user.is_active:  # Assurez-vous que l'utilisateur est actif
                 login(request, user)
                 print("login success")
-                return JsonResponse({"success": True, "message": "Login successful."}, status=200)
+                return JsonResponse({"success": True, "message": "Login successful.", "username": user.username}, status=200)
             else:
                 print("User not active")
                 return JsonResponse({"success": False, "message": "User not active."}, status=HttpResponseBadRequest.status_code)
@@ -271,3 +271,16 @@ def resend_email_rest(request, uidb64):
         return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm the renitialisation of your password. Note: Check your spam folder.'}, status=200)
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
+
+
+@csrf_exempt
+def delete_user(request, username):
+
+    try:
+        user = User.objects.get(username=username)
+        user.delete()
+        return JsonResponse({"success": True, "message": "User deleted successfully."}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({"success": False, "message": "User not found."}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)

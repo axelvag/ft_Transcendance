@@ -34,7 +34,7 @@ class ViewSigUp extends HTMLElement {
             </div>
             <div class="mb-4">
               <label class="form-label opacity-50" for="password2">Repeat your password</label>
-              <input class="form-control form-control-lg" type="password" id="password2" name="password2"  required />
+              <input class="form-control form-control-lg" type="password" id="password2" name="password2" required />
               <div id="password-error" class="invalid-feedback"></div>
             </div>
             
@@ -74,6 +74,12 @@ class ViewSigUp extends HTMLElement {
     //Event
     // this.displayFormErrors = this.displayFormErrors.bind(this);
     this.querySelector('#signup-form').addEventListener('submit', this.submitForm);
+    //Todo a revoir
+    this.querySelector('a[data-link="/login"]').addEventListener('click', function(e) {
+      e.preventDefault();
+      redirectTo('/login');
+    });
+    
     this.querySelector('#signup-form').addEventListener('click', e => e.stopPropagation());
   }
 
@@ -121,7 +127,7 @@ class ViewSigUp extends HTMLElement {
       password2: this.password2.value,
     };
 
-    const response = await fetch('http://127.0.0.1:8000/accounts/register/', {
+    const response = await fetch('http://127.0.0.1:8001/accounts/register/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -137,7 +143,7 @@ class ViewSigUp extends HTMLElement {
     if (data.success) {
       const successNotification = document.getElementById('success-notification');
       if (successNotification) successNotification.style.display = 'block';
-      redirectTo('/profil');
+      // redirectTo('/profil');
     } 
     else {
       if (data.errors.email) {
