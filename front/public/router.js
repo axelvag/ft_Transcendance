@@ -18,12 +18,16 @@ const routes = {
   '/signup': { title: 'signup', template: '<view-signup></view-signup>' },
   '/forget-pass': { title: 'forget pass', template: '<view-forget-pass></view-forget-pass>' },
   '/new-pass': { title: 'new pass', template: '<view-new-pass></view-new-pass>' },
-  '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
+  '/email-confirmation': {
+    title: 'Email confirmation',
+    template: '<view-email-confirmation></view-email-confirmation>',
+  },
   // logged
   '/friends': { title: 'Friends', template: friends },
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
-  '/game': { title: 'Game', template: '<view-game></view-game>' },
+  '/game/new': { title: 'New game', template: '<view-game-new></view-game-new>' },
+  '/game/play': { title: 'Game', template: '<view-game></view-game>' },
   // not found
   '/not-found': { title: 'Not Found', template: notFound },
 };
@@ -82,13 +86,18 @@ document.addEventListener('click', e => {
   }
 });
 
-const redirectTo = pathKey => {
+const redirectTo = (pathKey, options) => {
+  let queryStr = new URLSearchParams(options?.query).toString();
+  if (queryStr) {
+    queryStr = '?' + queryStr;
+  }
+
   const path = useHash
     ? // with hash
-      '/#' + pathKey
+      queryStr + '#' + pathKey
     : // without hash
-      pathKey;
-  history.pushState('', '', baseUrl + path);
+      pathKey + queryStr;
+  history.pushState('', '', `${baseUrl}/${path}`);
   router();
 };
 

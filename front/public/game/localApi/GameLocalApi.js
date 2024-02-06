@@ -1,7 +1,7 @@
 import Vec2 from './Vec2.js';
 import MovableRect from './MovableRect.js';
 import PausableTimeout from './PausableTimeout.js';
-import { getRandomCharacter } from './characters.js';
+import { getCharacter } from './characters.js';
 
 class GameLocalApi {
   #playerLeft = null;
@@ -45,9 +45,9 @@ class GameLocalApi {
   #isBallMovingBeforePause = false;
   #eventListeners = {};
 
-  constructor() {
-    this.#playerLeft = getRandomCharacter();
-    this.#playerRight = getRandomCharacter();
+  constructor(options) {
+    this.#playerLeft = getCharacter(options.playerLeft) || getCharacter('ryu');
+    this.#playerRight = getCharacter(options.playerRight) || getCharacter('ken');
     this.#init();
   }
 

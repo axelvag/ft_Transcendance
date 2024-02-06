@@ -231,7 +231,11 @@ class ViewGame extends HTMLElement {
   constructor() {
     super();
 
-    this.gameApi = new GameLocalApi();
+    const params = new URLSearchParams(window.location.search);
+    this.gameApi = new GameLocalApi({
+      playerLeft: params.get('player1'),
+      playerRight: params.get('player2'),
+    });
 
     this.renderDialog = this.renderDialog.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
