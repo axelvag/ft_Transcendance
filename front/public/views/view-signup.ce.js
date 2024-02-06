@@ -127,7 +127,7 @@ class ViewSigUp extends HTMLElement {
       password2: this.password2.value,
     };
 
-    const response = await fetch('http://127.0.0.1:8000/accounts/register/', {
+    const response = await fetch('http://127.0.0.1:8001/accounts/register/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
