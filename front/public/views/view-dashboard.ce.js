@@ -3,12 +3,14 @@ import { redirectTo } from '../router.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
+    // const username = window.user ? window.user.username : null;
     const username = localStorage.getItem('username');
+    console.log(username);
     if(!username){
+      alert('errors');
       redirectTo("/");
       return;
     }
-    console.log(username);
     this.innerHTML = `
       <div class="layout">
         <view-sidebar class="layout-sidebar"></view-sidebar>
@@ -28,7 +30,7 @@ class ViewDash extends HTMLElement {
     });
   }
   suppUser(username) {
-    const url = `http://127.0.0.1:8000/accounts/delete_user/${username}`;
+    const url = `http://127.0.0.1:8001/accounts/delete_user/${username}`;
     fetch(url, {
       method: 'POST',
       headers: {
@@ -38,6 +40,7 @@ class ViewDash extends HTMLElement {
     .then(response => response.json())
     .then(data => {
       if(data.success) {
+        // window.user = null;
         localStorage.removeItem('username');
         redirectTo("/");
       }
