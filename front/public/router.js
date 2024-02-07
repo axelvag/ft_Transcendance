@@ -8,7 +8,7 @@ import home from './views/home.js';
 
 const useHash = true;
 
-const baseUrl = '/front/public';
+const baseUrl = '';
 
 const routes = {
   '/': { title: 'Home', template: home },
