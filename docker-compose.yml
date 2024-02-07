@@ -47,20 +47,35 @@ services:
       restart: on-failure
 
     # Data base PostGreSQL
+    # data_base:
+    #   build:
+    #     context: ./data_base/Docker
+    #     dockerfile: Dockerfile
+    #   container_name: data_base
+    #   env_file:
+    #     - .env
+    #   volumes:
+    #     - data_base:/custom_postgres_data
+    #   ports:
+    #     - "5432:5432"
+    #   networks:
+    #     - back
+    #   restart: on-failure
+
     data_base:
-      build:
-        context: ./data_base/Docker
-        dockerfile: Dockerfile
-      container_name: data_base
-      env_file:
-        - .env
-      volumes:
-        - data_base:/custom_postgres_data
-      ports:
-        - "5432:5432"
-      networks:
-        - data_base
-      restart: on-failure
+        container_name: data_base
+        image: postgres:16.0-bookworm
+        environment:
+            - POSTGRES_DB=transcendence
+            - POSTGRES_USER=postgresTranscendence
+            - POSTGRES_PASSWORD=postgresTranscendence123
+        ports:
+            - "5432:5432"
+        volumes:
+            - data_base:/var/lib/postgresql/data
+        restart: always
+        networks:
+            - back
 
 
     api_gateway:
@@ -89,12 +104,12 @@ services:
 
 volumes:
   data_base:
-    name: data_base
-    driver: local # ici nous stockons le volume en local
-    driver_opts:
-      type: 'none' # aucun type specifique
-      o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
-      device: data_base
+    # name: data_base
+    # driver: local # ici nous stockons le volume en local
+    # driver_opts:
+    #   type: 'none' # aucun type specifique
+    #   o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
+    #   device: data_base
 
 networks:
   front:
