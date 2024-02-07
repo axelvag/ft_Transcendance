@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invitez un ami</title>
+</head>
+<body>
+    <h1>Invitez un ami</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Envoyer l'invitation</button>
+    </form>
+</body>
+</html>

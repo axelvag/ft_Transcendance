@@ -14,20 +14,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path
-# from . import views
-from listings import views
+# from django.contrib import admin
+# from django.urls import path
 
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
 # ]
 
+from django.contrib import admin
+from django.urls import path, include
+
 urlpatterns = [
-    # ... vos autres routes
     path('admin/', admin.site.urls),
-    path('hello/', views.hello),
-    path('send-friend-request/<int:user_id>/', views.send_friend_request, name='send_friend_request'),
-    path('accept-friend-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
-    path('decline-friend-request/<int:request_id>/', views.decline_friend_request, name='decline_friend_request'),
+    path('', include('invitations.urls')),
 ]
