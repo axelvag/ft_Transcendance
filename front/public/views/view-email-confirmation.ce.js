@@ -34,7 +34,7 @@ class ViewEmailConfirmation extends HTMLElement {
     console.log(uidb64);
     console.log(token);
 
-    const response1 = await fetch(`http://127.0.0.1:8000/accounts/is_user_active/${uidb64}/${token}`);
+    const response1 = await fetch(`http://127.0.0.1:8001/accounts/is_user_active/${uidb64}/${token}`);
     const data1 = await response1.json();
     if (data1.success) {
       // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
@@ -43,7 +43,7 @@ class ViewEmailConfirmation extends HTMLElement {
       this.querySelector('#email-confirm-success').hidden = false;
     }
     else {
-      const response = await fetch(`http://127.0.0.1:8000/accounts/activate/${uidb64}/${token}`);
+      const response = await fetch(`http://127.0.0.1:8001/accounts/activate/${uidb64}/${token}`);
       const data = await response.json();
       console.log(data);
       this.querySelector('#email-confirm-loading').hidden = true;
@@ -67,22 +67,8 @@ class ViewEmailConfirmation extends HTMLElement {
       this.querySelector('#email-confirm-loading').hidden = false;
 
       // Effectuez une nouvelle demande de confirmation par e-mail
-      const response = await fetch(`http://127.0.0.1:8000/accounts/resend_email_confirmation/${uidb64}`);
+      const response = await fetch(`http://127.0.0.1:8001/accounts/resend_email_confirmation/${uidb64}`);
       const data = await response.json();
-
-      // // Masquez le message "Loading..." après la requête
-      // this.querySelector('#email-confirm-loading').hidden = true;
-
-      // if (data.success) {
-      //   // Affichez le message de succès
-      //   this.querySelector('#email-confirm-success').hidden = false;
-      // } else {
-      //   // Affichez le message d'erreur si la demande a échoué
-      //   if (data.message) {
-      //     this.querySelector('#email-confirm-error-msg').textContent = data.message;
-      //   }
-      //   this.querySelector('#email-confirm-error').hidden = false;
-      // }
     });
   }
 }
