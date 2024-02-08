@@ -28,7 +28,10 @@ EXPOSE 8002
 
 WORKDIR /app/dashback
 
+RUN chmod +x ./script_python.sh
+
 # Commande pour lancer l'application Django
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8002"]
+# CMD ["python3", "manage.py", "runserver", "0.0.0.0:8002"]
+CMD [ "./script_python.sh" ]
 
 # CMD ["tail", "-f", "/dev/null"]
