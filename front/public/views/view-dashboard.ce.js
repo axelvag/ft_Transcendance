@@ -16,6 +16,7 @@ class ViewDash extends HTMLElement {
         <view-sidebar class="layout-sidebar"></view-sidebar>
         <div class="dashboard-content">
           <h1>Bienvenue, ${username} |</h1>
+          <button class="start-game" data-link="/game">Start a Game</button>
         </div>
         <div id="supp">
           <a href="#" id="delete-account-link">
