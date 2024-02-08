@@ -29,6 +29,7 @@ services:
       networks:
         - back
       depends_on:
+        - data_base
         - profile
       restart: on-failure
 
@@ -72,7 +73,7 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - data_base:/var/lib/postgresql/data
+            - data_base_data:/var/lib/postgresql/data
         restart: always
         networks:
             - back
@@ -103,7 +104,7 @@ services:
       restart: on-failure
 
 volumes:
-  data_base:
+  data_base_data:
     # name: data_base
     # driver: local # ici nous stockons le volume en local
     # driver_opts:
