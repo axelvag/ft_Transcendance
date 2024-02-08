@@ -50,7 +50,7 @@ def home(request):
 #     messages.success(request, "L'invitation a été acceptée.")
 #     return redirect('home')
 
-# # @login_required
+# @login_required
 # def reject_invitation(request, invitation_id):
 #     invitation = get_object_or_404(Invitation, id=invitation_id, to_email=request.user.email)
 #     invitation.delete()
