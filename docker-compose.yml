@@ -19,7 +19,7 @@ services:
     # Django Lucas
     authentification:
       build:
-        context: ./authentification/Docker
+        context: ./authentification
         dockerfile: Dockerfile
       container_name: authentification
       ports:
