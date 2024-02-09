@@ -54,7 +54,7 @@ def activateEmail(request, user, to_email):
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseBadRequest.status_code)
 
-@csrf_exempt
+# @csrf_exempt
 def login_user(request):
     if request.method == 'POST':
         try:
@@ -98,9 +98,10 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
+    response.delete_cookie('sessionid')
     return JsonResponse({"success": True, "message": "You have been logged out successfully."}, status=200)
 
-@csrf_exempt
+# @csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:

@@ -47,6 +47,18 @@ class ViewSignIn extends HTMLElement {
     this.emailError = this.querySelector('#email-error');
   }
 
+  async getCsrfToken() {
+    const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+      method: 'GET',
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data.csrfToken;
+    }
+    throw new Error('Could not retrieve CSRF token');
+  }
+
   async submitForm(event) {
     event.preventDefault();
 
@@ -61,12 +73,14 @@ class ViewSignIn extends HTMLElement {
       password: password,
   };
 
+    const csrfToken = await this.getCsrfToken();
+
     console.log(JSON.stringify(formData));
     const response = await fetch("http://127.0.0.1:8001/accounts/login/", {
         method: 'POST',
       headers: {
         "Content-Type": "application/json",
-        // 'X-CSRFToken': csrfToken
+        'X-CSRFToken': csrfToken
       },
       credentials: "include",
       body: JSON.stringify(formData),
