@@ -43,12 +43,12 @@ class GameLocalApi {
   #ballSpeed = 0;
   #ballDir = null;
   #isBallMovingBeforePause = false;
-  #eventListeners = {};
+  #listeners = [];
 
   constructor(options) {
+    options = options || {};
     this.#playerLeft = getCharacter(options.playerLeft) || getCharacter('ryu');
     this.#playerRight = getCharacter(options.playerRight) || getCharacter('ken');
-    this.#init();
   }
 
   #getState() {
@@ -80,9 +80,8 @@ class GameLocalApi {
     };
   }
 
-  #notify(eventName, data) {
-    if (!this.#eventListeners[eventName]) return;
-    this.#eventListeners[eventName].forEach(callback => callback(JSON.stringify(data)));
+  #notify(data) {
+    this.#listeners.forEach(callback => callback(JSON.stringify(data)));
   }
 
   #init() {
@@ -120,7 +119,10 @@ class GameLocalApi {
     this.#status = 'initialized';
     this.#previousCollider = null;
 
-    this.#notify('init', { state: this.#getState() });
+    this.#notify({
+      event: 'init',
+      state: this.#getState(),
+    });
   }
 
   #startNewRound(playerServing) {
@@ -129,7 +131,7 @@ class GameLocalApi {
     this.#ball.endCenter.copy(this.#ball.startCenter);
     this.#ball.startTime = Date.now();
     this.#ball.endTime = this.#ball.startTime;
-    this.#notify('update', {
+    this.#notify({
       event: 'newRound',
       state: {
         status: this.#status,
@@ -146,7 +148,7 @@ class GameLocalApi {
       this.#ballDir = Vec2.create(xDir, yDir).normalize();
       this.#ballSpeed = this.#ballSpeedOnStart;
       this.#calculateNextCollision();
-      this.#notify('update', { state: { ball: this.#ball } });
+      this.#notify({ state: { ball: this.#ball } });
 
       this.#previousCollider = null;
     }, this.#startRoundDelay);
@@ -247,7 +249,7 @@ class GameLocalApi {
       this.#ball.startCenter.copy(this.#ball.endCenter);
       this.#ballDir.reflect(collision.normal);
       this.#calculateNextCollision();
-      this.#notify('update', {
+      this.#notify({
         event: 'collision',
         state: { ball: this.#ball },
       });
@@ -289,13 +291,13 @@ class GameLocalApi {
           }
         }
         this.#calculateNextCollision();
-        this.#notify('update', {
+        this.#notify({
           event: 'collision',
           state: { ball: this.#ball },
         });
       } else {
         this.#calculateNextCollision();
-        this.#notify('update', {
+        this.#notify({
           state: { ball: this.#ball },
         });
       }
@@ -328,7 +330,7 @@ class GameLocalApi {
       }
 
       // send update
-      this.#notify('update', {
+      this.#notify({
         event: isMaxScoreReached ? 'victory' : 'score',
         state: {
           ball: this.#ball,
@@ -342,7 +344,7 @@ class GameLocalApi {
 
   #start() {
     if (this.#status !== 'initialized') {
-      this.#notify('update', { state: { status: this.#status } });
+      this.#notify({ state: { status: this.#status } });
       return;
     }
     this.#startNewRound('left');
@@ -363,7 +365,7 @@ class GameLocalApi {
     }
 
     this.#status = 'paused';
-    this.#notify('update', {
+    this.#notify({
       state: {
         ball: this.#ball,
         paddleLeft: this.#paddleLeft,
@@ -383,7 +385,7 @@ class GameLocalApi {
       this.#ball.startTime = Date.now();
       this.#calculateNextCollision();
     }
-    this.#notify('update', {
+    this.#notify({
       state: {
         ball: this.#ball,
         status: this.#status,
@@ -412,7 +414,7 @@ class GameLocalApi {
         this.#paddleLeft.startTime +
         (Math.abs(this.#paddleLeft.endCenter.y - this.#paddleLeft.startCenter.y) / this.#paddleSpeed) * 1000;
     }
-    this.#notify('update', { state: { paddleLeft: this.#paddleLeft } });
+    this.#notify({ state: { paddleLeft: this.#paddleLeft } });
   }
 
   #updatePaddleRightMove(dir) {
@@ -432,23 +434,18 @@ class GameLocalApi {
         this.#paddleRight.startTime +
         (Math.abs(this.#paddleRight.endCenter.y - this.#paddleRight.startCenter.y) / this.#paddleSpeed) * 1000;
     }
-    this.#notify('update', { state: { paddleRight: this.#paddleRight } });
+    this.#notify({ state: { paddleRight: this.#paddleRight } });
   }
 
-  on(eventName, callback) {
-    if (!this.#eventListeners[eventName]) {
-      this.#eventListeners[eventName] = [];
-    }
-    this.#eventListeners[eventName].push(callback);
-
-    // trigger immediately init event
-    if (eventName === 'init') {
-      this.#notify('init', { state: this.#getState() });
-    }
+  subscribe(callback) {
+    this.#listeners.push(callback);
   }
 
   emit(eventName, data) {
     switch (eventName) {
+      case 'init':
+        this.#init();
+        break;
       case 'start':
         this.#start();
         break;

@@ -118,11 +118,11 @@ class GamePlayer extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#attrs.avatar = this.getAttribute('avatar');
-    this.#attrs.name = this.getAttribute('name');
-    this.#attrs.score = this.getAttribute('score');
-    this.#attrs['score-max'] = this.getAttribute('score-max');
-    this.#attrs.direction = this.getAttribute('direction');
+    this.#attrs.avatar = this.getAttribute('avatar') || '';
+    this.#attrs.name = this.getAttribute('name') || '';
+    this.#attrs.score = this.getAttribute('score') || 0;
+    this.#attrs['score-max'] = this.getAttribute('score-max') || 0;
+    this.#attrs.direction = this.getAttribute('direction') || 'left';
 
     this.#render();
   }

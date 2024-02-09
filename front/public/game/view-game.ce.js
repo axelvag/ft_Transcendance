@@ -227,22 +227,35 @@ const style = `
 class ViewGame extends HTMLElement {
   #keys = {};
   #gameState = null;
+  #isLocalApi = false;
+  #gameApi = null;
 
   constructor() {
     super();
 
     const params = new URLSearchParams(window.location.search);
-    this.gameApi = new GameLocalApi({
-      playerLeft: params.get('player1'),
-      playerRight: params.get('player2'),
-    });
+    if (params.get('mode') === 'offline') {
+      this.#isLocalApi = true;
+      this.#gameApi = new GameLocalApi({
+        playerLeft: params.get('player1'),
+        playerRight: params.get('player2'),
+      });
+    } else if (params.get('game_id')) {
+      this.#isLocalApi = false;
+      this.#gameApi = new WebSocket(`ws://localhost:8003/play?game_id=${params.get('game_id')}`);
+    } else {
+      console.error('game_id not found');
+    }
 
     this.renderDialog = this.renderDialog.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
+    this.handleMessage = this.handleMessage.bind(this);
   }
 
   connectedCallback() {
+    if (!this.#gameApi) return;
+
     this.innerHTML = `
       <style>
         ${style}
@@ -261,20 +274,20 @@ class ViewGame extends HTMLElement {
     // Title
     this.dialogTitleEl = this.querySelector('.viewGame-dialog-title');
 
-    // Controls
+    // Controls;
     this.dialogStartBtn = this.querySelector('.viewGame-start');
     this.dialogStartBtn?.addEventListener('click', () => {
-      this.gameApi.emit('start');
+      this.#gameApi.emit('start');
     });
 
     this.dialogPauseBtn = this.querySelector('.viewGame-pause');
     this.dialogPauseBtn?.addEventListener('click', () => {
-      this.gameApi.emit('pause');
+      this.#gameApi.emit('pause');
     });
 
     this.dialogResumeBtn = this.querySelector('.viewGame-resume');
     this.dialogResumeBtn?.addEventListener('click', () => {
-      this.gameApi.emit('resume');
+      this.#gameApi.emit('resume');
     });
 
     this.dialogQuitBtn = this.querySelector('.viewGame-quit');
@@ -284,28 +297,47 @@ class ViewGame extends HTMLElement {
 
     this.dialogNewGameBtn = this.querySelector('.viewGame-newGame');
     this.dialogNewGameBtn?.addEventListener('click', () => {
-      this.gameApi.emit('reset');
-      this.gameApi.emit('start');
+      this.#gameApi.emit('reset');
+      this.#gameApi.emit('start');
       this.renderDialog();
     });
 
     // Renderer
     this.rendererEl = this.querySelector('.viewGame-renderer');
 
-    this.gameApi.on('init', data => {
-      const json = JSON.parse(data);
+    // Handle game events
+    if (this.#isLocalApi) {
+      this.#gameApi.subscribe(this.handleMessage);
+      this.#gameApi.emit('init');
+    } else {
+      this.#gameApi.addEventListener('message', this.handleMessage);
+    }
+
+    // Events
+    document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('keyup', this.handleKeyUp);
+    document.addEventListener('click', this.handleClick);
+  }
+
+  handleMessage(e) {
+    console.log('gameApi message', e);
+    const data = JSON.parse(e?.data || e);
+
+    // init
+    if (data?.event === 'init') {
       // todo: validate data
-      this.#gameState = json?.state;
+      this.#gameState = data?.state;
       this.renderPlayers();
       this.renderDialog();
       this.renderScores();
       this.rendererEl.init(this.#gameState);
       this.rendererEl.start();
-    });
-    this.gameApi.on('update', data => {
-      const json = JSON.parse(data);
+    }
+
+    // update
+    else {
       // todo: validate data
-      const updates = json?.state;
+      const updates = data?.state;
       this.#gameState = {
         ...this.#gameState,
         ...updates,
@@ -326,26 +358,21 @@ class ViewGame extends HTMLElement {
       }
 
       // sounds
-      if (json?.event) {
-        const sound = sounds[json.event];
+      if (data?.event) {
+        const sound = sounds[data.event];
         if (sound) {
           sound.currentTime = 0;
           sound.play();
         }
       }
-    });
-
-    // Events
-    document.addEventListener('keydown', this.handleKeyDown);
-    document.addEventListener('keyup', this.handleKeyUp);
-    document.addEventListener('click', this.handleClick);
+    }
   }
 
   disconnectedCallback() {
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);
     document.removeEventListener('click', this.handleClick);
-    this.gameApi.emit('reset');
+    this.#gameApi.emit('reset');
   }
 
   renderPlayers() {
@@ -443,17 +470,17 @@ class ViewGame extends HTMLElement {
     if (event.code === 'Space') {
       switch (this.#gameState.status) {
         case 'initialized':
-          this.gameApi.emit('start');
+          this.#gameApi.emit('start');
           return;
         case 'running':
-          this.gameApi.emit('pause');
+          this.#gameApi.emit('pause');
           return;
         case 'paused':
-          this.gameApi.emit('resume');
+          this.#gameApi.emit('resume');
           return;
         case 'finished':
-          this.gameApi.emit('reset');
-          this.gameApi.emit('start');
+          this.#gameApi.emit('reset');
+          this.#gameApi.emit('start');
           this.renderDialog();
           return;
       }
@@ -467,10 +494,10 @@ class ViewGame extends HTMLElement {
 
     if (['w', 's'].includes(event.key)) {
       const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
-      this.gameApi.emit('updatePaddleLeftMove', dir);
+      this.#gameApi.emit('updatePaddleLeftMove', dir);
     } else {
       const dir = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
-      this.gameApi.emit('updatePaddleRightMove', dir);
+      this.#gameApi.emit('updatePaddleRightMove', dir);
     }
   }
 
@@ -482,10 +509,10 @@ class ViewGame extends HTMLElement {
 
     if (['w', 's'].includes(event.key)) {
       const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
-      this.gameApi.emit('updatePaddleLeftMove', dir);
+      this.#gameApi.emit('updatePaddleLeftMove', dir);
     } else {
       const dir = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
-      this.gameApi.emit('updatePaddleRightMove', dir);
+      this.#gameApi.emit('updatePaddleRightMove', dir);
     }
   }
 }
