@@ -13,54 +13,58 @@ class ViewDash extends HTMLElement {
     }
     this.innerHTML = `
       <style>
-        *,
-        *::before,
-        *::after {
-          box-sizing: border-box;
+        .dashboard-text {
+          margin-left: 300px;
+          text-align: center;
+          margin-top: 100px; /* Ajustez la valeur selon vos besoins */
         }
         
-        .play-now-btn {
-          background-color: black; /* Couleur de fond */
-          color: white; /* Couleur du texte */
-          padding: 10px 20px; /* Espacement interne */
-          border: 2px solid white; /* Bordure blanche*/
-          border-radius: 5px; /* Coins arrondis */
-          font-size: 16px; /* Taille de la police */
-          font-weight: bold; /* Police en gras */
-          text-transform: uppercase; /* Texte en majuscules */
-          cursor: pointer; /* Curseur en forme de pointeur */
-          transition: background-color 0.3s, color 0.3s; /* Animation de transition */
-          text-decoration: none; /* Aucune décoration de texte */
-          display: inline-block; /*Permet au bouton de ne prendre que l'espace nécessaire */
-          margin-top: 1rem;
+        h1 {
+          font-size: 72px;
         }
-        
-        .white-mode .play-now-btn {
-          background-color: rgb(255, 255, 255); /* Couleur de fond */
-          color: rgb(0, 0, 0); /* Couleur du texte */
-          border: 2px solid rgb(0, 0, 0); /* Bordure blanche*/
+
+        #supp {
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          margin: 20px; /* Ajoutez une marge pour éviter que le texte ne soit collé aux bords */
         }
-        
-        .play-now-btn:hover, .play-now-btn:focus {
-          background-color: white; /* Couleur de fond lors du survol */
-          color: black; /* Couleur du texte lors du survol */
-          text-decoration: none; /* Aucune décoration de texte lors du survol */
+
+        .big-button-play {
+          display: flex;
+          justify-content: center; /* Centrer horizontalement */
+          align-items: center; /* Centrer verticalement */
+          margin-bottom: 300px; /* Ajustez la valeur selon vos besoins */
+          margin-left: 100px;
+          height: 100vh; /* Pour occuper toute la hauteur de la fenêtre */
         }
-        
-        .white-mode .play-now-btn:hover, .play-now-btn:focus {
-          background-color: rgb(0, 0, 0); /* Couleur de fond lors du survol */
-          color: rgb(255, 255, 255); /* Couleur du texte lors du survol */
+      
+        .play-now-btn_play {
+          font-size: 36px; /* Taille de police très grande */
+        } 
+
+        .custom-btn {
+          font-size: 48px; /* Augmenter la taille de la police */
+          padding: 20px 40px; /* Augmenter le rembourrage pour agrandir la zone cliquable */
         }
       </style>
+      <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+      </head>
       <div class="layout">
         <view-sidebar class="layout-sidebar"></view-sidebar>
         <div class="dashboard-content">
-          <h1>Bienvenue, ${username} |</h1>
-          <button type="submit" class="play-now-btn_play">Play Now</button>
+          <div class="dashboard-text">
+              <h1>TRANSCENDANCE PONG</h1>
+          </div>
+          <h2>Bienvenue, ${username}</h2>
+          <div class="big-button-play">
+            <button type="button" class="btn btn-outline-light btn-lg">Play Now</button>
+          </div>
         </div>
         <div id="supp">
           <a href="#" id="delete-account-link">
-            <h1> supprimer le compte</h1>
+            <h3> supprimer le compte</h3>
           </a>
         </div>
       </div>
