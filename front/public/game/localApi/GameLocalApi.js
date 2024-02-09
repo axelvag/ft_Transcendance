@@ -100,17 +100,11 @@ class GameLocalApi {
       startCenter: new Vec2(-this.#paddleStartCenterX, 0),
       height: this.#paddleHeight,
       width: this.#paddleWidth,
-      dir: new Vec2(0, 1),
-      yMin: -this.#innerHeight / 2,
-      yMax: this.#innerHeight / 2,
     });
     this.#paddleRight = new MovableRect({
       startCenter: new Vec2(this.#paddleStartCenterX, 0),
       height: this.#paddleHeight,
       width: this.#paddleWidth,
-      dir: new Vec2(0, 1),
-      yMin: -this.#innerHeight / 2,
-      yMax: this.#innerHeight / 2,
     });
     this.#scoreLeft = 0;
     this.#scoreRight = 0;
@@ -258,8 +252,7 @@ class GameLocalApi {
     // paddle
     else if (collision.type === 'paddle') {
       this.#ball.startCenter.copy(this.#ball.endCenter);
-      const paddleCenter =
-        collision.side === 'left' ? this.#paddleLeft.center(collision.time) : this.#paddleRight.center(collision.time);
+      const paddleCenter = collision.side === 'left' ? this.#paddleLeft.center() : this.#paddleRight.center();
       const hitOnPaddle = this.#ball.startCenter.y - paddleCenter.y;
       if (Math.abs(hitOnPaddle) <= this.#hitOnPaddleMax) {
         this.#ballDir.reflect(collision.normal);
@@ -404,7 +397,7 @@ class GameLocalApi {
     let currentDir = 0;
     if (this.#paddleLeft.endCenter.y > this.#paddleLeft.startCenter.y) currentDir = 1;
     else if (this.#paddleLeft.endCenter.y < this.#paddleLeft.startCenter.y) currentDir = -1;
-    if (dir === this.currentDir) return;
+    if (dir === currentDir) return;
 
     // update the move
     this.#paddleLeft.stop();
@@ -424,7 +417,7 @@ class GameLocalApi {
     let currentDir = 0;
     if (this.#paddleRight.endCenter.y > this.#paddleRight.startCenter.y) currentDir = 1;
     else if (this.#paddleRight.endCenter.y < this.#paddleRight.startCenter.y) currentDir = -1;
-    if (dir === this.currentDir) return;
+    if (dir === currentDir) return;
 
     // update the move
     this.#paddleRight.stop();
