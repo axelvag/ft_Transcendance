@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort, redirect
+from flask import Flask, request, jsonify, abort, redirect, Response
 from werkzeug.exceptions import HTTPException
 import logging
 import yaml
@@ -50,12 +50,6 @@ def forward_request(service_url, route, request):
     app.logger.debug(f"22222222222222222")
 
     try:
-        app.logger.debug(f"request.Methode {request.method}")
-        app.logger.debug(f"forward_url {forward_url}")
-        app.logger.debug(f"request.headers {request.headers}")
-        app.logger.debug(f"request.get_data() {request.get_data()}")
-        app.logger.debug(f"request.args {request.args}")
-
         response = requests.request(
             method=request.method,
             url=forward_url,
@@ -67,41 +61,49 @@ def forward_request(service_url, route, request):
             data=request.get_data(),
             params=request.args,
         )
-
-        app.logger.debug(f"333333333333333333 {response}")
+        
+        # Vérifier si la demande a réussi
+        response.raise_for_status()
 
         response_data_raw = response.content
         app.logger.debug(f"Raw response data: {response_data_raw}")
-        response_data = response_data_raw.decode('utf-8')
 
-        # Convertir les données de type bytes en str pour jsonify
-        # Pour fixe une erreur "TypeError: Object of type bytes is not JSON serializable"
-        response_data = response.content.decode('utf-8')
+        # Vérifier le type de contenu de la réponse
+        content_type = response.headers.get('content-type', '').lower()
+
+        if 'json' in content_type:
+            # Si la réponse est au format JSON, décoder en UTF-8 comme auparavant
+            response_data = response_data_raw.decode('utf-8')
+        else:
+            # Sinon, renvoyer les données brutes
+            response_data = response_data_raw
 
         return response_data, response.status_code, response.headers.items()
     except requests.RequestException as e:
         abort(500, f"Failed to forward request to {forward_url} : {str(e)}")
 
 
+
 @app.route('/<path:route>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def proxy(route):
     service_url = get_service_url(route)
-    # app.logger.debug("111111111111111111")
-    # app.logger.debug(f"service_url: {service_url}")
     if not service_url:
         app.logger.error(f"No service found for route: {route}")
         abort(404, f"No service found for route: {route}")
 
-
     response_data, status_code, headers = forward_request(service_url, route, request)
 
-    # Create a Flask response object to return to the client
-    response = jsonify(response_data)
-    response.status_code = status_code
-    for key, value in headers:
-        response.headers[key] = value
+    # Créez un objet Flask Response pour renvoyer au client
+    if isinstance(response_data, bytes):
+        # Si les données sont des bytes, renvoyez-les directement sans les sérialiser en JSON
+        response = Response(response_data, status=status_code, headers=dict(headers))
+    else:
+        # Sinon, sérialisez les données en JSON et renvoyez-les
+        response = jsonify(response_data)
+        response.status_code = status_code
+        for key, value in headers:
+            response.headers[key] = value
 
     return response
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
