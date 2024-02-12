@@ -89,10 +89,8 @@ class ViewSignIn extends HTMLElement {
     const data =  await response.json();
     console.log("error", data);
     if (data.success) {
-      localStorage.setItem('username', data.username); 
       console.log("Sucess!");
       redirectTo("/dashboard");
-      // alert('success');
     } else {
       if (data.message === "User not active.")
         this.emailError.style.display = 'block';

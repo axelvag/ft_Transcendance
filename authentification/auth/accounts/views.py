@@ -97,9 +97,11 @@ def login_user(request):
     return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
 
 def logout_user(request):
-    logout(request)
-    response.delete_cookie('sessionid')
-    return JsonResponse({"success": True, "message": "You have been logged out successfully."}, status=200)
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({"success": True, "message": "Déconnexion réussie."})
+    else:
+        return JsonResponse({"success": False, "message": "Méthode non autorisée."}, status=405)
 
 # @csrf_exempt
 def register_user(request):
@@ -294,13 +296,6 @@ def delete_user(request, username):
 
 def is_user_logged_in(request):
     if request.user.is_authenticated:
-        # Récupère le nom d'utilisateur et l'email de l'utilisateur connecté
-        username = request.user.username
-        email = request.user.email
-        return JsonResponse({
-            "is_logged_in": True,
-            "username": username,
-            "email": email
-        })
+        return JsonResponse({"success": True, "message": "User is login.", "username": request.user.username, "email": request.user.email}, status=200)
     else:
-        return JsonResponse({"is_logged_in": False})
+        return JsonResponse({"success": False, "message": "User is not login."}, status=400)
