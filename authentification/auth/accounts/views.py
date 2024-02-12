@@ -291,3 +291,16 @@ def delete_user(request, username):
         return JsonResponse({"success": False, "message": "User not found."}, status=404)
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+def is_user_logged_in(request):
+    if request.user.is_authenticated:
+        # Récupère le nom d'utilisateur et l'email de l'utilisateur connecté
+        username = request.user.username
+        email = request.user.email
+        return JsonResponse({
+            "is_logged_in": True,
+            "username": username,
+            "email": email
+        })
+    else:
+        return JsonResponse({"is_logged_in": False})
