@@ -35,6 +35,6 @@ WORKDIR /app/auth
 # Les droit ne marche pas donc je ne peux pas lancer le script !!!
 RUN chmod +x ./script_python.sh
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
-# CMD ["./script_python.sh"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
+CMD ["./script_python.sh"]
 # CMD ["ls", "-l", "script_python.sh"]
