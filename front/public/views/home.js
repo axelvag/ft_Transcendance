@@ -25,9 +25,7 @@ const template = `
       <div class="center-container">
         <h1 class="gradient-text-home">The Pong Game</h1>
         <div class="margin_top"></div>
-        <form action="#">
-          <button type="submit" class="play-now-btn_play">Play Now</button>
-        </form>
+          <button type="submit" class="play-now-btn_play" data-link="/game">Play Now</button>
       </div>
       <script src="{% static 'js/theme-toggle.js' %}"></script>
     </div>

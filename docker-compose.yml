@@ -99,15 +99,6 @@ services:
         - data_base
       restart: on-failure
 
-    communication:
-      build:
-        context: ./communication/Node # ./communication/Django mais requirement.txt est tres long
-        dockerfile: Dockerfile
-      container_name: communication
-      ports:
-        - "3000:3000"
-      restart: on-failure
-
 volumes:
   data_base_data:
     # name: data_base
