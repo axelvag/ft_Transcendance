@@ -17,11 +17,9 @@ class ViewDash extends HTMLElement {
           margin-left: 300px;
           text-align: center;
           margin-top: 100px; /* Ajustez la valeur selon vos besoins */
-        }
-        
-        h1 {
           font-size: 72px;
         }
+        
 
         #supp {
           position: absolute;
