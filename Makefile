@@ -24,6 +24,9 @@ rebuild:
 ps:
 		docker-compose ps
 
+sh-%:
+	docker compose -f docker-compose.yml exec $* /bin/sh
+
 re: fclean
 	make rebuild
 	make all
