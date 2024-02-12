@@ -10,6 +10,10 @@ class ViewSidebar extends HTMLElement {
         <button class="start-game" data-link="/game">Start a Game</button>
 
         <nav class="custom-nav">
+          <a class="nav-item" data-link="/dashboard">
+            <ui-icon name="dashboard"></ui-icon>
+            Home
+          </a>
           <a class="nav-item active" data-link="/profil">
             <ui-icon name="home"></ui-icon>
             Profile
