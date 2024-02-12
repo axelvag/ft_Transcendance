@@ -33,7 +33,7 @@ from django.http import JsonResponse
 def home(request):
     if request.method == "POST":
         form = InvitationForm(request.POST)
-        print("salut", form)
+        # print("salut", form)
         if form.is_valid():
             invitation = form.save(commit=False)
             invitation.from_user = request.user

@@ -105,7 +105,7 @@ class InvitationViewTests(TestCase):
 
     def test_home_view_post_valid(self):
         # Assurez-vous d'envoyer les bonnes données attendues par le formulaire.
-        response = self.client.post(reverse('home'), {'to_user': self.user2.username})  # Ajustez en fonction du formulaire
+        response = self.client.post(reverse('home'), {'username': self.user2.username})  # Ajustez en fonction du formulaire
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Invitation.objects.filter(from_user=self.user1, to_user=self.user2).exists())
 

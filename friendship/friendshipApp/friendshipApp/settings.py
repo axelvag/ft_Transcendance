@@ -25,8 +25,34 @@ SECRET_KEY = 'django-insecure-6bdpwckj*ktsr&n57rvtw0fi(yvppihbv$&r@f-575@exceg9q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['*']
+# Settings error Cros
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5500",  # Remplacez par l'URL de votre frontend
+    "http://127.0.0.1:8000",
+]
 
+# CORS_ORIGINS_ALLOWED_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+# CORS_ALLOW_ALL_ORIGINS = True
+
+ALLOWED_HOSTS=['*']
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+######
 
 # Application definition
 
@@ -41,6 +67,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -122,3 +149,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+APPEND_SLASH = False
