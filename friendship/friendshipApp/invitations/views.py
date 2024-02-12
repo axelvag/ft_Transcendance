@@ -27,12 +27,23 @@ from .models import Invitation
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 @login_required
+@csrf_exempt
 def home(request):
+    try:
+        data = json.loads(request.body.decode('utf8'))
+    except json.JSONDecodeError:
+        return JsonResponse({"errors": "Invalid JSON format"}, status=406)
+
+    print("data-->", data)
+    
     if request.method == "POST":
-        form = InvitationForm(request.POST)
+        # form = InvitationForm(request.POST)
+        form = InvitationForm(data)
         # print("salut", form)
         if form.is_valid():
             invitation = form.save(commit=False)

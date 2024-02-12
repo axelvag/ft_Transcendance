@@ -15,7 +15,7 @@ class InvitationForm(forms.ModelForm):
 
     class Meta: 
         model = Invitation
-        fields = []
+        fields = ['username']
 
     def clean_username(self):
         username = self.cleaned_data['username']
