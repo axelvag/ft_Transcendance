@@ -1,3 +1,5 @@
+import logoSvg from '@/assets/img/logo.svg?raw';
+
 const template = `
 <!DOCTYPE html>
 <html lang="en">
@@ -9,7 +11,7 @@ const template = `
 </head>
 <body>
   <div class="navbar">
-    <img src="assets/img/logoTranscendencenew.png" alt="Description de l'image" class="img-home">
+    ${logoSvg}
     <div class="flex">
       <label class="switch">
         <input type="checkbox" id="toggle-example" onchange="toggleTheme()">
@@ -32,7 +34,5 @@ const template = `
 </body>
 </html>
 `;
-
-
 
 export default template;

@@ -1,5 +1,5 @@
 // style
-import './scss/style.scss';
+import '@/scss/style.scss';
 
 // fonts
 import '@fontsource/orbitron/500.css';

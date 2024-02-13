@@ -1,3 +1,4 @@
+import logoSvg from '@/assets/img/logo.svg?raw';
 import { redirectTo } from '../router.js';
 
 class ViewSidebar extends HTMLElement {
@@ -5,7 +6,7 @@ class ViewSidebar extends HTMLElement {
     this.innerHTML = `
       <div class="sidebar">
         <a href="#" data-link="/dashboard">
-          <img src="./assets/img/pong-logo.png" alt="Logo" class="logo">
+          ${logoSvg}
         </a>
         <button class="start-game" data-link="/game">Start a Game</button>
 
@@ -38,33 +39,34 @@ class ViewSidebar extends HTMLElement {
         </a>
       </div>
     `;
-    this.querySelector('.logout').addEventListener('click', (event) => {
+    this.querySelector('.logout').addEventListener('click', event => {
       event.preventDefault(); // Empêche le lien de suivre son URL par défaut
       this.logoutUser();
     });
 
-    this.querySelector('a[data-link="/dashboard"]').addEventListener('click', function(e) {
+    this.querySelector('a[data-link="/dashboard"]').addEventListener('click', function (e) {
       e.preventDefault();
       redirectTo('/dashboard');
     });
   }
 
   logoutUser() {
-    fetch('http://127.0.0.1:8001/accounts/logout/', { // Assurez-vous que l'URL correspond à votre configuration Django
+    fetch('http://127.0.0.1:8001/accounts/logout/', {
+      // Assurez-vous que l'URL correspond à votre configuration Django
       method: 'GET', // ou 'POST' selon la méthode attendue par votre backend
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         // Ajoutez des en-têtes supplémentaires si nécessaire, comme le CSRF token pour les requêtes POST
       },
     })
-    .then(response => response.json())
-    .then(data => {
-      if(data.success) {
-        // alert(data.message); // Affiche un message de confirmation
-        redirectTo("/"); // Redirige l'utilisateur vers la page d'accueil
-      }
-    })
-    .catch(error => console.error('Error:', error));
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // alert(data.message); // Affiche un message de confirmation
+          redirectTo('/'); // Redirige l'utilisateur vers la page d'accueil
+        }
+      })
+      .catch(error => console.error('Error:', error));
   }
 }
 
