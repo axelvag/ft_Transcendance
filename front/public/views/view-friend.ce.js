@@ -48,10 +48,14 @@ class ViewFriend extends HTMLElement {
   handleFormSubmit(event) {
     event.preventDefault();
 
+    this.generalErrorFriend.style.display = 'none';
+    const successNotificationFriend = document.getElementById('success-notification-friend');
+    if (successNotificationFriend) successNotificationFriend.style.display = 'none';
+
     const friendName = this.querySelector('#friend-name').value;
     console.log("friend-->", friendName);
 
-    fetch('http://127.0.0.1:8000/home/', {
+    fetch('http://127.0.0.1:8003/home/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,11 +67,14 @@ class ViewFriend extends HTMLElement {
     .then(data => {
       console.log('data:', data);
       // Traiter la réponse du serveur
-      if (!data.success){
+      // if (!data.success){
+      if (data.username){
+        console.log("salut");
         this.generalErrorFriend.textContent = data.username[0];
         this.generalErrorFriend.style.display = 'block';
       }
       else{
+        console.log("salut123");
         const successNotificationFriend = document.getElementById('success-notification-friend');
       if (successNotificationFriend) successNotificationFriend.style.display = 'block';
       }

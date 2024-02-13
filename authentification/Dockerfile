@@ -18,9 +18,23 @@ RUN pip install --upgrade pip \
 # copie du contenu de Django de l'appli dans le conteneur
 COPY . /app/
 
+# COPY ./script_python.sh /app/
+# RUN chmod 777 ./script_python.sh
+
+
+
 EXPOSE 8001
+
+# WORKDIR /app/auth
+
+# # lancer l'appli Django
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
 
 WORKDIR /app/auth
 
-# lancer l'appli Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
+# Les droit ne marche pas donc je ne peux pas lancer le script !!!
+RUN chmod +x ./script_python.sh
+
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
+CMD ["./script_python.sh"]
+# CMD ["ls", "-l", "script_python.sh"]

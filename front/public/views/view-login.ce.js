@@ -62,7 +62,7 @@ class ViewSignIn extends HTMLElement {
   };
 
     console.log(JSON.stringify(formData));
-    const response = await fetch("http://127.0.0.1:8000/accounts/login/", {
+    const response = await fetch("http://127.0.0.1:8001/accounts/login/", {
         method: 'POST',
       headers: {
         "Content-Type": "application/json",
@@ -75,8 +75,9 @@ class ViewSignIn extends HTMLElement {
     const data =  await response.json();
     console.log("error", data);
     if (data.success) {
+      localStorage.setItem('username', data.username); 
       console.log("Sucess!");
-      redirectTo('/profil');
+      redirectTo("/dashboard");
       // alert('success');
     } else {
       if (data.message === "User not active.")

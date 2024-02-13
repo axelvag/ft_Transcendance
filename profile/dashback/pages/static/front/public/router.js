@@ -8,7 +8,7 @@ import logout from './views/logout.js';
 
 const useHash = true;
 
-const baseUrl = '/front/public';
+const baseUrl = '';
 
 const routes = {
   '/': { title: 'Profil', template: profil },

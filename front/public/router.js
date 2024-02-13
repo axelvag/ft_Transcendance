@@ -8,14 +8,17 @@ import home from './views/home.js';
 
 const useHash = true;
 
-const baseUrl = '/front/public';
+const baseUrl = '';
 
 const routes = {
   '/': { title: 'Home', template: home },
   '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
   '/login': { title: 'Login', template: '<view-signin></view-signin>' },
-  '/signup': { title: 'signup', template: '<view-signup></view-signup>' },
+  '/signup': { title: 'Signup', template: '<view-signup></view-signup>' },
+  '/forget-pass': { title: 'Forget password', template: '<view-forget-pass></view-forget-pass>' },
+  '/dashboard': { title: 'Dashboard', template: '<view-dash></view-dash>' },
+  '/new-pass': { title: 'New password', template: '<view-new-pass></view-new-pass>' },
   '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
   // logged
   '/friends': { title: 'Friends', template:'<view-friend></view-friend>'},
