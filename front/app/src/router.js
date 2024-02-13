@@ -1,6 +1,6 @@
 // templates
 // import login from './views/login.js';
-import friends from './views/friends.js';
+// import friends from './views/friends.js';
 import careers from './views/careers.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
@@ -21,7 +21,7 @@ const routes = {
   '/new-pass': { title: 'New password', template: '<view-new-pass></view-new-pass>' },
   '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
   // logged
-  '/friends': { title: 'Friends', template: friends },
+  '/friends': { title: 'Friends', template:'<view-friend></view-friend>'},
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
   '/game': { title: 'Game', template: '<view-game></view-game>' },
