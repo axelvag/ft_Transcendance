@@ -1,6 +1,6 @@
 import './view-sidebar.ce.js';
 import { redirectTo } from '../router.js';
-// import { verifyUserLoginAndDisplayDashboard } from './authService';
+import { verifyUserLoginAndDisplayDashboard } from './authService';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
