@@ -33,3 +33,8 @@ class InvitationForm(forms.ModelForm):
         if commit:
             invitation.save()
         return invitation
+
+# class heritante de mon models
+
+# class Meta : - faire le lien entre le form et mon modele 
+#              - specifier des option de modeles
