@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Pour utiliser Postgres
+python3 manage.py makemigrations
+
 # Exécuter les migrations
 python3 manage.py migrate
 
