@@ -1,5 +1,5 @@
 import logoSvg from '@/assets/img/logo.svg?raw';
-import { redirectTo } from '../router.js';
+import { redirectTo } from '@/router.js';
 
 class ViewSidebar extends HTMLElement {
   connectedCallback() {

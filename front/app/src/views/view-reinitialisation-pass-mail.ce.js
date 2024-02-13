@@ -1,4 +1,4 @@
-import '../components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout.ce.js';
 
 class ViewForgetPass extends HTMLElement {
   connectedCallback() {
@@ -25,32 +25,32 @@ class ViewForgetPass extends HTMLElement {
 
     this.querySelector('#pass-form').addEventListener('submit', this.submitForm.bind(this));
   }
-  
+
   async submitForm(event) {
     event.preventDefault();
-    console.log("Click submit !");
+    console.log('Click submit !');
     const form = event.target;
-    const email = document.getElementById("email").value;
+    const email = document.getElementById('email').value;
     const formData = {
       email: email,
     };
     console.log(JSON.stringify(formData));
-    const response = await fetch("http://127.0.0.1:8001/accounts/password_reset/", {
-        method: 'POST',
+    const response = await fetch('http://127.0.0.1:8001/accounts/password_reset/', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         // 'X-CSRFToken': csrfToken
       },
-      credentials: "include",
+      credentials: 'include',
       body: JSON.stringify(formData),
-    })
-    const data =  await response.json();
+    });
+    const data = await response.json();
     console.log(data);
     if (data.success) {
-        // Redirection vers la page de connexion
-        console.log("yoooooooooooooo");
-        // window.location.href = "/login";
-        alert('success');
+      // Redirection vers la page de connexion
+      console.log('yoooooooooooooo');
+      // window.location.href = "/login";
+      alert('success');
     } else {
       alert('errors');
       console.log(data.errors);

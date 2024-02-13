@@ -1,14 +1,14 @@
 import './view-sidebar.ce.js';
-import { redirectTo } from '../router.js';
+import { redirectTo } from '@/router.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
     // const username = window.user ? window.user.username : null;
     const username = localStorage.getItem('username');
     console.log(username);
-    if(!username){
+    if (!username) {
       alert('errors');
-      redirectTo("/");
+      redirectTo('/');
       return;
     }
     this.innerHTML = `
@@ -67,7 +67,7 @@ class ViewDash extends HTMLElement {
         </div>
       </div>
     `;
-    this.querySelector('#delete-account-link').addEventListener('click', (event) => {
+    this.querySelector('#delete-account-link').addEventListener('click', event => {
       event.preventDefault();
       this.suppUser(username);
     });
@@ -80,15 +80,15 @@ class ViewDash extends HTMLElement {
         'X-Requested-With': 'XMLHttpRequest',
       },
     })
-    .then(response => response.json())
-    .then(data => {
-      if(data.success) {
-        // window.user = null;
-        localStorage.removeItem('username');
-        redirectTo("/");
-      }
-    })
-    .catch(error => console.error('Error:', error));
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // window.user = null;
+          localStorage.removeItem('username');
+          redirectTo('/');
+        }
+      })
+      .catch(error => console.error('Error:', error));
   }
 }
 

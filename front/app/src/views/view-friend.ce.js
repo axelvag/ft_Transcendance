@@ -13,7 +13,6 @@
 import './view-sidebar.ce.js';
 
 class ViewFriend extends HTMLElement {
-
   connectedCallback() {
     this.innerHTML = `
       <div class="layout">
@@ -53,7 +52,7 @@ class ViewFriend extends HTMLElement {
     if (successNotificationFriend) successNotificationFriend.style.display = 'none';
 
     const friendName = this.querySelector('#friend-name').value;
-    console.log("friend-->", friendName);
+    console.log('friend-->', friendName);
 
     fetch('http://127.0.0.1:8003/home/', {
       method: 'POST',
@@ -63,26 +62,25 @@ class ViewFriend extends HTMLElement {
       credentials: 'include',
       body: JSON.stringify({ username: friendName }),
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('data:', data);
-      // Traiter la réponse du serveur
-      // if (!data.success){
-      if (data.username){
-        console.log("salut");
-        this.generalErrorFriend.textContent = data.username[0];
-        this.generalErrorFriend.style.display = 'block';
-      }
-      else{
-        console.log("salut123");
-        const successNotificationFriend = document.getElementById('success-notification-friend');
-      if (successNotificationFriend) successNotificationFriend.style.display = 'block';
-      }
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-      // Gérer les erreurs de la requête
-    });
+      .then(response => response.json())
+      .then(data => {
+        console.log('data:', data);
+        // Traiter la réponse du serveur
+        // if (!data.success){
+        if (data.username) {
+          console.log('salut');
+          this.generalErrorFriend.textContent = data.username[0];
+          this.generalErrorFriend.style.display = 'block';
+        } else {
+          console.log('salut123');
+          const successNotificationFriend = document.getElementById('success-notification-friend');
+          if (successNotificationFriend) successNotificationFriend.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Gérer les erreurs de la requête
+      });
   }
 }
 
