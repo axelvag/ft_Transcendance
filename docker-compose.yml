@@ -31,6 +31,7 @@ services:
       depends_on:
         - data_base
         - profile
+        - friendship
       environment:
       - POSTGRES_HOST=data_base  # Utilisez le nom du service comme hôte
       - POSTGRES_DB=transcendence
@@ -96,6 +97,19 @@ services:
       depends_on:
         - authentification
         - profile
+        - data_base
+      restart: on-failure
+
+    friendship:
+      build:
+        context: ./friendship
+        dockerfile: Dockerfile
+      container_name: friendship
+      ports:
+        - "8003:8003"
+      networks:
+        - back
+      depends_on:
         - data_base
       restart: on-failure
 
