@@ -1,27 +1,8 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body{
-  background-color: #000000;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-}
-
 .white-mode {
   background-color: whitesmoke;
 }
 
-H1{
-  /* margin-top: 15%; */
-  /* text-align: center; */
-  color: white;
-}
-
-.white-mode H1{
+.white-mode H1 {
   /* margin-top: 15%; */
   /* text-align: center; */
   color: rgb(0, 0, 0);
@@ -49,13 +30,15 @@ H1{
   border: 2px solid rgb(0, 0, 0); /* Bordure blanche*/
 }
 
-.play-now-btn:hover, .play-now-btn:focus {
+.play-now-btn:hover,
+.play-now-btn:focus {
   background-color: white; /* Couleur de fond lors du survol */
   color: black; /* Couleur du texte lors du survol */
   text-decoration: none; /* Aucune décoration de texte lors du survol */
 }
 
-.white-mode .play-now-btn:hover, .play-now-btn:focus {
+.white-mode .play-now-btn:hover,
+.play-now-btn:focus {
   background-color: rgb(0, 0, 0); /* Couleur de fond lors du survol */
   color: rgb(255, 255, 255); /* Couleur du texte lors du survol */
 }
@@ -70,17 +53,17 @@ H1{
 
 .gradient-text-home {
   font-size: 50px;
-  background: -webkit-linear-gradient(315deg,#B558F6 ,#0EA3D2);
+  background: -webkit-linear-gradient(315deg, #b558f6, #0ea3d2);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.margin_top{
+.margin_top {
   margin-top: 5%;
 }
 
-.play-now-btn_play{
+.play-now-btn_play {
   background-color: black; /* Couleur de fond */
   color: white; /* Couleur du texte */
   padding: 15px 70px; /* Espacement interne */
@@ -95,24 +78,26 @@ H1{
   display: inline-block; /* Permet au bouton de ne prendre que l'espace nécessaire */
 }
 
-.play-now-btn_play:hover, .play-now-btn_play:focus {
+.play-now-btn_play:hover,
+.play-now-btn_play:focus {
   background-color: white; /* Couleur de fond lors du survol */
   color: black; /* Couleur du texte lors du survol */
   text-decoration: none; /* Aucune décoration de texte lors du survol */
 }
 
-.white-mode .play-now-btn_play{
+.white-mode .play-now-btn_play {
   background-color: rgb(255, 255, 255); /* Couleur de fond */
   color: rgb(0, 0, 0); /* Couleur du texte */
   border: 4px solid rgb(0, 0, 0); /* Bordure blanche*/
 }
 
-.white-mode .play-now-btn_play:hover, .play-now-btn_play:focus {
+.white-mode .play-now-btn_play:hover,
+.play-now-btn_play:focus {
   background-color: rgb(0, 0, 0); /* Couleur de fond lors du survol */
   color: rgb(255, 255, 255); /* Couleur du texte lors du survol */
 }
 
-.navbar{
+.navbar {
   display: flex;
   flex-direction: row;
   /* width: 100%; */
@@ -120,31 +105,31 @@ H1{
   /* justify-content: space-between; */
 }
 
-.margin_left{
+.margin_left {
   margin-left: 1rem;
 }
 
-.bottom_navbar{
-  padding: 1px ;
+.bottom_navbar {
+  padding: 1px;
   background-color: rgb(255, 255, 255);
 }
 
-.white-mode .bottom_navbar{
+.white-mode .bottom_navbar {
   background-color: rgb(0, 0, 0);
 }
 
 .img-home {
-  width : 67px;
-  height : 45px;
+  width: 67px;
+  height: 45px;
 }
 
-.img-login-register{
-  width : 67px;
-  height : 45px;
-  margin-top:  1rem;
+.img-login-register {
+  width: 67px;
+  height: 45px;
+  margin-top: 1rem;
 }
 
-.flex{
+.flex {
   display: flex;
   flex-direction: row;
   margin-right: 1%;
@@ -176,21 +161,21 @@ H1{
   right: 0;
   bottom: 0;
   background-color: #623cba;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 /* Style pour le slider lorsque le switch est en position ON */
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 26px;
   width: 26px;
   left: 4px;
   bottom: 4px;
   background-color: rgb(0, 0, 0);
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 input:checked + .slider {
@@ -198,27 +183,26 @@ input:checked + .slider {
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1
-px #2196F3;
+  box-shadow: 0 0 1 px #2196f3;
 }
 
 /* Style pour le slider lorsque le switch est en position OFF */
 input:checked + .slider:before {
--webkit-transform: translateX(26px);
--ms-transform: translateX(26px);
-transform: translateX(26px);
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
 }
 
 /* Style arrondi pour le slider */
 .slider.round {
-border-radius: 34px;
+  border-radius: 34px;
 }
 
 .slider.round:before {
-border-radius: 50%;
+  border-radius: 50%;
 }
 
-.padding-global{
+.padding-global {
   padding-bottom: 7rem;
   padding-top: 7rem;
 
@@ -226,7 +210,7 @@ border-radius: 50%;
   margin: auto;
 }
 
-p{
+p {
   color: white;
 }
 
@@ -245,7 +229,7 @@ p{
 }
 
 .login-btn {
-  background-color: #B558F6; /* Couleur de votre choix */
+  background-color: #b558f6; /* Couleur de votre choix */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -264,7 +248,7 @@ p{
 }
 
 .create-account-link {
-  color: #B558F6;
+  color: #b558f6;
   text-align: center;
   display: block; /* ou inline-block selon votre disposition */
   margin-top: 20px;
@@ -290,7 +274,7 @@ form p input[type='email'] {
 
 input[type='text'],
 input[type='password'],
-input[type='email']{
+input[type='email'] {
   background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour les champs de saisie */
   border: 2px solid #555;
   color: white;
@@ -301,7 +285,7 @@ input[type='email']{
   border-radius: 10px;
 }
 
-.back-ground-login{
+.back-ground-login {
   background-image: url('../img/wp8986551-dark-purple-4k-wallpapers.jpg');
   background-size: cover; /* Couvre toute la zone disponible */
   background-position: center; /* Centre l'image dans la page */
@@ -312,12 +296,12 @@ input[type='email']{
   align-items: center;
 }
 
-.login-brand{
+.login-brand {
   flex: 0 0 auto;
 }
 
 label {
-  color: #FFF; /* Couleur de texte pour les étiquettes */
+  color: #fff; /* Couleur de texte pour les étiquettes */
   /* autres propriétés de style */
 }
 
