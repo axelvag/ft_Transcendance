@@ -98,13 +98,16 @@ class ViewDash extends HTMLElement {
     });
   }
 
-  suppUser(username) {
+  
+  async suppUser(username) {  
     const url = `http://127.0.0.1:8001/accounts/delete_user/${username}`;
     fetch(url, {
       method: 'POST',
       credentials: 'include',
       headers: {
+        'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': this.getCSRFToken(),
       },
     })
     .then(response => response.json())
@@ -114,6 +117,9 @@ class ViewDash extends HTMLElement {
       }
     })
     .catch(error => console.error('Error:', error));
+  }
+  getCSRFToken() {
+    return document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
   }
 }
 
