@@ -31,6 +31,24 @@ class ViewForgetPass extends HTMLElement {
     console.log("Click submit !");
     const form = event.target;
     const email = document.getElementById("email").value;
+
+    let csrfToken;
+    try {
+      const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+        method: 'GET',
+        credentials: 'include', // Pour inclure les cookies dans la requête
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
+      }
+      const data = await response.json();
+      csrfToken = data.csrfToken;
+    } catch (error) {
+      console.error('Erreur lors de la récupération du CSRF token:', error);
+      // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
+      return;
+    }
+
     const formData = {
       email: email,
     };
@@ -39,7 +57,7 @@ class ViewForgetPass extends HTMLElement {
         method: 'POST',
       headers: {
         "Content-Type": "application/json",
-        // 'X-CSRFToken': csrfToken
+        'X-CSRFToken': csrfToken
       },
       credentials: "include",
       body: JSON.stringify(formData),

@@ -20,7 +20,7 @@ class ViewSignIn extends HTMLElement {
               <label class="form-label opacity-50" for="password">
                 Password
               </label>
-              <a href="#" class="link fw-bold text-decoration-none">
+              <a href="#" data-link="/forget-pass" class="link fw-bold text-decoration-none">
                 Forgot password?
               </a>
             </div>
@@ -42,10 +42,17 @@ class ViewSignIn extends HTMLElement {
       </login-layout>
     `;
 
+    // this.querySelector('a[data-link="/forget-pass"]').addEventListener('click', (event) => {
+    //   event.preventDefault(); // Empêche le navigateur de suivre le lien
+    //   console.log("ici forget pass");
+    //   redirectTo('/forget-pass'); // Changez cette fonction selon votre logique de navigation
+    // });
+
     this.querySelector('#signin-form').addEventListener('submit', this.submitForm.bind(this));
     this.passwordError = this.querySelector('#password-error');
     this.emailError = this.querySelector('#email-error');
   }
+  
 
   async getCsrfToken() {
     const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
