@@ -10,6 +10,9 @@ import './game/view-game.ce.js';
 import './views/view-reinitialisation-pass-mail.ce.js';
 import './views/view-new-pass.ce.js';
 import './views/view-dashboard.ce.js';
+import './views/authService.js';
+import './views/apiService.js';
+
 
 // router
 import './router.js';
