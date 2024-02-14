@@ -43,9 +43,6 @@ class ViewDash extends HTMLElement {
           padding: 20px 40px; /* Augmenter le rembourrage pour agrandir la zone cliquable */
         }
       </style>
-      <head>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-      </head>
       <div class="layout">
         <view-sidebar class="layout-sidebar"></view-sidebar>
         <div class="dashboard-content">

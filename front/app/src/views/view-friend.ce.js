@@ -11,10 +11,16 @@
 // export default template;
 
 import './view-sidebar.ce.js';
+import { redirectTo } from '../router.js';
+import { verifyUserLoginAndDisplayDashboard } from '../router.js';
 
 class ViewFriend extends HTMLElement {
 
   connectedCallback() {
+    verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+  }
+  
+  displayDashboard(username) {
     this.innerHTML = `
       <div class="layout">
         <view-sidebar class="layout-sidebar"></view-sidebar>
@@ -41,8 +47,9 @@ class ViewFriend extends HTMLElement {
       </div>
     `;
 
-    this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
-    this.generalErrorFriend = document.getElementById('general-error-friend');
+      this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
+      this.generalErrorFriend = document.getElementById('general-error-friend');
+      // this.verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
   }
 
   handleFormSubmit(event) {
