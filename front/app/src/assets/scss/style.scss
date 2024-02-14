@@ -1,8 +1,16 @@
 $primary: #b558f6;
 $secondary: #0ea3d2;
-$body-bg-dark: #252529;
+$body-bg-dark: #000;
 
 @import 'bootstrap/scss/bootstrap.scss';
+
+.bg-gradient {
+  background: linear-gradient(to right, $primary, $secondary) !important;
+}
+
+.border-gradient {
+  border-image: linear-gradient(to right, $primary, $secondary) 1 stretch !important;
+}
 
 .text-gradient {
   background: linear-gradient(to right, $primary, $secondary) !important;
@@ -10,6 +18,6 @@ $body-bg-dark: #252529;
   -webkit-text-fill-color: transparent !important;
 }
 
+@import '_theme';
 @import '_layout';
 @import '_profil';
-@import '_home_auth';

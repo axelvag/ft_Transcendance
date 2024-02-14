@@ -1,97 +1,99 @@
-.custom-nav {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-}
-
-/* #app {
+.layout {
+  /* #app {
     display: flex;
 }  */
 
-/* --------------- */
+  /* --------------- */
 
-.sidebar {
-  background-color: #252529;
-  color: #ffffff;
-  height: 100%;
-  width: 300px;
-  padding: 50px;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  border-right: 2px solid #b558f6;
-}
+  .sidebar {
+    background-color: #252529;
+    color: #ffffff;
+    height: 100%;
+    width: 300px;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border-right: 2px solid #b558f6;
+  }
 
-.logo {
-  max-width: 100%;
-  height: auto;
-  margin-bottom: 2rem;
-}
+  .logo {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 2rem;
+  }
 
-.start-game {
-  padding: 10px 20px;
-  background-color: transparent;
-  color: white;
-  border: 2px solid #b558f6;
-  margin-bottom: 2rem;
-  font-size: 1.25rem;
-  text-align: center;
-}
+  .start-game {
+    padding: 10px 20px;
+    background-color: transparent;
+    color: white;
+    border: 2px solid #b558f6;
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    text-align: center;
+  }
 
-.start-game:hover {
-  background: #b558f6;
-  color: white;
-}
+  .start-game:hover {
+    background: #b558f6;
+    color: white;
+  }
 
-.nav {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+  .nav {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
-.nav-item {
-  padding: 10px 20px;
-  color: white;
-  text-decoration: none;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  margin-right: 1rem;
-  transition: background-color 0.3s, color 0.3s;
-  cursor: pointer;
-}
+  .nav-item {
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    margin-right: 1rem;
+    transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
+  }
 
-.nav-item:hover,
-.nav-item.active {
-  background-color: #b558f6;
-}
+  .nav-item:hover,
+  .nav-item.active {
+    background-color: #b558f6;
+  }
 
-.logout {
-  padding: 10px 20px;
-  border-top: 1px solid #b558f6;
-  color: white;
-  text-decoration: none;
-  font-size: 1rem;
-  font-weight: 600;
-}
+  .logout {
+    padding: 10px 20px;
+    border-top: 1px solid #b558f6;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+  }
 
-.logout:hover {
-  background-color: #b558f6;
-}
+  .logout:hover {
+    background-color: #b558f6;
+  }
 
-.custom-nav a {
-  color: white;
-  margin-bottom: 0.5rem;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 1rem;
-}
+  .custom-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: auto 0;
+  }
 
-.custom-nav a.active {
-  background-color: #b558f6;
-}
+  .custom-nav a {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+  }
 
-.custom-nav .nav-item i {
-  margin-right: 0.5rem;
+  .custom-nav a.active {
+    background-color: #b558f6;
+  }
+
+  .custom-nav .nav-item i {
+    margin-right: 0.5rem;
+  }
 }

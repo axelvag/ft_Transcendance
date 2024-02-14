@@ -1,32 +1,80 @@
 // templates
-// import login from './views/login.js';
-// import friends from './views/friends.js';
 import careers from './views/careers.js';
 import settings from './views/settings.js';
 import notFound from './views/notFound.js';
-import home from './views/home.js';
+
+// views
+import '@/views/view-welcome.ce.js';
+import '@/views/view-signup.ce.js';
+import '@/views/view-profil.ce.js';
+import '@/views/view-email-confirmation.ce.js';
+import '@/views/view-login.ce.js';
+import '@/game/view-game.ce.js';
+import '@/views/view-friend.ce.js';
+import '@/views/view-reinitialisation-pass-mail.ce.js';
+import '@/views/view-new-pass.ce.js';
+import '@/views/view-dashboard.ce.js';
 
 const useHash = true;
 
 const baseUrl = '';
 
 const routes = {
-  '/': { title: 'Home', template: home },
-  '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
-  // public
-  '/login': { title: 'Login', template: '<view-signin></view-signin>' },
-  '/signup': { title: 'Signup', template: '<view-signup></view-signup>' },
-  '/forget-pass': { title: 'Forget password', template: '<view-forget-pass></view-forget-pass>' },
-  '/dashboard': { title: 'Dashboard', template: '<view-dash></view-dash>' },
-  '/new-pass': { title: 'New password', template: '<view-new-pass></view-new-pass>' },
-  '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
-  // logged
-  '/friends': { title: 'Friends', template:'<view-friend></view-friend>'},
-  '/careers': { title: 'Careers', template: careers },
-  '/settings': { title: 'Settings', template: settings },
-  '/game': { title: 'Game', template: '<view-game></view-game>' },
+  // logged out routes
+  '/': {
+    title: 'Pong',
+    template: '<view-welcome></view-welcome>',
+  },
+  '/login': {
+    title: 'Login',
+    template: '<view-signin></view-signin>',
+  },
+  '/signup': {
+    title: 'Signup',
+    template: '<view-signup></view-signup>',
+  },
+  '/forget-pass': {
+    title: 'Forget password',
+    template: '<view-forget-pass></view-forget-pass>',
+  },
+  '/dashboard': {
+    title: 'Dashboard',
+    template: '<view-dash></view-dash>',
+  },
+  '/new-pass': {
+    title: 'New password',
+    template: '<view-new-pass></view-new-pass>',
+  },
+  '/email-confirmation': {
+    title: 'Email confirmation',
+    template: '<view-email-confirmation></view-email-confirmation>',
+  },
+  // logged in routes
+  '/profil': {
+    title: 'Profil',
+    template: '<view-profil></view-profil>',
+  },
+  '/friends': {
+    title: 'Friends',
+    template: '<view-friend></view-friend>',
+  },
+  '/careers': {
+    title: 'Careers',
+    template: careers,
+  },
+  '/settings': {
+    title: 'Settings',
+    template: settings,
+  },
+  '/game': {
+    title: 'Game',
+    template: '<view-game></view-game>',
+  },
   // not found
-  '/not-found': { title: 'Not Found', template: notFound },
+  '/not-found': {
+    title: 'Not Found',
+    template: notFound,
+  },
 };
 
 const updateActiveNavLink = () => {
