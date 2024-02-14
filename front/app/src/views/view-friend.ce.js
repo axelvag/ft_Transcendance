@@ -17,6 +17,7 @@ import { verifyUserLoginAndDisplayDashboard } from '../router.js';
 class ViewFriend extends HTMLElement {
 
   connectedCallback() {
+    console.log("ici");
     verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
   }
   
