@@ -4,8 +4,8 @@
   }
 }
 
-[data-bs-theme='light'] {
-  .light-hidden {
+html:not([data-bs-theme='dark']) {
+  .dark-visible {
     display: none;
   }
 }

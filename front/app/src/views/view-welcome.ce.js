@@ -1,4 +1,5 @@
 import logoSvg from '@/assets/img/logo.svg?raw';
+import { toggleTheme } from '@/theme.js';
 
 class ViewWelcome extends HTMLElement {
   connectedCallback() {
@@ -49,7 +50,7 @@ class ViewWelcome extends HTMLElement {
                 <li class="nav-item mx-lg-2">
                   <a class="nav-link p-0 theme-toggle" href="#">
                     <span class="fs-4">
-                      <ui-icon name="moon" class="light-hidden"></ui-icon>
+                      <ui-icon name="moon" class="dark-visible"></ui-icon>
                       <ui-icon name="sun" class="dark-hidden"></ui-icon>
                     </span>
                     <span class="ms-2 d-lg-none">Toggle theme</span>
@@ -82,8 +83,7 @@ class ViewWelcome extends HTMLElement {
 
     this.querySelector('.theme-toggle')?.addEventListener('click', e => {
       e.preventDefault();
-      const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-      document.documentElement.setAttribute('data-bs-theme', isDarkMode ? 'light' : 'dark');
+      toggleTheme();
     });
   }
 }
