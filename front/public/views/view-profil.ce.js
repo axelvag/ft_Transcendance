@@ -1,4 +1,6 @@
 import './view-sidebar.ce.js';
+import { redirectTo } from '../router.js';
+import { verifyUserLoginAndDisplayDashboard } from '../router.js';
 
 class ViewProfil extends HTMLElement {
   constructor() {
@@ -8,6 +10,10 @@ class ViewProfil extends HTMLElement {
   }
 
   connectedCallback() {
+    verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+  }
+
+  displayDashboard(username){
     this.innerHTML = `
       <div class="layout">
         <view-sidebar class="layout-sidebar"></view-sidebar>

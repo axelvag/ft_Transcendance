@@ -120,7 +120,6 @@ export const verifyUserLoginAndDisplayDashboard = (displayDashboardCallback) => 
         console.log(data.username, data.email);
         displayDashboardCallback(data.username);
       } else {
-        alert('Veuillez vous connecter.');
         redirectTo("/login");
       }
     })
