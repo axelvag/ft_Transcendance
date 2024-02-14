@@ -98,4 +98,33 @@ window.addEventListener('DOMContentLoaded', router);
 // Écouteur d'événements pour les changements de hash
 window.addEventListener('hashchange', router);
 
+
+const API_BASE_URL = 'http://127.0.0.1:8001';
+
+export const isUserLoggedIn = () => {
+  return fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
+    method: 'GET',
+    credentials: 'include', // Pour inclure les cookies dans la requête
+  })
+  .then(response => response.json())
+  .catch(error => {
+    console.error('Erreur lors de la vérification de l\'état de connexion:', error);
+    throw error; // Renvoyer l'erreur pour la gestion côté appelant
+  });
+};
+
+export const verifyUserLoginAndDisplayDashboard = (displayDashboardCallback) => {
+  isUserLoggedIn()
+    .then(data => {
+      if (data.success) {
+        console.log(data.username, data.email);
+        displayDashboardCallback(data.username);
+      } else {
+        alert('Veuillez vous connecter.');
+        redirectTo("/login");
+      }
+    })
+    .catch(error => console.error(error));
+};
+
 export { redirectTo };
