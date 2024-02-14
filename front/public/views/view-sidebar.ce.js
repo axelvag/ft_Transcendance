@@ -50,21 +50,28 @@ class ViewSidebar extends HTMLElement {
   }
 
   logoutUser() {
-    fetch('http://127.0.0.1:8001/accounts/logout/', { // Assurez-vous que l'URL correspond à votre configuration Django
-      method: 'GET', // ou 'POST' selon la méthode attendue par votre backend
+    fetch('http://127.0.0.1:8001/accounts/logout/', {
+      method: 'POST',
+      credentials: 'include', // Pour envoyer les cookies (sessionid, csrftoken)
       headers: {
+        'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-        // Ajoutez des en-têtes supplémentaires si nécessaire, comme le CSRF token pour les requêtes POST
+        'X-CSRFToken': this.getCSRFToken(), // Assurez-vous d'obtenir le token CSRF correctement
       },
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) throw new Error('Logout failed');
+      return response.json(); // Ou gérer autrement selon la réponse attendue
+    })
     .then(data => {
-      if(data.success) {
-        // alert(data.message); // Affiche un message de confirmation
-        redirectTo("/"); // Redirige l'utilisateur vers la page d'accueil
-      }
+      redirectTo("/");
     })
     .catch(error => console.error('Error:', error));
+  }
+  
+  // Fonction pour obtenir le token CSRF depuis le cookie
+  getCSRFToken() {
+    return document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
   }
 }
 

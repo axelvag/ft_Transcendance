@@ -3,14 +3,39 @@ import { redirectTo } from '../router.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
-    // const username = window.user ? window.user.username : null;
-    const username = localStorage.getItem('username');
-    console.log(username);
-    if(!username){
-      alert('errors');
-      redirectTo("/");
-      return;
-    }
+    this.verifyUserLoggedIn();
+  }
+
+  verifyUserLoggedIn() {
+    // URL de la vue Django pour vérifier si l'utilisateur est connecté
+    const url = 'http://127.0.0.1:8001/accounts/is_user_logged_in/';
+
+    const response = fetch(url, {
+        method: 'GET',
+        credentials: 'include', // Pour inclure les cookies dans la requête
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.success) {
+          console.log(data.username);
+          console.log(data.email);
+          // L'utilisateur est connecté, utiliser les données reçues
+          const username = data.username;
+          const email = data.email;
+          // Afficher le contenu du tableau de bord avec le nom d'utilisateur
+          this.displayDashboard(username);
+        } else {
+          // L'utilisateur n'est pas connecté, rediriger vers la page de connexion
+          alert('Veuillez vous connecter.');
+          redirectTo("/login");
+        }
+      })
+      .catch(error => {
+        console.error('Erreur lors de la vérification de l\'état de connexion:', error);
+      });
+  }
+
+  displayDashboard(username) {
     this.innerHTML = `
       <style>
         .dashboard-text {
@@ -72,23 +97,29 @@ class ViewDash extends HTMLElement {
       this.suppUser(username);
     });
   }
-  suppUser(username) {
+
+  
+  async suppUser(username) {  
     const url = `http://127.0.0.1:8001/accounts/delete_user/${username}`;
     fetch(url, {
       method: 'POST',
+      credentials: 'include',
       headers: {
+        'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': this.getCSRFToken(),
       },
     })
     .then(response => response.json())
     .then(data => {
       if(data.success) {
-        // window.user = null;
-        localStorage.removeItem('username');
         redirectTo("/");
       }
     })
     .catch(error => console.error('Error:', error));
+  }
+  getCSRFToken() {
+    return document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
   }
 }
 

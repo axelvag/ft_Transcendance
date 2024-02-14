@@ -20,7 +20,7 @@ class ViewSignIn extends HTMLElement {
               <label class="form-label opacity-50" for="password">
                 Password
               </label>
-              <a href="#" class="link fw-bold text-decoration-none">
+              <a href="#" data-link="/forget-pass" class="link fw-bold text-decoration-none">
                 Forgot password?
               </a>
             </div>
@@ -42,9 +42,28 @@ class ViewSignIn extends HTMLElement {
       </login-layout>
     `;
 
+    // this.querySelector('a[data-link="/forget-pass"]').addEventListener('click', (event) => {
+    //   event.preventDefault(); // Empêche le navigateur de suivre le lien
+    //   console.log("ici forget pass");
+    //   redirectTo('/forget-pass'); // Changez cette fonction selon votre logique de navigation
+    // });
+
     this.querySelector('#signin-form').addEventListener('submit', this.submitForm.bind(this));
     this.passwordError = this.querySelector('#password-error');
     this.emailError = this.querySelector('#email-error');
+  }
+  
+
+  async getCsrfToken() {
+    const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+      method: 'GET',
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data.csrfToken;
+    }
+    throw new Error('Could not retrieve CSRF token');
   }
 
   async submitForm(event) {
@@ -61,12 +80,14 @@ class ViewSignIn extends HTMLElement {
       password: password,
   };
 
+    const csrfToken = await this.getCsrfToken();
+
     console.log(JSON.stringify(formData));
     const response = await fetch("http://127.0.0.1:8001/accounts/login/", {
         method: 'POST',
       headers: {
         "Content-Type": "application/json",
-        // 'X-CSRFToken': csrfToken
+        'X-CSRFToken': csrfToken
       },
       credentials: "include",
       body: JSON.stringify(formData),
@@ -75,10 +96,8 @@ class ViewSignIn extends HTMLElement {
     const data =  await response.json();
     console.log("error", data);
     if (data.success) {
-      localStorage.setItem('username', data.username); 
       console.log("Sucess!");
       redirectTo("/dashboard");
-      // alert('success');
     } else {
       if (data.message === "User not active.")
         this.emailError.style.display = 'block';
