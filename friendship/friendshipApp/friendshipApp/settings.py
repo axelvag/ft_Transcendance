@@ -113,7 +113,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': '5432',  # Le port par défaut de PostgreSQL
+        'PORT': '5432',  # Le port par défaut de PostgreSQLd
     }
 }
 
