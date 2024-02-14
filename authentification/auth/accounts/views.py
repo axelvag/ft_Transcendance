@@ -18,6 +18,8 @@ from .tokens import account_activation_token
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.views.decorators.http import require_POST
 import json
+from django.views.decorators.csrf import csrf_exempt
+
 # Create your views here.
 User = get_user_model()
 
@@ -101,6 +103,7 @@ def logout_user(request):
     else:
         return JsonResponse({"success": False, "message": "Méthode non autorisée."}, status=405)
 
+@csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:

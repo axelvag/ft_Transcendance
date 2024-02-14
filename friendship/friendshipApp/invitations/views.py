@@ -31,7 +31,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 
-@login_required
+# @login_required
 @csrf_exempt
 def home(request):
     try:
