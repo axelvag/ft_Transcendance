@@ -5,7 +5,7 @@ class ViewForgetPass extends HTMLElement {
     this.innerHTML = `
         <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-          <span class="text-gradient">Réinitialisation mot de passe</span>
+          <span class="text-bicolor">Réinitialisation mot de passe</span>
         </h1>
         <form id="pass-form">
         <div class="mb-4">

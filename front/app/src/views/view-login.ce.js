@@ -6,7 +6,7 @@ class ViewSignIn extends HTMLElement {
     this.innerHTML = `
         <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-          <span class="text-gradient">Log In</span>
+          <span class="text-bicolor">Log In</span>
         </h1>
         <form id="signin-form">
           <div class="mb-4">

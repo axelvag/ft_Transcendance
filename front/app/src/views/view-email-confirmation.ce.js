@@ -5,7 +5,7 @@ class ViewEmailConfirmation extends HTMLElement {
     this.innerHTML = `
         <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-          <span class="text-gradient">Email confirmation</span>
+          <span class="text-bicolor">Email confirmation</span>
         </h1>
         <div id="email-confirm-loading">Loading...</div>
 

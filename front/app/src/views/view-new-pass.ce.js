@@ -7,7 +7,7 @@ class ViewNewPass extends HTMLElement {
         <login-layout>
         
         <h1 class="fw-bold py-2 mb-4">
-        <span class="text-gradient">Nouveau mot de passe</span>
+        <span class="text-bicolor">Nouveau mot de passe</span>
         </h1>
         <div id="email-confirm-loading">Loading...</div>
         <div id="email-confirm-success" hidden>

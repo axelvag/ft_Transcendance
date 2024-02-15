@@ -4,24 +4,6 @@ import { toggleTheme } from '@/theme.js';
 class ViewWelcome extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <style>
-        .viewWelcome-bg {
-          position: fixed;
-          z-index: -1;
-          top: 0;
-          left: 0;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          height: 50vh;
-          width: 50vw;
-          border-radius: 50%;
-          background-image: linear-gradient(to right, var(--bs-primary) 0%, var(--bs-secondary) 100%);
-          filter: blur(100vmax);
-          opacity: 0.75;
-        }
-      </style>
-
       <nav class="navbar navbar-expand-lg fixed-top z-2">
         <div class="container-fluid">
           <a class="navbar-brand d-flex" href="#" data-link="/">
@@ -61,13 +43,11 @@ class ViewWelcome extends HTMLElement {
           </div>
         </div>
       </nav>
-      
-      <div class="viewWelcome-bg"></div>
 
-      <section class="min-vh-100 d-flex align-items-center pt-5">
+      <section class="min-vh-100 d-flex align-items-center pt-5 halo-bicolor">
         <div class="container text-center">
           <h1 class="display-2 fw-bold mb-4">
-            Ultimate <span class="text-gradient">Pong</span> Game 
+            Ultimate <span class="text-bicolor">Pong</span> Game 
           </h1>
           <p class="fs-3 fw-semibold mb-4">
             Engage in the classic battle with friends or solo, online and offline.

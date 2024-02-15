@@ -4,20 +4,9 @@ $body-bg-dark: #000;
 
 @import 'bootstrap/scss/bootstrap.scss';
 
-.bg-gradient {
-  background: linear-gradient(to right, $primary, $secondary) !important;
-}
-
-.border-gradient {
-  border-image: linear-gradient(to right, $primary, $secondary) 1 stretch !important;
-}
-
-.text-gradient {
-  background: linear-gradient(to right, $primary, $secondary) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
 @import '_theme';
+@import '_bicolor';
+
+// todo: remove
 @import '_layout';
 @import '_profil';

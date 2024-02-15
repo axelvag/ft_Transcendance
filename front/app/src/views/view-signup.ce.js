@@ -10,7 +10,7 @@ class ViewSigUp extends HTMLElement {
     this.innerHTML = `
         <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-        <span class="text-gradient">Sign up</span>
+        <span class="text-bicolor">Sign up</span>
         </h1>
         <form id="signup-form">
         <div class="mb-4">
