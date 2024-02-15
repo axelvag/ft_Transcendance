@@ -3,18 +3,18 @@ import '@/components/layouts/auth-layout.ce.js';
 class ViewForgetPass extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-        <login-layout>
+      <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-          <span class="text-bicolor">Réinitialisation mot de passe</span>
+          <span class="text-bicolor">Reset password</span>
         </h1>
         <form id="pass-form">
-        <div class="mb-4">
-          <label class="form-label opacity-50" for="email">
-            Your email
-          </label>
-          <input class="form-control form-control-lg" type="email" id="email" name="email" required />
-        </div>
-        <div class="d-grid pt-3">
+          <div class="mb-4">
+            <label class="form-label" for="email">
+              Your email
+            </label>
+            <input class="form-control form-control-lg" type="email" id="email" name="email" required />
+          </div>
+          <div class="d-grid pt-3">
             <button type="submit" class="btn btn-primary btn-lg fw-bold">
               Envoyer
             </button>

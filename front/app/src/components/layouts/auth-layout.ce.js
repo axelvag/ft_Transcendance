@@ -14,28 +14,32 @@ class LoginLayout extends HTMLElement {
 
       .auth-layout {
         height: 100vh;
-        position: relative;
-        display: flex;
-      }
-
-      .auth-layout-img {
-        display: block;
-        min-width: 0;
-        flex: 1 1 0;
-        background: url(./assets/img/login-bg.jpg) no-repeat center center;
-        background-size: cover;
-      }
-
-      .auth-layout-body {
-        min-width: 0;
-        flex: 1 1 0;
-        height: 100vh;
-        overflow: auto;
         display: grid;
         justify-items: center;
+        overflow: auto;
+
+        position: relative;
+        z-index: 0;
+        &::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          height: 500px;
+          width: 500px;
+          border-radius: 50%;
+          background-image: linear-gradient(to right, var(--bs-primary) 0%, var(--bs-secondary) 100%);
+          filter: blur(1000px);
+          opacity: 0.75;
+        }
       }
 
       .auth-layout-wrapper {
+        position: relative;
+        z-index: 1;
         padding: 2rem;
         width: 100%;
         max-width: 520px;
@@ -43,31 +47,22 @@ class LoginLayout extends HTMLElement {
 
       /* tablet */
       @media (min-width: 768px) {
-        .auth-layout-body {
+        .auth-layout {
           align-items: center;
           padding: 2rem;
         }
 
         .auth-layout-wrapper {
+          background-color: rgba(255, 255, 255, 0.1);
           border: 2px solid var(--bs-gray-500);
           border-radius: 1.5rem;
         }
       }
-
-      /* desktop */
-      @media (max-width: 1279px) {
-        .auth-layout-img {
-          display: none;
-        }
-      }
     </style>
     <div class="auth-layout">
-      <div class="auth-layout-body">
-        <div class="auth-layout-wrapper">
-          <slot></slot>
-        </div>
+      <div class="auth-layout-wrapper">
+        <slot></slot>
       </div>
-      <div class="auth-layout-img"></div>
     </div>
     `;
   }
