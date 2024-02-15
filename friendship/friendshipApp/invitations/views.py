@@ -31,10 +31,11 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 
-# @login_required
+@login_required
 @csrf_exempt
 def home(request):
-    print("Pusssyyyyyyyyyyyyyyyyyyyyyyyy")
+    if not request.user.is_authenticated:
+        print("Pusssyyyyyyyyyyyyyyyyyyyyyyyy")
 
     try:
         data = json.loads(request.body.decode('utf8'))
