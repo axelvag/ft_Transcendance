@@ -18,6 +18,7 @@ from .tokens import account_activation_token
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.views.decorators.http import require_POST
 import json
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 User = get_user_model()
 
@@ -275,7 +276,7 @@ def resend_email_rest(request, uidb64):
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
 
-
+@login_required
 def delete_user(request, username):
 
     try:
