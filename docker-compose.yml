@@ -1,4 +1,4 @@
-version: '3'
+version: "3.8"
 
 services:
 
@@ -37,68 +37,69 @@ services:
       - POSTGRES_DB=transcendence
       - POSTGRES_USER=postgresTranscendence
       - POSTGRES_PASSWORD=postgresTranscendence123
-      restart: on-failure
+    restart: on-failure
 
-    # Alessio
-    profile:
-      build:
-        context: ./profile
-        dockerfile: Dockerfile
-      container_name: profile
-      ports:
-        - "8002:8002"
-      networks:
-        - back
-      depends_on:
-        - data_base
-      restart: on-failure
+  # Back - profile
+  profile:
+    build:
+      context: ./profile
+      dockerfile: Dockerfile
+    container_name: profile
+    ports:
+      - "8002:8002"
+    networks:
+      - back
+    depends_on:
+      - data_base
+    restart: on-failure
 
-    # Data base PostGreSQL
-    # data_base:
-    #   build:
-    #     context: ./data_base/Docker
-    #     dockerfile: Dockerfile
-    #   container_name: data_base
-    #   env_file:
-    #     - .env
-    #   volumes:
-    #     - data_base:/custom_postgres_data
-    #   ports:
-    #     - "5432:5432"
-    #   networks:
-    #     - back
-    #   restart: on-failure
+  # Data base PostGreSQL
+  # data_base:
+  #   build:
+  #     context: ./data_base/Docker
+  #     dockerfile: Dockerfile
+  #   container_name: data_base
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - data_base:/custom_postgres_data
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - back
+  #   restart: on-failure
 
-    data_base:
-        container_name: data_base
-        image: postgres:16.0-bookworm
-        environment:
-            - POSTGRES_DB=transcendence
-            - POSTGRES_USER=postgresTranscendence
-            - POSTGRES_PASSWORD=postgresTranscendence123
-        ports:
-            - "5432:5432"
-        volumes:
-            - data_base_data:/var/lib/postgresql/data
-        restart: always
-        networks:
-            - back
+  # Back - data base
+  data_base:
+    container_name: data_base
+    image: postgres:16.0-bookworm
+    environment:
+      - POSTGRES_DB=transcendence
+      - POSTGRES_USER=postgresTranscendence
+      - POSTGRES_PASSWORD=postgresTranscendence123
+    ports:
+      - "5432:5432"
+    volumes:
+      - data_base_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - back
 
-
-    api_gateway:
-      build:
-        context: ./api_gateway
-        dockerfile: Dockerfile
-      container_name: api_gateway
-      ports:
-        - "5000:5000"
-      networks:
-        - back
-      depends_on:
-        - authentification
-        - profile
-        - data_base
-      restart: on-failure
+  # Back - api gateway
+  api_gateway:
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    ports:
+      - "5000:5000"
+    networks:
+      - back
+    depends_on:
+      - authentification
+      - profile
+      - data_base
+    restart: on-failure
 
     friendship:
       build:

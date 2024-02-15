@@ -1,3 +1,12 @@
+// style
+import './scss/style.scss';
+
+// fonts
+import '@fontsource/orbitron/500.css';
+
+// bootstrap js
+import 'bootstrap/dist/js/bootstrap.min.js';
+
 // components
 import './components/icons/ui-icon.ce.js';
 
