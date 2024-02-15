@@ -17,7 +17,6 @@ from django.core.mail import EmailMessage
 from .tokens import account_activation_token
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
 import json
 # Create your views here.
 User = get_user_model()
@@ -54,7 +53,6 @@ def activateEmail(request, user, to_email):
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseBadRequest.status_code)
 
-@csrf_exempt
 def login_user(request):
     if request.method == 'POST':
         try:
@@ -97,10 +95,12 @@ def login_user(request):
     return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
 
 def logout_user(request):
-    logout(request)
-    return JsonResponse({"success": True, "message": "You have been logged out successfully."}, status=200)
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({"success": True, "message": "Déconnexion réussie."})
+    else:
+        return JsonResponse({"success": False, "message": "Méthode non autorisée."}, status=405)
 
-@csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:
@@ -168,8 +168,6 @@ def resend_email_confirmation(request, uidb64):
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
 
-
-@csrf_exempt
 def password_reset(request):
     User = get_user_model()
     if request.method == "POST":
@@ -220,7 +218,6 @@ def activate_mail_pass(request, uidb64, token):
         return JsonResponse({"success": False, "message": "Activation link is invalid!"}, status=HttpResponseBadRequest.status_code)
 
 
-@csrf_exempt
 def password_change(request, uidb64):
     if request.method == 'POST':
         User = get_user_model()
@@ -279,7 +276,6 @@ def resend_email_rest(request, uidb64):
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
 
 
-@csrf_exempt
 def delete_user(request, username):
 
     try:
@@ -290,3 +286,9 @@ def delete_user(request, username):
         return JsonResponse({"success": False, "message": "User not found."}, status=404)
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+def is_user_logged_in(request):
+    if request.user.is_authenticated:
+        return JsonResponse({"success": True, "message": "User is login.", "username": request.user.username, "email": request.user.email}, status=200)
+    else:
+        return JsonResponse({"success": False, "message": "User is not login."}, status=400)
