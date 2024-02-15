@@ -132,6 +132,7 @@ class ViewSigUp extends HTMLElement {
       }
       const data = await response.json();
       csrfToken = data.csrfToken;
+      console.log(csrfToken);
     } catch (error) {
       console.error('Erreur lors de la récupération du CSRF token:', error);
       // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)

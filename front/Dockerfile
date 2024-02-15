@@ -1,15 +1,17 @@
-# Alpine est une distribution Linux legere
-FROM nginx:alpine
+# build
+FROM node:18.19.0 as build
 
-# # mettre le fichier de configuration nginx.conf dans le container
-# COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+WORKDIR /app
+COPY ./app/package*.json ./
+RUN npm install
 
-COPY ./public/assets/img /usr/share/nginx/html/front/public/assets/img
+COPY ./app .
+RUN npm run build
 
-# mettre le fichier de configuration nginx.conf dans le container
-COPY ./public /usr/share/nginx/html
+# serve
+FROM nginx:1.25.3
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY ./nginx.conf /etc/nginx/nginx.conf
 
-# EXPOSE 8000
-
-# # lance le serveur nginx
-# CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
