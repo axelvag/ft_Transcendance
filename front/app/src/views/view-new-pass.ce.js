@@ -78,9 +78,27 @@ class ViewNewPass extends HTMLElement {
 
   async submitForm(event) {
     event.preventDefault();
+
     console.log('Click submit !');
     const password1 = document.getElementById('password1').value;
     const password2 = document.getElementById('password2').value;
+
+    let csrfToken;
+    try {
+      const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+        method: 'GET',
+        credentials: 'include', // Pour inclure les cookies dans la requête
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
+      }
+      const data = await response.json();
+      csrfToken = data.csrfToken;
+    } catch (error) {
+      console.error('Erreur lors de la récupération du CSRF token:', error);
+      // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
+      return;
+    }
 
     const url = `http://127.0.0.1:8001/accounts/password-change/${this.uidb64}`; // Ajout de uidb64 à l'URL
     console.log(url);
@@ -94,7 +112,7 @@ class ViewNewPass extends HTMLElement {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'X-CSRFToken': csrfToken
+        'X-CSRFToken': csrfToken,
       },
       credentials: 'include',
       body: JSON.stringify(formData),
