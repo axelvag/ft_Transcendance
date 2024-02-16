@@ -1,43 +1,26 @@
-// const template = `
-//     <div class="layout">
-//         <view-sidebar></view-sidebar>
-//         <main>
-//             <h1>Friends</h1>
-//             <p>Welcome to your profile page. Here you can view and edit your profile information.</p>
-//         </main>
-//     </div>
-// `;
-
-// export default template;
-
-import './view-sidebar.ce.js';
+import '@/components/layouts/default-layout-sidebar.ce.js';
+import '@/components/layouts/default-layout-main.ce.js';
 
 class ViewFriend extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <div class="layout">
-        <view-sidebar class="layout-sidebar"></view-sidebar>
-        <div class="layout-main">
-          <main class="profile-container">
-              <div class="profile-card">
-                  <form class="profile-form">
-                      <div class="form-group">
-                          <label for="friend-name">Choose friend</label>
-                          <input type="text" id="friend-name" value="" required>
-                      </div>
-                      <div id="success-notification-friend" class="alert alert-success mt-3" style="display: none;">
-                        <strong>Success !</strong> Invitation successful !
-                      </div>
-                      <div id="general-error-friend" class="alert alert-danger mt-3" style="display: none;"></div>
-                      <div class="form-actions">
-                          <button type="button" class="cancel-button">Cancel</button>
-                          <button type="submit" class="save-button">Send Friend</button>
-                      </div>
-                  </form>
-              </div>
-          </main>
-        </div>
-      </div>
+      <default-layout-sidebar></default-layout-sidebar>
+      <default-layout-main>
+        <form class="profile-form">
+          <div class="form-group">
+              <label for="friend-name">Choose friend</label>
+              <input type="text" id="friend-name" value="" required>
+          </div>
+          <div id="success-notification-friend" class="alert alert-success mt-3" style="display: none;">
+            <strong>Success !</strong> Invitation successful !
+          </div>
+          <div id="general-error-friend" class="alert alert-danger mt-3" style="display: none;"></div>
+          <div class="form-actions">
+              <button type="button" class="cancel-button">Cancel</button>
+              <button type="submit" class="save-button">Send Friend</button>
+          </div>
+        </form>
+      </default-layout-main>
     `;
 
     this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));

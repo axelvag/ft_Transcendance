@@ -1,12 +1,8 @@
-$primary: #b558f6;
-$secondary: #0ea3d2;
-$body-bg-dark: #000;
+@import '_variables';
 
-@import 'bootstrap/scss/bootstrap.scss';
+@import '_bootstrap-core';
 
 @import '_theme';
 @import '_bicolor';
-
-// todo: remove
-@import '_layout';
-@import '_profil';
+@import '_sidebar';
+@import '_hidden';

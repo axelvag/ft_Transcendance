@@ -1,135 +1,236 @@
-import './view-sidebar.ce.js';
+import '@/components/layouts/default-layout-sidebar.ce.js';
+import '@/components/layouts/default-layout-main.ce.js';
 
-class ViewProfil extends HTMLElement {
-  constructor() {
-    super();
-    this.saveProfile = this.saveProfile.bind(this); // Pour l'instance de this et pas avoir de prbl
-    this.selectedAvatarFile = null;
-  }
+const fake_getUser = async () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({
+        username: 'Philou',
+        firstname: 'Philippe',
+        lastname: 'Martin',
+        email: 'philippe.martin@gmail.com',
+        avatar: 'https://i.pravatar.cc/128?img=7',
+      });
+    }, 1000);
+  });
+};
 
-  connectedCallback() {
-    this.innerHTML = `
-      <div class="layout">
-        <view-sidebar class="layout-sidebar"></view-sidebar>
-        <div class="layout-main">
-          <main class="profile-container">
-              <div class="profile-card">
+const fake_saveUser = async data => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        user: { ...data },
+      });
+    }, 1000);
+  });
+};
 
-                  <section class="profile-header">
-                      <img id="avatar-preview" alt="Modify Avatar"">
-                      <input type="file" id="avatar-input" style="display: none;" accept="image/*">
-                      <button class="avatar-button">Change avatar</button>
-                  </section>
-
-                  <form class="profile-form">
-                  
-                      <div class="form-group">
-                          <label for="first-name">First Name</label>
-                          <input type="text" id="first-name" value="" required>
-                      </div>
-                      <div class="form-group">
-                          <label for="last-name">Last Name</label>
-                          <input type="text" id="last-name" value="" required>
-                      </div>
-                      <div class="form-group">
-                          <label for="email">Email</label>
-                          <input type="email" id="email" value="" required>
-                      </div>
-                      <div class="form-group">
-                          <label for="password">Password</label>
-                          <input type="password" id="password" value="" required>
-                      </div>
-                      <div class="form-actions">
-                          <button type="cancel-button" class="cancel-button">Annuler</button>
-                          <button type="submit" class="save-button">Sauvegarder</button>
-                      </div>
-                  </form>
-              </div>
-          </main>
+const loadingProfileTemplate = `
+  <div class="placeholder-glow">
+    <h1 class="display-5 fw-bold mb-4">
+      Hi!
+    </h1>
+    <h2 class="h3 fw-semibold border-bottom py-3 my-4">
+      Profile information
+    </h2>
+    <div>
+      <div class="mb-4">
+        <div class="img-thumbnail placeholder" style="width: 128px; height: 128px;"></div>
+      </div>
+      <div class="mb-4">
+        <div class="form-label opacity-75 mb-1">Username</div>
+        <div class="fs-5 fw-semibold">
+          <span class="placeholder rounded-1 col-12" style="max-width: 120px;"></span>
         </div>
       </div>
+      <div class="mb-4">
+        <div class="form-label opacity-75 mb-1">Email</div>
+        <div class="fs-5 fw-semibold">
+          <span class="placeholder rounded-1 col-12" style="max-width: 200px;"></span>
+        </div>
+      </div>
+      <div class="mb-4">
+        <div class="form-label opacity-75 mb-1">Name</div>
+        <div class="fs-5 fw-semibold">
+          <span class="placeholder rounded-1 col-12" style="max-width: 150px;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+const viewProfileTemplate = user => `
+  <h1 class="display-5 fw-bold mb-4">
+    Hi <span class="text-bicolor">${user.username}</span>!
+  </h1>
+  <h2 class="h3 fw-semibold border-bottom py-3 my-4 d-flex">
+    <span class="flex-grow-1 flex-shrink-1 text-truncate">Profile information</span>
+    <button class="btn btn-outline-primary btn-sm" id="edit-profile">
+      <ui-icon name="edit" scale="1.125" class="me-1"></ui-icon>
+      Edit
+    </button>
+  </h2>
+  <div>
+    <div class="mb-4">
+      <img src="${user.avatar}" class="img-thumbnail" width="128" height="128" alt="${user.username}">
+    </div>
+    <div class="mb-4">
+      <div class="form-label opacity-75 mb-1">Username</div>
+      <div class="fs-5 fw-semibold">${user.username}</div>
+    </div>
+    <div class="mb-4">
+      <div class="form-label opacity-75 mb-1">Email</div>
+      <div class="fs-5 fw-semibold">${user.email}</div>
+    </div>
+    <div class="mb-4">
+      <div class="form-label opacity-75 mb-1">Name</div>
+      <div class="fs-5 fw-semibold">${user.firstname} ${user.lastname}</div>
+    </div>
+  </div>
+`;
+
+const editProfileTemplate = user => `
+  <h1 class="display-5 fw-bold mb-4">
+    Hi <span class="text-bicolor">${user.username}</span>!
+  </h1>
+  <h2 class="h3 fw-semibold border-bottom py-3 my-4">
+    Profile information
+  </h2>
+  <div class="position-relative">
+    <form id="profile-edit">
+      <div class="mb-4">
+        <label class="form-label" for="firstname">Profile picture</label>
+        <div>
+          <img src="${user.avatar}" class="img-thumbnail" width="128" height="128" alt="${user.username}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <label class="form-label" for="username">Username</label>
+          <input class="form-control form-control-lg" type="text" id="username" value="${user.username}" required>
+        </div>
+        <div class="col-lg-6 mb-4">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-control form-control-lg" type="email" id="email" value="${user.email}" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <label class="form-label" for="firstname">First Name</label>
+          <input class="form-control form-control-lg" type="text" id="firstname" value="${user.firstname}" required>
+        </div>
+        <div class="col-lg-6 mb-4">
+          <label class="form-label" for="lastname">Last Name</label>
+          <input class="form-control form-control-lg" type="text" id="lastname" value="${user.lastname}" required>
+        </div>
+      </div>
+      <div class="py-3 mb-4 d-flex gap-3">
+        <button id="reset-profile" class="btn btn-outline-primary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+    <div
+      class="
+        position-absolute top-0 bottom-0 start-0 end-0 z-1
+        d-flex align-items-center justify-content-center
+      "
+      id="profile-edit-loader"
+      hidden
+    >
+      <ui-loader></ui-loader>
+    </div>
+  </div>
+`;
+
+class ViewProfil extends HTMLElement {
+  #profileContentEl = null;
+  #user = null;
+
+  constructor() {
+    super();
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  async connectedCallback() {
+    this.innerHTML = `
+      <default-layout-sidebar></default-layout-sidebar>
+      <default-layout-main id="profile-section">
+        ${loadingProfileTemplate}
+      </default-layout-main>
     `;
 
-    const cancelButton = this.querySelector('.cancel-button');
-    const profileForm = this.querySelector('.profile-form');
-    const avatarButton = this.querySelector('.avatar-button');
-    const avatarInput = this.querySelector('#avatar-input');
+    this.#profileContentEl = this.querySelector('#profile-section');
+    this.addEventListener('click', this.handleClick);
 
-    cancelButton.addEventListener('click', () => {
-      profileForm.reset(); // Réinitialise le formulaire
-    });
+    this.#loadUser();
+  }
 
-    profileForm.addEventListener('submit', this.saveProfile);
-    // profileForm.addEventListener('submit', (event) => this.saveProfile(event));
+  disconnectedCallback() {
+    this.removeEventListener('click', this.handleClick);
+  }
 
-    avatarButton.addEventListener('click', () => {
-      avatarInput.click(); // Déclenche le clic sur le input caché
-    });
+  handleClick(e) {
+    const editProfileBtn = e.target.closest('#edit-profile');
+    if (editProfileBtn) {
+      this.#editProfile();
+    }
+    const resetProfileBtn = e.target.closest('#reset-profile');
+    if (resetProfileBtn) {
+      this.#resetProfile();
+    }
+  }
 
-    avatarInput.addEventListener('input', event => {
-      const file = event.target.files[0];
-      if (file) {
-        this.selectedAvatarFile = file;
-        const reader = new FileReader(); // objet js pour lire les contenu des fichier stocke
-        reader.onload = e => {
-          const preview = document.getElementById('avatar-preview');
-          console.log('test==', preview);
-          preview.src = e.target.result; // Met à jour la source de l'élément img
-        };
-        reader.readAsDataURL(file);
-      }
+  async #loadUser() {
+    try {
+      this.#user = await fake_getUser();
+      this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  #editProfile() {
+    this.#profileContentEl.innerHTML = editProfileTemplate(this.#user);
+    this.querySelector('#profile-edit').addEventListener('submit', e => {
+      e.preventDefault();
+      this.#saveProfile();
     });
   }
 
-  saveProfile(event) {
-    console.log(event);
-    event.preventDefault();
+  #resetProfile() {
+    this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
+  }
 
-    const firstName = this.querySelector('#first-name').value;
-    const lastName = this.querySelector('#last-name').value;
-    const email = this.querySelector('#email').value;
-    const password = this.querySelector('#password').value;
-    const img = this.selectedAvatarFile;
-
-    const profileData = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password,
-      img: img,
-    };
-
-    console.log(profileData);
-
-    //Send to sever
-
-    // reset form
-    const profileForm = this.querySelector('.profile-form');
-    profileForm.reset();
+  async #saveProfile() {
+    const profileEditForm = this.querySelector('#profile-edit');
+    if (profileEditForm) {
+      const newUser = {
+        username: profileEditForm.querySelector('#username').value,
+        email: profileEditForm.querySelector('#email').value,
+        firstname: profileEditForm.querySelector('#firstname').value,
+        lastname: profileEditForm.querySelector('#lastname').value,
+        avatar: this.#user.avatar,
+      };
+      try {
+        this.querySelector('#profile-edit-loader').hidden = false;
+        this.querySelector('#profile-edit').classList.add('opacity-25');
+        const response = await fake_saveUser(newUser);
+        if (response.success) {
+          this.#user = response.user;
+          this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
+        } else {
+          this.querySelector('#profile-edit-loader').hidden = true;
+          this.querySelector('#profile-edit').classList.remove('opacity-25');
+          console.error(err);
+        }
+      } catch (err) {
+        this.querySelector('#profile-edit-loader').hidden = true;
+        this.querySelector('#profile-edit').classList.remove('opacity-25');
+        console.error(err);
+      }
+    }
   }
 }
 
 customElements.define('view-profil', ViewProfil);
-
-// Ici, vous pouvez appeler la méthode fetch pour envoyer les données
-// à votre serveur
-// fetch('/path_to_your_server_endpoint', {
-//     method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({
-//         firstName: firstName,
-//         lastName: lastName,
-//         email: email,
-//         password: password
-//     })
-// })
-// .then(response => response.json())
-// .then(data => {
-//     // Traiter la réponse ici
-//     console.log('Success:', data);
-// })
-// .catch((error) => {
-//     console.error('Error:', error);
-// });

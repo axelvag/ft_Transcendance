@@ -119,13 +119,14 @@ const router = () => {
 };
 
 document.addEventListener('click', e => {
-  if (e.target.matches('[data-link]')) {
+  const linkEl = e.target.closest('[data-link]');
+  if (linkEl) {
     e.preventDefault();
     const path = useHash
       ? // with hash
-        '/#' + e.target.getAttribute('data-link')
+        '/#' + linkEl.getAttribute('data-link')
       : // without hash
-        e.target.getAttribute('data-link');
+        linkEl.getAttribute('data-link');
     history.pushState('', '', baseUrl + path);
     router();
   }

@@ -12,7 +12,13 @@ class ViewWelcome extends HTMLElement {
           <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">
             <ui-icon name="menu" class="fs-3"></ui-icon>
           </button>
-          <div class="offcanvas offcanvas-end border-0" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+          <div
+            class="offcanvas offcanvas-end"
+            tabindex="-1"
+            id="offcanvas"
+            aria-labelledby="offcanvasLabel"
+            style="--bs-offcanvas-width: 15rem; --bs-offcanvas-border-color: rgba(var(--bs-dark-rgb), 0.25);"
+          >
             <div class="offcanvas-header">
               <h5 class="offcanvas-title" id="offcanvasLabel">MENU</h5>
               <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>

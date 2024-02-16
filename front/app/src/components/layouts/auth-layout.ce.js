@@ -17,29 +17,10 @@ class LoginLayout extends HTMLElement {
         display: grid;
         justify-items: center;
         overflow: auto;
-
-        position: relative;
-        z-index: 0;
-        &::before {
-          content: '';
-          position: fixed;
-          top: 0;
-          left: 0;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          height: 500px;
-          width: 500px;
-          border-radius: 50%;
-          background-image: linear-gradient(to right, var(--bs-primary) 0%, var(--bs-secondary) 100%);
-          filter: blur(1000px);
-          opacity: 0.75;
-        }
+        background-color: var(--bs-tertiary-bg);
       }
 
       .auth-layout-wrapper {
-        position: relative;
-        z-index: 1;
         padding: 2rem;
         width: 100%;
         max-width: 520px;
@@ -48,12 +29,13 @@ class LoginLayout extends HTMLElement {
       /* tablet */
       @media (min-width: 768px) {
         .auth-layout {
+          background-color: var(--bs-secondary-bg);
           align-items: center;
           padding: 2rem;
         }
 
         .auth-layout-wrapper {
-          background-color: rgba(255, 255, 255, 0.1);
+          background-color: var(--bs-tertiary-bg);
           border: 2px solid var(--bs-gray-500);
           border-radius: 1.5rem;
         }

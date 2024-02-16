@@ -24,6 +24,10 @@
   }
 }
 
+.bg-bicolor {
+  background: linear-gradient(to right, $primary, $secondary) !important;
+}
+
 .text-bicolor {
   background: linear-gradient(to right, $primary, $secondary) !important;
   -webkit-background-clip: text !important;
