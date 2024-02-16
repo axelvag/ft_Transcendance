@@ -60,7 +60,6 @@ class DefaultLayoutSidebar extends HTMLElement {
                 <span class="d-inline-block py-1">Start a Game</span>
               </a>
             </div>
-            <hr />
             <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center" href="#" data-link="/dashboard">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="dashboard"></ui-icon>
@@ -92,7 +91,6 @@ class DefaultLayoutSidebar extends HTMLElement {
               </a>
             </li>
             <span class="my-auto"></span>
-            <hr />
             <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center theme-toggle" href="#">
                 <span class="fs-5 me-2 flex-shrink-0 flex-grow-0">
