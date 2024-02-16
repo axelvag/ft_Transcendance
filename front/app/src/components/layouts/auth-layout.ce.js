@@ -32,33 +32,26 @@ class LoginLayout extends HTMLElement {
           background: none;
           align-items: center;
           padding: 2rem;
+          
+          --halo-bicolor-bg-rgb: var(--bs-body-bg-rgb);
 
-          position: relative;
-          z-index: 0;
-          &::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            height: 500px;
-            width: 500px;
-            border-radius: 50%;
-            background-image: linear-gradient(to right, var(--bs-primary) 0%, var(--bs-secondary) 100%);
-            filter: blur(1000px);
-            opacity: 0.75;
-          }
+          background-color: rgba(var(--halo-bicolor-bg-rgb), 1);
+          background-image: radial-gradient(
+              closest-side,
+              rgba(var(--halo-bicolor-bg-rgb), 0) 0%,
+              rgba(var(--halo-bicolor-bg-rgb), 1) 100%
+            ),
+            linear-gradient(to right, rgba(var(--bs-primary-rgb), 0.25) 0%, rgba(var(--bs-secondary-rgb), 0.25) 100%);
+          background-size: 1000px 1000px, 1000px 1000px;
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-attachment: fixed;
         }
 
         .auth-layout-wrapper {
           background: var(--bs-tertiary-bg);
           border: 2px solid var(--bs-gray-500);
           border-radius: 1.5rem;
-          
-          position: relative;
-          z-index: 1;
         }
       }
     </style>
