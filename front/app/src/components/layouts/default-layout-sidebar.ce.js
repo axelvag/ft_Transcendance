@@ -6,12 +6,12 @@ class DefaultLayoutSidebar extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
       <header
-        class="navbar fixed-top z-2 bg-body-secondary py-0 d-lg-none"
+        class="navbar fixed-top z-2 z-lg-n1 bg-body-secondary py-0"
         style="height: 3rem;"
       >
         <div class="container-fluid">
           <a href="#" data-link="/dashboard">
-           PONG
+            ${logoSvg}
           </a>
           <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
             <ui-icon name="menu" class="fs-3"></ui-icon>
