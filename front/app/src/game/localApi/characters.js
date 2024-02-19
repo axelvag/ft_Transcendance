@@ -37,47 +37,47 @@ const characters = [
   },
   {
     name: 'Makoto',
-    avatar: './assets/img/avatar-makoto.jpg',
+    avatar: '/assets/img/avatar-makoto.jpg',
   },
   {
     name: 'Necro',
-    avatar: './assets/img/avatar-necro.jpg',
+    avatar: '/assets/img/avatar-necro.jpg',
   },
   {
     name: 'Oro',
-    avatar: './assets/img/avatar-oro.jpg',
+    avatar: '/assets/img/avatar-oro.jpg',
   },
   {
     name: 'Q',
-    avatar: './assets/img/avatar-q.jpg',
+    avatar: '/assets/img/avatar-q.jpg',
   },
   {
     name: 'Remy',
-    avatar: './assets/img/avatar-remy.jpg',
+    avatar: '/assets/img/avatar-remy.jpg',
   },
   {
     name: 'Ryu',
-    avatar: './assets/img/avatar-ryu.jpg',
+    avatar: '/assets/img/avatar-ryu.jpg',
   },
   {
     name: 'Sean',
-    avatar: './assets/img/avatar-sean.jpg',
+    avatar: '/assets/img/avatar-sean.jpg',
   },
   {
     name: 'Twelve',
-    avatar: './assets/img/avatar-twelve.jpg',
+    avatar: '/assets/img/avatar-twelve.jpg',
   },
   {
     name: 'Urien',
-    avatar: './assets/img/avatar-urien.jpg',
+    avatar: '/assets/img/avatar-urien.jpg',
   },
   {
     name: 'Yang',
-    avatar: './assets/img/avatar-yang.jpg',
+    avatar: '/assets/img/avatar-yang.jpg',
   },
   {
     name: 'Yun',
-    avatar: './assets/img/avatar-yun.jpg',
+    avatar: '/assets/img/avatar-yun.jpg',
   },
 ];
 

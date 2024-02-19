@@ -1,0 +1,11 @@
+[data-bs-theme='dark'] {
+  .dark-hidden {
+    display: none;
+  }
+}
+
+html:not([data-bs-theme='dark']) {
+  .dark-visible {
+    display: none;
+  }
+}

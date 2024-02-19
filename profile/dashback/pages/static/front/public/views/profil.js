@@ -1,9 +1,9 @@
-import "./view-sidebar.js";
+import "./default-layout-sidebar.js";
 import "./view-profil.js";
 
 const template = `
       <div class="layout">
-            <view-sidebar></view-sidebar>
+            <default-layout-sidebar></default-layout-sidebar>
             <view-profil></view-profil>
       </div>
 `;

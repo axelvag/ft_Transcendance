@@ -19,4 +19,4 @@ class ViewSidebar extends HTMLElement {
   }
 }
 
-customElements.define('view-sidebar', ViewSidebar);
+customElements.define("default-layout-sidebar", ViewSidebar);
