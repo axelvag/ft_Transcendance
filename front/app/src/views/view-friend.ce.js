@@ -80,7 +80,10 @@ class ViewFriend extends HTMLElement {
       }
     })
     .catch((error) => {
-      console.error('Error:', error);
+      console.error('Errorrrrrr:', error);
+      // return JSON.parse(text);
+      this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
+      this.generalErrorFriend.style.display = 'block';
       // Gérer les erreurs de la requête
     });
   }
