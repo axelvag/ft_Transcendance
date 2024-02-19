@@ -1,5 +1,6 @@
 import '../components/layouts/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
+import { user } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -96,6 +97,8 @@ class ViewSignIn extends HTMLElement {
     console.log('error', data);
     if (data.success) {
       console.log('Sucess!');
+      user.isAuthenticated = true;
+      user.id = data.id;
       redirectTo('/dashboard');
     } else {
       if (data.message === 'User not active.') this.emailError.style.display = 'block';

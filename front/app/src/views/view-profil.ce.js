@@ -1,6 +1,7 @@
 import './view-sidebar.ce.js';
 import { redirectTo } from '@/router.js';
 import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
+import { isAuthenticated } from '@/auth.js';
 
 class ViewProfil extends HTMLElement {
   constructor() {
@@ -10,7 +11,11 @@ class ViewProfil extends HTMLElement {
   }
 
   connectedCallback() {
-    verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+    // verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+    const isAuth = isAuthenticated();
+    if (!isAuth) {
+      redirectTo('/login');
+    }
   }
 
   displayDashboard(username) {

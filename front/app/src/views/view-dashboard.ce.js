@@ -1,17 +1,21 @@
 import './view-sidebar.ce.js';
 import { redirectTo } from '@/router.js';
 import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
+import { user } from '@/auth.js';
+import { isAuthenticated } from '@/auth.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
-    verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
-    // const isLoggedIn = isUserLoggedIn();
-    // if (!isLoggedIn) {
-    //   redirectTo('/');
-    // }
+    // verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+    const isAuth = isAuthenticated();
+    if (!isAuth) {
+      redirectTo('/login');
+    } else {
+      this.displayDashboard();
+    }
   }
 
-  displayDashboard(username) {
+  displayDashboard() {
     this.innerHTML = `
       <style>
         .dashboard-text {
@@ -53,7 +57,7 @@ class ViewDash extends HTMLElement {
           <div class="dashboard-text">
               <h1>TRANSCENDANCE PONG</h1>
           </div>
-          <h2>Bienvenue, ${username}</h2>
+          <h2>Bienvenue, ${user.username}, ${user.id}</h2>
           <div class="big-button-play">
             <button type="button" class="btn btn-outline-light btn-lg">Play Now</button>
           </div>
@@ -67,11 +71,11 @@ class ViewDash extends HTMLElement {
     `;
     this.querySelector('#delete-account-link').addEventListener('click', event => {
       event.preventDefault();
-      this.suppUser(username);
+      this.suppUser(user.username);
     });
   }
 
-  async suppUser(username) {
+  suppUser(username) {
     const url = `http://127.0.0.1:8001/accounts/delete_user/${username}`;
     fetch(url, {
       method: 'POST',

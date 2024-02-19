@@ -11,7 +11,7 @@ const useHash = true;
 const baseUrl = '';
 
 const routes = {
-  '/': { title: 'Home', template: home },
+  '/': { title: 'Home', template: '<view-home></view-home>' },
   '/profil': { title: 'Profil', template: '<view-profil></view-profil>' },
   // public
   '/login': { title: 'Login', template: '<view-signin></view-signin>' },

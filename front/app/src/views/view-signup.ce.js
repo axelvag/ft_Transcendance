@@ -184,8 +184,10 @@ class ViewSigUp extends HTMLElement {
   getCSRFToken() {
     const csrfTokenCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
     if (csrfTokenCookie) {
+      console.log("csrf find");
       return csrfTokenCookie.split('=')[1];
     }
+    console.log("csrf not find");
     return null; // Retourne null si le cookie CSRF n'est pas trouvé
   }
 
