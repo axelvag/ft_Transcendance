@@ -1,5 +1,5 @@
-import '../components/layouts/auth-layout.ce.js';
-import { redirectTo } from '../router.js';
+import '@/components/layouts/auth-layout.ce.js';
+import { redirectTo } from '@/router.js';
 
 class ViewSigUp extends HTMLElement {
   constructor() {
@@ -10,18 +10,18 @@ class ViewSigUp extends HTMLElement {
     this.innerHTML = `
         <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-        <span class="text-gradient">Sign up</span>
+        <span class="text-bicolor">Sign up</span>
         </h1>
         <form id="signup-form">
         <div class="mb-4">
-          <label class="form-label opacity-50" for="email">
+          <label class="form-label" for="email">
             Your email
           </label>
           <input class="form-control form-control-lg" type="email" id="email" name="email" required />
           <div id="email-error" class="invalid-feedback"></div>
         </div>
           <div class="mb-4">
-            <label class="form-label opacity-50" for="username">
+            <label class="form-label" for="username">
               Choose your username
               </label>
             <input class="form-control form-control-lg" type="username" id="username" name="username" required />
@@ -29,11 +29,11 @@ class ViewSigUp extends HTMLElement {
           </div>
             
             <div class="mb-4">
-              <label class="form-label opacity-50" for="password1">Choose your password</label>
+              <label class="form-label" for="password1">Choose your password</label>
               <input class="form-control form-control-lg" type="password" id="password1" name="password1" required />
             </div>
             <div class="mb-4">
-              <label class="form-label opacity-50" for="password2">Repeat your password</label>
+              <label class="form-label" for="password2">Repeat your password</label>
               <input class="form-control form-control-lg" type="password" id="password2" name="password2" required />
               <div id="password-error" class="invalid-feedback"></div>
             </div>
@@ -75,11 +75,11 @@ class ViewSigUp extends HTMLElement {
     // this.displayFormErrors = this.displayFormErrors.bind(this);
     this.querySelector('#signup-form').addEventListener('submit', this.submitForm);
     //Todo a revoir
-    this.querySelector('a[data-link="/login"]').addEventListener('click', function(e) {
+    this.querySelector('a[data-link="/login"]').addEventListener('click', function (e) {
       e.preventDefault();
       redirectTo('/login');
     });
-    
+
     this.querySelector('#signup-form').addEventListener('click', e => e.stopPropagation());
   }
 
@@ -120,6 +120,25 @@ class ViewSigUp extends HTMLElement {
     let verif = this.passwordVerification();
     if (!verif) return;
 
+    // Ajout : Récupération du CSRF Token
+    let csrfToken;
+    try {
+      const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+        method: 'GET',
+        credentials: 'include', // Pour inclure les cookies dans la requête
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
+      }
+      const data = await response.json();
+      csrfToken = data.csrfToken;
+      console.log(csrfToken);
+    } catch (error) {
+      console.error('Erreur lors de la récupération du CSRF token:', error);
+      // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
+      return;
+    }
+
     const formData = {
       username: this.username.value,
       email: this.email.value,
@@ -131,35 +150,31 @@ class ViewSigUp extends HTMLElement {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'X-CSRFToken': csrfToken
+        'X-CSRFToken': csrfToken,
       },
       credentials: 'include',
       body: JSON.stringify(formData),
     });
 
     const data = await response.json();
-    console.log("data", data);
+    console.log('data', data);
 
     if (data.success) {
       const successNotification = document.getElementById('success-notification');
       if (successNotification) successNotification.style.display = 'block';
       // redirectTo('/profil');
-    } 
-    else {
+    } else {
       if (data.errors.email) {
         this.emailError.textContent = data.errors.email[0];
         this.email.classList.add('is-invalid');
-      }
-      else if (data.errors.password2) {
+      } else if (data.errors.password2) {
         this.passwordError.textContent = data.errors.password2[0];
         this.password1.classList.add('is-invalid');
         this.password2.classList.add('is-invalid');
-      }
-      else if (data.errors.username) {
+      } else if (data.errors.username) {
         this.usernameError.textContent = data.errors.username[0];
         this.username.classList.add('is-invalid');
-      }
-      else  {
+      } else {
         this.generalError.textContent = data.errors.non_field_errors[0]; // categorie special d'erreur
         this.generalError.style.display = 'block';
       }

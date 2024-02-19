@@ -26,10 +26,24 @@ class InvitationForm(forms.ModelForm):
         except User.DoesNotExist:
             raise forms.ValidationError("Cet utilisateur n'existe pas.")
         return user
+        # return username
 
+    # def save(self, commit=True):
+    #     invitation = super().save(commit=False)
+    #     invitation.to_user = self.cleaned_data['username']
+    #     if commit:
+    #         invitation.save()
+    #     return invitation
     def save(self, commit=True):
         invitation = super().save(commit=False)
-        invitation.to_user = self.cleaned_data['username']
+        # Récupérez l'objet User correspondant au nom d'utilisateur et assignez-le à invitation.to_user
+        username = self.cleaned_data['username']
+        user = User.objects.get(username=username)
+        invitation.to_user = user
         if commit:
             invitation.save()
         return invitation
+
+
+# Pour la fonction clean_username : return username (retourne la variable plutot que l'objet User)
+# Deuxieme fonction save --> test chatgpt me la generer pour debug
