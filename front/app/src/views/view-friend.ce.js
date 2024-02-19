@@ -45,25 +45,29 @@ class ViewFriend extends HTMLElement {
       credentials: 'include',
       body: JSON.stringify({ username: friendName }),
     })
-      .then(response => response.json())
-      .then(data => {
-        console.log('data:', data);
-        // Traiter la réponse du serveur
-        // if (!data.success){
-        if (data.username) {
-          console.log('salut');
-          this.generalErrorFriend.textContent = data.username[0];
-          this.generalErrorFriend.style.display = 'block';
-        } else {
-          console.log('salut123');
-          const successNotificationFriend = document.getElementById('success-notification-friend');
-          if (successNotificationFriend) successNotificationFriend.style.display = 'block';
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        // Gérer les erreurs de la requête
-      });
+    .then(response => response.json())
+    .then(data => {
+      console.log('data:', data);
+      // Traiter la réponse du serveur
+      // if (!data.success){
+      if (data.username){
+        console.log("salut");
+        this.generalErrorFriend.textContent = data.username[0];
+        this.generalErrorFriend.style.display = 'block';
+      }
+      else{
+        console.log("salut123");
+        const successNotificationFriend = document.getElementById('success-notification-friend');
+      if (successNotificationFriend) successNotificationFriend.style.display = 'block';
+      }
+    })
+    .catch((error) => {
+      console.error('Errorrrrrr:', error);
+      // return JSON.parse(text);
+      this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
+      this.generalErrorFriend.style.display = 'block';
+      // Gérer les erreurs de la requête
+    });
   }
 }
 

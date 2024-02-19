@@ -34,6 +34,9 @@ import json
 @login_required
 @csrf_exempt
 def home(request):
+    if not request.user.is_authenticated:
+        print("Pusssyyyyyyyyyyyyyyyyyyyyyyyy")
+
     try:
         data = json.loads(request.body.decode('utf8'))
     except json.JSONDecodeError:
@@ -53,6 +56,7 @@ def home(request):
             # return redirect('home')
             return JsonResponse({"message": "L'invitation a été envoyée avec succès !"}, status=200)
         else:
+            print("hellooooo")
             return JsonResponse(form.errors, status=400)
     else:
         form = InvitationForm()
@@ -65,21 +69,3 @@ def home(request):
             'form': form.as_p(),  # You might want to handle form rendering on the frontend instead
             'invitations': invitations_data,
         })
-    #     form = InvitationForm()
-    # invitations = Invitation.objects.filter(to_email=request.user.email, accepted=False)
-    # return render(request, 'invitations/home.html', {'form': form, 'invitations': invitations})
-
-# @login_required
-# def accept_invitation(request, invitation_id):
-#     invitation = get_object_or_404(Invitation, id=invitation_id, to_email=request.user.email, accepted=False)
-#     invitation.accepted = True
-#     invitation.save()
-#     messages.success(request, "L'invitation a été acceptée.")
-#     return redirect('home')
-
-# @login_required
-# def reject_invitation(request, invitation_id):
-#     invitation = get_object_or_404(Invitation, id=invitation_id, to_email=request.user.email)
-#     invitation.delete()
-#     messages.info(request, "L'invitation a été rejetée.")
-#     return redirect('home')
