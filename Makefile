@@ -1,28 +1,30 @@
+PROFILE ?= prod
+
 .PHONY: all build rebuild stop stop volumes fclean sh-% prune
 
 all: volumes build up migrate restart
 
 build:
-		docker-compose -f docker-compose.yml --env-file .env build
+	docker compose -f docker-compose.yml --profile $(PROFILE) --env-file .env build
 
 up:
-		docker-compose -f docker-compose.yml --env-file .env up -d
+	docker compose -f docker-compose.yml --profile $(PROFILE) up -d
 
 stop:
-		docker-compose -f docker-compose.yml --env-file .env stop
+	docker compose -f docker-compose.yml --profile prod --profile dev --env-file .env stop
 
 volumes:
-		# mkdir -p /var/lib/postgresql/data
+	# mkdir -p /var/lib/postgresql/data
 
 fclean:
-		docker-compose -f docker-compose.yml down -v --rmi all --remove-orphans
-		# rm -rf /var/lib/postgresql/data
+	docker compose -f docker-compose.yml down -v --rmi all --remove-orphans
+	# rm -rf /var/lib/postgresql/data
 
 rebuild:
-		docker-compose -f docker-compose.yml --env-file .env build --no-cache
+	docker compose -f docker-compose.yml --env-file .env build --no-cache
 
 ps:
-		docker-compose ps
+	docker compose ps
 
 sh-%:
 	docker compose -f docker-compose.yml exec $* /bin/sh
@@ -43,8 +45,8 @@ prune:
 	-docker buildx prune -a -f 2>/dev/null
 
 migrate:
-	docker-compose run --rm authentification python manage.py makemigrations
-	docker-compose run --rm authentification python manage.py migrate
+	docker compose run --rm authentification python manage.py makemigrations
+	docker compose run --rm authentification python manage.py migrate
 
 restart: 
 	docker stop authentification
