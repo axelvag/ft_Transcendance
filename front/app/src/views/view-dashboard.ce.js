@@ -1,10 +1,14 @@
 import './view-sidebar.ce.js';
-import { redirectTo } from '../router.js';
-import { verifyUserLoginAndDisplayDashboard } from '../router.js';
+import { redirectTo } from '@/router.js';
+import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
     verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+    // const isLoggedIn = isUserLoggedIn();
+    // if (!isLoggedIn) {
+    //   redirectTo('/');
+    // }
   }
 
   displayDashboard(username) {
@@ -61,14 +65,13 @@ class ViewDash extends HTMLElement {
         </div>
       </div>
     `;
-    this.querySelector('#delete-account-link').addEventListener('click', (event) => {
+    this.querySelector('#delete-account-link').addEventListener('click', event => {
       event.preventDefault();
       this.suppUser(username);
     });
   }
 
-  
-  async suppUser(username) {  
+  async suppUser(username) {
     const url = `http://127.0.0.1:8001/accounts/delete_user/${username}`;
     fetch(url, {
       method: 'POST',
@@ -79,16 +82,19 @@ class ViewDash extends HTMLElement {
         'X-CSRFToken': this.getCSRFToken(),
       },
     })
-    .then(response => response.json())
-    .then(data => {
-      if(data.success) {
-        redirectTo("/");
-      }
-    })
-    .catch(error => console.error('Error:', error));
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          redirectTo('/');
+        }
+      })
+      .catch(error => console.error('Error:', error));
   }
   getCSRFToken() {
-    return document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
+    return document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='))
+      .split('=')[1];
   }
 }
 

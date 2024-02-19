@@ -2,7 +2,7 @@ import './components/game-renderer-2d.ce.js';
 import './components/game-player.ce.js';
 import './components/game-scoreboard.ce.js';
 import GameLocalApi from './localApi/GameLocalApi.js';
-import { redirectTo } from '../router.js';
+import { redirectTo } from '@/router.js';
 
 const sounds = {
   collision: new Audio('./assets/sounds/hit.wav'),

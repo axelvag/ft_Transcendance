@@ -19,9 +19,12 @@ const routes = {
   '/forget-pass': { title: 'Forget password', template: '<view-forget-pass></view-forget-pass>' },
   '/dashboard': { title: 'Dashboard', template: '<view-dash></view-dash>' },
   '/new-pass': { title: 'New password', template: '<view-new-pass></view-new-pass>' },
-  '/email-confirmation': { title: 'Email confirmation', template: '<view-email-confirmation></view-email-confirmation>' },
+  '/email-confirmation': {
+    title: 'Email confirmation',
+    template: '<view-email-confirmation></view-email-confirmation>',
+  },
   // logged
-  '/friends': { title: 'Friends', template:'<view-friend></view-friend>'},
+  '/friends': { title: 'Friends', template: '<view-friend></view-friend>' },
   '/careers': { title: 'Careers', template: careers },
   '/settings': { title: 'Settings', template: settings },
   '/game': { title: 'Game', template: '<view-game></view-game>' },
@@ -97,33 +100,5 @@ window.addEventListener('popstate', router);
 window.addEventListener('DOMContentLoaded', router);
 // Écouteur d'événements pour les changements de hash
 window.addEventListener('hashchange', router);
-
-
-const API_BASE_URL = 'http://127.0.0.1:8001';
-
-export const isUserLoggedIn = () => {
-  return fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
-    method: 'GET',
-    credentials: 'include', // Pour inclure les cookies dans la requête
-  })
-  .then(response => response.json())
-  .catch(error => {
-    console.error('Erreur lors de la vérification de l\'état de connexion:', error);
-    throw error; // Renvoyer l'erreur pour la gestion côté appelant
-  });
-};
-
-export const verifyUserLoginAndDisplayDashboard = (displayDashboardCallback) => {
-  isUserLoggedIn()
-    .then(data => {
-      if (data.success) {
-        console.log(data.username, data.email);
-        displayDashboardCallback(data.username);
-      } else {
-        redirectTo("/login");
-      }
-    })
-    .catch(error => console.error(error));
-};
 
 export { redirectTo };

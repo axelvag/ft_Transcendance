@@ -1,5 +1,5 @@
 import '../components/layouts/auth-layout.ce.js';
-import { redirectTo } from '../router.js';
+import { redirectTo } from '@/router.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -52,7 +52,6 @@ class ViewSignIn extends HTMLElement {
     this.passwordError = this.querySelector('#password-error');
     this.emailError = this.querySelector('#email-error');
   }
-  
 
   async getCsrfToken() {
     const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
@@ -71,39 +70,36 @@ class ViewSignIn extends HTMLElement {
 
     this.emailError.style.display = 'none';
     this.passwordError.style.display = 'none';
-    
+
     const form = event.target;
-    const usernameOremail = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    const usernameOremail = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
     const formData = {
       username: usernameOremail,
       password: password,
-  };
+    };
 
     const csrfToken = await this.getCsrfToken();
 
     console.log(JSON.stringify(formData));
-    const response = await fetch("http://127.0.0.1:8001/accounts/login/", {
-        method: 'POST',
+    const response = await fetch('http://127.0.0.1:8001/accounts/login/', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        'X-CSRFToken': csrfToken
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
       },
-      credentials: "include",
+      credentials: 'include',
       body: JSON.stringify(formData),
-    })
-    
-    const data =  await response.json();
-    console.log("error", data);
+    });
+
+    const data = await response.json();
+    console.log('error', data);
     if (data.success) {
-      console.log("Sucess!");
-      redirectTo("/dashboard");
+      console.log('Sucess!');
+      redirectTo('/dashboard');
     } else {
-      if (data.message === "User not active.")
-        this.emailError.style.display = 'block';
-      else if (data.message === "Invalid username or password.")
-        this.passwordError.style.display = 'block';
-      
+      if (data.message === 'User not active.') this.emailError.style.display = 'block';
+      else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
     }
   }
 }

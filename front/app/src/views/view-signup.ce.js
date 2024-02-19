@@ -1,5 +1,5 @@
 import '../components/layouts/auth-layout.ce.js';
-import { redirectTo } from '../router.js';
+import { redirectTo } from '@/router.js';
 
 class ViewSigUp extends HTMLElement {
   constructor() {
@@ -75,11 +75,11 @@ class ViewSigUp extends HTMLElement {
     // this.displayFormErrors = this.displayFormErrors.bind(this);
     this.querySelector('#signup-form').addEventListener('submit', this.submitForm);
     //Todo a revoir
-    this.querySelector('a[data-link="/login"]').addEventListener('click', function(e) {
+    this.querySelector('a[data-link="/login"]').addEventListener('click', function (e) {
       e.preventDefault();
       redirectTo('/login');
     });
-    
+
     this.querySelector('#signup-form').addEventListener('click', e => e.stopPropagation());
   }
 
@@ -145,7 +145,7 @@ class ViewSigUp extends HTMLElement {
       password1: this.password1.value,
       password2: this.password2.value,
     };
-    
+
     const response = await fetch('http://127.0.0.1:8001/accounts/register/', {
       method: 'POST',
       headers: {
@@ -156,44 +156,39 @@ class ViewSigUp extends HTMLElement {
       credentials: 'include',
       body: JSON.stringify(formData),
     });
-    
+
     const data = await response.json();
-    console.log("data", data);
+    console.log('data', data);
 
     if (data.success) {
       const successNotification = document.getElementById('success-notification');
       if (successNotification) successNotification.style.display = 'block';
       // redirectTo('/profil');
-    } 
-    else {
+    } else {
       if (data.errors.email) {
         this.emailError.textContent = data.errors.email[0];
         this.email.classList.add('is-invalid');
-      }
-      else if (data.errors.password2) {
+      } else if (data.errors.password2) {
         this.passwordError.textContent = data.errors.password2[0];
         this.password1.classList.add('is-invalid');
         this.password2.classList.add('is-invalid');
-      }
-      else if (data.errors.username) {
+      } else if (data.errors.username) {
         this.usernameError.textContent = data.errors.username[0];
         this.username.classList.add('is-invalid');
-      }
-      else  {
+      } else {
         this.generalError.textContent = data.errors.non_field_errors[0]; // categorie special d'erreur
         this.generalError.style.display = 'block';
       }
     }
   }
   getCSRFToken() {
-    const csrfTokenCookie = document.cookie.split('; ')
-      .find(row => row.startsWith('csrftoken='));
+    const csrfTokenCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
     if (csrfTokenCookie) {
       return csrfTokenCookie.split('=')[1];
     }
     return null; // Retourne null si le cookie CSRF n'est pas trouvé
   }
-  
+
   resetError = () => {
     this.email.classList.remove('is-invalid');
     this.password1.classList.remove('is-invalid');

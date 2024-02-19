@@ -1,4 +1,4 @@
-import { redirectTo } from '../router.js';
+import { redirectTo } from '@/router.js';
 
 class ViewSidebar extends HTMLElement {
   connectedCallback() {
@@ -38,12 +38,12 @@ class ViewSidebar extends HTMLElement {
         </a>
       </div>
     `;
-    this.querySelector('.logout').addEventListener('click', (event) => {
+    this.querySelector('.logout').addEventListener('click', event => {
       event.preventDefault(); // Empêche le lien de suivre son URL par défaut
       this.logoutUser();
     });
 
-    this.querySelector('a[data-link="/dashboard"]').addEventListener('click', function(e) {
+    this.querySelector('a[data-link="/dashboard"]').addEventListener('click', function (e) {
       e.preventDefault();
       redirectTo('/dashboard');
     });
@@ -59,19 +59,22 @@ class ViewSidebar extends HTMLElement {
         'X-CSRFToken': this.getCSRFToken(), // Assurez-vous d'obtenir le token CSRF correctement
       },
     })
-    .then(response => {
-      if (!response.ok) throw new Error('Logout failed');
-      return response.json(); // Ou gérer autrement selon la réponse attendue
-    })
-    .then(data => {
-      redirectTo("/");
-    })
-    .catch(error => console.error('Error:', error));
+      .then(response => {
+        if (!response.ok) throw new Error('Logout failed');
+        return response.json(); // Ou gérer autrement selon la réponse attendue
+      })
+      .then(data => {
+        redirectTo('/');
+      })
+      .catch(error => console.error('Error:', error));
   }
-  
+
   // Fonction pour obtenir le token CSRF depuis le cookie
   getCSRFToken() {
-    return document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
+    return document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='))
+      .split('=')[1];
   }
 }
 
