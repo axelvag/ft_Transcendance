@@ -12,14 +12,19 @@
 
 import './view-sidebar.ce.js';
 import { redirectTo } from '@/router.js';
-import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
+import { isAuthenticated } from '@/auth.js';
 
 class ViewFriend extends HTMLElement {
   connectedCallback() {
-    verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+    const isAuth = isAuthenticated();
+    if (!isAuth) {
+      redirectTo('/login');
+    } else {
+      this.displayDashboard();
+    }
   }
 
-  displayDashboard(username) {
+  displayDashboard() {
     this.innerHTML = `
       <div class="layout">
         <view-sidebar class="layout-sidebar"></view-sidebar>

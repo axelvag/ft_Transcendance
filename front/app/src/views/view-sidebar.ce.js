@@ -1,4 +1,5 @@
 import { redirectTo } from '@/router.js';
+import { user } from '@/auth.js';
 
 class ViewSidebar extends HTMLElement {
   connectedCallback() {
@@ -64,6 +65,7 @@ class ViewSidebar extends HTMLElement {
         return response.json(); // Ou gérer autrement selon la réponse attendue
       })
       .then(data => {
+        user.isAuthenticated = false;
         redirectTo('/');
       })
       .catch(error => console.error('Error:', error));

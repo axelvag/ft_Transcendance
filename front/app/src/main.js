@@ -21,6 +21,8 @@ import './views/view-reinitialisation-pass-mail.ce.js';
 import './views/view-new-pass.ce.js';
 import './views/view-dashboard.ce.js';
 import './views/home.js';
+import './views/careers.js';
+import './views/settings.js';
 
 
 // router

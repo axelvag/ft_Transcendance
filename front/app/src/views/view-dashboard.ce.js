@@ -71,12 +71,12 @@ class ViewDash extends HTMLElement {
     `;
     this.querySelector('#delete-account-link').addEventListener('click', event => {
       event.preventDefault();
-      this.suppUser(user.username);
+      this.suppUser();
     });
   }
 
-  suppUser(username) {
-    const url = `http://127.0.0.1:8001/accounts/delete_user/${username}`;
+  suppUser() {
+    const url = `http://127.0.0.1:8001/accounts/delete_user/${user.username}`;
     fetch(url, {
       method: 'POST',
       credentials: 'include',
@@ -89,6 +89,7 @@ class ViewDash extends HTMLElement {
       .then(response => response.json())
       .then(data => {
         if (data.success) {
+          user.isAuthenticated = false;
           redirectTo('/');
         }
       })

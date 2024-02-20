@@ -99,6 +99,8 @@ class ViewSignIn extends HTMLElement {
       console.log('Sucess!');
       user.isAuthenticated = true;
       user.id = data.id;
+      user.email = data.email;
+      user.username = data.username;
       redirectTo('/dashboard');
     } else {
       if (data.message === 'User not active.') this.emailError.style.display = 'block';

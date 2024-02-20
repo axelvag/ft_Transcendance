@@ -1,19 +1,6 @@
-// import { redirectTo } from '@/router.js';
-// import { user } from '@/auth.js';
-import { verifyUserLoginAndDisplayDashboardHome } from '@/auth.js';
-
 
 class ViewHome extends HTMLElement {
   connectedCallback() {
-  //   verifyUserLoginAndDisplayDashboardHome(this.displayDashboard.bind(this));
-  //   // const isLoggedIn = isUserLoggedIn();
-  //   // if (!isLoggedIn) {
-  //   //   redirectTo('/');
-  //   // }
-  // }
-
-  // displayDashboard() {
-
     this.innerHTML = `
     <!DOCTYPE html>
     <html lang="en">
@@ -51,7 +38,3 @@ class ViewHome extends HTMLElement {
   }
 }
 customElements.define('view-home', ViewHome);
-
-// export default template;
-
-

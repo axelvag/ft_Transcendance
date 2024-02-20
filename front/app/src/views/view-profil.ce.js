@@ -16,9 +16,12 @@ class ViewProfil extends HTMLElement {
     if (!isAuth) {
       redirectTo('/login');
     }
+    else{
+      this.displayDashboard()
+    }
   }
 
-  displayDashboard(username) {
+  displayDashboard() {
     this.innerHTML = `
       <div class="layout">
         <view-sidebar class="layout-sidebar"></view-sidebar>

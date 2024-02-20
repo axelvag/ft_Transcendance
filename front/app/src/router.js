@@ -25,8 +25,8 @@ const routes = {
   },
   // logged
   '/friends': { title: 'Friends', template: '<view-friend></view-friend>' },
-  '/careers': { title: 'Careers', template: careers },
-  '/settings': { title: 'Settings', template: settings },
+  '/careers': { title: 'Careers', template: '<view-careers></view-careers>' },
+  '/settings': { title: 'Settings', template: '<view-settings></view-settings>' },
   '/game': { title: 'Game', template: '<view-game></view-game>' },
   // not found
   '/not-found': { title: 'Not Found', template: notFound },
