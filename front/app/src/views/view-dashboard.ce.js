@@ -1,6 +1,5 @@
 import './view-sidebar.ce.js';
 import { redirectTo } from '@/router.js';
-import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
 import { user } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
 
