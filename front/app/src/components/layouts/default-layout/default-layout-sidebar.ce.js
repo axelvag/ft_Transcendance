@@ -1,3 +1,4 @@
+import './default-layout-sidebar.ce.scss';
 import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';

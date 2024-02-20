@@ -1,4 +1,4 @@
-import '@/components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 
 class ViewSigUp extends HTMLElement {
@@ -8,7 +8,7 @@ class ViewSigUp extends HTMLElement {
   }
   connectedCallback() {
     this.innerHTML = `
-        <login-layout>
+        <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
         <span class="text-bicolor">Sign up</span>
         </h1>
@@ -54,7 +54,7 @@ class ViewSigUp extends HTMLElement {
               </div>
             </div>
             </form>
-      </login-layout>
+      </auth-layout>
     `;
 
     //For function

@@ -1,5 +1,5 @@
-import '@/components/layouts/default-layout-sidebar.ce.js';
-import '@/components/layouts/default-layout-main.ce.js';
+import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
+import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 
 class ViewDash extends HTMLElement {

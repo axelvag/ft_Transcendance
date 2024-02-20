@@ -1,9 +1,9 @@
-import '@/components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout/auth-layout.ce.js';
 
 class ViewEmailConfirmation extends HTMLElement {
   async connectedCallback() {
     this.innerHTML = `
-        <login-layout>
+        <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
           <span class="text-bicolor">Email confirmation</span>
         </h1>
@@ -23,7 +23,7 @@ class ViewEmailConfirmation extends HTMLElement {
           <button class="btn btn-primary">Renvoyer un Email</button>
         </div>
 
-      </login-layout>
+      </auth-layout>
     `;
     console.log(document.location.href);
     const hash = location.hash;
