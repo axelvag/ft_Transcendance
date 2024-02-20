@@ -5,10 +5,10 @@ import GameLocalApi from './localApi/GameLocalApi.js';
 import { redirectTo } from '@/router.js';
 
 const sounds = {
-  collision: new Audio('./assets/sounds/hit.wav'),
-  score: new Audio('./assets/sounds/score.wav'),
-  victory: new Audio('./assets/sounds/victory.wav'),
-  defeat: new Audio('./assets/sounds/defeat.wav'),
+  collision: new Audio('/assets/sounds/hit.wav'),
+  score: new Audio('/assets/sounds/score.wav'),
+  victory: new Audio('/assets/sounds/victory.wav'),
+  defeat: new Audio('/assets/sounds/defeat.wav'),
 };
 Object.values(sounds).forEach(sound => {
   sound.preload = 'auto';
@@ -41,7 +41,7 @@ const template = `
   <div class="viewGame-dialog">
     <div class="viewGame-dialog-players">
       <game-player class="viewGame-dialog-player is-left"></game-player>
-      <div class="viewGame-dialog-players-separator text-gradient">vs</div>
+      <div class="viewGame-dialog-players-separator text-bicolor">vs</div>
       <game-player class="viewGame-dialog-player is-right"></game-player>
     </div>
     <div class="viewGame-dialog-wrapper">

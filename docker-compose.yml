@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # Serveur web
+  # Front - prod (build)
   front:
     build:
       context: ./front
@@ -10,12 +10,33 @@ services:
     ports:
       - "8000:80"
     networks:
-      - back
+      - front
     depends_on:
       - authentification
     restart: on-failure
+    profiles:
+      - prod
 
-  # Django Lucas
+  # Front - dev (live server)
+  front_dev:
+    build:
+      context: ./front
+      dockerfile: Dockerfile.dev
+    container_name: front_dev
+    volumes:
+      - /app/node_modules
+      - type: bind
+        source: ./front/app
+        target: /app
+    ports:
+      - "8000:8000"
+    networks:
+      - front
+    restart: on-failure
+    profiles:
+      - dev
+
+  # Back - authentification
   authentification:
     build:
       context: ./authentification
@@ -32,10 +53,10 @@ services:
       - profile
       - friendship
     environment:
-    - POSTGRES_HOST=data_base  # Utilisez le nom du service comme hôte
-    - POSTGRES_DB=transcendence
-    - POSTGRES_USER=postgresTranscendence
-    - POSTGRES_PASSWORD=postgresTranscendence123
+      - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
+      - POSTGRES_DB=transcendence
+      - POSTGRES_USER=postgresTranscendence
+      - POSTGRES_PASSWORD=postgresTranscendence123
     restart: on-failure
 
   profile:
@@ -110,6 +131,11 @@ services:
       - back
     depends_on:
       - data_base
+    environment:
+      - POSTGRES_HOST=data_base
+      - POSTGRES_DB=transcendence
+      - POSTGRES_USER=postgresTranscendence
+      - POSTGRES_PASSWORD=postgresTranscendence123
     restart: on-failure
 
 volumes:

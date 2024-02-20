@@ -1,24 +1,24 @@
-import '../components/layouts/auth-layout.ce.js';
-import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
+import '@/components/layouts/auth-layout.ce.js';
+import { redirectTo } from '@/router.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-        <login-layout>
+      <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-          <span class="text-gradient">Log In</span>
+          <span class="text-bicolor">Log In</span>
         </h1>
         <form id="signin-form">
           <div class="mb-4">
-            <label class="form-label opacity-50" for="username">
+            <label class="form-label" for="username">
               Username
             </label>
             <input class="form-control form-control-lg" type="username" id="username" name="username" required />
           </div>
           <div class="mb-4">
             <div class="d-flex justify-content-between">
-              <label class="form-label opacity-50" for="password">
+              <label class="form-label" for="password">
                 Password
               </label>
               <a href="#" data-link="/forget-pass" class="link fw-bold text-decoration-none">

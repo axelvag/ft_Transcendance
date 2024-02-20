@@ -1,36 +1,35 @@
-import '../components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 
 class ViewNewPass extends HTMLElement {
   async connectedCallback() {
     this.innerHTML = `
-        <login-layout>
-        
+      <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-        <span class="text-gradient">Nouveau mot de passe</span>
+          <span class="text-bicolor">New password</span>
         </h1>
         <div id="email-confirm-loading">Loading...</div>
         <div id="email-confirm-success" hidden>
-        <form id="new-pass-form">
-        <div class="mb-4">
-            <label class="form-label opacity-50" for="password1">
-              Choose your new password
+          <form id="new-pass-form">
+            <div class="mb-4">
+              <label class="form-label" for="password1">
+                Choose your new password
               </label>
               <input class="form-control form-control-lg" type="password" id="password1" name="password1" required />
-          </div>
-          <div class="mb-4">
-          <label class="form-label opacity-50" for="password2">
-          Repeat your password
-          </label>
-          <input class="form-control form-control-lg" type="password" id="password2" name="password2" required />
-          </div>
-          <div class="d-grid pt-3">
-            <button type="submit" class="btn btn-primary btn-lg fw-bold">
-              Log In
-            </button>
             </div>
-            </form>
-          </div>
+            <div class="mb-4">
+              <label class="form-label" for="password2">
+                Repeat your password
+              </label>
+              <input class="form-control form-control-lg" type="password" id="password2" name="password2" required />
+            </div>
+            <div class="d-grid pt-3">
+              <button type="submit" class="btn btn-primary btn-lg fw-bold">
+                Log In
+              </button>
+            </div>
+          </form>
+        </div>
         <div id="email-confirm-error" hidden>
           <h5 class="fw-bold">Error</h5>
           <p id="email-confirm-error-msg">Something didn't work!</p>

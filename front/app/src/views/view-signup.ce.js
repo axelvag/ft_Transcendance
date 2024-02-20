@@ -1,4 +1,4 @@
-import '../components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 
 class ViewSigUp extends HTMLElement {
@@ -10,18 +10,18 @@ class ViewSigUp extends HTMLElement {
     this.innerHTML = `
         <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-        <span class="text-gradient">Sign up</span>
+        <span class="text-bicolor">Sign up</span>
         </h1>
         <form id="signup-form">
         <div class="mb-4">
-          <label class="form-label opacity-50" for="email">
+          <label class="form-label" for="email">
             Your email
           </label>
           <input class="form-control form-control-lg" type="email" id="email" name="email" required />
           <div id="email-error" class="invalid-feedback"></div>
         </div>
           <div class="mb-4">
-            <label class="form-label opacity-50" for="username">
+            <label class="form-label" for="username">
               Choose your username
               </label>
             <input class="form-control form-control-lg" type="username" id="username" name="username" required />
@@ -29,11 +29,11 @@ class ViewSigUp extends HTMLElement {
           </div>
             
             <div class="mb-4">
-              <label class="form-label opacity-50" for="password1">Choose your password</label>
+              <label class="form-label" for="password1">Choose your password</label>
               <input class="form-control form-control-lg" type="password" id="password1" name="password1" required />
             </div>
             <div class="mb-4">
-              <label class="form-label opacity-50" for="password2">Repeat your password</label>
+              <label class="form-label" for="password2">Repeat your password</label>
               <input class="form-control form-control-lg" type="password" id="password2" name="password2" required />
               <div id="password-error" class="invalid-feedback"></div>
             </div>

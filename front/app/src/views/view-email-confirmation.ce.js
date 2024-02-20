@@ -1,11 +1,11 @@
-import '../components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout.ce.js';
 
 class ViewEmailConfirmation extends HTMLElement {
   async connectedCallback() {
     this.innerHTML = `
         <login-layout>
         <h1 class="fw-bold py-2 mb-4">
-          <span class="text-gradient">Email confirmation</span>
+          <span class="text-bicolor">Email confirmation</span>
         </h1>
         <div id="email-confirm-loading">Loading...</div>
 
@@ -38,11 +38,10 @@ class ViewEmailConfirmation extends HTMLElement {
     const data1 = await response1.json();
     if (data1.success) {
       // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
-      console.log("user Actif");
+      console.log('user Actif');
       this.querySelector('#email-confirm-loading').hidden = true;
       this.querySelector('#email-confirm-success').hidden = false;
-    }
-    else {
+    } else {
       const response = await fetch(`http://127.0.0.1:8001/accounts/activate/${uidb64}/${token}`);
       const data = await response.json();
       console.log(data);

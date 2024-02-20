@@ -1,3 +1,5 @@
+import '@/components/layouts/default-layout-sidebar.ce.js';
+import '@/components/layouts/default-layout-main.ce.js';
 import { isAuthenticated } from '@/auth.js';
 import { redirectTo } from '@/router.js';
 
@@ -13,6 +15,8 @@ class ViewSettings extends HTMLElement {
 
     displayDashboard() {
         this.innerHTML = `
+        <default-layout-sidebar></default-layout-sidebar>
+        <default-layout-main>
         <div class="layout">
             <view-sidebar></view-sidebar>
             <main>
