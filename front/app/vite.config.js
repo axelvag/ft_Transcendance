@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 import svgLoader from 'vite-svg-loader';
+import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
   resolve: {
@@ -9,6 +10,11 @@ export default defineConfig({
     },
   },
   plugins: [svgLoader()],
+  css: {
+    postcss: {
+      plugins: [autoprefixer()],
+    },
+  },
   server: {
     host: true,
     port: '8000',
