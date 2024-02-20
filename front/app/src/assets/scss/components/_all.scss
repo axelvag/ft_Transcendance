@@ -1,16 +1,4 @@
-@import 'bootstrap/scss/mixins/banner';
-@include bsBanner('');
-
-// scss-docs-start import-stack
-// Configuration
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/variables-dark';
-@import 'bootstrap/scss/maps';
-@import 'bootstrap/scss/mixins';
-@import 'bootstrap/scss/utilities';
-
-// Layout & components
+// Bootstrap Layout & components
 @import 'bootstrap/scss/root';
 @import 'bootstrap/scss/reboot';
 @import 'bootstrap/scss/type';
@@ -43,29 +31,5 @@
 @import 'bootstrap/scss/offcanvas';
 @import 'bootstrap/scss/placeholders';
 
-// Helpers
-@import 'bootstrap/scss/helpers';
-
-// Utilities
-$utilities: map-merge(
-  $utilities,
-  (
-    'position':
-      map-merge(
-        map-get($utilities, 'position'),
-        (
-          responsive: true,
-        )
-      ),
-    'z-index':
-      map-merge(
-        map-get($utilities, 'z-index'),
-        (
-          responsive: true,
-        )
-      ),
-  )
-);
-
-@import 'bootstrap/scss/utilities/api';
-// scss-docs-end import-stack
+// Custom components
+@import '_sidebar';

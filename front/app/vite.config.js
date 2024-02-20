@@ -11,6 +11,13 @@ export default defineConfig({
   },
   plugins: [svgLoader()],
   css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @import "@/assets/scss/_base";
+        `,
+      },
+    },
     postcss: {
       plugins: [autoprefixer()],
     },
