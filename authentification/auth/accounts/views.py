@@ -299,7 +299,7 @@ def is_user_logged_in(request):
     else:
         return JsonResponse({"success": False, "message": "User is not login."}, status=400)
 
-@csrf_exempt
+# @csrf_exempt
 @require_http_methods(["POST"])  # Accepte uniquement les requêtes POST
 def update_user(request):
     try:

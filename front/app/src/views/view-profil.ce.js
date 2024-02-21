@@ -40,6 +40,7 @@ const saveUser = async (newUser) => {
         'X-CSRFToken': getCSRFToken(),
         // Ajoutez ici d'autres en-têtes nécessaires, comme les tokens CSRF ou d'authentification
       },
+      credentials: 'include',
       body: JSON.stringify(newUser),
     });
 
