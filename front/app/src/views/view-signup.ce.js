@@ -121,23 +121,23 @@ class ViewSigUp extends HTMLElement {
     if (!verif) return;
 
     // Ajout : Récupération du CSRF Token
-    let csrfToken;
-    try {
-      const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
-        method: 'GET',
-        credentials: 'include', // Pour inclure les cookies dans la requête
-      });
-      if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
-      }
-      const data = await response.json();
-      csrfToken = data.csrfToken;
-      console.log(csrfToken);
-    } catch (error) {
-      console.error('Erreur lors de la récupération du CSRF token:', error);
-      // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
-      return;
-    }
+    // let csrfToken;
+    // try {
+    //   const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+    //     method: 'GET',
+    //     credentials: 'include', // Pour inclure les cookies dans la requête
+    //   });
+    //   if (!response.ok) {
+    //     throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
+    //   }
+    //   const data = await response.json();
+    //   csrfToken = data.csrfToken;
+    //   console.log(csrfToken);
+    // } catch (error) {
+    //   console.error('Erreur lors de la récupération du CSRF token:', error);
+    //   // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
+    //   return;
+    // }
 
     const formData = {
       username: this.username.value,
@@ -150,7 +150,8 @@ class ViewSigUp extends HTMLElement {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
+        // 'X-CSRFToken': csrfToken,
+        'X-CSRFToken': this.getCSRFToken(),
       },
       credentials: 'include',
       body: JSON.stringify(formData),
@@ -179,6 +180,15 @@ class ViewSigUp extends HTMLElement {
         this.generalError.style.display = 'block';
       }
     }
+  }
+  getCSRFToken() {
+    const csrfTokenCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+    if (csrfTokenCookie) {
+      console.log("csrf find");
+      return csrfTokenCookie.split('=')[1];
+    }
+    console.log("csrf not find");
+    return null; // Retourne null si le cookie CSRF n'est pas trouvé
   }
 
   resetError = () => {

@@ -1,3 +1,6 @@
+import { redirectTo } from '@/router.js';
+import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
+import { isAuthenticated } from '@/auth.js';
 import '@/components/layouts/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout-main.ce.js';
 
@@ -152,7 +155,18 @@ class ViewProfil extends HTMLElement {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  async connectedCallback() {
+  connectedCallback() {
+    // verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+    const isAuth = isAuthenticated();
+    if (!isAuth) {
+      redirectTo('/login');
+    }
+    else{
+      this.displayDashboard()
+    }
+  }
+
+  displayDashboard() {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main id="profile-section">
