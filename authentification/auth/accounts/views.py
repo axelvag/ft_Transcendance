@@ -104,7 +104,7 @@ def logout_user(request):
     else:
         return JsonResponse({"success": False, "message": "Méthode non autorisée."}, status=405)
 
-# @csrf_exempt
+@csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:

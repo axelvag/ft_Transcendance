@@ -1,5 +1,7 @@
 import { redirectTo } from '@/router.js';
 import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
+import { getCSRFToken } from '@/auth.js';
+import { user } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
 import '@/components/layouts/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout-main.ce.js';
@@ -18,15 +20,40 @@ const fake_getUser = async () => {
   });
 };
 
-const fake_saveUser = async data => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        user: { ...data },
-      });
-    }, 1000);
-  });
+// const fake_saveUser = async data => {
+//   return new Promise(resolve => {
+//     setTimeout(() => {
+//       resolve({
+//         success: true,
+//         user: { ...data },
+//       });
+//     }, 1000);
+//   });
+// };
+
+const saveUser = async (newUser) => {
+  try {
+    const response = await fetch('http://127.0.0.1:8002/update_user/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 'X-CSRFToken': getCSRFToken(),
+        // Ajoutez ici d'autres en-têtes nécessaires, comme les tokens CSRF ou d'authentification
+      },
+      credentials: 'include',
+      body: JSON.stringify(newUser),
+    });
+
+    if (!response.ok) {
+      throw new Error('La requête a échoué avec le statut ' + response.status);
+    }
+
+    const data = await response.json();
+    return data; // Renvoie les données de réponse pour un traitement ultérieur
+  } catch (error) {
+    console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
+    throw error; // Renvoie l'erreur pour une gestion ultérieure
+  }
 };
 
 const loadingProfileTemplate = `
@@ -225,11 +252,12 @@ class ViewProfil extends HTMLElement {
         firstname: profileEditForm.querySelector('#firstname').value,
         lastname: profileEditForm.querySelector('#lastname').value,
         avatar: this.#user.avatar,
+        id: user.id,
       };
       try {
         this.querySelector('#profile-edit-loader').hidden = false;
         this.querySelector('#profile-edit').classList.add('opacity-25');
-        const response = await fake_saveUser(newUser);
+        const response = await saveUser(newUser);
         if (response.success) {
           this.#user = response.user;
           this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);

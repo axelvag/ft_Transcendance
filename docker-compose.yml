@@ -50,7 +50,7 @@ services:
       - back
     depends_on:
       - data_base
-      # - profile
+      - profile
       - friendship
     environment:
       - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
@@ -59,18 +59,23 @@ services:
       - POSTGRES_PASSWORD=postgresTranscendence123
     restart: on-failure
 
-  # profile:
-  #   build:
-  #     context: ./profile
-  #     dockerfile: Dockerfile
-  #   container_name: profile
-  #   ports:
-  #     - "8002:8002"
-  #   networks:
-  #     - back
-  #   depends_on:
-  #     - data_base
-  #   restart: on-failure
+  profile:
+    build:
+      context: ./profile
+      dockerfile: Dockerfile
+    container_name: profile
+    ports:
+      - "8002:8002"
+    networks:
+      - back
+    depends_on:
+      - data_base
+    environment:
+      - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
+      - POSTGRES_DB=transcendence
+      - POSTGRES_USER=postgresTranscendence
+      - POSTGRES_PASSWORD=postgresTranscendence123
+    restart: on-failure
 
   # Data base PostGreSQL
   # data_base:
@@ -116,7 +121,7 @@ services:
       - back
     depends_on:
       - authentification
-      # - profile
+      - profile
       - data_base
     restart: on-failure
 

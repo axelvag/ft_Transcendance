@@ -16,8 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from pages import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('update_user/', views.update_user, name='update_user'),
 ]
+
+# Dans votre fichier urls.py
+# from django.urls import path
+# from .views import update_user
+# from django.contrib import admin
+
+# urlpatterns = [
+#     path('update_user/', update_user, name='update_user'),
+#     # ... autres routes ...
+# ]
