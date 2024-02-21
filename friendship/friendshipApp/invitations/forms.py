@@ -9,6 +9,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Invitation
+from .api_client import AuthAPIClient
 
 class InvitationForm(forms.ModelForm):
     username = forms.CharField(max_length=150, help_text="Nom d'utilisateur de l'invité")
@@ -19,14 +20,26 @@ class InvitationForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        try:
-            user = User.objects.get(username=username)
-            if Invitation.objects.filter(to_user=user).exists():
+        user_status = AuthAPIClient.get_user_status(username)
+        
+        if user_status['exists']:
+            if Invitation.objects.filter(to_user__username=username).exists():
                 raise forms.ValidationError("Tu as déjà envoyé une demande d'ami à cet utilisateur.")
-        except User.DoesNotExist:
+        else:
             raise forms.ValidationError("Cet utilisateur n'existe pas.")
-        return user
-        # return username
+        
+        return username
+
+    # def clean_username(self):
+    #     username = self.cleaned_data['username']
+    #     try:
+    #         user = User.objects.get(username=username)
+    #         if Invitation.objects.filter(to_user=user).exists():
+    #             raise forms.ValidationError("Tu as déjà envoyé une demande d'ami à cet utilisateur.")
+    #     except User.DoesNotExist:
+    #         raise forms.ValidationError("Cet utilisateur n'existe pas.")
+    #     return user
+    #     # return username
 
     # def save(self, commit=True):
     #     invitation = super().save(commit=False)

@@ -103,7 +103,7 @@ def logout_user(request):
     else:
         return JsonResponse({"success": False, "message": "Méthode non autorisée."}, status=405)
 
-# @csrf_exempt
+@csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:
@@ -289,7 +289,8 @@ def delete_user(request, username):
         return JsonResponse({"success": False, "message": "User not found."}, status=404)
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
-
+        
+@csrf_exempt
 def is_user_logged_in(request):
     if request.user.is_authenticated:
         return JsonResponse({"success": True, "message": "User is login.", "username": request.user.username, "email": request.user.email}, status=200)
