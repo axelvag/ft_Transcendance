@@ -2,17 +2,8 @@ import './components/game-renderer-2d.ce.js';
 import './components/game-player.ce.js';
 import './components/game-scoreboard.ce.js';
 import GameLocalApi from './localApi/GameLocalApi.js';
+import AudioPlayer from './localApi/AudioPlayer.js';
 import { redirectTo } from '@/router.js';
-
-const sounds = {
-  collision: new Audio('/assets/sounds/hit.wav'),
-  score: new Audio('/assets/sounds/score.wav'),
-  victory: new Audio('/assets/sounds/victory.wav'),
-  defeat: new Audio('/assets/sounds/defeat.wav'),
-};
-Object.values(sounds).forEach(sound => {
-  sound.preload = 'auto';
-});
 
 const template = `
 <div class="viewGame">
@@ -227,18 +218,28 @@ const style = `
 class ViewGame extends HTMLElement {
   #keys = {};
   #gameState = null;
+  #audioPlayer = null;
 
   constructor() {
     super();
 
-    this.gameApi = new GameLocalApi();
-
     this.renderDialog = this.renderDialog.bind(this);
+    this.handleInitMessage = this.handleInitMessage.bind(this);
+    this.handleUpdateMessage = this.handleUpdateMessage.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
   }
 
-  connectedCallback() {
+  async connectedCallback() {
+    // init
+    this.gameApi = new GameLocalApi();
+
+    this.#audioPlayer = new AudioPlayer();
+    await this.#audioPlayer.load('collision', '/assets/sounds/hit.wav');
+    await this.#audioPlayer.load('score', '/assets/sounds/score.wav');
+    await this.#audioPlayer.load('victory', '/assets/sounds/victory.wav');
+    await this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
+
     this.innerHTML = `
       <style>
         ${style}
@@ -288,50 +289,11 @@ class ViewGame extends HTMLElement {
     // Renderer
     this.rendererEl = this.querySelector('.viewGame-renderer');
 
-    this.gameApi.on('init', data => {
-      const json = JSON.parse(data);
-      // todo: validate data
-      this.#gameState = json?.state;
-      this.renderPlayers();
-      this.renderDialog();
-      this.renderScores();
-      this.rendererEl.init(this.#gameState);
-      this.rendererEl.start();
-    });
-    this.gameApi.on('update', data => {
-      const json = JSON.parse(data);
-      // todo: validate data
-      const updates = json?.state;
-      this.#gameState = {
-        ...this.#gameState,
-        ...updates,
-      };
+    // Game API events
+    this.gameApi.on('init', this.handleInitMessage);
+    this.gameApi.on('update', this.handleUpdateMessage);
 
-      // dialog
-      this.renderDialog();
-
-      // renderer
-      this.rendererEl.update(updates);
-      if (updates.status === 'finished') {
-        this.rendererEl.stop();
-      }
-
-      // players and board
-      if (updates.scoreLeft != null || updates.scoreRight != null) {
-        this.renderScores();
-      }
-
-      // sounds
-      if (json?.event) {
-        const sound = sounds[json.event];
-        if (sound) {
-          sound.currentTime = 0;
-          sound.play();
-        }
-      }
-    });
-
-    // Events
+    // UI Events
     document.addEventListener('keydown', this.handleKeyDown);
     document.addEventListener('keyup', this.handleKeyUp);
     document.addEventListener('click', this.handleClick);
@@ -432,6 +394,44 @@ class ViewGame extends HTMLElement {
     this.dialogResumeBtn.hidden = !actions.includes('resume');
     this.dialogQuitBtn.hidden = !actions.includes('quit');
     this.dialogNewGameBtn.hidden = !actions.includes('newGame');
+  }
+
+  handleInitMessage(data) {
+    const json = JSON.parse(data);
+    // todo: validate data
+    this.#gameState = json?.state;
+    this.renderPlayers();
+    this.renderDialog();
+    this.renderScores();
+    this.rendererEl.init(this.#gameState);
+    this.rendererEl.start();
+  }
+
+  handleUpdateMessage(data) {
+    const json = JSON.parse(data);
+    // todo: validate data
+    const updates = json?.state;
+    this.#gameState = {
+      ...this.#gameState,
+      ...updates,
+    };
+
+    // dialog
+    this.renderDialog();
+
+    // renderer
+    this.rendererEl.update(updates);
+    if (updates.status === 'finished') {
+      this.rendererEl.stop();
+    }
+
+    // players and board
+    if (updates.scoreLeft != null || updates.scoreRight != null) {
+      this.renderScores();
+    }
+
+    // sounds
+    this.#audioPlayer.play(json?.event);
   }
 
   handleKeyDown(event) {
