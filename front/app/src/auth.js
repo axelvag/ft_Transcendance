@@ -43,25 +43,31 @@ const verifyUserLoginAndDisplayDashboard = displayDashboardCallback => {
     .catch(error => console.error(error));
 };
 
-const verifyUserLoginMain = () => {
-  return fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
-    method: 'GET',
-    credentials: 'include', // Pour inclure les cookies dans la requête
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        user.isAuthenticated = true;
-        user.id = data.id;
-        user.email = data.email;
-        user.username = data.username;
-        redirectTo('/dashboard'); // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-      }
-    })
-    .catch(error => {
-      console.error("Erreur lors de la vérification de l'état de connexion:", error);
-      throw error; // Renvoyer l'erreur pour la gestion côté appelant
+const verifyUserLoginMain = async () => {
+  console.log("passee");
+  let path = window.location.hash.substring(1);
+  try {
+    const response = await fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
+      method: 'GET',
+      credentials: 'include', // Pour inclure les cookies dans la requête
     });
+    const data = await response.json();
+    
+    if (data.success) {
+      console.log("pas");
+      user.isAuthenticated = true;
+      user.id = data.id;
+      user.email = data.email;
+      user.username = data.username;
+      console.log(path);
+      if (path === "/signup" || path === "/login" || path === "/forget-pass" || path === "")
+        path = "/dashboard";
+      redirectTo(path); // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+    }
+  } catch (error) {
+    console.error("Erreur lors de la vérification de l'état de connexion:", error);
+    throw error; // Renvoyer l'erreur pour la gestion côté appelant
+  }
 };
 
 const getCSRFToken = () => {

@@ -186,6 +186,7 @@ class ViewProfil extends HTMLElement {
     // verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
     const isAuth = isAuthenticated();
     if (!isAuth) {
+      console.log("5");
       redirectTo('/login');
     }
     else{

@@ -135,6 +135,7 @@ document.addEventListener('click', e => {
 });
 
 const redirectTo = pathKey => {
+  console.log("ici");
   const path = useHash
     ? // with hash
       '/#' + pathKey

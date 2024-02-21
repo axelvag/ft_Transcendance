@@ -9,6 +9,7 @@ class ViewDash extends HTMLElement {
     // verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
     const isAuth = isAuthenticated();
     if (!isAuth) {
+      console.log("3");
       redirectTo('/login');
     } else {
       this.displayDashboard();

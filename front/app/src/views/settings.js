@@ -7,6 +7,7 @@ class ViewSettings extends HTMLElement {
     connectedCallback() {
         const isAuth = isAuthenticated();
         if (!isAuth) {
+            console.log("2");
         redirectTo('/login');
         } else {
         this.displayDashboard();
