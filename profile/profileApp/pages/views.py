@@ -85,12 +85,19 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Profile
 from django.contrib.auth import get_user_model
+import logging
 
+# username, email fonctionne --> a corriger user_id first_name, last_name
+# logger = logging.getLogger(__name__)
 User = get_user_model()
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def update_user(request):
+
+    # logger.debug('Message de débogage')
+    print("Hellllllllloooooooooooooooooooooooooo")
+
     try:
         data = json.loads(request.body)
         user_id = data.get('id')
@@ -106,7 +113,10 @@ def update_user(request):
             return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
 
         # Si le profil existe, nous le mettons à jour, sinon nous en créons un nouveau
-        profile, created = Profile.objects.get_or_create(user=user)
+        # profile, created = Profile.objects.get_or_create(user=user)
+        profile = Profile.objects.get(pk=user_id)
+        if profile is None:
+          profile = Profile.objects.create(firstName=first_name, lastName=last_name, user_id_tableUser=user_id)
 
         # Mise à jour de l'utilisateur
         if username:
@@ -128,45 +138,3 @@ def update_user(request):
         return JsonResponse({"success": False, "message": "Données JSON invalides."}, status=400)
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
-
-# from django.contrib.auth import get_user_model
-# from django.http import JsonResponse
-# from django.views.decorators.http import require_http_methods
-# from django.views.decorators.csrf import csrf_exempt
-# from .models import Profile
-# import json
-
-# User = get_user_model()
-
-# @csrf_exempt
-# @require_http_methods(["POST"])
-# def update_user(request):
-#     try:
-#         data = json.loads(request.body)
-
-#         # Récupérer les informations de l'utilisateur à partir des données JSON
-#         user_id = data.get('id')
-#         first_name = data.get('first_name')
-#         last_name = data.get('last_name')
-        
-#         # Trouver l'instance de l'utilisateur
-#         user = User.objects.get(pk=user_id)
-
-#         # Mettre à jour le profil associé à l'utilisateur
-#         profile, created = Profile.objects.get_or_create(user=user)
-#         profile.first_name = first_name if first_name is not None else profile.first_name
-#         profile.last_name = last_name if last_name is not None else profile.last_name
-#         profile.save()
-
-#         # Réponse de succès
-#         return JsonResponse({"success": True, "message": "Utilisateur mis à jour avec succès."})
-
-#     except User.DoesNotExist:
-#         # Utilisateur non trouvé
-#         return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
-#     except json.JSONDecodeError:
-#         # JSON invalide
-#         return JsonResponse({"success": False, "message": "Données JSON invalides."}, status=400)
-#     except Exception as e:
-#         # Autre erreur
-#         return JsonResponse({"success": False, "message": "Données JSON invalides."}, status=500)
