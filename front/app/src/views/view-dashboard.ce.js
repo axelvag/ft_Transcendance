@@ -6,7 +6,14 @@ import '@/components/layouts/default-layout-main.ce.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
-    // verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'isLoggedIn' && event.newValue === 'false') {
+        // Logique pour gérer la déconnexion, par exemple :
+        console.log("logout logout");
+        window.location.href = '/login'; // Rediriger vers la page de connexion
+        return;
+      }
+    });
     const isAuth = isAuthenticated();
     if (!isAuth) {
       console.log("3");

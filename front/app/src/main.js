@@ -1,5 +1,8 @@
 import { verifyUserLoginMain } from './auth.js';
 verifyUserLoginMain();
+if (localStorage.getItem('isLoggedIn') === null) {
+  localStorage.setItem('isLoggedIn', 'false');
+}
 // style
 import '@/assets/scss/style.scss';
 

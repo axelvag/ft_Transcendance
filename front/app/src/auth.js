@@ -56,11 +56,12 @@ const verifyUserLoginMain = async () => {
     if (data.success) {
       console.log("pas");
       user.isAuthenticated = true;
+      localStorage.setItem('isLoggedIn', 'true');
       user.id = data.id;
       user.email = data.email;
       user.username = data.username;
       console.log(path);
-      if (path === "/signup" || path === "/login" || path === "/forget-pass" || path === "")
+      if (path === "/signup" || path === "/login" || path === "/forget-pass" || path === "" || path === "/")
         path = "/dashboard";
       redirectTo(path); // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
     }

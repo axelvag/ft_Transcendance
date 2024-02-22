@@ -139,6 +139,13 @@ class DefaultLayoutSidebar extends HTMLElement {
       })
       .then(data => {
         user.isAuthenticated = false;
+        console.log('Setting isLoggedIn to false in localStorage before setting');
+        
+        localStorage.setItem('isLoggedIn', 'false');
+
+        // Débogage après la mise à jour de localStorage
+        console.log('isLoggedIn has been set to false in localStorage');
+
         redirectTo('/');
       })
       .catch(error => console.error('Error:', error));
