@@ -97,6 +97,7 @@ def update_user(request):
 
     # logger.debug('Message de débogage')
     print("Hellllllllloooooooooooooooooooooooooo")
+    logging.critical("111111111111")
 
     try:
         data = json.loads(request.body)
@@ -110,14 +111,35 @@ def update_user(request):
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
+            logging.critical("2222222222222222")
             return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
 
         # Si le profil existe, nous le mettons à jour, sinon nous en créons un nouveau
         # profile, created = Profile.objects.get_or_create(user=user)
-        profile = Profile.objects.get(pk=user_id)
-        if profile is None:
-          profile = Profile.objects.create(firstName=first_name, lastName=last_name, user_id_tableUser=user_id)
+        # profile = Profile.objects.get(pk=user_id)
+        # if profile is None:
+        #   profile = Profile.objects.create(firstName=first_name, lastName=last_name, user_id_tableUser=user_id)
+        # logging.critical("yooo")
+        # try:
+        #     logging.critical("33333333333333")
+        #     profile = Profile.objects.get(user=user)  # Assumant que 'user' est la clé étrangère dans Profile pointant vers User
+        # except Profile.DoesNotExist:
+        #     logging.critical("4444444444444444444")
+        #     profile = Profile.objects.create(user=user, first_name=first_name, last_name=last_name)
 
+        try:
+            logging.critical("33333333333333")
+            profile, created = Profile.objects.get_or_create(user=user, defaults={'first_name': first_name, 'last_name': last_name})
+            if created:
+                logging.critical("Nouveau profil créé pour l'utilisateur")
+            else:
+                logging.critical("Profil existant trouvé pour l'utilisateur")
+        except Exception as e:
+            logging.critical("Une exception s'est produite lors de la tentative de récupération ou de création du profil: {}".format(str(e)))
+        return JsonResponse({"success": False, "message": "Erreur lors de la création ou récupération du profil utilisateur."}, status=500)
+
+
+        logging.critical("yeppppppe")
         # Mise à jour de l'utilisateur
         if username:
             user.username = username
@@ -125,6 +147,7 @@ def update_user(request):
             user.email = email
         user.save()  # Sauvegardez les changements de l'utilisateur
 
+        logging.critical("56565656565656")
         # Mise à jour du profil
         if first_name:
             profile.first_name = first_name
@@ -137,4 +160,5 @@ def update_user(request):
     except json.JSONDecodeError:
         return JsonResponse({"success": False, "message": "Données JSON invalides."}, status=400)
     except Exception as e:
+        logging.critical("55555555555555555555")
         return JsonResponse({"success": False, "message": str(e)}, status=500)
