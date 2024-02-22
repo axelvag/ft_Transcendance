@@ -1,7 +1,7 @@
 default-layout-sidebar + default-layout-main {
   padding: 3rem 0 0;
 
-  @media (min-width: 992px) {
+  @include media-breakpoint-up(lg) {
     padding: 0 0 0 15rem;
   }
 }

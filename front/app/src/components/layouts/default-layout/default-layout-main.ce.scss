@@ -20,7 +20,7 @@
   }
 
   /* tablet */
-  @media (min-width: 768px) {
+  @include media-breakpoint-up(md) {
     padding: 4rem 3rem;
   }
 }
