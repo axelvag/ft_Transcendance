@@ -1,6 +1,7 @@
 import './components/game-renderer-2d.ce.js';
 import './components/game-player.ce.js';
 import './components/game-scoreboard.ce.js';
+import './view-game.ce.scss';
 import GameLocalApi from './localApi/GameLocalApi.js';
 import AudioPlayer from './localApi/AudioPlayer.js';
 import { redirectTo } from '@/router.js';
@@ -61,160 +62,6 @@ const template = `
 </div>
 `;
 
-const style = `
-.viewGame {
-	color: white;
-	background-color: black;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	width: 100svw;
-	height: 100svh;
-
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-  overflow: hidden;
-}
-
-.viewGame-header {
-  flex: 0 0 auto;
-  padding: 1.5rem;
-}
-
-.viewGame-body {
-  flex: 1 1 0;
-  overflow: hidden;
-  display: flex;
-}
-
-.viewGame-body-center {
-  flex: 0 1 auto;
-  padding: 0 1rem;
-}
-
-.viewGame-body-left,
-.viewGame-body-right {
-  flex: 1 1 0;
-  padding: 3rem;
-}
-
-.viewGame-footer {
-  flex: 0 0 auto;
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-}
-
-.viewGame-tip {
-  font-size: 0.875rem;
-  color: var(--bs-gray-600);
-}
-
-.viewGame-tip-icon {
-  flex: 0 0 auto;
-  font-size: 1.25rem;
-}
-
-.viewGame-dialog {
-	position: fixed;
-	inset: 0;
-  z-index: 9999;
-	background: rgba(0, 0, 0, 0.75);
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 8rem;
-}
-
-.viewGame-dialog-players {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-}
-
-.viewGame-dialog-players-separator {
-  flex: 0 0 auto;
-  font-family: Orbitron, sans-serif;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 3rem;
-  margin: -4rem 8rem 0;
-}
-.viewGame-dialog-players:has([winner]) .viewGame-dialog-player:not([winner]) {
-  font-size: 1.5rem;
-}
-.viewGame-dialog-player.is-left[winner] {
-  margin-left: -7.5rem;
-}
-.viewGame-dialog-player.is-right[winner] {
-  margin-right: -7.5rem;
-}
-
-.viewGame-dialog-wrapper {
-  flex: 0 0 auto;
-  background: #000;
-  background-image: linear-gradient(
-    to right,
-    rgba(var(--bs-primary-rgb), 0.5) 0%,
-    rgba(var(--bs-secondary-rgb), 0.5) 100%
-  );
-  border: 1px solid #fff;
-  border-width: 2px 0;
-
-  display: flex;
-  justify-content: center;
-}
-
-.viewGame-dialog-content {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.viewGame-dialog-title {
-	font-weight: bold;
-	font-size: 2.25rem;
-  text-transform: uppercase;
-  font-family: Orbitron, sans-serif;
-}
-
-.viewGame-dialog-controls {
-	display: flex;
-  align-items: center;
-	gap: 1.5rem;
-}
-
-.viewGame-dialog-btn {
-  width: 2em;
-  height: 2em;
-  border-radius: 100%;
-  outline: none !important;
-  border: none !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  background-color: white;
-  color: black;
-	cursor: pointer;
-  opacity: 0.75;
-  transition: opacity 0.15s ease-in-out;
-}
-
-.viewGame-dialog-btn:hover {
-  opacity: 1;
-}
-
-.viewGame-renderer {
-  flex: 1 1 0;
-	user-select: none;
-}
-`;
-
 class ViewGame extends HTMLElement {
   #keys = {};
   #gameState = null;
@@ -240,12 +87,7 @@ class ViewGame extends HTMLElement {
     await this.#audioPlayer.load('victory', '/assets/sounds/victory.wav');
     await this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
 
-    this.innerHTML = `
-      <style>
-        ${style}
-      </style>
-      ${template}
-    `;
+    this.innerHTML = template;
 
     // Dialog
     this.dialogEl = this.querySelector('.viewGame-dialog');
@@ -400,6 +242,7 @@ class ViewGame extends HTMLElement {
     const json = JSON.parse(data);
     // todo: validate data
     this.#gameState = json?.state;
+    this.style.setProperty('--viewGame-aspect-ratio', `${this.#gameState.width}/${this.#gameState.height}`);
     this.renderPlayers();
     this.renderDialog();
     this.renderScores();

@@ -9,7 +9,6 @@ class GameRenderer2D extends HTMLElement {
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
     this.render = this.render.bind(this);
     this.loop = this.loop.bind(this);
     this.start = this.start.bind(this);
@@ -23,80 +22,62 @@ class GameRenderer2D extends HTMLElement {
   init(gameState) {
     // todo: validate gameState
     this.#gameState = gameState;
-    this.shadowRoot.innerHTML = `
-      <style>
-        svg {
-          width: 100%;
-          height: 100%;
-          user-select: none;
-        }
-        .gameRenderer2D-paddle-left {
-          fill: var(--bs-primary);
-        }
-        .gameRenderer2D-paddle-right {
-          fill: var(--bs-secondary);
-        }
-        .gameRenderer2D-wall {
-          stroke: var(--bs-gray-900);
-        }
-        .gameRenderer2D-middle {
-          stroke: var(--bs-gray-900);
-        }
-      </style>
-      <svg viewBox="0 0 ${this.#gameState.width} ${this.#gameState.height}">
+    this.innerHTML = `
+      <svg
+        class="w-100 h-100 user-select-none"
+        viewBox="0 0 ${this.#gameState.width} ${this.#gameState.height}"
+      >
       
         <!-- Middle line -->
         <line
-          class="gameRenderer2D-middle"
           x1="${this.#gameState.width / 2}"
           y1="${this.#gameState.wallThickness}"
           x2="${this.#gameState.width / 2}"
           y2="${this.#gameState.height - this.#gameState.wallThickness}"
           stroke-width="4"
           stroke-dasharray="4, 6"
-          stroke="#fff"
+          stroke="var(--bs-gray-900)"
         />
 
         <!-- Ball -->
         <rect
-          class="gameRenderer2D-ball"
+          id="gameRenderer2D-ball"
           x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.ball)}"
           y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.ball)}"
           width="${this.#gameState.ball.width}"
           height="${this.#gameState.ball.height}"
-          fill="#fff"
+          fill="var(--bs-body-color)"
         />
 
         <!-- Left paddle -->
         <rect
-          class="gameRenderer2D-paddle gameRenderer2D-paddle-left"
+          id="gameRenderer2D-paddle-left"
           x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.paddleLeft)}"
           y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.paddleLeft)}"
           width="${this.#gameState.paddleLeft.width}"
           height="${this.#gameState.paddleLeft.height}"
-          fill="#fff"
+          fill="var(--bs-primary)"
         />
 
         <!-- Right paddle -->
         <rect
-          class="gameRenderer2D-paddle gameRenderer2D-paddle-right"
+          id="gameRenderer2D-paddle-right"
           x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.paddleRight)}"
           y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.paddleRight)}"
           width="${this.#gameState.paddleRight.width}"
           height="${this.#gameState.paddleRight.height}"
-          fill="#fff"
+          fill="var(--bs-secondary)"
         />
       
         <!-- Walls -->
         <rect
-          class="gameRenderer2D-wall gameRenderer2D-wall-top"
           x="${this.#gameState.wallThickness / 2}"
           y="${this.#gameState.wallThickness / 2}"
           rx="${this.#gameState.wallThickness * 2}"
           width="${this.#gameState.width - this.#gameState.wallThickness}"
           height="${this.#gameState.height - this.#gameState.wallThickness}"
           stroke-width="${this.#gameState.wallThickness}"
-          stroke="#fff"
+          stroke="var(--bs-gray-900)"
           fill="transparent"
         />
 
@@ -104,9 +85,9 @@ class GameRenderer2D extends HTMLElement {
     `;
 
     // Elements
-    this.#ballEl = this.shadowRoot.querySelector('.gameRenderer2D-ball');
-    this.#paddleLeftEl = this.shadowRoot.querySelector('.gameRenderer2D-paddle-left');
-    this.#paddleRightEl = this.shadowRoot.querySelector('.gameRenderer2D-paddle-right');
+    this.#ballEl = this.querySelector('#gameRenderer2D-ball');
+    this.#paddleLeftEl = this.querySelector('#gameRenderer2D-paddle-left');
+    this.#paddleRightEl = this.querySelector('#gameRenderer2D-paddle-right');
 
     this.#isReady = true;
   }
