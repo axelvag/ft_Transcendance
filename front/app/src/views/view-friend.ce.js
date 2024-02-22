@@ -7,7 +7,6 @@ class ViewFriend extends HTMLElement {
   connectedCallback() {
     const isAuth = isAuthenticated();
     if (!isAuth) {
-      console.log("4");
       redirectTo('/login');
     } else {
       this.displayDashboard();

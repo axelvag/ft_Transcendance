@@ -6,10 +6,8 @@ import '@/components/layouts/default-layout-main.ce.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
-    // verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
     const isAuth = isAuthenticated();
     if (!isAuth) {
-      console.log("3");
       redirectTo('/login');
     } else {
       this.displayDashboard();

@@ -7,7 +7,6 @@ class ViewCareers extends HTMLElement {
     connectedCallback() {
         const isAuth = isAuthenticated();
         if (!isAuth) {
-        console.log("1");
         redirectTo('/login');
         } else {
         this.displayDashboard();
