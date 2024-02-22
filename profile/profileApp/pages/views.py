@@ -156,6 +156,7 @@ def update_user(request):
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
+            logging.critical("2222222222222222")
             return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
         
         if username:
