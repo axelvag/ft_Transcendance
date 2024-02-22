@@ -1,11 +1,11 @@
 from django.contrib import admin
 from .models import Profile
 
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user_id_tableUser', 'firstName', 'lastName')
-    search_fields = ('firstName', 'lastName')
-    list_filter = ('user_id_tableUser',)
+# class ProfileAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'firstName', 'lastName')  # Remplacez 'user_id_tableUser' par 'user'
+#     list_filter = ('user',)  # Assurez-vous que cela correspond aux champs réels dans votre modèle
+
+# admin.site.register(Profile, ProfileAdmin)
 
 # @admin.register(Profile) : C'est un décorateur qui enregistre la classe Profile avec l'administration Django.
 # ProfileAdmin : C'est une classe personnalisée d'administration qui hérite de admin.ModelAdmin. Vous pouvez personnaliser l'interface d'administration de votre modèle Profile ici.

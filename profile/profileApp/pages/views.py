@@ -91,50 +91,94 @@ import logging
 # logger = logging.getLogger(__name__)
 User = get_user_model()
 
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def update_user(request):
+
+#     # logger.debug('Message de débogage')
+#     print("Hellllllllloooooooooooooooooooooooooo")
+
+#     try:
+#         data = json.loads(request.body)
+#         user_id = data.get('id')
+#         first_name = data.get('firstName')
+#         last_name = data.get('lastName')
+#         username = data.get('username')
+#         email = data.get('email')
+#         logging.critical("sssasasaa")
+
+#         # Assurez-vous que vous récupérez l'objet User et Profile correctement
+#         try:
+#             user = User.objects.get(pk=user_id)
+#         except User.DoesNotExist:
+#             return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+
+#         logging.critical("22222222222")
+#         if username:
+#             user.username = username
+#         if email:
+#             user.email = email
+#         user.save()  # Sauvegardez les changements de l'utilisateur
+
+#         profile, created = Profile.objects.get_or_create(user=user, defaults={
+#             'firstName': 'Prénom par défaut',
+#             'lastName': 'Nom par défaut',
+#             # Vous pouvez définir d'autres valeurs par défaut ici
+#         })
+
+#         # Si le profil existe déjà, vous pouvez le mettre à jour comme ceci
+#         if not created:
+#             profile.firstName = 'Nouveau prénom'
+#             profile.lastName = 'Nouveau nom'
+#             # Mettre à jour d'autres champs si nécessaire
+#             profile.save()
+
+#         return JsonResponse({"success": True, "message": "Utilisateur mis à jour avec succès."})
+
+#     except json.JSONDecodeError:
+#         return JsonResponse({"success": False, "message": "Données JSON invalides."}, status=400)
+#     except Exception as e:
+#         return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def update_user(request):
-
-    # logger.debug('Message de débogage')
-    print("Hellllllllloooooooooooooooooooooooooo")
-
-    try:
+    if request.method == "POST":
+        # Supposons que les données soient envoyées en JSON
         data = json.loads(request.body)
         user_id = data.get('id')
-        first_name = data.get('firstName')
-        last_name = data.get('lastName')
+        first_name = data.get('firstname')
+        last_name = data.get('lastname')
         username = data.get('username')
         email = data.get('email')
 
-        # Assurez-vous que vous récupérez l'objet User et Profile correctement
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
-
-        # Si le profil existe, nous le mettons à jour, sinon nous en créons un nouveau
-        # profile, created = Profile.objects.get_or_create(user=user)
-        profile = Profile.objects.get(pk=user_id)
-        if profile is None:
-          profile = Profile.objects.create(firstName=first_name, lastName=last_name, user_id_tableUser=user_id)
-
-        # Mise à jour de l'utilisateur
+        
         if username:
             user.username = username
         if email:
             user.email = email
-        user.save()  # Sauvegardez les changements de l'utilisateur
+        user.save()
+        # Utiliser get_or_create pour vérifier si le profil existe déjà, sinon en créer un nouveau
+        profile, created = Profile.objects.get_or_create(
+            user_id=user_id,  # Supposons que vous avez un champ user_id dans votre modèle Profile
+            defaults={
+                'firstName': first_name,
+                'lastName': last_name,
+            }
+        )
 
-        # Mise à jour du profil
-        if first_name:
-            profile.first_name = first_name
-        if last_name:
-            profile.last_name = last_name
-        profile.save()  # Sauvegardez les changements du profil
+        # Si le profil existait déjà et que nous voulons le mettre à jour avec de nouvelles valeurs
+        if not created:
+            profile.firstName = first_name
+            profile.lastName = last_name
+            profile.save()
+            
+        return JsonResponse({"success": True, "message": "Profil mis à jour ou créé avec succès."})
 
-        return JsonResponse({"success": True, "message": "Utilisateur mis à jour avec succès."})
-
-    except json.JSONDecodeError:
-        return JsonResponse({"success": False, "message": "Données JSON invalides."}, status=400)
-    except Exception as e:
-        return JsonResponse({"success": False, "message": str(e)}, status=500)
+    else:
+        return JsonResponse({"success": False, "message": "Méthode HTTP non autorisée."}, status=405)
