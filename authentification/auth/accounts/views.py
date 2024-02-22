@@ -300,27 +300,27 @@ def is_user_logged_in(request):
         return JsonResponse({"success": False, "message": "User is not login."}, status=400)
 
 # @csrf_exempt
-@require_http_methods(["POST"])  # Accepte uniquement les requêtes POST
-def update_user(request):
-    try:
-        # Assurez-vous que le corps de la requête est au format JSON
-        data = json.loads(request.body)
-        username = data.get('username')
-        email = data.get('email')
-        user_id = data.get('id')  # Identifiant de l'utilisateur à mettre à jour
+# @require_http_methods(["POST"])  # Accepte uniquement les requêtes POST
+# def update_user(request):
+#     try:
+#         # Assurez-vous que le corps de la requête est au format JSON
+#         data = json.loads(request.body)
+#         username = data.get('username')
+#         email = data.get('email')
+#         user_id = data.get('id')  # Identifiant de l'utilisateur à mettre à jour
 
-        # Recherche de l'utilisateur par son ID
-        user = User.objects.get(pk=user_id)
+#         # Recherche de l'utilisateur par son ID
+#         user = User.objects.get(pk=user_id)
         
-        # Mise à jour de l'utilisateur
-        if username:
-            user.username = username
-        if email:
-            user.email = email
-        user.save()
+#         # Mise à jour de l'utilisateur
+#         if username:
+#             user.username = username
+#         if email:
+#             user.email = email
+#         user.save()
 
-        return JsonResponse({"success": True, "message": "Utilisateur mis à jour avec succès."})
-    except ObjectDoesNotExist:
-        return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
-    except Exception as e:
-        return JsonResponse({"success": False, "message": str(e)}, status=500)
+#         return JsonResponse({"success": True, "message": "Utilisateur mis à jour avec succès."})
+#     except ObjectDoesNotExist:
+#         return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+#     except Exception as e:
+#         return JsonResponse({"success": False, "message": str(e)}, status=500)
