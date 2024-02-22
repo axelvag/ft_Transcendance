@@ -1,5 +1,4 @@
 import { verifyUserLoginMain } from './auth.js';
-verifyUserLoginMain();
 // style
 import '@/assets/scss/style.scss';
 
@@ -22,5 +21,6 @@ import '@/router.js';
 // theme
 import { initTheme } from '@/theme.js';
 
+verifyUserLoginMain();
 // init theme
 initTheme();
