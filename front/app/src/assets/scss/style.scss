@@ -1,4 +1,8 @@
 // @import '_base'; // already prepend by vite
 
-@import 'components/_all';
-@import 'utilities/_all';
+@import '_bootstrap-core';
+
+// Custom utilities
+@import '_bicolor';
+@import '_hidden';
+@import '_theme';

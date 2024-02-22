@@ -31,5 +31,27 @@
 @import 'bootstrap/scss/offcanvas';
 @import 'bootstrap/scss/placeholders';
 
-// Custom components
-@import '_sidebar';
+// Bootstrap Helpers
+@import 'bootstrap/scss/helpers';
+
+// Bootstrap Utilities (built with api)
+$utilities: map-merge(
+  $utilities,
+  (
+    'position':
+      map-merge(
+        map-get($utilities, 'position'),
+        (
+          responsive: true,
+        )
+      ),
+    'z-index':
+      map-merge(
+        map-get($utilities, 'z-index'),
+        (
+          responsive: true,
+        )
+      ),
+  )
+);
+@import 'bootstrap/scss/utilities/api';
