@@ -27,60 +27,83 @@ class GameRenderer2D extends HTMLElement {
         class="w-100 h-100 user-select-none"
         viewBox="0 0 ${this.#gameState.width} ${this.#gameState.height}"
       >
-      
-        <!-- Middle line -->
-        <line
-          x1="${this.#gameState.width / 2}"
-          y1="${this.#gameState.wallThickness}"
-          x2="${this.#gameState.width / 2}"
-          y2="${this.#gameState.height - this.#gameState.wallThickness}"
-          stroke-width="4"
-          stroke-dasharray="4, 6"
-          stroke="var(--bs-gray-900)"
-        />
+        <defs>
+          <clipPath id="gameRenderer2D-mask">
+            <rect
+              x="0"
+              y="0"
+              width="${this.#gameState.width}"
+              height="${this.#gameState.height}"
+              rx="${this.#gameState.wallThickness * 2.5}"
+            />
+          </clipPath>
+        </defs>
+        
+        <g clip-path="url(#gameRenderer2D-mask)">
 
-        <!-- Ball -->
-        <rect
-          id="gameRenderer2D-ball"
-          x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.ball)}"
-          y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.ball)}"
-          width="${this.#gameState.ball.width}"
-          height="${this.#gameState.ball.height}"
-          fill="var(--bs-body-color)"
-        />
+          <!-- Background -->
+          <rect
+            x="0"
+            y="0"
+            width="${this.#gameState.width}"
+            height="${this.#gameState.height}"
+            fill="var(--bs-body-bg)"
+          />
+        
+          <!-- Middle line -->
+          <line
+            x1="${this.#gameState.width / 2}"
+            y1="${this.#gameState.wallThickness}"
+            x2="${this.#gameState.width / 2}"
+            y2="${this.#gameState.height - this.#gameState.wallThickness}"
+            stroke-width="4"
+            stroke-dasharray="4, 6"
+            stroke="var(--bs-gray-900)"
+          />
 
-        <!-- Left paddle -->
-        <rect
-          id="gameRenderer2D-paddle-left"
-          x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.paddleLeft)}"
-          y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.paddleLeft)}"
-          width="${this.#gameState.paddleLeft.width}"
-          height="${this.#gameState.paddleLeft.height}"
-          fill="var(--bs-primary)"
-        />
+          <!-- Ball -->
+          <rect
+            id="gameRenderer2D-ball"
+            x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.ball)}"
+            y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.ball)}"
+            width="${this.#gameState.ball.width}"
+            height="${this.#gameState.ball.height}"
+            fill="var(--bs-body-color)"
+          />
 
-        <!-- Right paddle -->
-        <rect
-          id="gameRenderer2D-paddle-right"
-          x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.paddleRight)}"
-          y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.paddleRight)}"
-          width="${this.#gameState.paddleRight.width}"
-          height="${this.#gameState.paddleRight.height}"
-          fill="var(--bs-secondary)"
-        />
-      
-        <!-- Walls -->
-        <rect
-          x="${this.#gameState.wallThickness / 2}"
-          y="${this.#gameState.wallThickness / 2}"
-          rx="${this.#gameState.wallThickness * 2}"
-          width="${this.#gameState.width - this.#gameState.wallThickness}"
-          height="${this.#gameState.height - this.#gameState.wallThickness}"
-          stroke-width="${this.#gameState.wallThickness}"
-          stroke="var(--bs-gray-900)"
-          fill="transparent"
-        />
+          <!-- Left paddle -->
+          <rect
+            id="gameRenderer2D-paddle-left"
+            x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.paddleLeft)}"
+            y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.paddleLeft)}"
+            width="${this.#gameState.paddleLeft.width}"
+            height="${this.#gameState.paddleLeft.height}"
+            fill="var(--bs-primary)"
+          />
 
+          <!-- Right paddle -->
+          <rect
+            id="gameRenderer2D-paddle-right"
+            x="${this.#gameState.width / 2 + this.#getLeft(this.#gameState.paddleRight)}"
+            y="${this.#gameState.height / 2 - this.#getTop(this.#gameState.paddleRight)}"
+            width="${this.#gameState.paddleRight.width}"
+            height="${this.#gameState.paddleRight.height}"
+            fill="var(--bs-secondary)"
+          />
+        
+          <!-- Walls -->
+          <rect
+            x="${this.#gameState.wallThickness / 2}"
+            y="${this.#gameState.wallThickness / 2}"
+            rx="${this.#gameState.wallThickness * 2}"
+            width="${this.#gameState.width - this.#gameState.wallThickness}"
+            height="${this.#gameState.height - this.#gameState.wallThickness}"
+            stroke-width="${this.#gameState.wallThickness}"
+            stroke="var(--bs-gray-900)"
+            fill="transparent"
+          />
+
+        </g>
       </svg>
     `;
 

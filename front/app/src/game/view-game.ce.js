@@ -8,26 +8,28 @@ import { redirectTo } from '@/router.js';
 
 const template = `
 <div class="viewGame">
-  <div class="viewGame-header">
-    <game-scoreboard></game-scoreboard>
-  </div>
-  <div class="viewGame-body">
-    <div class="viewGame-body-left">
-      <game-player class="viewGame-player-left"></game-player>
+  <div class="viewGame-wrapper">
+    <div class="viewGame-header">
+      <game-scoreboard></game-scoreboard>
     </div>
-    <div class="viewGame-body-center">
-      <game-renderer-2d class="viewGame-renderer"></game-renderer-2d>
+    <div class="viewGame-body">
+      <div class="viewGame-body-left">
+        <game-player class="viewGame-player-left"></game-player>
+      </div>
+      <div class="viewGame-body-center">
+        <game-renderer-2d class="viewGame-renderer"></game-renderer-2d>
+      </div>
+      <div class="viewGame-body-right">
+        <game-player class="viewGame-player-right"></game-player>
+      </div>
     </div>
-    <div class="viewGame-body-right">
-      <game-player class="viewGame-player-right"></game-player>
-    </div>
-  </div>
-  <div class="viewGame-footer">
-    <div class="viewGame-tip">
-      <span class="viewGame-tip-icon">
-        <ui-icon name="bulb"></ui-icon>
-      </span>
-      <span class="viewGame-tip-text">Press Spacebar to pause / resume the game.</span>
+    <div class="viewGame-footer">
+      <div class="viewGame-tip">
+        <span class="viewGame-tip-icon">
+          <ui-icon name="bulb"></ui-icon>
+        </span>
+        <span class="viewGame-tip-text">Press Spacebar to pause / resume the game.</span>
+      </div>
     </div>
   </div>
   <div class="viewGame-dialog">
@@ -40,7 +42,7 @@ const template = `
       <div class="viewGame-dialog-content">
         <div class="viewGame-dialog-title"></div>
         <div class="viewGame-dialog-controls">
-          <button class="viewGame-dialog-btn fs-2 viewGame-start" hidden>
+          <button class="viewGame-dialog-btn is-lg viewGame-start" hidden>
             <ui-icon name="play" scale="1.25"></ui-icon>
           </button>
           <button class="viewGame-dialog-btn viewGame-pause" hidden>
@@ -49,7 +51,7 @@ const template = `
           <button class="viewGame-dialog-btn viewGame-newGame" hidden>
             <ui-icon name="restart"></ui-icon>
           </button>
-          <button class="viewGame-dialog-btn fs-1 viewGame-resume" hidden>
+          <button class="viewGame-dialog-btn is-lg viewGame-resume" hidden>
             <ui-icon name="play" scale="1.25"></ui-icon>
           </button>
           <button class="viewGame-dialog-btn viewGame-quit" hidden>
