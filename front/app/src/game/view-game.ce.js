@@ -1,6 +1,7 @@
 import './components/game-renderer-2d.ce.js';
 import './components/game-player.ce.js';
 import './components/game-scoreboard.ce.js';
+import './components/game-dialog.ce.js';
 import './view-game.ce.scss';
 import GameLocalApi from './localApi/GameLocalApi.js';
 import AudioPlayer from './localApi/AudioPlayer.js';
@@ -32,35 +33,7 @@ const template = `
       </div>
     </div>
   </div>
-  <div class="viewGame-dialog">
-    <div class="viewGame-dialog-players">
-      <game-player class="viewGame-dialog-player is-left"></game-player>
-      <div class="viewGame-dialog-players-separator text-bicolor">vs</div>
-      <game-player class="viewGame-dialog-player is-right"></game-player>
-    </div>
-    <div class="viewGame-dialog-wrapper">
-      <div class="viewGame-dialog-content">
-        <div class="viewGame-dialog-title"></div>
-        <div class="viewGame-dialog-controls">
-          <button class="viewGame-dialog-btn is-lg viewGame-start" hidden>
-            <ui-icon name="play" scale="1.25"></ui-icon>
-          </button>
-          <button class="viewGame-dialog-btn viewGame-pause" hidden>
-            <ui-icon name="pause"></ui-icon>
-          </button>
-          <button class="viewGame-dialog-btn viewGame-newGame" hidden>
-            <ui-icon name="restart"></ui-icon>
-          </button>
-          <button class="viewGame-dialog-btn is-lg viewGame-resume" hidden>
-            <ui-icon name="play" scale="1.25"></ui-icon>
-          </button>
-          <button class="viewGame-dialog-btn viewGame-quit" hidden>
-            <ui-icon name="quit"></ui-icon>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <game-dialog class="viewGame-dialog"></game-dialog>
 </div>
 `;
 
@@ -93,42 +66,6 @@ class ViewGame extends HTMLElement {
 
     // Dialog
     this.dialogEl = this.querySelector('.viewGame-dialog');
-
-    // Players
-    this.dialogPlayersEl = this.querySelector('.viewGame-dialog-players');
-    this.dialogPlayerLeftEl = this.querySelector('.viewGame-dialog-player.is-left');
-    this.dialogPlayerRightEl = this.querySelector('.viewGame-dialog-player.is-right');
-
-    // Title
-    this.dialogTitleEl = this.querySelector('.viewGame-dialog-title');
-
-    // Controls
-    this.dialogStartBtn = this.querySelector('.viewGame-start');
-    this.dialogStartBtn?.addEventListener('click', () => {
-      this.gameApi.emit('start');
-    });
-
-    this.dialogPauseBtn = this.querySelector('.viewGame-pause');
-    this.dialogPauseBtn?.addEventListener('click', () => {
-      this.gameApi.emit('pause');
-    });
-
-    this.dialogResumeBtn = this.querySelector('.viewGame-resume');
-    this.dialogResumeBtn?.addEventListener('click', () => {
-      this.gameApi.emit('resume');
-    });
-
-    this.dialogQuitBtn = this.querySelector('.viewGame-quit');
-    this.dialogQuitBtn?.addEventListener('click', () => {
-      redirectTo('/profil');
-    });
-
-    this.dialogNewGameBtn = this.querySelector('.viewGame-newGame');
-    this.dialogNewGameBtn?.addEventListener('click', () => {
-      this.gameApi.emit('reset');
-      this.gameApi.emit('start');
-      this.renderDialog();
-    });
 
     // Renderer
     this.rendererEl = this.querySelector('.viewGame-renderer');
@@ -167,19 +104,6 @@ class ViewGame extends HTMLElement {
       this.playerRightEl.setAttribute('score-max', this.#gameState.scoreMax);
       this.playerRightEl.setAttribute('direction', 'right');
     }
-
-    this.dialogPlayerLeftEl = this.querySelector('.viewGame-dialog-player.is-left');
-    if (this.playerLeftEl) {
-      this.dialogPlayerLeftEl.setAttribute('name', this.#gameState.playerLeft.name);
-      this.dialogPlayerLeftEl.setAttribute('avatar', this.#gameState.playerLeft.avatar);
-    }
-
-    this.dialogPlayerRightEl = this.querySelector('.viewGame-dialog-player.is-right');
-    if (this.playerLeftEl) {
-      this.dialogPlayerRightEl.setAttribute('name', this.#gameState.playerRight.name);
-      this.dialogPlayerRightEl.setAttribute('avatar', this.#gameState.playerRight.avatar);
-      this.dialogPlayerRightEl.setAttribute('direction', 'right');
-    }
   }
 
   renderScores() {
@@ -190,54 +114,67 @@ class ViewGame extends HTMLElement {
   }
 
   renderDialog() {
-    let isVisible = false;
-    let showPlayers = false;
-    let winner = null;
-    let title = '';
-    let actions = [];
+    const players = {
+      playerLeft: this.#gameState.playerLeft,
+      playerRight: this.#gameState.playerRight,
+    };
+
+    const controls = {
+      start: {
+        icon: 'play',
+        action: () => this.gameApi.emit('start'),
+      },
+      pause: {
+        icon: 'pause',
+        action: () => this.gameApi.emit('pause'),
+      },
+      resume: {
+        icon: 'play',
+        action: () => this.gameApi.emit('resume'),
+      },
+      quit: {
+        icon: 'quit',
+        action: () => redirectTo('/'),
+      },
+      restart: {
+        icon: 'restart',
+        action: () => {
+          this.gameApi.emit('reset');
+          this.gameApi.emit('start');
+        },
+      },
+    };
 
     switch (this.#gameState.status) {
       case 'initialized':
-        isVisible = true;
-        showPlayers = true;
-        title = 'Ready?';
-        actions = ['start'];
+        this.dialogEl.render({
+          open: true,
+          players,
+          title: 'Ready?',
+          controls: [{ ...controls.start, large: true }],
+        });
         break;
       case 'paused':
-        isVisible = true;
-        title = `Paused`;
-        actions = ['newGame', 'resume', 'quit'];
+        this.dialogEl.render({
+          open: true,
+          title: 'Paused',
+          controls: [controls.restart, { ...controls.resume, large: true }, controls.quit],
+        });
         break;
       case 'finished':
-        isVisible = true;
-        showPlayers = true;
-        winner = this.#gameState.scoreLeft > this.#gameState.scoreRight ? 'left' : 'right';
-        const winnerPlayer = winner === 'left' ? this.#gameState.playerLeft : this.#gameState.playerRight;
-        title = `${winnerPlayer.name} wins!`;
-        actions = ['newGame', 'quit'];
+        const winner = this.#gameState.scoreLeft > this.#gameState.scoreRight ? 'left' : 'right';
+        const winnerName = winner === 'left' ? players.playerLeft.name : players.playerRight.name;
+        this.dialogEl.render({
+          open: true,
+          players,
+          winner,
+          title: `${winnerName} wins!`,
+          controls: [controls.restart, controls.quit],
+        });
         break;
       default:
-        isVisible = false;
+        this.dialogEl.render({ open: false });
     }
-
-    this.dialogEl.hidden = !isVisible;
-    this.dialogPlayersEl.hidden = !showPlayers;
-    if (winner === 'left') {
-      this.dialogPlayerLeftEl.setAttribute('winner', '');
-    } else {
-      this.dialogPlayerLeftEl.removeAttribute('winner');
-    }
-    if (winner === 'right') {
-      this.dialogPlayerRightEl.setAttribute('winner', '');
-    } else {
-      this.dialogPlayerRightEl.removeAttribute('winner');
-    }
-    this.dialogTitleEl.textContent = title;
-    this.dialogStartBtn.hidden = !actions.includes('start');
-    this.dialogPauseBtn.hidden = !actions.includes('pause');
-    this.dialogResumeBtn.hidden = !actions.includes('resume');
-    this.dialogQuitBtn.hidden = !actions.includes('quit');
-    this.dialogNewGameBtn.hidden = !actions.includes('newGame');
   }
 
   handleInitMessage(data) {
