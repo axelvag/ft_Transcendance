@@ -5,6 +5,7 @@ import './components/game-dialog.ce.js';
 import './view-game.ce.scss';
 import GameLocalApi from './localApi/GameLocalApi.js';
 import AudioPlayer from './localApi/AudioPlayer.js';
+import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
 
 const template = `
@@ -85,6 +86,7 @@ class ViewGame extends HTMLElement {
     document.removeEventListener('keyup', this.handleKeyUp);
     document.removeEventListener('click', this.handleClick);
     this.gameApi.emit('reset');
+    exitFullscreen();
   }
 
   renderPlayers() {
@@ -122,7 +124,9 @@ class ViewGame extends HTMLElement {
     const controls = {
       start: {
         icon: 'play',
-        action: () => this.gameApi.emit('start'),
+        action: () => {
+          this.gameApi.emit('start');
+        },
       },
       pause: {
         icon: 'pause',

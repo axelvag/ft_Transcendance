@@ -1,11 +1,11 @@
 [data-bs-theme='dark'] {
   .dark-hidden {
-    display: none;
+    display: none !important;
   }
 }
 
 html:not([data-bs-theme='dark']) {
   .dark-visible {
-    display: none;
+    display: none !important;
   }
 }

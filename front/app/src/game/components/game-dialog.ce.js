@@ -1,5 +1,7 @@
 import './game-dialog.ce.scss';
 import './game-player.ce.js';
+import { enterFullscreen, exitFullscreen } from '@/fullscreen.js';
+import { selectTheme } from '@/theme.js';
 
 class GameDialog extends HTMLElement {
   constructor() {
@@ -20,10 +22,34 @@ class GameDialog extends HTMLElement {
           <div class="gameDialog-content">
             <div class="gameDialog-title"></div>
             <div class="gameDialog-controls"></div>
+            <div class="gameDialog-settings">
+  
+            <!-- Theme -->
+            <button class="gameDialog-settings-item dark-hidden" id="gameDialog-theme-dark">
+              <ui-icon name="sun"></ui-icon>
+            </button>
+            <button class="gameDialog-settings-item bg-secondary dark-visible" id="gameDialog-theme-light">
+              <ui-icon name="moon"></ui-icon>
+            </button>
+  
+            <!-- Fullscreen -->
+            <button class="gameDialog-settings-item fullscreen-hidden" id="gameDialog-enterFullscreen">
+              <ui-icon name="expand"></ui-icon>
+            </button>
+            <button class="gameDialog-settings-item bg-secondary fullscreen-visible" id="gameDialog-exitFullscreen">
+              <ui-icon name="collapse"></ui-icon>
+            </button>
+  
+          </div>
           </div>
         </div>
       </div>
     `;
+
+    this.querySelector('#gameDialog-enterFullscreen').addEventListener('click', enterFullscreen);
+    this.querySelector('#gameDialog-exitFullscreen').addEventListener('click', exitFullscreen);
+    this.querySelector('#gameDialog-theme-dark').addEventListener('click', () => selectTheme('dark'));
+    this.querySelector('#gameDialog-theme-light').addEventListener('click', () => selectTheme('light'));
   }
 
   disconnectedCallback() {}
