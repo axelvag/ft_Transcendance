@@ -1,3 +1,5 @@
+import './game-scoreboard.ce.scss';
+
 class GameBoard extends HTMLElement {
   #attrs = {};
 
@@ -10,41 +12,6 @@ class GameBoard extends HTMLElement {
     this.#attrs.score = this.getAttribute('score-right');
 
     this.innerHTML = `
-      <style>
-        .gameScoreboard {
-          font-family: 'Orbitron', sans-serif;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .gameScoreboard-scores {
-          display: flex;
-          align-items: center;
-        }
-        .gameScoreboard-score {
-          flex: 0 0 auto;
-          font-size: 3rem;
-          line-height: 1;
-          padding: 0.25rem 0 0.375rem;
-          min-width: 5rem;
-        }
-        .gameScoreboard-score-separator {
-          flex: 0 0 auto;
-          font-size: 2rem;
-          line-height: 1;
-          margin-top: -0.2em;
-          padding: 0 0.75rem;
-        }
-        .gameScoreboard-hr {
-          height: 2px;
-          width: 20rem;
-          background: linear-gradient(to right, var(--bs-primary), var(--bs-secondary));
-          margin: 0.25rem 0;
-          border-radius: 100%;
-          filter: blur(1px) opacity(0.75);
-        }
-      </style>
       <div class="gameScoreboard">
         <div class="gameScoreboard-hr"></div>
         <div class="gameScoreboard-scores">

@@ -1,4 +1,4 @@
-import '@/components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { isAuthenticated } from '@/auth.js';
 import { redirectTo } from '@/router.js';
 
@@ -14,7 +14,7 @@ class ViewForgetPass extends HTMLElement {
 
   displayDashboard() {
     this.innerHTML = `
-      <login-layout>
+      <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
           <span class="text-bicolor">Reset password</span>
         </h1>
@@ -31,7 +31,7 @@ class ViewForgetPass extends HTMLElement {
             </button>
           </div>
         </form>
-      </login-layout>
+      </auth-layout>
     `;
 
     this.querySelector('#pass-form').addEventListener('submit', this.submitForm.bind(this));

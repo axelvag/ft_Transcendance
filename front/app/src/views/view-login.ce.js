@@ -1,7 +1,6 @@
-import { user } from '@/auth.js';
-import '@/components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
-import { isAuthenticated } from '@/auth.js';
+import { user, isAuthenticated } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -15,7 +14,7 @@ class ViewSignIn extends HTMLElement {
 
   displayDashboard() {
     this.innerHTML = `
-      <login-layout>
+      <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
           <span class="text-bicolor">Log In</span>
         </h1>
@@ -50,7 +49,7 @@ class ViewSignIn extends HTMLElement {
             </div>
           </div>
         </form>
-      </login-layout>
+      </auth-layout>
     `;
 
     // this.querySelector('a[data-link="/forget-pass"]').addEventListener('click', (event) => {

@@ -1,0 +1,16 @@
+// Customized bootstrap variables
+$primary: #b558f6;
+$secondary: #0ea3d2;
+$body-bg-dark: #000;
+$body-secondary-bg: #f0f4f9;
+$body-tertiary-bg: #fff;
+$body-secondary-bg-dark: mix(#252529, #000, 85%);
+$body-tertiary-bg-dark: #252529;
+
+// Bootstrap configuration
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/variables-dark';
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';

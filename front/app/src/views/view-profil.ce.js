@@ -1,10 +1,7 @@
+import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
+import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
-import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
-import { getCSRFToken } from '@/auth.js';
-import { user } from '@/auth.js';
-import { isAuthenticated } from '@/auth.js';
-import '@/components/layouts/default-layout-sidebar.ce.js';
-import '@/components/layouts/default-layout-main.ce.js';
+import { verifyUserLoginAndDisplayDashboard, getCSRFToken, user, isAuthenticated } from '@/auth.js';
 
 const fake_getUser = async () => {
   return new Promise(resolve => {
@@ -31,7 +28,7 @@ const fake_getUser = async () => {
 //   });
 // };
 
-const saveUser = async (newUser) => {
+const saveUser = async newUser => {
   try {
     const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
       method: 'POST',
@@ -186,9 +183,8 @@ class ViewProfil extends HTMLElement {
     const isAuth = isAuthenticated();
     if (!isAuth) {
       redirectTo('/login');
-    }
-    else{
-      this.displayDashboard()
+    } else {
+      this.displayDashboard();
     }
   }
 

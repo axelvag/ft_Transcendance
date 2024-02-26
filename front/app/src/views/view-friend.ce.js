@@ -1,7 +1,7 @@
+import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
+import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 import { isAuthenticated } from '@/auth.js';
-import '@/components/layouts/default-layout-sidebar.ce.js';
-import '@/components/layouts/default-layout-main.ce.js';
 
 class ViewFriend extends HTMLElement {
   connectedCallback() {
@@ -57,29 +57,28 @@ class ViewFriend extends HTMLElement {
       credentials: 'include',
       body: JSON.stringify({ username: friendName }),
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('data:', data);
-      // Traiter la réponse du serveur
-      // if (!data.success){
-      if (data.username){
-        console.log("salut");
-        this.generalErrorFriend.textContent = data.username[0];
+      .then(response => response.json())
+      .then(data => {
+        console.log('data:', data);
+        // Traiter la réponse du serveur
+        // if (!data.success){
+        if (data.username) {
+          console.log('salut');
+          this.generalErrorFriend.textContent = data.username[0];
+          this.generalErrorFriend.style.display = 'block';
+        } else {
+          console.log('salut123');
+          const successNotificationFriend = document.getElementById('success-notification-friend');
+          if (successNotificationFriend) successNotificationFriend.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        console.error('Errorrrrrr:', error);
+        // return JSON.parse(text);
+        this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
         this.generalErrorFriend.style.display = 'block';
-      }
-      else{
-        console.log("salut123");
-        const successNotificationFriend = document.getElementById('success-notification-friend');
-      if (successNotificationFriend) successNotificationFriend.style.display = 'block';
-      }
-    })
-    .catch((error) => {
-      console.error('Errorrrrrr:', error);
-      // return JSON.parse(text);
-      this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
-      this.generalErrorFriend.style.display = 'block';
-      // Gérer les erreurs de la requête
-    });
+        // Gérer les erreurs de la requête
+      });
   }
 }
 

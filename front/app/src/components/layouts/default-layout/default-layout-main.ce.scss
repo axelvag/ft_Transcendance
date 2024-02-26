@@ -1,0 +1,26 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.defaultLayoutMain {
+  width: 100%;
+
+  &-wrapper {
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    max-width: 60rem;
+  }
+
+  /* tablet */
+  @include media-breakpoint-up(md) {
+    padding: 4rem 3rem;
+  }
+}
