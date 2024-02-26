@@ -87,6 +87,10 @@
     display: flex;
     align-items: center;
     gap: 2em;
+
+    @include media-breakpoint-down(lg) {
+      font-size: 0.875rem;
+    }
   }
 
   &-btn {

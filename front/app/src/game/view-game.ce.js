@@ -181,7 +181,7 @@ class ViewGame extends HTMLElement {
     const json = JSON.parse(data);
     // todo: validate data
     this.#gameState = json?.state;
-    this.style.setProperty('--viewGame-aspect-ratio', `${this.#gameState.width}/${this.#gameState.height}`);
+    this.style.setProperty('--viewGame-ratio', `${this.#gameState.width / this.#gameState.height}`);
     this.renderPlayers();
     this.renderDialog();
     this.renderScores();
