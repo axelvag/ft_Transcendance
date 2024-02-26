@@ -31,7 +31,6 @@
     overflow: hidden;
     display: flex;
     justify-content: space-evenly;
-    align-items: center;
     overflow: hidden;
     position: relative;
 
@@ -46,7 +45,14 @@
     &-left,
     &-right {
       flex: 0 0 auto;
-      padding: 3em;
+      padding: 0 3em;
+      gap: 3em;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      position: relative;
     }
   }
 
@@ -70,6 +76,29 @@
   &-renderer {
     flex: 1 1 0;
     user-select: none;
+  }
+
+  &-touchBtn {
+    flex: 1 1 0;
+    background: var(--bs-body-color);
+    color: var(--bs-body-bg);
+    opacity: 0.15;
+    border-radius: 1em;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    ui-icon {
+      font-size: 3em;
+    }
+
+    transition: opacity 0.15s ease-in-out;
+    &.is-active {
+      opacity: 0.25;
+    }
+  }
+  &:not(.is-touch) &-touchBtn {
+    display: none;
   }
 }
 

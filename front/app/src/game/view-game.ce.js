@@ -16,13 +16,25 @@ const template = `
     </div>
     <div class="viewGame-body">
       <div class="viewGame-body-left">
+        <div class="viewGame-touchBtn is-playerLeft is-up">
+          <ui-icon name="arrow-up"></ui-icon>
+        </div>
         <game-player class="viewGame-player-left"></game-player>
+        <div class="viewGame-touchBtn is-playerLeft is-down">
+        <ui-icon name="arrow-down"></ui-icon>
+      </div>
       </div>
       <div class="viewGame-body-center">
         <game-renderer-2d class="viewGame-renderer"></game-renderer-2d>
       </div>
       <div class="viewGame-body-right">
+        <div class="viewGame-touchBtn is-playerRight is-up">
+        <ui-icon name="arrow-up"></ui-icon>
+      </div>
         <game-player class="viewGame-player-right"></game-player>
+        <div class="viewGame-touchBtn is-playerRight is-down">
+        <ui-icon name="arrow-down"></ui-icon>
+      </div>
       </div>
     </div>
     <div class="viewGame-footer">
@@ -40,6 +52,10 @@ const template = `
 
 class ViewGame extends HTMLElement {
   #keys = {};
+  #touchs = {
+    left: { up: false, down: false },
+    right: { up: false, down: false },
+  };
   #gameState = null;
   #audioPlayer = null;
 
@@ -51,6 +67,8 @@ class ViewGame extends HTMLElement {
     this.handleUpdateMessage = this.handleUpdateMessage.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
+    this.handleTouchStart = this.handleTouchStart.bind(this);
+    this.handleTouchEnd = this.handleTouchEnd.bind(this);
   }
 
   async connectedCallback() {
@@ -64,6 +82,11 @@ class ViewGame extends HTMLElement {
     await this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
 
     this.innerHTML = template;
+
+    // Touch
+    if ('ontouchstart' in window || navigator.maxTouchPoints) {
+      this.querySelector('.viewGame').classList.add('is-touch');
+    }
 
     // Dialog
     this.dialogEl = this.querySelector('.viewGame-dialog');
@@ -79,6 +102,8 @@ class ViewGame extends HTMLElement {
     document.addEventListener('keydown', this.handleKeyDown);
     document.addEventListener('keyup', this.handleKeyUp);
     document.addEventListener('click', this.handleClick);
+    document.addEventListener('touchstart', this.handleTouchStart);
+    document.addEventListener('touchend', this.handleTouchEnd);
   }
 
   disconnectedCallback() {
@@ -263,12 +288,72 @@ class ViewGame extends HTMLElement {
     this.#keys[event.key] = false;
 
     if (['w', 's'].includes(event.key)) {
-      const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
-      this.gameApi.emit('updatePaddleLeftMove', dir);
-    } else {
-      const dir = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
-      this.gameApi.emit('updatePaddleRightMove', dir);
+      this.#updatePaddleLeftMove();
+    } else if (['ArrowUp', 'ArrowDown'].includes(event.key)) {
+      this.#updatePaddleRightMove();
     }
+  }
+
+  handleTouchStart(event) {
+    const touchEl = event.target.closest('.viewGame-touchBtn');
+    if (!touchEl) return;
+
+    event.preventDefault();
+
+    const playerKey = touchEl.classList.contains('is-playerLeft') ? 'left' : 'right';
+    const dirKey = touchEl.classList.contains('is-up') ? 'up' : 'down';
+    this.#touchs[playerKey][dirKey] = true;
+
+    touchEl.classList.add('is-active');
+    if (playerKey === 'left') {
+      this.#updatePaddleLeftMove();
+    } else {
+      this.#updatePaddleRightMove();
+    }
+  }
+
+  handleTouchEnd(event) {
+    const touchEl = event.target.closest('.viewGame-touchBtn');
+    if (!touchEl) return;
+
+    event.preventDefault();
+
+    const playerKey = touchEl.classList.contains('is-playerLeft') ? 'left' : 'right';
+    const dirKey = touchEl.classList.contains('is-up') ? 'up' : 'down';
+    this.#touchs[playerKey][dirKey] = false;
+
+    touchEl.classList.remove('is-active');
+    if (playerKey === 'left') {
+      this.#updatePaddleLeftMove();
+    } else {
+      this.#updatePaddleRightMove();
+    }
+  }
+
+  #updatePaddleLeftMove() {
+    const keyMove = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
+    const touchMove = Number(Boolean(this.#touchs.left.up)) - Number(Boolean(this.#touchs.left.down));
+
+    let dir = 0;
+    if (keyMove + touchMove > 0) {
+      dir = 1;
+    } else if (keyMove + touchMove < 0) {
+      dir = -1;
+    }
+    this.gameApi.emit('updatePaddleLeftMove', dir);
+  }
+
+  #updatePaddleRightMove() {
+    const keyMove = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
+    const touchMove = Number(Boolean(this.#touchs.right.up)) - Number(Boolean(this.#touchs.right.down));
+
+    let dir = 0;
+    if (keyMove + touchMove > 0) {
+      dir = 1;
+    } else if (keyMove + touchMove < 0) {
+      dir = -1;
+    }
+    this.gameApi.emit('updatePaddleRightMove', dir);
   }
 }
 
