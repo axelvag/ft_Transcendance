@@ -2,6 +2,7 @@ import './default-layout-sidebar.ce.scss';
 import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
+import { user } from '@/auth.js';
 
 class DefaultLayoutSidebar extends HTMLElement {
   connectedCallback() {
@@ -138,6 +139,7 @@ class DefaultLayoutSidebar extends HTMLElement {
         return response.json(); // Ou gérer autrement selon la réponse attendue
       })
       .then(data => {
+        user.isAuthenticated = false;
         redirectTo('/');
       })
       .catch(error => console.error('Error:', error));

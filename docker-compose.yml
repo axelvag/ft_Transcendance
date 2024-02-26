@@ -138,6 +138,19 @@ services:
       - POSTGRES_PASSWORD=postgresTranscendence123
     restart: on-failure
 
+  statistic:
+    build:
+      context: ./statistic
+      dockerfile: Dockerfile
+    container_name: statistic
+    ports:
+      - "8004:8004"
+    networks:
+      - back
+    depends_on:
+      - data_base
+    restart: on-failure
+
 volumes:
   data_base_data:
     # name: data_base

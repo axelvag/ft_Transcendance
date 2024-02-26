@@ -18,8 +18,11 @@ from .tokens import account_activation_token
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.views.decorators.http import require_POST
 import json
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.decorators import method_decorator
 # Create your views here.
 User = get_user_model()
 
@@ -86,7 +89,7 @@ def login_user(request):
             if user.is_active:  # Assurez-vous que l'utilisateur est actif
                 login(request, user)
                 print("login success")
-                return JsonResponse({"success": True, "message": "Login successful.", "username": user.username}, status=200)
+                return JsonResponse({"success": True, "message": "Login successful.", "username": user.username, "id": user.id, "email": user.email}, status=200)
             else:
                 print("User not active")
                 return JsonResponse({"success": False, "message": "User not active."}, status=HttpResponseBadRequest.status_code)
@@ -278,7 +281,7 @@ def resend_email_rest(request, uidb64):
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
 
-
+@login_required
 def delete_user(request, username):
 
     try:
@@ -292,6 +295,32 @@ def delete_user(request, username):
 
 def is_user_logged_in(request):
     if request.user.is_authenticated:
-        return JsonResponse({"success": True, "message": "User is login.", "username": request.user.username, "email": request.user.email}, status=200)
+        return JsonResponse({"success": True, "message": "User is login.", "username": request.user.username, "email": request.user.email, "id": request.user.id}, status=200)
     else:
         return JsonResponse({"success": False, "message": "User is not login."}, status=400)
+
+# @csrf_exempt
+# @require_http_methods(["POST"])  # Accepte uniquement les requêtes POST
+# def update_user(request):
+#     try:
+#         # Assurez-vous que le corps de la requête est au format JSON
+#         data = json.loads(request.body)
+#         username = data.get('username')
+#         email = data.get('email')
+#         user_id = data.get('id')  # Identifiant de l'utilisateur à mettre à jour
+
+#         # Recherche de l'utilisateur par son ID
+#         user = User.objects.get(pk=user_id)
+        
+#         # Mise à jour de l'utilisateur
+#         if username:
+#             user.username = username
+#         if email:
+#             user.email = email
+#         user.save()
+
+#         return JsonResponse({"success": True, "message": "Utilisateur mis à jour avec succès."})
+#     except ObjectDoesNotExist:
+#         return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+#     except Exception as e:
+#         return JsonResponse({"success": False, "message": str(e)}, status=500)

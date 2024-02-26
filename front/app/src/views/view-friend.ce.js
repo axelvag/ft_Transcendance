@@ -1,8 +1,19 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
+import { redirectTo } from '@/router.js';
+import { isAuthenticated } from '@/auth.js';
 
 class ViewFriend extends HTMLElement {
   connectedCallback() {
+    const isAuth = isAuthenticated();
+    if (!isAuth) {
+      redirectTo('/login');
+    } else {
+      this.displayDashboard();
+    }
+  }
+
+  displayDashboard() {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
@@ -25,6 +36,7 @@ class ViewFriend extends HTMLElement {
 
     this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
     this.generalErrorFriend = document.getElementById('general-error-friend');
+    // this.verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
   }
 
   handleFormSubmit(event) {

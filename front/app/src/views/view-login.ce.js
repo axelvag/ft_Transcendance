@@ -1,8 +1,18 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
+import { user, isAuthenticated } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
+    const isAuth = isAuthenticated();
+    if (isAuth) {
+      redirectTo('/dashboard');
+    } else {
+      this.displayDashboard();
+    }
+  }
+
+  displayDashboard() {
     this.innerHTML = `
       <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
@@ -96,6 +106,10 @@ class ViewSignIn extends HTMLElement {
     console.log('error', data);
     if (data.success) {
       console.log('Sucess!');
+      user.isAuthenticated = true;
+      user.id = data.id;
+      user.email = data.email;
+      user.username = data.username;
       redirectTo('/dashboard');
     } else {
       if (data.message === 'User not active.') this.emailError.style.display = 'block';
