@@ -83,11 +83,6 @@ class ViewGame extends HTMLElement {
 
     this.innerHTML = template;
 
-    // Touch
-    if ('ontouchstart' in window || navigator.maxTouchPoints) {
-      this.querySelector('.viewGame').classList.add('is-touch');
-    }
-
     // Dialog
     this.dialogEl = this.querySelector('.viewGame-dialog');
 
