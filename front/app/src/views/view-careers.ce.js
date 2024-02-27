@@ -20,6 +20,9 @@ class ViewCareers extends HTMLElement {
         .irish-grover {
             font-family: 'Irish Grover', cursive;
         }
+        .extra-large {
+          font-size: 9rem; /* Taille de police plus grande */
+        }
       </style>
 
 
@@ -35,14 +38,14 @@ class ViewCareers extends HTMLElement {
               <img src="https://robohash.org/4572b535a32e02ecef37ebf74c8d76a7?set=set2&bgset=&size=400x400" class="img-thumbnail rounded-circle" width="230" height="230" alt="character">
             </div>
           </div>
-          <div class="col-md-6">
-            <h1 class="display-5 fw-bold mb-4 text-center text-lg irish-grover">
+          <div class="col-md-6 mt-2">
+            <h1 class="display-5 fw-bold mb-4 text-center text-lg irish-grover extra-large style="margin-left: -250px;"">
               ${user.id} / 4
             </h1>
           </div>
         </div>
         <div
-        <h3 class="display-5 fw-bold mb-4">
+        <h3 class="display-5 fw-bold" style="margin-left: 70px;">
           ${user.username}
         </h3>
 
