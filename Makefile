@@ -45,4 +45,5 @@ prune:
 	-docker buildx prune -a -f 2>/dev/null
 
 migrate:
+	chmod +x migrate.sh
 	./migrate.sh
