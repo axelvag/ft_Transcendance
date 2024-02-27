@@ -2,57 +2,57 @@ import './components/game-renderer-2d.ce.js';
 import './components/game-player.ce.js';
 import './components/game-scoreboard.ce.js';
 import './components/game-dialog.ce.js';
-import './view-game.ce.scss';
+import './view-game-play.ce.scss';
 import GameWorker from './localApi/GameWorker.js?worker';
 import AudioPlayer from './localApi/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
 
 const template = `
-<div class="viewGame" hidden>
-  <div class="viewGame-wrapper">
-    <div class="viewGame-header">
+<div class="viewGamePlay" hidden>
+  <div class="viewGamePlay-wrapper">
+    <div class="viewGamePlay-header">
       <game-scoreboard></game-scoreboard>
     </div>
-    <div class="viewGame-body">
-      <div class="viewGame-body-left">
-        <div class="viewGame-touchBtn is-playerLeft is-up">
+    <div class="viewGamePlay-body">
+      <div class="viewGamePlay-body-left">
+        <div class="viewGamePlay-touchBtn is-playerLeft is-up">
           <ui-icon name="arrow-up"></ui-icon>
         </div>
-        <game-player class="viewGame-player-left"></game-player>
-        <div class="viewGame-touchBtn is-playerLeft is-down">
+        <game-player class="viewGamePlay-player-left"></game-player>
+        <div class="viewGamePlay-touchBtn is-playerLeft is-down">
         <ui-icon name="arrow-down"></ui-icon>
       </div>
       </div>
-      <div class="viewGame-body-center">
-        <game-renderer-2d class="viewGame-renderer"></game-renderer-2d>
+      <div class="viewGamePlay-body-center">
+        <game-renderer-2d class="viewGamePlay-renderer"></game-renderer-2d>
       </div>
-      <div class="viewGame-body-right">
-        <div class="viewGame-touchBtn is-playerRight is-up">
+      <div class="viewGamePlay-body-right">
+        <div class="viewGamePlay-touchBtn is-playerRight is-up">
         <ui-icon name="arrow-up"></ui-icon>
       </div>
-        <game-player class="viewGame-player-right"></game-player>
-        <div class="viewGame-touchBtn is-playerRight is-down">
+        <game-player class="viewGamePlay-player-right"></game-player>
+        <div class="viewGamePlay-touchBtn is-playerRight is-down">
         <ui-icon name="arrow-down"></ui-icon>
       </div>
       </div>
     </div>
-    <div class="viewGame-footer">
-      <div class="viewGame-tip">
-        <span class="viewGame-tip-icon">
+    <div class="viewGamePlay-footer">
+      <div class="viewGamePlay-tip">
+        <span class="viewGamePlay-tip-icon">
           <ui-icon name="bulb"></ui-icon>
         </span>
-        <span class="viewGame-tip-text">Press Spacebar to pause / resume the game.</span>
+        <span class="viewGamePlay-tip-text">Press Spacebar to pause / resume the game.</span>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Dialog -->
-<game-dialog class="viewGame-dialog"></game-dialog>
+<game-dialog class="viewGamePlay-dialog"></game-dialog>
 
 <!-- Error Modal -->
-<div id="viewGameErrorModal" hidden>
+<div id="viewGamePlayErrorModal" hidden>
   <div class="modal d-block" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
       <div class="modal-content">
@@ -70,7 +70,7 @@ const template = `
 </div>
 `;
 
-class ViewGame extends HTMLElement {
+class ViewGamePlay extends HTMLElement {
   #keys = {};
   #touchs = {
     left: { up: false, down: false },
@@ -103,10 +103,10 @@ class ViewGame extends HTMLElement {
     this.innerHTML = template;
 
     // Dialog
-    this.dialogEl = this.querySelector('.viewGame-dialog');
+    this.dialogEl = this.querySelector('.viewGamePlay-dialog');
 
     // Renderer
-    this.rendererEl = this.querySelector('.viewGame-renderer');
+    this.rendererEl = this.querySelector('.viewGamePlay-renderer');
 
     // Game events
     this.gameWorker.onmessage = function (e) {
@@ -123,7 +123,7 @@ class ViewGame extends HTMLElement {
     // Game error
     this.gameWorker.onerror = function () {
       this.gameWorker.terminate();
-      this.querySelector('#viewGameErrorModal').hidden = false;
+      this.querySelector('#viewGamePlayErrorModal').hidden = false;
     };
     this.gameWorker.onerror = this.gameWorker.onerror.bind(this);
 
@@ -152,7 +152,7 @@ class ViewGame extends HTMLElement {
   }
 
   renderPlayers() {
-    this.playerLeftEl = this.querySelector('.viewGame-player-left');
+    this.playerLeftEl = this.querySelector('.viewGamePlay-player-left');
     if (this.playerLeftEl) {
       this.playerLeftEl.setAttribute('name', this.#gameState.playerLeft.name);
       this.playerLeftEl.setAttribute('avatar', this.#gameState.playerLeft.avatar);
@@ -160,7 +160,7 @@ class ViewGame extends HTMLElement {
       this.playerLeftEl.setAttribute('score-max', this.#gameState.scoreMax);
     }
 
-    this.playerRightEl = this.querySelector('.viewGame-player-right');
+    this.playerRightEl = this.querySelector('.viewGamePlay-player-right');
     if (this.playerLeftEl) {
       this.playerRightEl.setAttribute('name', this.#gameState.playerRight.name);
       this.playerRightEl.setAttribute('avatar', this.#gameState.playerRight.avatar);
@@ -171,9 +171,9 @@ class ViewGame extends HTMLElement {
   }
 
   renderScores() {
-    this.querySelector('.viewGame-player-left')?.setAttribute('score', this.#gameState.scoreLeft || 0);
+    this.querySelector('.viewGamePlay-player-left')?.setAttribute('score', this.#gameState.scoreLeft || 0);
     this.querySelector('game-scoreboard')?.setAttribute('score-left', this.#gameState.scoreLeft || 0);
-    this.querySelector('.viewGame-player-right')?.setAttribute('score', this.#gameState.scoreRight || 0);
+    this.querySelector('.viewGamePlay-player-right')?.setAttribute('score', this.#gameState.scoreRight || 0);
     this.querySelector('game-scoreboard')?.setAttribute('score-right', this.#gameState.scoreRight || 0);
   }
 
@@ -247,13 +247,13 @@ class ViewGame extends HTMLElement {
     const json = JSON.parse(data);
     // todo: validate data
     this.#gameState = json?.state;
-    this.style.setProperty('--viewGame-ratio', `${this.#gameState.width / this.#gameState.height}`);
+    this.style.setProperty('--viewGamePlay-ratio', `${this.#gameState.width / this.#gameState.height}`);
     this.renderPlayers();
     this.renderDialog();
     this.renderScores();
     this.rendererEl.init(this.#gameState);
     this.rendererEl.start();
-    this.querySelector('.viewGame').hidden = false;
+    this.querySelector('.viewGamePlay').hidden = false;
   }
 
   handleUpdateMessage(data) {
@@ -333,7 +333,7 @@ class ViewGame extends HTMLElement {
   }
 
   handleTouchStart(event) {
-    const touchEl = event.target.closest('.viewGame-touchBtn');
+    const touchEl = event.target.closest('.viewGamePlay-touchBtn');
     if (!touchEl) return;
 
     event.preventDefault();
@@ -351,7 +351,7 @@ class ViewGame extends HTMLElement {
   }
 
   handleTouchEnd(event) {
-    const touchEl = event.target.closest('.viewGame-touchBtn');
+    const touchEl = event.target.closest('.viewGamePlay-touchBtn');
     if (!touchEl) return;
 
     event.preventDefault();
@@ -395,4 +395,4 @@ class ViewGame extends HTMLElement {
   }
 }
 
-customElements.define('view-game', ViewGame);
+customElements.define('view-game-play', ViewGamePlay);
