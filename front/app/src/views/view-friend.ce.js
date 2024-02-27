@@ -9,11 +9,11 @@ class ViewFriend extends HTMLElement {
     if (!isAuth) {
       redirectTo('/login');
     } else {
-      this.displayDashboard();
+      this.render();
     }
   }
 
-  displayDashboard() {
+  render() {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>

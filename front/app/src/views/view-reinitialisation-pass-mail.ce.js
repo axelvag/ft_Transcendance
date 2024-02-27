@@ -8,11 +8,11 @@ class ViewForgetPass extends HTMLElement {
     if (isAuth) {
       redirectTo('/dashboard');
     } else {
-      this.displayDashboard();
+      this.render();
     }
   }
 
-  displayDashboard() {
+  render() {
     this.innerHTML = `
       <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
