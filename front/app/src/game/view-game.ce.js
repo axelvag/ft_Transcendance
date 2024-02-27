@@ -3,13 +3,13 @@ import './components/game-player.ce.js';
 import './components/game-scoreboard.ce.js';
 import './components/game-dialog.ce.js';
 import './view-game.ce.scss';
-import GameLocalApi from './localApi/GameLocalApi.js';
+import GameWorker from './localApi/GameWorker.js?worker';
 import AudioPlayer from './localApi/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
 
 const template = `
-<div class="viewGame">
+<div class="viewGame" hidden>
   <div class="viewGame-wrapper">
     <div class="viewGame-header">
       <game-scoreboard></game-scoreboard>
@@ -46,7 +46,27 @@ const template = `
       </div>
     </div>
   </div>
-  <game-dialog class="viewGame-dialog"></game-dialog>
+</div>
+
+<!-- Dialog -->
+<game-dialog class="viewGame-dialog"></game-dialog>
+
+<!-- Error Modal -->
+<div id="viewGameErrorModal" hidden>
+  <div class="modal d-block" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger d-block text-center">
+          <ui-icon name="error" class="fs-1"></ui-icon>
+        </div>
+        <div class="modal-body d-flex flex-column align-items-center gap-2 py-4">
+          <p>An unexpected error occured!</p>
+          <button type="button" class="btn btn-danger" data-link="/">Leave</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop show"></div>
 </div>
 `;
 
@@ -69,18 +89,17 @@ class ViewGame extends HTMLElement {
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleTouchStart = this.handleTouchStart.bind(this);
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
-  }
 
-  async connectedCallback() {
-    // init
-    this.gameApi = new GameLocalApi();
+    this.gameWorker = new GameWorker();
 
     this.#audioPlayer = new AudioPlayer();
-    await this.#audioPlayer.load('collision', '/assets/sounds/hit.wav');
-    await this.#audioPlayer.load('score', '/assets/sounds/score.wav');
-    await this.#audioPlayer.load('victory', '/assets/sounds/victory.wav');
-    await this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
+    this.#audioPlayer.load('collision', '/assets/sounds/hit.wav');
+    this.#audioPlayer.load('score', '/assets/sounds/score.wav');
+    this.#audioPlayer.load('victory', '/assets/sounds/victory.wav');
+    this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
+  }
 
+  connectedCallback() {
     this.innerHTML = template;
 
     // Dialog
@@ -89,9 +108,24 @@ class ViewGame extends HTMLElement {
     // Renderer
     this.rendererEl = this.querySelector('.viewGame-renderer');
 
-    // Game API events
-    this.gameApi.on('init', this.handleInitMessage);
-    this.gameApi.on('update', this.handleUpdateMessage);
+    // Game events
+    this.gameWorker.onmessage = function (e) {
+      const { type, data } = e.data || {};
+
+      if (type === 'init') {
+        this.handleInitMessage(data);
+      } else if (type === 'update') {
+        this.handleUpdateMessage(data);
+      }
+    };
+    this.gameWorker.onmessage = this.gameWorker.onmessage.bind(this);
+
+    // Game error
+    this.gameWorker.onerror = function () {
+      this.gameWorker.terminate();
+      this.querySelector('#viewGameErrorModal').hidden = false;
+    };
+    this.gameWorker.onerror = this.gameWorker.onerror.bind(this);
 
     // UI Events
     document.addEventListener('keydown', this.handleKeyDown);
@@ -102,10 +136,18 @@ class ViewGame extends HTMLElement {
   }
 
   disconnectedCallback() {
+    // remove events
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);
     document.removeEventListener('click', this.handleClick);
-    this.gameApi.emit('reset');
+    document.removeEventListener('touchstart', this.handleTouchStart);
+    document.removeEventListener('touchend', this.handleTouchEnd);
+
+    // close worker
+    this.gameWorker.postMessage({ type: 'reset' });
+    this.gameWorker.terminate();
+
+    // exit fullscreen
     exitFullscreen();
   }
 
@@ -145,16 +187,16 @@ class ViewGame extends HTMLElement {
       start: {
         icon: 'play',
         action: () => {
-          this.gameApi.emit('start');
+          this.gameWorker.postMessage({ type: 'start' });
         },
       },
       pause: {
         icon: 'pause',
-        action: () => this.gameApi.emit('pause'),
+        action: () => this.gameWorker.postMessage({ type: 'pause' }),
       },
       resume: {
         icon: 'play',
-        action: () => this.gameApi.emit('resume'),
+        action: () => this.gameWorker.postMessage({ type: 'resume' }),
       },
       quit: {
         icon: 'quit',
@@ -163,8 +205,8 @@ class ViewGame extends HTMLElement {
       restart: {
         icon: 'restart',
         action: () => {
-          this.gameApi.emit('reset');
-          this.gameApi.emit('start');
+          this.gameWorker.postMessage({ type: 'reset' });
+          this.gameWorker.postMessage({ type: 'start' });
         },
       },
     };
@@ -211,6 +253,7 @@ class ViewGame extends HTMLElement {
     this.renderScores();
     this.rendererEl.init(this.#gameState);
     this.rendererEl.start();
+    this.querySelector('.viewGame').hidden = false;
   }
 
   handleUpdateMessage(data) {
@@ -245,17 +288,17 @@ class ViewGame extends HTMLElement {
     if (event.code === 'Space') {
       switch (this.#gameState.status) {
         case 'initialized':
-          this.gameApi.emit('start');
+          this.gameWorker.postMessage({ type: 'start' });
           return;
         case 'running':
-          this.gameApi.emit('pause');
+          this.gameWorker.postMessage({ type: 'pause' });
           return;
         case 'paused':
-          this.gameApi.emit('resume');
+          this.gameWorker.postMessage({ type: 'resume' });
           return;
         case 'finished':
-          this.gameApi.emit('reset');
-          this.gameApi.emit('start');
+          this.gameWorker.postMessage({ type: 'reset' });
+          this.gameWorker.postMessage({ type: 'start' });
           this.renderDialog();
           return;
       }
@@ -269,10 +312,10 @@ class ViewGame extends HTMLElement {
 
     if (['w', 's'].includes(event.key)) {
       const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
-      this.gameApi.emit('updatePaddleLeftMove', dir);
+      this.gameWorker.postMessage({ type: 'updatePaddleLeftMove', data: { dir } });
     } else {
       const dir = Number(Boolean(this.#keys.ArrowUp)) - Number(Boolean(this.#keys.ArrowDown));
-      this.gameApi.emit('updatePaddleRightMove', dir);
+      this.gameWorker.postMessage({ type: 'updatePaddleRightMove', data: { dir } });
     }
   }
 
@@ -335,7 +378,7 @@ class ViewGame extends HTMLElement {
     } else if (keyMove + touchMove < 0) {
       dir = -1;
     }
-    this.gameApi.emit('updatePaddleLeftMove', dir);
+    this.gameWorker.postMessage({ type: 'updatePaddleLeftMove', data: { dir } });
   }
 
   #updatePaddleRightMove() {
@@ -348,7 +391,7 @@ class ViewGame extends HTMLElement {
     } else if (keyMove + touchMove < 0) {
       dir = -1;
     }
-    this.gameApi.emit('updatePaddleRightMove', dir);
+    this.gameWorker.postMessage({ type: 'updatePaddleRightMove', data: { dir } });
   }
 }
 
