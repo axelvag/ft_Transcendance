@@ -1,9 +1,4 @@
-// templates
-// import careers from './views/careers.js';
-// import settings from './views/settings.js';
-import notFound from './views/notFound.js';
-
-// views
+import '@/views/view-not-found.ce.js';
 import '@/views/view-welcome.ce.js';
 import '@/views/view-signup.ce.js';
 import '@/views/view-profil.ce.js';
@@ -14,8 +9,8 @@ import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
 import '@/views/view-dashboard.ce.js';
-import '@/views/settings.js';
-import '@/views/careers.js';
+import '@/views/view-settings.ce.js';
+import '@/views/view-careers.ce.js';
 
 const useHash = true;
 
@@ -75,7 +70,7 @@ const routes = {
   // not found
   '/not-found': {
     title: 'Not Found',
-    template: notFound,
+    template: '<view-not-found></view-not-found>',
   },
 };
 
@@ -135,7 +130,7 @@ document.addEventListener('click', e => {
 });
 
 const redirectTo = pathKey => {
-  console.log("ici");
+  console.log('ici');
   const path = useHash
     ? // with hash
       '/#' + pathKey

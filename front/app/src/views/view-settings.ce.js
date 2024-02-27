@@ -9,21 +9,16 @@ class ViewSettings extends HTMLElement {
     if (!isAuth) {
       redirectTo('/login');
     } else {
-      this.displayDashboard();
+      this.render();
     }
   }
 
-  displayDashboard() {
+  render() {
     this.innerHTML = `
-        <default-layout-sidebar></default-layout-sidebar>
-        <default-layout-main>
-        <div class="layout">
-            <view-sidebar></view-sidebar>
-            <main>
-                <h1>Settings</h1>
-                <p>Welcome to your profile page. Here you can view and edit your profile information.</p>
-            </main>
-        </div>
+      <default-layout-sidebar></default-layout-sidebar>
+      <default-layout-main>
+        <h1>Settings</h1>
+      </default-layout-main>
     `;
   }
 }
