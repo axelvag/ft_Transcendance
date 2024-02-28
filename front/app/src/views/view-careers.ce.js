@@ -23,6 +23,9 @@ class ViewCareers extends HTMLElement {
         .extra-large {
           font-size: 9rem; /* Taille de police plus grande */
         }
+        .text-grey {
+          color: grey; /* Couleur de texte gris */
+        }
       </style>
 
 
@@ -31,6 +34,8 @@ class ViewCareers extends HTMLElement {
         <h1 class="display-5 fw-bold mb-4 text-center" style="margin-top: -50px;">
           Statistic
         </h1>
+
+        <!-- avatar and classement -->
 
         <div class="row">
           <div class="col-md-6">
@@ -45,6 +50,8 @@ class ViewCareers extends HTMLElement {
           </div>
         </div>
 
+        <!-- Nom et RANK -->
+
         <div class="row">
           <div class="col-md-6">
             <h3 class="display-5 fw-bold me-3 btn-lg" style="margin-left: 70px;">
@@ -56,6 +63,74 @@ class ViewCareers extends HTMLElement {
               <span class="d-inline-block py-1">
               <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
               RANK
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Victories and Lost -->
+
+        <div class="row">
+          <div class="col-md-6 text-grey">
+            <h2>
+              Victories
+            </h2>
+          </div>
+          <div class="col-md-6 text-grey">
+            <h2>
+              Lost
+            </h2>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+              <span class="d-inline-block py-1">
+              <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_victories" style="width: 50px; height: 50px; margin-right: 10px;">
+              183
+              </span>
+            </a>
+          </div>
+          <div class="col-md-6">
+            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+              <span class="d-inline-block py-1">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbP1HN0d57DzAd6VfjkrSq_SaX_rZAXbydjladTg7YaLvzgPzJDumCmHT0P953ftqgS2Q&usqp=CAU" alt="logo_lost" style="width: 50px; height: 50px; margin-right: 10px;">
+              13
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Online and Local -->
+
+        <div class="row">
+          <div class="col-md-6 text-grey">
+            <h2>
+              Online
+            </h2>
+          </div>
+          <div class="col-md-6 text-grey">
+            <h2>
+              Local
+            </h2>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+              <span class="d-inline-block py-1">
+              <img src="https://e7.pngegg.com/pngimages/845/246/png-clipart-pixelform-studios-ipad-technology-perfect-radio-studio-purple-violet.png" alt="logo_online" style="width: 50px; height: 50px; margin-right: 10px;">
+              160
+              </span>
+            </a>
+          </div>
+          <div class="col-md-6">
+            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+              <span class="d-inline-block py-1">
+              <img src="https://static.vecteezy.com/system/resources/previews/023/561/259/non_2x/purple-and-white-keyboard-icon-in-3d-render-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
+              27
               </span>
             </a>
           </div>
