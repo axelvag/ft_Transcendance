@@ -163,7 +163,7 @@ const editProfileTemplate = user => `
   </div>
 `;
 
-class ViewProfil extends HTMLElement {
+class ViewProfile extends HTMLElement {
   #profileContentEl = null;
   #user = null;
 
@@ -254,4 +254,4 @@ class ViewProfil extends HTMLElement {
   }
 }
 
-customElements.define('view-profil', ViewProfil);
+customElements.define('view-profile', ViewProfile);

@@ -3,7 +3,7 @@ import { isAuthenticated } from '@/auth.js';
 import '@/views/view-not-found.ce.js';
 import '@/views/view-welcome.ce.js';
 import '@/views/view-signup.ce.js';
-import '@/views/view-profil.ce.js';
+import '@/views/view-profile.ce.js';
 import '@/views/view-email-confirmation.ce.js';
 import '@/views/view-login.ce.js';
 import '@/game/view-game.ce.js';
@@ -64,9 +64,9 @@ const routes = {
     template: '<view-dash></view-dash>',
     beforeEnter: isLoggedInGuard,
   },
-  '/profil': {
-    title: 'Profil',
-    template: '<view-profil></view-profil>',
+  '/profile': {
+    title: 'Profile',
+    template: '<view-profile></view-profile>',
     beforeEnter: isLoggedInGuard,
   },
   '/friends': {
