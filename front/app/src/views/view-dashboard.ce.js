@@ -15,23 +15,41 @@ class ViewDash extends HTMLElement {
 
   render() {
     this.innerHTML = `
-      <default-layout-sidebar></default-layout-sidebar>
-      <default-layout-main>
-        <div class="dashboard-content">
+    <default-layout-sidebar></default-layout-sidebar>
+    <default-layout-main>
+      <div class="row">
+        <div class="col-md-6">
           <div class="dashboard-text">
               <h1>TRANSCENDANCE PONG</h1>
           </div>
-          <h2>Bienvenue, ${user.username}, ${user.id}</h2>
-          <div class="big-button-play">
-            <button type="button" class="btn btn-outline-light btn-lg">Play Now</button>
+        </div>
+        <div class="col-md-6 d-flex flex-column align-items-center">
+          <div class="mb-2">
+            <img src="https://pbs.twimg.com/media/E3-FSn5XwAMwOYR.jpg" class="img-thumbnail rounded-circle" width="200" height="200" alt="character">
+          </div>
+          <div>
+            <h3 class="display-5 fw-bold btn-lg">
+              ${user.username}
+            </h3>
           </div>
         </div>
-        <div id="supp">
-          <a href="#" id="delete-account-link">
-            <h3> supprimer le compte</h3>
-          </a>
+      </div>
+
+      <div class="d-flex justify-content-center align-items-center mt-3" style="height: 100vh;">
+        <div class="big-button-play rounded-3">
+          <button type="button" class="btn btn-outline-light btn-lg" style="width: 400px; height: 180px; font-size: 2rem;">
+            Play Now
+          </button>
         </div>
-      </default-layout-main>
+      </div>
+
+        
+      <div id="supp">
+        <a href="#" id="delete-account-link">
+          <h3> supprimer le compte</h3>
+        </a>
+      </div>
+    </default-layout-main>
     `;
     this.querySelector('#delete-account-link').addEventListener('click', event => {
       event.preventDefault();
