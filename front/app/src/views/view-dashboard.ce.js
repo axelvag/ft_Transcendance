@@ -37,7 +37,7 @@ class ViewDash extends HTMLElement {
 
       <div class="d-flex justify-content-center align-items-center mt-3" style="height: 100vh;">
         <div class="big-button-play rounded-3">
-          <button type="button" class="btn btn-outline-light btn-lg" style="width: 400px; height: 180px; font-size: 2rem;">
+          <button type="button" class="btn btn-outline-light btn-lg" style="width: 400px; height: 180px; font-size: 4rem;">
             Play Now
           </button>
         </div>
