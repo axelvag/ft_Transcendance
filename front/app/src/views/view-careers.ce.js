@@ -26,6 +26,9 @@ class ViewCareers extends HTMLElement {
         .text-grey {
           color: grey; /* Couleur de texte gris */
         }
+        .no-wrap {
+          flex-wrap: nowrap !important; /* Utilisation de !important pour s'assurer que cette règle CSS est prioritaire */
+        }
       </style>
 
 
@@ -40,10 +43,10 @@ class ViewCareers extends HTMLElement {
         <div class="row">
           <div class="col-md-6">
             <div class="mb-2">
-              <img src="https://robohash.org/4572b535a32e02ecef37ebf74c8d76a7?set=set2&bgset=&size=400x400" class="img-thumbnail rounded-circle" width="230" height="230" alt="character">
+              <img src="https://pbs.twimg.com/media/E3-FSn5XwAMwOYR.jpg" class="img-thumbnail rounded-circle" width="200" height="200" alt="character">
             </div>
           </div>
-          <div class="col-md-6 mt-2">
+          <div class="col-md-6 mt-5">
             <h1 class="display-5 fw-bold mb-4 text-center text-lg irish-grover extra-large style="margin-left: -250px;"">
               ${user.id} / 4
             </h1>
@@ -70,13 +73,13 @@ class ViewCareers extends HTMLElement {
 
         <!-- Victories and Lost -->
 
-        <div class="row mt-5">
-          <div class="col-md-6 text-grey">
+        <div class="row mt-5 no-wrap">
+          <div class="col-md-6 text-grey" style="margin-left: 130px;">
             <h2>
               Victories
             </h2>
           </div>
-          <div class="col-md-6 text-grey">
+          <div class="col-md-6 text-grey" style="margin-left: 20px;">
             <h2>
               Lost
             </h2>
@@ -88,7 +91,7 @@ class ViewCareers extends HTMLElement {
             <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_victories" style="width: 50px; height: 50px; margin-right: 10px;">
-                183
+                &nbsp;183&nbsp;&nbsp;
               </span>
             </div>
           </div>
@@ -96,7 +99,7 @@ class ViewCareers extends HTMLElement {
             <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://purplex.ca/wp-content/uploads/2023/03/purple-x-sigle.png" alt="logo_lost" style="width: 50px; height: 50px; margin-right: 10px;">
-                13
+                &nbsp;13&nbsp;&nbsp;
               </span>
             </div>
           </div>
@@ -104,13 +107,13 @@ class ViewCareers extends HTMLElement {
 
         <!-- Online and Local -->
 
-        <div class="row">
-          <div class="col-md-6 text-grey">
+        <div class="row mt-3 no-wrap">
+          <div class="col-md-6 text-grey" style="margin-left: 130px;">
             <h2>
               Online
             </h2>
           </div>
-          <div class="col-md-6 text-grey">
+          <div class="col-md-6 text-grey" style="margin-left: 20px;">
             <h2>
               Local
             </h2>
@@ -122,7 +125,7 @@ class ViewCareers extends HTMLElement {
             <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://cdn-icons-png.flaticon.com/512/4562/4562970.png" alt="logo_online" style="width: 50px; height: 50px; margin-right: 10px;">
-                160
+                &nbsp;160&nbsp;&nbsp;
               </span>
             </div>
           </div>
@@ -130,7 +133,7 @@ class ViewCareers extends HTMLElement {
             <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://static.vecteezy.com/system/resources/previews/023/561/259/non_2x/purple-and-white-keyboard-icon-in-3d-render-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
-                27
+                &nbsp;27&nbsp;&nbsp;
               </span>
             </div>
           </div>
@@ -146,12 +149,12 @@ class ViewCareers extends HTMLElement {
         </div>
         </div>
 
-        <div class="row mt-3">
+        <div class="row mt-2">
         <div class="col-md-12 d-flex justify-content-center">
           <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
             <span class="d-inline-block py-1">
-              <img src="https://static.vecteezy.com/system/resources/previews/023/561/259/non_2x/purple-and-white-keyboard-icon-in-3d-render-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
-              130H
+              <img src="https://static.vecteezy.com/system/resources/previews/022/541/253/non_2x/3d-render-purple-pastel-color-alarm-clock-3d-circle-clock-icon-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
+              &nbsp;130H&nbsp;&nbsp;
             </span>
           </div>
         </div>
