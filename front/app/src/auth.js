@@ -7,26 +7,41 @@ const user = {
   email: null,
 };
 
+const setLocalUser = data => {
+  user.isAuthenticated = true;
+  user.id = data.id;
+  user.email = data.email;
+  user.username = data.username;
+};
+
+const resetLocalUser = () => {
+  user.isAuthenticated = false;
+  user.id = null;
+  user.email = null;
+  user.username = null;
+};
+
 const isAuthenticated = async () => {
   try {
     if (!user.isAuthenticated) {
-      const reponse = await fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
+      resetLocalUser();
+      const response = await fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
         method: 'GET',
         credentials: 'include',
       });
-
-      const data = await reponse.json();
-      if (!data.success) {
-        user.isAuthenticated = true;
-        user.id = data.id;
-        user.email = data.email;
-        user.username = data.username;
+      const data = await response.json();
+      if (data.success) {
+        setLocalUser(data);
+      } else {
+        resetLocalUser();
       }
     }
-    return user.isAuthenticated;
   } catch (error) {
-    return false;
+    console.error('Error:', error);
+    resetLocalUser();
   }
+  console.log('isAuthenticated', user.isAuthenticated);
+  return user.isAuthenticated;
 };
 
 const getCSRFToken = () => {
@@ -39,4 +54,33 @@ const getCSRFToken = () => {
   return null; // Retourne null si le cookie CSRF n'est pas trouvé
 };
 
-export { user, isAuthenticated, getCSRFToken };
+const logout = async () => {
+  try {
+    await fetch(`${API_BASE_URL}/accounts/logout/`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': getCSRFToken(),
+      },
+    });
+  } catch (error) {
+    console.error('Error:', error);
+  }
+
+  resetLocalUser();
+};
+
+const getProfile = () => {
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    firstname: '',
+    lastname: '',
+    avatar: `https://i.pravatar.cc/300?u=6${user.id}`,
+  };
+};
+
+export { user, isAuthenticated, getCSRFToken, logout, getProfile };

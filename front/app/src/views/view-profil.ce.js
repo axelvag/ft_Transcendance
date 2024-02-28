@@ -1,17 +1,11 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { getCSRFToken, user } from '@/auth.js';
+import { getCSRFToken, getProfile } from '@/auth.js';
 
 const fake_getUser = async () => {
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve({
-        username: 'Philou',
-        firstname: 'Philippe',
-        lastname: 'Martin',
-        email: 'philippe.martin@gmail.com',
-        avatar: 'https://i.pravatar.cc/128?img=7',
-      });
+      resolve(getProfile());
     }, 1000);
   });
 };

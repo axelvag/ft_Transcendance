@@ -2,10 +2,11 @@ import './default-layout-sidebar.ce.scss';
 import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
-import { user } from '@/auth.js';
+import { logout, getProfile } from '@/auth.js';
 
 class DefaultLayoutSidebar extends HTMLElement {
   connectedCallback() {
+    const user = getProfile();
     this.innerHTML = `
       <header
         class="navbar fixed-top z-2 z-lg-n1 bg-body-secondary py-0"
@@ -65,31 +66,25 @@ class DefaultLayoutSidebar extends HTMLElement {
             <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center" href="#" data-link="/dashboard">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="dashboard"></ui-icon>
-                <span class="ps-1 flex-shrink-1 flex-grow-1 text-truncate">Home</span>
-              </a>
-            </li>
-            <li class="nav-item my-1">
-              <a class="nav-link d-flex align-items-center" href="#" data-link="/profil">
-                <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="home"></ui-icon>
-                <span class="ps-1 flex-shrink-1 flex-grow-1 text-truncate">Profile</span>
+                <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Home</span>
               </a>
             </li>
             <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center" href="#" data-link="/friends">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="friends"></ui-icon> 
-                <span class="ps-1 flex-shrink-1 flex-grow-1 text-truncate">Friends</span>
+                <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Friends</span>
               </a>
             </li>
             <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center" href="#" data-link="/careers">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="carrers"></ui-icon> 
-                <span class="ps-1 flex-shrink-1 flex-grow-1 text-truncate">Careers</span>
+                <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Careers</span>
               </a>
             </li>
             <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center" href="#" data-link="/settings">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="settings"></ui-icon>
-                <span class="ps-1 flex-shrink-1 flex-grow-1 text-truncate">Settings</span>
+                <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Settings</span>
               </a>
             </li>
             <span class="my-auto"></span>
@@ -99,13 +94,27 @@ class DefaultLayoutSidebar extends HTMLElement {
                   <ui-icon name="moon" class="dark-visible"></ui-icon>
                   <ui-icon name="sun" class="dark-hidden"></ui-icon>
                 </span>
-                <span class="ps-1 flex-shrink-1 flex-grow-1 text-truncate">Toggle theme</span>
+                <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Toggle theme</span>
               </a>
             </li>
             <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center logout" href="#">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="logout"></ui-icon>
-                <span class="ps-1 flex-shrink-1 flex-grow-1 text-truncate">Log out</span>
+                <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Log out</span>
+              </a>
+            </li>
+            <li class="nav-item my-1">
+              <a class="nav-link d-flex align-items-center" href="#" data-link="/profil">
+                <div class="me-2 flex-shrink-0 flex-grow-0">
+                  <img
+                    src="${user.avatar}" 
+                    class="d-block object-fit-cover rounded-circle m-n1"
+                    width="28"
+                    height="28"
+                    alt="${user.username}"
+                  />
+                </div>
+                <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">${user.username}</span>
               </a>
             </li>
           </nav>
@@ -120,29 +129,13 @@ class DefaultLayoutSidebar extends HTMLElement {
 
     this.querySelector('.logout').addEventListener('click', e => {
       e.preventDefault();
-      this.logoutUser();
+      this.handleLogout();
     });
   }
 
-  logoutUser() {
-    fetch('http://127.0.0.1:8001/accounts/logout/', {
-      method: 'POST',
-      credentials: 'include', // Pour envoyer les cookies (sessionid, csrftoken)
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': this.getCSRFToken(), // Assurez-vous d'obtenir le token CSRF correctement
-      },
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('Logout failed');
-        return response.json(); // Ou gérer autrement selon la réponse attendue
-      })
-      .then(data => {
-        user.isAuthenticated = false;
-        redirectTo('/');
-      })
-      .catch(error => console.error('Error:', error));
+  async handleLogout() {
+    await logout();
+    redirectTo('/');
   }
 
   // Fonction pour obtenir le token CSRF depuis le cookie
