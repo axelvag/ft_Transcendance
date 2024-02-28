@@ -1,3 +1,5 @@
+import { isAuthenticated } from '@/auth.js';
+
 import '@/views/view-not-found.ce.js';
 import '@/views/view-welcome.ce.js';
 import '@/views/view-signup.ce.js';
@@ -16,27 +18,37 @@ const useHash = true;
 
 const baseUrl = '';
 
+const isLoggedOutGuard = async () => {
+  const isLoggedin = await isAuthenticated();
+  if (isLoggedin) redirectTo('/dashboard');
+  return !isLoggedin;
+};
+
+const isLoggedInGuard = async () => {
+  const isLoggedin = await isAuthenticated();
+  if (!isLoggedin) redirectTo('/login');
+  return isLoggedin;
+};
+
 const routes = {
-  // logged out routes
   '/': {
     title: 'Pong',
     template: '<view-welcome></view-welcome>',
   },
+  // auth routes
   '/login': {
     title: 'Login',
     template: '<view-signin></view-signin>',
+    beforeEnter: isLoggedOutGuard,
   },
   '/signup': {
     title: 'Signup',
     template: '<view-signup></view-signup>',
+    beforeEnter: isLoggedOutGuard,
   },
   '/forget-pass': {
     title: 'Forget password',
     template: '<view-forget-pass></view-forget-pass>',
-  },
-  '/dashboard': {
-    title: 'Dashboard',
-    template: '<view-dash></view-dash>',
   },
   '/new-pass': {
     title: 'New password',
@@ -47,21 +59,30 @@ const routes = {
     template: '<view-email-confirmation></view-email-confirmation>',
   },
   // logged in routes
+  '/dashboard': {
+    title: 'Dashboard',
+    template: '<view-dash></view-dash>',
+    beforeEnter: isLoggedInGuard,
+  },
   '/profil': {
     title: 'Profil',
     template: '<view-profil></view-profil>',
+    beforeEnter: isLoggedInGuard,
   },
   '/friends': {
     title: 'Friends',
     template: '<view-friend></view-friend>',
+    beforeEnter: isLoggedInGuard,
   },
   '/careers': {
     title: 'Careers',
     template: '<view-careers></view-careers>',
+    beforeEnter: isLoggedInGuard,
   },
   '/settings': {
     title: 'Settings',
     template: '<view-settings></view-settings>',
+    beforeEnter: isLoggedInGuard,
   },
   '/game': {
     title: 'Game',
@@ -93,7 +114,7 @@ const updateActiveNavLink = () => {
   }
 };
 
-const router = () => {
+const router = async () => {
   const relativePath = useHash
     ? // with hash
       (window.location.hash || '#/').substring(1)
@@ -106,6 +127,10 @@ const router = () => {
   if (!appEl) console.error('#app not found');
 
   if (view) {
+    if (view.beforeEnter) {
+      const canEnterRoute = await view.beforeEnter();
+      if (!canEnterRoute) return;
+    }
     document.title = view.title;
     appEl.innerHTML = view.template;
     updateActiveNavLink();
