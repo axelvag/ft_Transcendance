@@ -104,7 +104,7 @@ class DefaultLayoutSidebar extends HTMLElement {
               </a>
             </li>
             <li class="nav-item my-1">
-              <a class="nav-link d-flex align-items-center" href="#" data-link="/profil">
+              <a class="nav-link d-flex align-items-center" href="#" data-link="/profile">
                 <div class="me-2 flex-shrink-0 flex-grow-0">
                   <img
                     src="${user.avatar}" 
