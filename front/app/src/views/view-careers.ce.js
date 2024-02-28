@@ -70,7 +70,7 @@ class ViewCareers extends HTMLElement {
 
         <!-- Victories and Lost -->
 
-        <div class="row">
+        <div class="row mt-5">
           <div class="col-md-6 text-grey">
             <h2>
               Victories
@@ -85,20 +85,20 @@ class ViewCareers extends HTMLElement {
 
         <div class="row">
           <div class="col-md-6">
-            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+            <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
-              <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_victories" style="width: 50px; height: 50px; margin-right: 10px;">
-              183
+                <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_victories" style="width: 50px; height: 50px; margin-right: 10px;">
+                183
               </span>
-            </a>
+            </div>
           </div>
           <div class="col-md-6">
-            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+            <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
-              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbP1HN0d57DzAd6VfjkrSq_SaX_rZAXbydjladTg7YaLvzgPzJDumCmHT0P953ftqgS2Q&usqp=CAU" alt="logo_lost" style="width: 50px; height: 50px; margin-right: 10px;">
-              13
+                <img src="https://purplex.ca/wp-content/uploads/2023/03/purple-x-sigle.png" alt="logo_lost" style="width: 50px; height: 50px; margin-right: 10px;">
+                13
               </span>
-            </a>
+            </div>
           </div>
         </div>
 
@@ -119,21 +119,42 @@ class ViewCareers extends HTMLElement {
 
         <div class="row">
           <div class="col-md-6">
-            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+            <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
-              <img src="https://e7.pngegg.com/pngimages/845/246/png-clipart-pixelform-studios-ipad-technology-perfect-radio-studio-purple-violet.png" alt="logo_online" style="width: 50px; height: 50px; margin-right: 10px;">
-              160
+                <img src="https://cdn-icons-png.flaticon.com/512/4562/4562970.png" alt="logo_online" style="width: 50px; height: 50px; margin-right: 10px;">
+                160
               </span>
-            </a>
+            </div>
           </div>
           <div class="col-md-6">
-            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+            <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
-              <img src="https://static.vecteezy.com/system/resources/previews/023/561/259/non_2x/purple-and-white-keyboard-icon-in-3d-render-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
-              27
+                <img src="https://static.vecteezy.com/system/resources/previews/023/561/259/non_2x/purple-and-white-keyboard-icon-in-3d-render-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
+                27
               </span>
-            </a>
+            </div>
           </div>
+        </div>
+
+        <!-- Time play -->
+
+        <div class="row mt-3">
+        <div class="col-md-12 text-center text-grey">
+          <h2>
+            Time play
+          </h2>
+        </div>
+        </div>
+
+        <div class="row mt-3">
+        <div class="col-md-12 d-flex justify-content-center">
+          <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
+            <span class="d-inline-block py-1">
+              <img src="https://static.vecteezy.com/system/resources/previews/023/561/259/non_2x/purple-and-white-keyboard-icon-in-3d-render-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
+              130H
+            </span>
+          </div>
+        </div>
         </div>
 
 
