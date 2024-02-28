@@ -28,7 +28,7 @@ class ViewCareers extends HTMLElement {
 
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
-        <h1 class="display-5 fw-bold mb-4 text-center">
+        <h1 class="display-5 fw-bold mb-4 text-center" style="margin-top: -50px;">
           Statistic
         </h1>
 
@@ -44,10 +44,23 @@ class ViewCareers extends HTMLElement {
             </h1>
           </div>
         </div>
-        <div
-        <h3 class="display-5 fw-bold" style="margin-left: 70px;">
-          ${user.username}
-        </h3>
+
+        <div class="row">
+          <div class="col-md-6">
+            <h3 class="display-5 fw-bold me-3 btn-lg" style="margin-left: 70px;">
+              ${user.username}
+            </h3>
+          </div>
+          <div class="col-md-6">
+            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+              <span class="d-inline-block py-1">
+              <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
+              RANK
+              </span>
+            </a>
+          </div>
+        </div>
+
 
       </default-layout-main>
     `;
