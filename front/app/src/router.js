@@ -89,7 +89,7 @@ const routes = {
     title: 'Game',
     template: '<view-game-set-mode></view-game-set-mode>',
   },
-  '/game/offline-duo': {
+  '/game/duo': {
     title: 'Game',
     template: '<view-game-play></view-game-play>',
   },

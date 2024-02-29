@@ -40,7 +40,6 @@ const isAuthenticated = async () => {
     console.error('Error:', error);
     resetLocalUser();
   }
-  console.log('isAuthenticated', user.isAuthenticated);
   return user.isAuthenticated;
 };
 
