@@ -1,18 +1,9 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
-import { user, isAuthenticated } from '@/auth.js';
+import { user } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
-    const isAuth = isAuthenticated();
-    if (isAuth) {
-      redirectTo('/dashboard');
-    } else {
-      this.render();
-    }
-  }
-
-  render() {
     this.innerHTML = `
       <auth-layout>
         <h1 class="fw-bold py-2 mb-4">

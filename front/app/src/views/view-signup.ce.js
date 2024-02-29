@@ -1,6 +1,5 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
-import { isAuthenticated } from '@/auth.js';
 
 class ViewSigUp extends HTMLElement {
   constructor() {
@@ -8,15 +7,6 @@ class ViewSigUp extends HTMLElement {
     this.submitForm = this.submitForm.bind(this);
   }
   connectedCallback() {
-    const isAuth = isAuthenticated();
-    if (isAuth) {
-      redirectTo('/dashboard');
-    } else {
-      this.render();
-    }
-  }
-
-  render() {
     this.innerHTML = `
         <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
