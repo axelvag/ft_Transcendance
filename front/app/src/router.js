@@ -7,7 +7,7 @@ import '@/views/view-profile.ce.js';
 import '@/views/view-email-confirmation.ce.js';
 import '@/views/view-login.ce.js';
 import '@/game/view-game-set-mode.ce.js';
-import '@/game/view-game-play.ce.js';
+import '@/game/view-game-offline.ce.js';
 import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
@@ -89,9 +89,13 @@ const routes = {
     title: 'Game',
     template: '<view-game-set-mode></view-game-set-mode>',
   },
+  '/game/solo': {
+    title: 'Game',
+    template: '<view-game-offline></view-game-offline>',
+  },
   '/game/duo': {
     title: 'Game',
-    template: '<view-game-play></view-game-play>',
+    template: '<view-game-offline duo></view-game-offline>',
   },
   // not found
   '/not-found': {

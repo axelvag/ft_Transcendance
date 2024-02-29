@@ -13,43 +13,51 @@ class GameDialog extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
       <div class="gameDialog">
+        <div class="gameDialog-nav">
+
+          <!-- Back -->
+          <button class="gameDialog-nav-item gameDialog-back" hidden>
+            <ui-icon name="arrow-left"></ui-icon>
+          </button>
+
+          <!-- Spacer -->
+          <div class="gameDialog-nav-spacer"></div>
+
+          <!-- Theme -->
+          <button class="gameDialog-nav-item dark-hidden gameDialog-theme-dark">
+            <ui-icon name="sun"></ui-icon>
+          </button>
+          <button class="gameDialog-nav-item dark-visible gameDialog-theme-light">
+            <ui-icon name="moon"></ui-icon>
+          </button>
+
+          <!-- Fullscreen -->
+          <button class="gameDialog-nav-item fullscreen-hidden gameDialog-enterFullscreen">
+            <ui-icon name="expand"></ui-icon>
+          </button>
+          <button class="gameDialog-nav-item fullscreen-visible gameDialog-exitFullscreen">    
+            <ui-icon name="collapse"></ui-icon>
+          </button>
+
+        </div>
         <div class="gameDialog-players">
           <game-player class="gameDialog-player is-left"></game-player>
           <div class="gameDialog-players-separator text-bicolor">vs</div>
-          <game-player class="gameDialog-player is-right"></game-player>
+          <game-player class="gameDialog-player is-right" direction="right"></game-player>
         </div>
         <div class="gameDialog-wrapper">
           <div class="gameDialog-content">
             <div class="gameDialog-title"></div>
             <div class="gameDialog-controls"></div>
-            <div class="gameDialog-settings">
-  
-            <!-- Theme -->
-            <button class="gameDialog-settings-item dark-hidden" id="gameDialog-theme-dark">
-              <ui-icon name="sun"></ui-icon>
-            </button>
-            <button class="gameDialog-settings-item bg-secondary dark-visible" id="gameDialog-theme-light">
-              <ui-icon name="moon"></ui-icon>
-            </button>
-  
-            <!-- Fullscreen -->
-            <button class="gameDialog-settings-item fullscreen-hidden" id="gameDialog-enterFullscreen">
-              <ui-icon name="expand"></ui-icon>
-            </button>
-            <button class="gameDialog-settings-item bg-secondary fullscreen-visible" id="gameDialog-exitFullscreen">
-              <ui-icon name="collapse"></ui-icon>
-            </button>
-  
-          </div>
           </div>
         </div>
       </div>
     `;
 
-    this.querySelector('#gameDialog-enterFullscreen').addEventListener('click', enterFullscreen);
-    this.querySelector('#gameDialog-exitFullscreen').addEventListener('click', exitFullscreen);
-    this.querySelector('#gameDialog-theme-dark').addEventListener('click', () => selectTheme('dark'));
-    this.querySelector('#gameDialog-theme-light').addEventListener('click', () => selectTheme('light'));
+    this.querySelector('.gameDialog-enterFullscreen').addEventListener('click', enterFullscreen);
+    this.querySelector('.gameDialog-exitFullscreen').addEventListener('click', exitFullscreen);
+    this.querySelector('.gameDialog-theme-dark').addEventListener('click', () => selectTheme('dark'));
+    this.querySelector('.gameDialog-theme-light').addEventListener('click', () => selectTheme('light'));
   }
 
   disconnectedCallback() {}
@@ -59,6 +67,11 @@ class GameDialog extends HTMLElement {
     if (this.playerLeftEl) {
       this.playerLeftEl.setAttribute('name', players?.playerLeft?.name);
       this.playerLeftEl.setAttribute('avatar', players?.playerLeft?.avatar);
+      if (players?.playerLeft?.type) {
+        this.playerLeftEl.setAttribute('type', players.playerLeft.type);
+      } else {
+        this.playerLeftEl.removeAttribute('type');
+      }
       if (winner === 'left') {
         this.playerLeftEl.setAttribute('winner', true);
       } else {
@@ -70,7 +83,12 @@ class GameDialog extends HTMLElement {
     if (this.playerLeftEl) {
       this.playerRightEl.setAttribute('name', players?.playerRight?.name);
       this.playerRightEl.setAttribute('avatar', players?.playerRight?.avatar);
-      this.playerRightEl.setAttribute('direction', 'right');
+      this.playerRightEl.setAttribute('type', players?.playerRight?.type);
+      if (players?.playerLeft?.type) {
+        this.playerRightEl.setAttribute('type', players.playerRight.type);
+      } else {
+        this.playerRightEl.removeAttribute('type');
+      }
       if (winner === 'right') {
         this.playerRightEl.setAttribute('winner', true);
       } else {
@@ -94,9 +112,19 @@ class GameDialog extends HTMLElement {
     });
   }
 
+  renderBack(back) {
+    const backEl = this.querySelector('.gameDialog-back');
+    console.log(back);
+    backEl.hidden = !back;
+    if (back?.action) {
+      backEl.addEventListener('click', back.action);
+    }
+  }
+
   render(params = {}) {
     this.renderPlayers(params.players, params.winner);
     this.querySelector('.gameDialog-title').textContent = params.title;
+    this.renderBack(params.back);
     this.renderControls(params.controls);
     this.hidden = !params.open;
   }

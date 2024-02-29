@@ -1,10 +1,6 @@
 import Vec2 from './Vec2.js';
 import MovableRect from './MovableRect.js';
 import PausableTimeout from './PausableTimeout.js';
-import { getRandomCharacter } from './characters.js';
-
-let playerLeft = getRandomCharacter();
-let playerRight = getRandomCharacter();
 
 let width = 800;
 let height = 600;
@@ -47,8 +43,6 @@ init();
 
 function getState() {
   return {
-    playerLeft,
-    playerRight,
     width,
     height,
     wallThickness,

@@ -10,6 +10,7 @@ class GamePlayer extends HTMLElement {
   connectedCallback() {
     this.#attrs.avatar = this.getAttribute('avatar');
     this.#attrs.name = this.getAttribute('name');
+    this.#attrs.type = this.getAttribute('type');
     this.#attrs.score = this.getAttribute('score');
     this.#attrs['score-max'] = this.getAttribute('score-max');
     this.#attrs.direction = this.getAttribute('direction');
@@ -18,7 +19,7 @@ class GamePlayer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['avatar', 'name', 'score', 'score-max', 'direction', 'winner'];
+    return ['avatar', 'name', 'type', 'score', 'score-max', 'direction', 'winner'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -31,6 +32,8 @@ class GamePlayer extends HTMLElement {
       this.querySelector('.gamePlayer-avatar img').src = newValue || '';
     } else if (name === 'name') {
       this.querySelector('.gamePlayer-name').textContent = newValue;
+    } else if (name === 'type') {
+      this.querySelector('.gamePlayer-type').textContent = newValue || '';
     } else if (name === 'score' || name === 'score-max') {
       this.#renderScore();
     } else if (name === 'direction') {
@@ -53,7 +56,10 @@ class GamePlayer extends HTMLElement {
     this.innerHTML = `
       <div class="gamePlayer is-${this.#getSide()}">
         <div class="gamePlayer-avatar">
-          <img src="${this.#attrs.avatar}" />
+          <div class="gamePlayer-avatar-img">
+            <img src="${this.#attrs.avatar}" />
+          </div>
+          <span class="gamePlayer-type">${this.#attrs.type || ''}</span>
         </div>
         <ui-icon name="crown" class="gamePlayer-crown"></ui-icon>
         <div class="gamePlayer-details">

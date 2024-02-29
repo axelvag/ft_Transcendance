@@ -1,59 +1,57 @@
-import './components/game-renderer-2d.ce.js';
-import './components/game-player.ce.js';
-import './components/game-scoreboard.ce.js';
-import './components/game-dialog.ce.js';
-import './view-game-play.ce.scss';
-import GameWorker from './localApi/GameWorker.js?worker';
-import AudioPlayer from './localApi/AudioPlayer.js';
+import './game-renderer-2d.ce.js';
+import './game-player.ce.js';
+import './game-scoreboard.ce.js';
+import './game-dialog.ce.js';
+import './game-play.ce.scss';
+import GameWorker from '../localApi/GameWorker.js?worker';
+import AudioPlayer from '../localApi/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
-import { isAuthenticated } from '@/auth.js';
 
 const template = `
-<div class="viewGamePlay" hidden>
-  <div class="viewGamePlay-wrapper">
-    <div class="viewGamePlay-header">
+<div class="gamePlay" hidden>
+  <div class="gamePlay-wrapper">
+    <div class="gamePlay-header">
       <game-scoreboard></game-scoreboard>
     </div>
-    <div class="viewGamePlay-body">
-      <div class="viewGamePlay-body-left">
-        <div class="viewGamePlay-touchBtn is-playerLeft is-up">
+    <div class="gamePlay-body">
+      <div class="gamePlay-body-left">
+        <div class="gamePlay-touchBtn is-playerLeft is-up">
           <ui-icon name="arrow-up"></ui-icon>
         </div>
-        <game-player class="viewGamePlay-player-left"></game-player>
-        <div class="viewGamePlay-touchBtn is-playerLeft is-down">
+        <game-player class="gamePlay-player-left"></game-player>
+        <div class="gamePlay-touchBtn is-playerLeft is-down">
         <ui-icon name="arrow-down"></ui-icon>
       </div>
       </div>
-      <div class="viewGamePlay-body-center">
-        <game-renderer-2d class="viewGamePlay-renderer"></game-renderer-2d>
+      <div class="gamePlay-body-center">
+        <game-renderer-2d class="gamePlay-renderer"></game-renderer-2d>
       </div>
-      <div class="viewGamePlay-body-right">
-        <div class="viewGamePlay-touchBtn is-playerRight is-up">
+      <div class="gamePlay-body-right">
+        <div class="gamePlay-touchBtn is-playerRight is-up">
         <ui-icon name="arrow-up"></ui-icon>
       </div>
-        <game-player class="viewGamePlay-player-right"></game-player>
-        <div class="viewGamePlay-touchBtn is-playerRight is-down">
+        <game-player class="gamePlay-player-right"></game-player>
+        <div class="gamePlay-touchBtn is-playerRight is-down">
         <ui-icon name="arrow-down"></ui-icon>
       </div>
       </div>
     </div>
-    <div class="viewGamePlay-footer">
-      <div class="viewGamePlay-tip">
-        <span class="viewGamePlay-tip-icon">
+    <div class="gamePlay-footer">
+      <div class="gamePlay-tip">
+        <span class="gamePlay-tip-icon">
           <ui-icon name="bulb"></ui-icon>
         </span>
-        <span class="viewGamePlay-tip-text">Press Spacebar to pause / resume the game.</span>
+        <span class="gamePlay-tip-text">Press Spacebar to pause / resume the game.</span>
       </div>
     </div>
   </div>
+  <game-dialog class="gamePlay-dialog"></game-dialog>
 </div>
 
-<!-- Dialog -->
-<game-dialog class="viewGamePlay-dialog"></game-dialog>
 
 <!-- Error Modal -->
-<div id="viewGamePlayErrorModal" hidden>
+<div id="gamePlayErrorModal" hidden>
   <div class="modal d-block" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
       <div class="modal-content">
@@ -71,7 +69,7 @@ const template = `
 </div>
 `;
 
-class ViewGamePlay extends HTMLElement {
+class GamePlay extends HTMLElement {
   #keys = {};
   #touchs = {
     left: { up: false, down: false },
@@ -79,7 +77,8 @@ class ViewGamePlay extends HTMLElement {
   };
   #gameState = null;
   #audioPlayer = null;
-  #isAuthenticated = false;
+  #playerLeft = {};
+  #playerRight = {};
 
   constructor() {
     super();
@@ -101,15 +100,26 @@ class ViewGamePlay extends HTMLElement {
     this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
   }
 
-  async connectedCallback() {
+  connectedCallback() {
     this.innerHTML = template;
-    this.#isAuthenticated = await isAuthenticated();
+
+    // Players
+    this.#playerLeft = {
+      name: this.getAttribute('player-left-name'),
+      avatar: this.getAttribute('player-left-avatar'),
+      type: this.getAttribute('player-left-type'),
+    };
+    this.#playerRight = {
+      name: this.getAttribute('player-right-name'),
+      avatar: this.getAttribute('player-right-avatar'),
+      type: this.getAttribute('player-right-type'),
+    };
 
     // Dialog
-    this.dialogEl = this.querySelector('.viewGamePlay-dialog');
+    this.dialogEl = this.querySelector('.gamePlay-dialog');
 
     // Renderer
-    this.rendererEl = this.querySelector('.viewGamePlay-renderer');
+    this.rendererEl = this.querySelector('.gamePlay-renderer');
 
     // Game events
     this.gameWorker.onmessage = function (e) {
@@ -126,7 +136,7 @@ class ViewGamePlay extends HTMLElement {
     // Game error
     this.gameWorker.onerror = function () {
       this.gameWorker.terminate();
-      this.querySelector('#viewGamePlayErrorModal').hidden = false;
+      this.querySelector('#gamePlayErrorModal').hidden = false;
     };
     this.gameWorker.onerror = this.gameWorker.onerror.bind(this);
 
@@ -155,18 +165,20 @@ class ViewGamePlay extends HTMLElement {
   }
 
   renderPlayers() {
-    this.playerLeftEl = this.querySelector('.viewGamePlay-player-left');
+    this.playerLeftEl = this.querySelector('.gamePlay-player-left');
     if (this.playerLeftEl) {
       this.playerLeftEl.setAttribute('name', this.#gameState.playerLeft.name);
       this.playerLeftEl.setAttribute('avatar', this.#gameState.playerLeft.avatar);
+      this.playerLeftEl.setAttribute('type', this.#gameState.playerLeft.type);
       this.playerLeftEl.setAttribute('score', 0);
       this.playerLeftEl.setAttribute('score-max', this.#gameState.scoreMax);
     }
 
-    this.playerRightEl = this.querySelector('.viewGamePlay-player-right');
+    this.playerRightEl = this.querySelector('.gamePlay-player-right');
     if (this.playerLeftEl) {
       this.playerRightEl.setAttribute('name', this.#gameState.playerRight.name);
       this.playerRightEl.setAttribute('avatar', this.#gameState.playerRight.avatar);
+      this.playerRightEl.setAttribute('type', this.#gameState.playerRight.type);
       this.playerRightEl.setAttribute('score', 0);
       this.playerRightEl.setAttribute('score-max', this.#gameState.scoreMax);
       this.playerRightEl.setAttribute('direction', 'right');
@@ -174,9 +186,9 @@ class ViewGamePlay extends HTMLElement {
   }
 
   renderScores() {
-    this.querySelector('.viewGamePlay-player-left')?.setAttribute('score', this.#gameState.scoreLeft || 0);
+    this.querySelector('.gamePlay-player-left')?.setAttribute('score', this.#gameState.scoreLeft || 0);
     this.querySelector('game-scoreboard')?.setAttribute('score-left', this.#gameState.scoreLeft || 0);
-    this.querySelector('.viewGamePlay-player-right')?.setAttribute('score', this.#gameState.scoreRight || 0);
+    this.querySelector('.gamePlay-player-right')?.setAttribute('score', this.#gameState.scoreRight || 0);
     this.querySelector('game-scoreboard')?.setAttribute('score-right', this.#gameState.scoreRight || 0);
   }
 
@@ -187,12 +199,6 @@ class ViewGamePlay extends HTMLElement {
     };
 
     const controls = {
-      start: {
-        icon: 'play',
-        action: () => {
-          this.gameWorker.postMessage({ type: 'start' });
-        },
-      },
       pause: {
         icon: 'pause',
         action: () => this.gameWorker.postMessage({ type: 'pause' }),
@@ -203,7 +209,7 @@ class ViewGamePlay extends HTMLElement {
       },
       quit: {
         icon: 'quit',
-        action: () => redirectTo(this.#isAuthenticated ? '/dashboard' : '/'),
+        action: () => redirectTo('/dashboard'),
       },
       restart: {
         icon: 'restart',
@@ -215,14 +221,6 @@ class ViewGamePlay extends HTMLElement {
     };
 
     switch (this.#gameState.status) {
-      case 'initialized':
-        this.dialogEl.render({
-          open: true,
-          players,
-          title: 'Ready?',
-          controls: [{ ...controls.start, large: true }],
-        });
-        break;
       case 'paused':
         this.dialogEl.render({
           open: true,
@@ -238,7 +236,10 @@ class ViewGamePlay extends HTMLElement {
           players,
           winner,
           title: `${winnerName} wins!`,
-          controls: [controls.restart, controls.quit],
+          controls: [{ ...controls.restart, large: true }],
+          back: {
+            action: () => redirectTo('/game'),
+          },
         });
         break;
       default:
@@ -249,14 +250,21 @@ class ViewGamePlay extends HTMLElement {
   handleInitMessage(data) {
     const json = JSON.parse(data);
     // todo: validate data
-    this.#gameState = json?.state;
-    this.style.setProperty('--viewGamePlay-ratio', `${this.#gameState.width / this.#gameState.height}`);
+    const dataState = json?.state;
+    this.#gameState = {
+      playerLeft: { ...this.#playerLeft },
+      playerRight: { ...this.#playerRight },
+      ...dataState,
+    };
+    this.style.setProperty('--gamePlay-ratio', `${this.#gameState.width / this.#gameState.height}`);
     this.renderPlayers();
     this.renderDialog();
     this.renderScores();
     this.rendererEl.init(this.#gameState);
     this.rendererEl.start();
-    this.querySelector('.viewGamePlay').hidden = false;
+    this.querySelector('.gamePlay').hidden = false;
+
+    this.gameWorker.postMessage({ type: 'start' });
   }
 
   handleUpdateMessage(data) {
@@ -336,7 +344,7 @@ class ViewGamePlay extends HTMLElement {
   }
 
   handleTouchStart(event) {
-    const touchEl = event.target.closest('.viewGamePlay-touchBtn');
+    const touchEl = event.target.closest('.gamePlay-touchBtn');
     if (!touchEl) return;
 
     event.preventDefault();
@@ -354,7 +362,7 @@ class ViewGamePlay extends HTMLElement {
   }
 
   handleTouchEnd(event) {
-    const touchEl = event.target.closest('.viewGamePlay-touchBtn');
+    const touchEl = event.target.closest('.gamePlay-touchBtn');
     if (!touchEl) return;
 
     event.preventDefault();
@@ -398,4 +406,4 @@ class ViewGamePlay extends HTMLElement {
   }
 }
 
-customElements.define('view-game-play', ViewGamePlay);
+customElements.define('game-play', GamePlay);

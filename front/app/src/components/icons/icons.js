@@ -1,12 +1,22 @@
 export const icons = {
+  'arrow-left': `
+    <svg viewBox="0 0 24 24">
+      <path fill="currentColor" d="M7.828 11H20v2H7.828l5.364 5.364l-1.414 1.414L4 12l7.778-7.778l1.414 1.414z"/>
+    </svg>
+  `,
+  'arrow-right': `
+    <svg viewBox="0 0 24 24">
+      <path fill="currentColor" d="m16.172 11l-5.364-5.364l1.414-1.414L20 12l-7.778 7.778l-1.414-1.414L16.172 13H4v-2z"/>
+    </svg>
+  `,
   'arrow-up': `
     <svg viewBox="0 0 24 24">
-      <path fill="currentColor" d="M13 20h-2V8l-5.5 5.5l-1.42-1.42L12 4.16l7.92 7.92l-1.42 1.42L13 8z"/>
+      <path fill="currentColor" d="m4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8z"/>
     </svg>
   `,
   'arrow-down': `
     <svg viewBox="0 0 24 24">
-      <path fill="currentColor" d="M11 4h2v12l5.5-5.5l1.42 1.42L12 19.84l-7.92-7.92L5.5 10.5L11 16z"/>
+      <path fill="currentColor" d="m20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8z"/>
     </svg>
   `,
   mail: `

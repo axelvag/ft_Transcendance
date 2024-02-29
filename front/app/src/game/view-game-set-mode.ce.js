@@ -121,7 +121,7 @@ class ViewGameSetMode extends HTMLElement {
         const gameMode = el.getAttribute('data-game-mode');
         switch (gameMode) {
           case 'solo':
-            alert('Coming soon!');
+            redirectTo('/game/solo');
             break;
           case 'duo':
             redirectTo('/game/duo');
