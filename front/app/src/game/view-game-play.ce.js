@@ -7,6 +7,7 @@ import GameWorker from './localApi/GameWorker.js?worker';
 import AudioPlayer from './localApi/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
+import { isAuthenticated } from '@/auth.js';
 
 const template = `
 <div class="viewGamePlay" hidden>
@@ -78,6 +79,7 @@ class ViewGamePlay extends HTMLElement {
   };
   #gameState = null;
   #audioPlayer = null;
+  #isAuthenticated = false;
 
   constructor() {
     super();
@@ -99,8 +101,9 @@ class ViewGamePlay extends HTMLElement {
     this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     this.innerHTML = template;
+    this.#isAuthenticated = await isAuthenticated();
 
     // Dialog
     this.dialogEl = this.querySelector('.viewGamePlay-dialog');
@@ -200,7 +203,7 @@ class ViewGamePlay extends HTMLElement {
       },
       quit: {
         icon: 'quit',
-        action: () => redirectTo('/'),
+        action: () => redirectTo(this.#isAuthenticated ? '/dashboard' : '/'),
       },
       restart: {
         icon: 'restart',
