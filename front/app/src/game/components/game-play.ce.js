@@ -79,6 +79,8 @@ class GamePlay extends HTMLElement {
   #audioPlayer = null;
   #playerLeft = {};
   #playerRight = {};
+  #playerLeftKeys = ['w', 's'];
+  #playerRightKeys = ['ArrowUp', 'ArrowDown'];
 
   constructor() {
     super();
@@ -114,6 +116,20 @@ class GamePlay extends HTMLElement {
       avatar: this.getAttribute('player-right-avatar'),
       type: this.getAttribute('player-right-type'),
     };
+
+    // Disable ai controls
+    if (this.#playerLeft.type === 'ai') {
+      this.#playerLeftKeys = [];
+      this.querySelectorAll('.gamePlay-touchBtn.is-playerLeft').forEach(el => {
+        el.hidden = true;
+      });
+    }
+    if (this.#playerRight.type === 'ai') {
+      this.#playerRightKeys = [];
+      this.querySelectorAll('.gamePlay-touchBtn.is-playerRight').forEach(el => {
+        el.hidden = true;
+      });
+    }
 
     // Dialog
     this.dialogEl = this.querySelector('.gamePlay-dialog');
@@ -316,12 +332,12 @@ class GamePlay extends HTMLElement {
     }
 
     // paddle moves
-    if (!['w', 's', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+    if (![...this.#playerLeftKeys, ...this.#playerRightKeys].includes(event.key)) return;
     if (this.#keys[event.key]) return;
 
     this.#keys[event.key] = true;
 
-    if (['w', 's'].includes(event.key)) {
+    if (this.#playerLeftKeys.includes(event.key)) {
       const dir = Number(Boolean(this.#keys.w)) - Number(Boolean(this.#keys.s));
       this.gameWorker.postMessage({ type: 'updatePaddleLeftMove', data: { dir } });
     } else {
@@ -336,16 +352,16 @@ class GamePlay extends HTMLElement {
 
     this.#keys[event.key] = false;
 
-    if (['w', 's'].includes(event.key)) {
+    if (this.#playerLeftKeys.includes(event.key)) {
       this.#updatePaddleLeftMove();
-    } else if (['ArrowUp', 'ArrowDown'].includes(event.key)) {
+    } else if (this.#playerRightKeys.includes(event.key)) {
       this.#updatePaddleRightMove();
     }
   }
 
   handleTouchStart(event) {
     const touchEl = event.target.closest('.gamePlay-touchBtn');
-    if (!touchEl) return;
+    if (!touchEl || touchEl.hidden) return;
 
     event.preventDefault();
 

@@ -114,7 +114,6 @@ class GameDialog extends HTMLElement {
 
   renderBack(back) {
     const backEl = this.querySelector('.gameDialog-back');
-    console.log(back);
     backEl.hidden = !back;
     if (back?.action) {
       backEl.addEventListener('click', back.action);
