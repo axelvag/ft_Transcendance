@@ -401,9 +401,9 @@ function updatePaddleLeftMove(data = {}) {
     paddleLeft.stop();
     const currentY = paddleLeft.center().y;
     paddleLeft.endCenter.y = targetY;
-    if (targetY > currentY + paddleHeight / 4) {
+    if (targetY > currentY + paddleHeight / 2) {
       paddleLeft.endTime = paddleLeft.startTime + ((targetY - currentY) / paddleSpeed) * 1000;
-    } else if (targetY < currentY - paddleHeight / 4) {
+    } else if (targetY < currentY - paddleHeight / 2) {
       paddleLeft.endTime = paddleLeft.startTime + ((currentY - targetY) / paddleSpeed) * 1000;
     }
   }
@@ -434,10 +434,10 @@ function updatePaddleRightMove(data = {}) {
 
     const currentY = paddleRight.center().y;
     paddleRight.stop();
-    if (targetY > currentY + paddleHeight / 4) {
+    if (targetY > currentY + paddleHeight / 2) {
       paddleRight.endCenter.y = targetY;
       paddleRight.endTime = paddleRight.startTime + ((targetY - currentY) / paddleSpeed) * 1000;
-    } else if (targetY < currentY - paddleHeight / 4) {
+    } else if (targetY < currentY - paddleHeight / 2) {
       paddleRight.endCenter.y = targetY;
       paddleRight.endTime = paddleRight.startTime + ((currentY - targetY) / paddleSpeed) * 1000;
     }
