@@ -7,6 +7,7 @@ import GameWorker from '../localApi/GameWorker.js?worker';
 import AudioPlayer from '../localApi/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
+import calculateNextAiPosition from '../localApi/calculateNextAiPosition.js';
 
 const template = `
 <div class="gamePlay" hidden>
@@ -81,6 +82,7 @@ class GamePlay extends HTMLElement {
   #playerRight = {};
   #playerLeftKeys = ['w', 's'];
   #playerRightKeys = ['ArrowUp', 'ArrowDown'];
+  #aiInterval = null;
 
   constructor() {
     super();
@@ -175,6 +177,9 @@ class GamePlay extends HTMLElement {
     // close worker
     this.gameWorker.postMessage({ type: 'reset' });
     this.gameWorker.terminate();
+
+    // clear interval
+    clearInterval(this.#aiInterval);
 
     // exit fullscreen
     exitFullscreen();
@@ -281,6 +286,20 @@ class GamePlay extends HTMLElement {
     this.querySelector('.gamePlay').hidden = false;
 
     this.gameWorker.postMessage({ type: 'start' });
+
+    // AI interval
+    if (this.#playerLeft.type === 'ai' || this.#playerRight.type === 'ai') {
+      this.#aiInterval = setInterval(() => {
+        if (this.#playerLeft.type === 'ai') {
+          const result = calculateNextAiPosition(this.#gameState, 'left');
+          this.gameWorker.postMessage({ type: 'updatePaddleLeftMove', data: { targetY: result.targetY } });
+        }
+        if (this.#playerRight.type === 'ai') {
+          const result = calculateNextAiPosition(this.#gameState, 'right');
+          this.gameWorker.postMessage({ type: 'updatePaddleRightMove', data: { targetY: result.targetY } });
+        }
+      }, 1000);
+    }
   }
 
   handleUpdateMessage(data) {

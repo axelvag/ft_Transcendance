@@ -50,10 +50,13 @@ function getState() {
     ballSpeedOnStart,
     ballAcceleration,
     ballSpeedMax,
+    ballYOnWallCollision,
+    ballXOnPaddleCollision,
     paddleHeight,
     paddleWidth,
     paddlePadding,
     paddleSpeed,
+    paddleMaxCenterY,
     scoreMax,
     innerWidth,
     innerHeight,
@@ -373,40 +376,71 @@ function reset() {
   init();
 }
 
-function updatePaddleLeftMove(dir) {
+function updatePaddleLeftMove(data = {}) {
   if (status !== 'running') return;
 
-  // check if paddle is already moving in the same direction
-  let currentDir = 0;
-  if (paddleLeft.endCenter.y > paddleLeft.startCenter.y) currentDir = 1;
-  else if (paddleLeft.endCenter.y < paddleLeft.startCenter.y) currentDir = -1;
-  if (dir === currentDir) return;
+  if (data.hasOwnProperty('dir')) {
+    const dir = data.dir;
 
-  // update the move
-  paddleLeft.stop();
-  if (dir !== 0) {
-    paddleLeft.endCenter.y = paddleMaxCenterY * dir;
-    paddleLeft.endTime =
-      paddleLeft.startTime + (Math.abs(paddleLeft.endCenter.y - paddleLeft.startCenter.y) / paddleSpeed) * 1000;
+    // check if paddle is already moving in the same direction
+    let currentDir = 0;
+    if (paddleLeft.endCenter.y > paddleLeft.startCenter.y) currentDir = 1;
+    else if (paddleLeft.endCenter.y < paddleLeft.startCenter.y) currentDir = -1;
+    if (dir === currentDir) return;
+
+    // update the move
+    paddleLeft.stop();
+    if (dir !== 0) {
+      paddleLeft.endCenter.y = paddleMaxCenterY * dir;
+      paddleLeft.endTime =
+        paddleLeft.startTime + (Math.abs(paddleLeft.endCenter.y - paddleLeft.startCenter.y) / paddleSpeed) * 1000;
+    }
+  } else if (data.hasOwnProperty('targetY')) {
+    const targetY = data.targetY;
+
+    paddleLeft.stop();
+    const currentY = paddleLeft.center().y;
+    paddleLeft.endCenter.y = targetY;
+    if (targetY > currentY + paddleHeight / 4) {
+      paddleLeft.endTime = paddleLeft.startTime + ((targetY - currentY) / paddleSpeed) * 1000;
+    } else if (targetY < currentY - paddleHeight / 4) {
+      paddleLeft.endTime = paddleLeft.startTime + ((currentY - targetY) / paddleSpeed) * 1000;
+    }
   }
   notify('update', { state: { paddleLeft: paddleLeft } });
 }
 
-function updatePaddleRightMove(dir) {
+function updatePaddleRightMove(data = {}) {
   if (status !== 'running') return;
 
-  // check if paddle is already moving in the same direction
-  let currentDir = 0;
-  if (paddleRight.endCenter.y > paddleRight.startCenter.y) currentDir = 1;
-  else if (paddleRight.endCenter.y < paddleRight.startCenter.y) currentDir = -1;
-  if (dir === currentDir) return;
+  if (data.hasOwnProperty('dir')) {
+    const dir = data.dir;
 
-  // update the move
-  paddleRight.stop();
-  if (dir !== 0) {
-    paddleRight.endCenter.y = paddleMaxCenterY * dir;
-    paddleRight.endTime =
-      paddleRight.startTime + (Math.abs(paddleRight.endCenter.y - paddleRight.startCenter.y) / paddleSpeed) * 1000;
+    // check if paddle is already moving in the same direction
+    let currentDir = 0;
+    if (paddleRight.endCenter.y > paddleRight.startCenter.y) currentDir = 1;
+    else if (paddleRight.endCenter.y < paddleRight.startCenter.y) currentDir = -1;
+    if (dir === currentDir) return;
+
+    // update the move
+    paddleRight.stop();
+    if (dir !== 0) {
+      paddleRight.endCenter.y = paddleMaxCenterY * dir;
+      paddleRight.endTime =
+        paddleRight.startTime + (Math.abs(paddleRight.endCenter.y - paddleRight.startCenter.y) / paddleSpeed) * 1000;
+    }
+  } else if (data.hasOwnProperty('targetY')) {
+    const targetY = data.targetY;
+
+    const currentY = paddleRight.center().y;
+    paddleRight.stop();
+    if (targetY > currentY + paddleHeight / 4) {
+      paddleRight.endCenter.y = targetY;
+      paddleRight.endTime = paddleRight.startTime + ((targetY - currentY) / paddleSpeed) * 1000;
+    } else if (targetY < currentY - paddleHeight / 4) {
+      paddleRight.endCenter.y = targetY;
+      paddleRight.endTime = paddleRight.startTime + ((currentY - targetY) / paddleSpeed) * 1000;
+    }
   }
   notify('update', { state: { paddleRight: paddleRight } });
 }
@@ -427,10 +461,10 @@ self.addEventListener('message', e => {
       reset();
       break;
     case 'updatePaddleLeftMove':
-      updatePaddleLeftMove(data?.dir);
+      updatePaddleLeftMove(data);
       break;
     case 'updatePaddleRightMove':
-      updatePaddleRightMove(data?.dir);
+      updatePaddleRightMove(data);
       break;
   }
 });
