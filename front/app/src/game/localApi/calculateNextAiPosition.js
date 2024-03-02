@@ -1,18 +1,12 @@
 import MovableRect from './MovableRect';
 import Vec2 from './Vec2';
 
-// Limited AI
-const waitForRebound = true;
-const goToCenterOnWait = false;
-const dirRandomness = 0.4;
-
-// God AI
-// const waitForRebound = false;
-// const goToCenterOnWait = true;
-// const dirRandomness = 0;
-
-const calculateNextAiPosition = (gameState, position) => {
+const calculateNextAiPosition = (gameState, position, options = {}) => {
   const state = JSON.parse(JSON.stringify(gameState));
+
+  const waitForRebound = options.waitForRebound || false;
+  const goToCenterOnWait = options.goToCenterOnWait || true;
+  const dirRandomness = options.dirRandomness || 0;
 
   try {
     const ball = new MovableRect({

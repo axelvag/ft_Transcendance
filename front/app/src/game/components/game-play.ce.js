@@ -289,13 +289,18 @@ class GamePlay extends HTMLElement {
 
     // AI interval
     if (this.#playerLeft.type === 'ai' || this.#playerRight.type === 'ai') {
+      const aiOptions = {
+        waitForRebound: true,
+        goToCenterOnWait: false,
+        dirRandomness: 0.4,
+      };
       this.#aiInterval = setInterval(() => {
         if (this.#playerLeft.type === 'ai') {
-          const result = calculateNextAiPosition(this.#gameState, 'left');
+          const result = calculateNextAiPosition(this.#gameState, 'left', aiOptions);
           this.gameWorker.postMessage({ type: 'updatePaddleLeftMove', data: { targetY: result.targetY } });
         }
         if (this.#playerRight.type === 'ai') {
-          const result = calculateNextAiPosition(this.#gameState, 'right');
+          const result = calculateNextAiPosition(this.#gameState, 'right', aiOptions);
           this.gameWorker.postMessage({ type: 'updatePaddleRightMove', data: { targetY: result.targetY } });
         }
       }, 1000);
