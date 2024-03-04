@@ -52,6 +52,13 @@ $utilities: map-merge(
           responsive: true,
         )
       ),
+    'font-size':
+      map-merge(
+        map-get($utilities, 'font-size'),
+        (
+          responsive: true,
+        )
+      ),
   )
 );
 @import 'bootstrap/scss/utilities/api';

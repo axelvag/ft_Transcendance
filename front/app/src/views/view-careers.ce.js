@@ -5,15 +5,6 @@ import { user, isAuthenticated } from '@/auth.js';
 
 class ViewCareers extends HTMLElement {
   connectedCallback() {
-    const isAuth = isAuthenticated();
-    if (!isAuth) {
-      redirectTo('/login');
-    } else {
-      this.render();
-    }
-  }
-
-  render() {
     this.innerHTML = `
       <style>
         @import url('https://fonts.googleapis.com/css2?family=Irish+Grover&display=swap');

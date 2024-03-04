@@ -1,4 +1,4 @@
-.viewGame {
+.gamePlay {
   position: fixed;
   inset: 0;
   background-color: var(--bs-body-bg);
@@ -10,6 +10,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  user-select: none;
 
   font-size: min(2vh, 1.75vw, 2rem);
 
@@ -36,7 +37,7 @@
 
     &-center {
       flex: 0 1 auto;
-      aspect-ratio: var(--viewGame-ratio, 1);
+      aspect-ratio: var(--gamePlay-ratio, 1);
       height: 100%;
       max-width: calc(100% - 28em);
       position: relative;
@@ -85,7 +86,12 @@
     opacity: 0.15;
     border-radius: 1em;
 
-    display: flex;
+    // diplays only on touch devices
+    display: none;
+    @media (pointer: coarse) {
+      display: flex;
+    }
+
     align-items: center;
     justify-content: center;
     ui-icon {
@@ -97,13 +103,10 @@
       opacity: 0.25;
     }
   }
-  &:not(.is-touch) &-touchBtn {
-    display: none;
-  }
 }
 
 @include media-breakpoint-down(lg) {
-  .viewGame {
+  .gamePlay {
     &-header {
       position: absolute;
       z-index: 1;
@@ -111,7 +114,7 @@
       left: 50%;
       margin-top: 2.5em;
       transform: translateX(-50%) translateY(-50vh);
-      transform: translateX(-50%) translateY(max(-50vh, calc(-50vw / var(--viewGame-ratio, 1) + 7em)));
+      transform: translateX(-50%) translateY(max(-50vh, calc(-50vw / var(--gamePlay-ratio, 1) + 7em)));
     }
 
     &-footer {

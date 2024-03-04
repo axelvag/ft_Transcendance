@@ -5,12 +5,14 @@
   --gamePlayer-avatar-margin: 0;
   --gamePlayer-score-flex-direction: row;
   --gamePlayer-crow-display: none;
+  --gamePlayer-type-inset: auto auto 0 0;
 
   &.is-right {
     --gamePlayer-inset: auto 0 auto auto;
     --gamePlayer-color: var(--bs-secondary);
     --gamePlayer-avatar-transform: scale(-1, 1);
     --gamePlayer-score-flex-direction: row-reverse;
+    --gamePlayer-type-inset: auto 0 0 auto;
   }
 
   &.is-winner {
@@ -28,15 +30,18 @@
 
   &-avatar {
     flex: 0 0 auto;
-    width: 8em;
-    height: 8em;
-    border: 0.25em solid var(--gamePlayer-color);
-    background: #fff;
-    border-radius: 100%;
-    overflow: hidden;
     position: relative;
     margin: var(--gamePlayer-avatar-margin);
-    transform: var(--gamePlayer-avatar-transform);
+
+    &-img {
+      width: 8em;
+      height: 8em;
+      border: 0.25em solid var(--gamePlayer-color);
+      background: #fff;
+      border-radius: 100%;
+      overflow: hidden;
+      transform: var(--gamePlayer-avatar-transform);
+    }
 
     img {
       display: block;
@@ -47,6 +52,26 @@
       &:error {
         display: none;
       }
+    }
+  }
+
+  &-type {
+    position: absolute;
+    z-index: 2;
+    margin: 0.75em;
+    inset: var(--gamePlayer-type-inset);
+
+    font-size: 0.75em;
+    line-height: 1.5;
+    padding: 0 0.35em;
+    background: var(--bs-danger);
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 0.25em;
+
+    &:empty {
+      display: none;
     }
   }
 

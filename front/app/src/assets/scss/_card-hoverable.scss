@@ -1,0 +1,19 @@
+.card-hoverable {
+  text-decoration: none;
+
+  &:not([disabled]) {
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      outline: var(--bs-body-color) solid 2px;
+    }
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    > * {
+      filter: grayscale(100%) opacity(0.35);
+    }
+  }
+}
