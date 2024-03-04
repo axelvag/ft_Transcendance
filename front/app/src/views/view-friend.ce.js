@@ -51,16 +51,20 @@ class ViewFriend extends HTMLElement {
             <div class="col-md-6">
               <form class="profile-form">
                 <div class="form-group">
-                    <label for="friend-name">Add a friend</label>
-                    <input type="text" id="friend-name" value="" required>
+                  <div class="input-group">
+                  <div class="input-group-prepend">
+                      <span class="input-group-text">Add a friend</span>
+                  </div>
+                  <input type="text" id="friend-name" class="form-control" required>
+                </div>
                 </div>
                 <div id="success-notification-friend" class="alert alert-success mt-3" style="display: none;">
                   <strong>Success !</strong> Invitation successful !
                 </div>
                 <div id="general-error-friend" class="alert alert-danger mt-3" style="display: none;"></div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-button">Cancel</button>
-                    <button type="submit" class="save-button">Send Invite</button>
+                <div class="form-actions ms-5 ps-4">
+                    <button type="button" class="btn btn-outline-light cancel-button">Cancel</button>
+                    <button type="submit" class="btn btn-outline-light save-button">Send Invite</button>
                 </div>
               </form>
             </div>
@@ -82,7 +86,7 @@ class ViewFriend extends HTMLElement {
         </div>
 
         <div class="row">
-          <div class="col-md-6 mt-3 mb-3 ml-3 text-secondary" style="margin-left: 40px">
+          <div class="col-md-6 mt-3 mb-3 ms-5 text-secondary">
             Nobody
           </div>
         </div>
@@ -99,7 +103,7 @@ class ViewFriend extends HTMLElement {
         </div>
 
         <div class="row">
-          <div class="col-md-6 mt-3 mb-3 ml-3 text-secondary" style="margin-left: 40px">
+          <div class="col-md-6 mt-3 mb-3 ms-5 text-secondary">
             Nobody
           </div>
         </div>
