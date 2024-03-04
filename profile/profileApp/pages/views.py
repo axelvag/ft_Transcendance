@@ -191,21 +191,28 @@ from django.http import JsonResponse
 @require_http_methods(["POST"])
 def update_user(request):
     if request.method == "POST":
+        logging.critical("Enter")
         data = json.loads(request.body)
         user_id = data.get('id')
         first_name = data.get('firstname')
         last_name = data.get('lastname')
 
         # Appel au service d'authentification pour mettre à jour le username et l'email
-        auth_service_url = 'http://127.0.0.1:8001/accounts/update_profile/'  # URL de l'API du service d'authentification
+        # auth_service_url = 'http://127.0.0.1:8001/accounts/update_profile/'  # URL de l'API du service d'authentification
+        auth_service_url = "http://authentification:8001/accounts/update_profile/"
+        response = requests.post(auth_service_url, json={"key": "value"})  # Assurez-vous que la clé et la valeur sont correctes
+        print(response.status_code, response.text)
         auth_data = {
             'id': user_id,
             'username': data.get('username'),
             'email': data.get('email'),
         }
+        logging.critical("11111111")
         auth_response = requests.post(auth_service_url, json=auth_data)
+        logging.critical("222222222")
         if auth_response.status_code != 200:
             # Gérer l'erreur si l'appel au service d'authentification échoue
+            logging.critical("close1")
             return JsonResponse({"success": False, "message": "Échec de la mise à jour des informations d'authentification."})
 
         profile, created = Profile.objects.get_or_create(
@@ -222,7 +229,9 @@ def update_user(request):
             profile.lastName = last_name
             profile.save()
             
+        logging.critical("close2")
         return JsonResponse({"success": True, "message": "Profil mis à jour ou créé avec succès."})
 
     else:
+        logging.critical("close3")
         return JsonResponse({"success": False, "message": "Méthode HTTP non autorisée."}, status=405)

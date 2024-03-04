@@ -20,6 +20,7 @@ from django.views.decorators.http import require_POST
 import json
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+import logging
 
 # Create your views here.
 User = get_user_model()
@@ -301,6 +302,7 @@ def is_user_logged_in(request):
 @csrf_exempt
 # @require_http_methods(["POST"])
 def update_profile(request):
+    logging.critical("Enter1")
     data = json.loads(request.body)
     user_id = data.get('id')
     username = data.get('username')
@@ -309,6 +311,7 @@ def update_profile(request):
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
+        logging.critical("closeBackAuth")
         return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
 
     if username:
@@ -317,4 +320,5 @@ def update_profile(request):
         user.email = email
     user.save()
     
+    logging.critical("blablabla")
     return JsonResponse({"success": True, "message": "Informations utilisateur mises à jour avec succès."})
