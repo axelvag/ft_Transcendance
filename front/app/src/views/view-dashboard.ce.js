@@ -53,6 +53,7 @@ class ViewDash extends HTMLElement {
       .then(data => {
         if (data.success) {
           user.isAuthenticated = false;
+          localStorage.setItem('isLogged', 'false');
           redirectTo('/');
         }
       })
