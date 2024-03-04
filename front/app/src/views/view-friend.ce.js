@@ -30,9 +30,8 @@ class ViewFriend extends HTMLElement {
 
         <div class="accordion" id="accordionPanelsFriends">
           <div class="accordion-item mt-4 mb-4">
-            <!-- style="background-color: linear-gradient(to right, #b558f6, #0ea3d2) !important" -->
             <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+              <button class="accordion-button collapsed bg-bicolor" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="friends"></ui-icon>
                 Your friends
               </button>
