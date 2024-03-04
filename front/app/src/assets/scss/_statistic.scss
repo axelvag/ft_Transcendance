@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Irish+Grover&display=swap');
+.irish-grover {
+    font-family: 'Irish Grover', cursive;
+}
+.extra-large {
+  font-size: 9rem; /* Taille de police plus grande */
+}
+.text-grey {
+  color: grey; /* Couleur de texte gris */
+}
+.no-wrap {
+  flex-wrap: nowrap !important; /* Utilisation de !important pour s'assurer que cette règle CSS est prioritaire */
+}
