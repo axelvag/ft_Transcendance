@@ -6,23 +6,6 @@ import { user, isAuthenticated } from '@/auth.js';
 class ViewCareers extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <style>
-        @import url('https://fonts.googleapis.com/css2?family=Irish+Grover&display=swap');
-        .irish-grover {
-            font-family: 'Irish Grover', cursive;
-        }
-        .extra-large {
-          font-size: 9rem; /* Taille de police plus grande */
-        }
-        .text-grey {
-          color: grey; /* Couleur de texte gris */
-        }
-        .no-wrap {
-          flex-wrap: nowrap !important; /* Utilisation de !important pour s'assurer que cette règle CSS est prioritaire */
-        }
-      </style>
-
-
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
         <h1 class="display-5 fw-bold mb-4 text-center" style="margin-top: -50px;">
@@ -38,7 +21,7 @@ class ViewCareers extends HTMLElement {
             </div>
           </div>
           <div class="col-md-6 mt-5">
-            <h1 class="display-5 fw-bold mb-4 text-center text-lg irish-grover extra-large style="margin-left: -250px;"">
+            <h1 class="display-5 fw-bold mb-4 text-center text-lg irish-grover extra-large" style="margin-left: -250px;">
               ${user.id} / 4
             </h1>
           </div>
@@ -48,12 +31,12 @@ class ViewCareers extends HTMLElement {
 
         <div class="row">
           <div class="col-md-6">
-            <h3 class="display-5 fw-bold me-3 btn-lg" style="margin-left: 70px;">
+            <h3 class="display-5 fw-bold btn-lg ms-5">
               ${user.username}
             </h3>
           </div>
-          <div class="col-md-6">
-            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); margin-left: 120px; font-size: 2rem;" href="#" data-link="/game">
+          <div class="col-md-6" style="margin-top: -20px">
+            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); font-size: 2rem;" href="#" data-link="/game">
               <span class="d-inline-block py-1">
               <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
               RANK
@@ -64,22 +47,14 @@ class ViewCareers extends HTMLElement {
 
         <!-- Victories and Lost -->
 
-        <div class="row mt-5 no-wrap">
-          <div class="col-md-6 text-grey" style="margin-left: 130px;">
-            <h2>
-              Victories
-            </h2>
-          </div>
-          <div class="col-md-6 text-grey" style="margin-left: 20px;">
-            <h2>
-              Lost
-            </h2>
-          </div>
-        </div>
-
-        <div class="row">
+        <div class="row mt-2">
           <div class="col-md-6">
-            <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
+            <div class="text-grey ms-4">
+              <h2>
+                Victories
+              </h2>
+            </div>
+            <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_victories" style="width: 50px; height: 50px; margin-right: 10px;">
                 &nbsp;183&nbsp;&nbsp;
@@ -87,7 +62,12 @@ class ViewCareers extends HTMLElement {
             </div>
           </div>
           <div class="col-md-6">
-            <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
+            <div class="text-grey ms-5">
+              <h2>
+                Lost
+              </h2>
+            </div>
+            <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://purplex.ca/wp-content/uploads/2023/03/purple-x-sigle.png" alt="logo_lost" style="width: 50px; height: 50px; margin-right: 10px;">
                 &nbsp;13&nbsp;&nbsp;
@@ -98,22 +78,14 @@ class ViewCareers extends HTMLElement {
 
         <!-- Online and Local -->
 
-        <div class="row mt-3 no-wrap">
-          <div class="col-md-6 text-grey" style="margin-left: 130px;">
-            <h2>
-              Online
-            </h2>
-          </div>
-          <div class="col-md-6 text-grey" style="margin-left: 20px;">
-            <h2>
-              Local
-            </h2>
-          </div>
-        </div>
-
-        <div class="row">
+        <div class="row mt-2">
           <div class="col-md-6">
-            <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
+            <div class="text-grey ms-4">
+              <h2>
+                Online
+              </h2>
+            </div>
+            <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://cdn-icons-png.flaticon.com/512/4562/4562970.png" alt="logo_online" style="width: 50px; height: 50px; margin-right: 10px;">
                 &nbsp;160&nbsp;&nbsp;
@@ -121,7 +93,12 @@ class ViewCareers extends HTMLElement {
             </div>
           </div>
           <div class="col-md-6">
-            <div class="btn border border-white rounded-pill btn-lg" style="margin-left: 120px; font-size: 2rem; pointer-events: none;">
+            <div class="text-grey ms-5">
+              <h2>
+                Local
+              </h2>
+            </div>
+            <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://static.vecteezy.com/system/resources/previews/023/561/259/non_2x/purple-and-white-keyboard-icon-in-3d-render-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
                 &nbsp;27&nbsp;&nbsp;
@@ -132,8 +109,8 @@ class ViewCareers extends HTMLElement {
 
         <!-- Time play -->
 
-        <div class="row mt-3">
-        <div class="col-md-12 text-center text-grey">
+        <div class="row">
+        <div class="col-md-8 text-center text-grey">
           <h2>
             Time play
           </h2>
@@ -141,7 +118,7 @@ class ViewCareers extends HTMLElement {
         </div>
 
         <div class="row mt-2">
-        <div class="col-md-12 d-flex justify-content-center">
+        <div class="col-md-8 d-flex justify-content-center">
           <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
             <span class="d-inline-block py-1">
               <img src="https://static.vecteezy.com/system/resources/previews/022/541/253/non_2x/3d-render-purple-pastel-color-alarm-clock-3d-circle-clock-icon-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
