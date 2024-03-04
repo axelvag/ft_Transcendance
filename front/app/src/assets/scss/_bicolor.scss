@@ -18,6 +18,10 @@
   background: linear-gradient(to right, $primary, $secondary) !important;
 }
 
+.bg-bicolor-diagonal {
+  background: linear-gradient(120deg, $primary, $secondary) !important;
+}
+
 .text-bicolor {
   background: linear-gradient(to right, $primary, $secondary) !important;
   -webkit-background-clip: text !important;

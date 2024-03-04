@@ -1,6 +1,5 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
-import { isAuthenticated } from '@/auth.js';
 
 class ViewSigUp extends HTMLElement {
   constructor() {
@@ -8,15 +7,6 @@ class ViewSigUp extends HTMLElement {
     this.submitForm = this.submitForm.bind(this);
   }
   connectedCallback() {
-    const isAuth = isAuthenticated();
-    if (isAuth) {
-      redirectTo('/dashboard');
-    } else {
-      this.render();
-    }
-  }
-
-  render() {
     this.innerHTML = `
         <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
@@ -27,24 +17,52 @@ class ViewSigUp extends HTMLElement {
           <label class="form-label" for="email">
             Your email
           </label>
-          <input class="form-control form-control-lg" type="email" id="email" name="email" required />
+          <input
+            class="form-control form-control-lg"
+            type="email"
+            id="email"
+            name="email"
+            required
+            autocomplete="email"
+          />
           <div id="email-error" class="invalid-feedback"></div>
         </div>
           <div class="mb-4">
             <label class="form-label" for="username">
               Choose your username
               </label>
-            <input class="form-control form-control-lg" type="username" id="username" name="username" required />
+            <input
+              class="form-control form-control-lg"
+              type="username"
+              id="username"
+              name="username"
+              required
+              autocomplete="username"
+            />
             <div id="username-error" class="invalid-feedback"></div>
           </div>
             
             <div class="mb-4">
               <label class="form-label" for="password1">Choose your password</label>
-              <input class="form-control form-control-lg" type="password" id="password1" name="password1" required />
+              <input
+                class="form-control form-control-lg"
+                type="password"
+                id="password1"
+                name="password1"
+                required
+                autocomplete="new-password"
+              />
             </div>
             <div class="mb-4">
               <label class="form-label" for="password2">Repeat your password</label>
-              <input class="form-control form-control-lg" type="password" id="password2" name="password2" required />
+              <input
+                class="form-control form-control-lg"
+                type="password"
+                id="password2"
+                name="password2"
+                required
+                autocomplete="new-password"
+              />
               <div id="password-error" class="invalid-feedback"></div>
             </div>
             

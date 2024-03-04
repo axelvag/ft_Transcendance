@@ -1,18 +1,11 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { redirectTo } from '@/router.js';
-import { verifyUserLoginAndDisplayDashboard, getCSRFToken, user, isAuthenticated } from '@/auth.js';
+import { getCSRFToken, getProfile } from '@/auth.js';
 
 const fake_getUser = async () => {
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve({
-        username: 'Philou',
-        firstname: 'Philippe',
-        lastname: 'Martin',
-        email: 'philippe.martin@gmail.com',
-        avatar: 'https://i.pravatar.cc/128?img=7',
-      });
+      resolve(getProfile());
     }, 1000);
   });
 };
@@ -170,7 +163,7 @@ const editProfileTemplate = user => `
   </div>
 `;
 
-class ViewProfil extends HTMLElement {
+class ViewProfile extends HTMLElement {
   #profileContentEl = null;
   #user = null;
 
@@ -180,15 +173,6 @@ class ViewProfil extends HTMLElement {
   }
 
   connectedCallback() {
-    const isAuth = isAuthenticated();
-    if (!isAuth) {
-      redirectTo('/login');
-    } else {
-      this.render();
-    }
-  }
-
-  render() {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main id="profile-section">
@@ -270,4 +254,4 @@ class ViewProfil extends HTMLElement {
   }
 }
 
-customElements.define('view-profil', ViewProfil);
+customElements.define('view-profile', ViewProfile);

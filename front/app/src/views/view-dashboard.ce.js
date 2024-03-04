@@ -1,31 +1,22 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
-import { user, isAuthenticated } from '@/auth.js';
+import { user } from '@/auth.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
-    const isAuth = isAuthenticated();
-    if (!isAuth) {
-      redirectTo('/login');
-    } else {
-      this.render();
-    }
-  }
-
-  render() {
     this.innerHTML = `
     <default-layout-sidebar></default-layout-sidebar>
     <default-layout-main>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-8">
           <div class="dashboard-text">
-            <h1 class="text-bicolor display-5">
+            <h1 class="text-bicolor display-5 fw-bolder">
               TRANSCENDANCE PONG
             </h1>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-4">
           <div class="row justify-content-end">
             <div class="col-md-6 d-flex flex-column align-items-center">
                 <img src="https://pbs.twimg.com/media/E3-FSn5XwAMwOYR.jpg" class="img-thumbnail rounded-circle" width="200" height="200" alt="character">
