@@ -1,6 +1,7 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
+import { getCsrfToken } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -68,17 +69,17 @@ class ViewSignIn extends HTMLElement {
     this.emailError = this.querySelector('#email-error');
   }
 
-  async getCsrfToken() {
-    const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
-      method: 'GET',
-      credentials: 'include',
-    });
-    if (response.ok) {
-      const data = await response.json();
-      return data.csrfToken;
-    }
-    throw new Error('Could not retrieve CSRF token');
-  }
+  // async getCsrfToken() {
+  //   const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+  //     method: 'GET',
+  //     credentials: 'include',
+  //   });
+  //   if (response.ok) {
+  //     const data = await response.json();
+  //     return data.csrfToken;
+  //   }
+  //   throw new Error('Could not retrieve CSRF token');
+  // }
 
   async submitForm(event) {
     event.preventDefault();
@@ -94,7 +95,7 @@ class ViewSignIn extends HTMLElement {
       password: password,
     };
 
-    const csrfToken = await this.getCsrfToken();
+    const csrfToken = await getCsrfToken();
 
     console.log(JSON.stringify(formData));
     const response = await fetch('http://127.0.0.1:8001/accounts/login/', {

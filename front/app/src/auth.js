@@ -71,6 +71,19 @@ const logout = async () => {
   resetLocalUser();
 };
 
+const getCsrfToken = async () => {
+  const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (response.ok) {
+    const data = await response.json();
+    console.log(data.csrfToken);
+    return data.csrfToken;
+  }
+  throw new Error('Could not retrieve CSRF token');
+}
+
 const getProfile = () => {
   return {
     id: user.id,
@@ -82,4 +95,4 @@ const getProfile = () => {
   };
 };
 
-export { user, isAuthenticated, getCSRFToken, logout, getProfile };
+export { user, isAuthenticated, getCSRFToken, logout, getProfile, getCsrfToken };
