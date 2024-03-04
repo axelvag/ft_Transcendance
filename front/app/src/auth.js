@@ -8,6 +8,7 @@ const user = {
 };
 
 const setLocalUser = data => {
+  localStorage.setItem('isLogged', 'true');
   user.isAuthenticated = true;
   user.id = data.id;
   user.email = data.email;
@@ -15,6 +16,7 @@ const setLocalUser = data => {
 };
 
 const resetLocalUser = () => {
+  // localStorage.setItem('isLogged', 'false');
   user.isAuthenticated = false;
   user.id = null;
   user.email = null;

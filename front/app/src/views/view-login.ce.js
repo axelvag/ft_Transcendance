@@ -112,6 +112,7 @@ class ViewSignIn extends HTMLElement {
     console.log('error', data);
     if (data.success) {
       console.log('Sucess!');
+      localStorage.setItem('isLogged', 'true');
       user.isAuthenticated = true;
       user.id = data.id;
       user.email = data.email;
