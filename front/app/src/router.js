@@ -14,6 +14,7 @@ import '@/views/view-new-pass.ce.js';
 import '@/views/view-dashboard.ce.js';
 import '@/views/view-settings.ce.js';
 import '@/views/view-careers.ce.js';
+import '@/views/view-rank.ce.js';
 
 const useHash = true;
 
@@ -101,6 +102,10 @@ const routes = {
   '/not-found': {
     title: 'Not Found',
     template: '<view-not-found></view-not-found>',
+  },
+  '/rank': {
+    title: 'Rank',
+    template: '<view-rank></view-rank>',
   },
 };
 

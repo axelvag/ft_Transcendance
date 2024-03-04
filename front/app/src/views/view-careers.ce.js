@@ -36,7 +36,7 @@ class ViewCareers extends HTMLElement {
             </h3>
           </div>
           <div class="col-md-6" style="margin-top: -20px">
-            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); font-size: 2rem;" href="#" data-link="/game">
+            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg" style="--bs-btn-color: var(--bs-body-color); font-size: 2rem;" href="#" data-link="/rank">
               <span class="d-inline-block py-1">
               <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
               RANK
