@@ -141,30 +141,73 @@ User = get_user_model()
 #         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
 
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def update_user(request):
+#     if request.method == "POST":
+#         # Supposons que les données soient envoyées en JSON
+#         data = json.loads(request.body)
+#         user_id = data.get('id')
+#         first_name = data.get('firstname')
+#         last_name = data.get('lastname')
+#         username = data.get('username')
+#         email = data.get('email')
+
+#         try:
+#             user = User.objects.get(pk=user_id)
+#         except User.DoesNotExist:
+#             logging.critical("2222222222222222")
+#             return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+        
+#         if username:
+#             user.username = username
+#         if email:
+#             user.email = email
+#         user.save()
+#         # Utiliser get_or_create pour vérifier si le profil existe déjà, sinon en créer un nouveau
+#         profile, created = Profile.objects.get_or_create(
+#             user_id=user_id,  # Supposons que vous avez un champ user_id dans votre modèle Profile
+#             defaults={
+#                 'firstName': first_name,
+#                 'lastName': last_name,
+#             }
+#         )
+
+#         # Si le profil existait déjà et que nous voulons le mettre à jour avec de nouvelles valeurs
+#         if not created:
+#             profile.firstName = first_name
+#             profile.lastName = last_name
+#             profile.save()
+            
+#         return JsonResponse({"success": True, "message": "Profil mis à jour ou créé avec succès."})
+
+#     else:
+#         return JsonResponse({"success": False, "message": "Méthode HTTP non autorisée."}, status=405)
+
+import requests
+from django.http import JsonResponse
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def update_user(request):
     if request.method == "POST":
-        # Supposons que les données soient envoyées en JSON
         data = json.loads(request.body)
         user_id = data.get('id')
         first_name = data.get('firstname')
         last_name = data.get('lastname')
-        username = data.get('username')
-        email = data.get('email')
 
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            logging.critical("2222222222222222")
-            return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
-        
-        if username:
-            user.username = username
-        if email:
-            user.email = email
-        user.save()
-        # Utiliser get_or_create pour vérifier si le profil existe déjà, sinon en créer un nouveau
+        # Appel au service d'authentification pour mettre à jour le username et l'email
+        auth_service_url = 'http://127.0.0.1:8001/accounts/update_profile/'  # URL de l'API du service d'authentification
+        auth_data = {
+            'id': user_id,
+            'username': data.get('username'),
+            'email': data.get('email'),
+        }
+        auth_response = requests.post(auth_service_url, json=auth_data)
+        if auth_response.status_code != 200:
+            # Gérer l'erreur si l'appel au service d'authentification échoue
+            return JsonResponse({"success": False, "message": "Échec de la mise à jour des informations d'authentification."})
+
         profile, created = Profile.objects.get_or_create(
             user_id=user_id,  # Supposons que vous avez un champ user_id dans votre modèle Profile
             defaults={

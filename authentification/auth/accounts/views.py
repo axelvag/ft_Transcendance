@@ -296,3 +296,25 @@ def is_user_logged_in(request):
         return JsonResponse({"success": True, "message": "User is login.", "username": request.user.username, "email": request.user.email, "id": request.user.id}, status=200)
     else:
         return JsonResponse({"success": False, "message": "User is not login."}, status=400)
+
+# Dans le service d'authentification
+@csrf_exempt
+# @require_http_methods(["POST"])
+def update_profile(request):
+    data = json.loads(request.body)
+    user_id = data.get('id')
+    username = data.get('username')
+    email = data.get('email')
+
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+    user.save()
+    
+    return JsonResponse({"success": True, "message": "Informations utilisateur mises à jour avec succès."})
