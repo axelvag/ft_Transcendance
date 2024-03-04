@@ -14,7 +14,7 @@ class ViewDash extends HTMLElement {
           </div>
           <h2>Bienvenue, ${user.username}, ${user.id}</h2>
           <div class="big-button-play">
-            <button type="button" class="btn btn-outline-light btn-lg">Play Now</button>
+            <button type="button" class="btn btn-outline-light btn-lg" data-link="/game">Play Now</button>
           </div>
         </div>
         <div id="supp">

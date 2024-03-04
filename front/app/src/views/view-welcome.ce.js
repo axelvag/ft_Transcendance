@@ -1,5 +1,6 @@
 import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
+import '@/game/components/game-demo.ce.js';
 
 class ViewWelcome extends HTMLElement {
   connectedCallback() {
@@ -51,18 +52,25 @@ class ViewWelcome extends HTMLElement {
       </nav>
 
       <section class="min-vh-100 d-flex align-items-center pt-5 halo-bicolor">
-        <div class="container text-center">
-          <h1 class="display-2 fw-bold mb-4">
-            Ultimate <span class="text-bicolor">Pong</span> Game 
-          </h1>
-          <p class="fs-3 fw-semibold mb-4">
-            Engage in the classic battle with friends or solo, online and offline.
-          </p>
-          <p class="py-3">
-            <a class="btn btn-primary px-sm-5 py-sm-3 fw-bold" href="#" data-link="/game">
-              Play now
-            </a>
-          </p>
+        <div class="container text-center text-lg-start">
+          <div class="row align-items-center">
+            <div class="col-12 col-lg-6">
+              <h1 class="display-3 fw-bold mb-4">
+                Ultimate <span class="text-bicolor">Pong</span> Game 
+              </h1>
+              <p class="fs-3 fw-semibold mb-4">
+                Engage in the classic battle with friends or solo, online and offline.
+              </p>
+              <p class="pt-3">
+                <a class="btn btn-primary px-sm-5 py-sm-3 fw-bold" href="#" data-link="/game">
+                  Play now
+                </a>
+              </p>
+            </div>
+            <div class="col-12 col-lg-6">
+                <game-demo class="d-block p-5 mx-5 mt-n4 mt-lg-4 mx-lg-0"></game-demo>
+            </div>
+          </div>
         </div>
       </section>
     `;

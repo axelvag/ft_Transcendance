@@ -6,7 +6,8 @@ import '@/views/view-signup.ce.js';
 import '@/views/view-profile.ce.js';
 import '@/views/view-email-confirmation.ce.js';
 import '@/views/view-login.ce.js';
-import '@/game/view-game.ce.js';
+import '@/game/view-game-set-mode.ce.js';
+import '@/game/view-game-offline.ce.js';
 import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
@@ -86,7 +87,15 @@ const routes = {
   },
   '/game': {
     title: 'Game',
-    template: '<view-game></view-game>',
+    template: '<view-game-set-mode></view-game-set-mode>',
+  },
+  '/game/solo': {
+    title: 'Game',
+    template: '<view-game-offline></view-game-offline>',
+  },
+  '/game/duo': {
+    title: 'Game',
+    template: '<view-game-offline duo></view-game-offline>',
   },
   // not found
   '/not-found': {
@@ -155,7 +164,6 @@ document.addEventListener('click', e => {
 });
 
 const redirectTo = pathKey => {
-  console.log('ici');
   const path = useHash
     ? // with hash
       '/#' + pathKey

@@ -1,7 +1,7 @@
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
-  isAuthenticated: false,
+  isAuthenticated: undefined,
   id: null,
   username: null,
   email: null,
@@ -23,7 +23,7 @@ const resetLocalUser = () => {
 
 const isAuthenticated = async () => {
   try {
-    if (!user.isAuthenticated) {
+    if (user.isAuthenticated === undefined) {
       resetLocalUser();
       const response = await fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
         method: 'GET',
@@ -40,7 +40,6 @@ const isAuthenticated = async () => {
     console.error('Error:', error);
     resetLocalUser();
   }
-  console.log('isAuthenticated', user.isAuthenticated);
   return user.isAuthenticated;
 };
 
