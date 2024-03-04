@@ -129,12 +129,15 @@ def register_user(request):
         print("yoo")
         return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
 
+# def get_csrf_token(request):
+#     """
+#     Vue pour obtenir le jeton CSRF et le renvoyer sous forme de réponse JSON.
+#     """
+#     csrf_token = get_token(request)
+#     return JsonResponse({"csrfToken": csrf_token})
+
 def get_csrf_token(request):
-    """
-    Vue pour obtenir le jeton CSRF et le renvoyer sous forme de réponse JSON.
-    """
-    csrf_token = get_token(request)
-    return JsonResponse({"csrfToken": csrf_token})
+    return JsonResponse({'csrfToken': get_token(request)})
 
 def is_user_active(request, uidb64, token):
     print("je passe")

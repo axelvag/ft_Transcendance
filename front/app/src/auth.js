@@ -71,6 +71,22 @@ const logout = async () => {
   resetLocalUser();
 };
 
+// const fetchCsrfToken = async () => {
+//   await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/')
+//     .then(response => response.json())
+//     .then(data => {
+//         // Ici, vous pouvez soit stocker le token CSRF dans un variable JavaScript,
+//         // soit directement dans les cookies si ce n'est pas déjà fait.
+//         console.log('CSRF token fetched:', data.csrfToken);
+//         // Exemple de mise à jour de l'en-tête pour les futures requêtes AJAX :
+//         // $.ajaxSetup({
+//         //     headers: {'X-CSRFToken': data.csrfToken}
+//         // });
+//         return (data.csrfToken);
+//     })
+//     .catch(error => console.error('Error fetching CSRF token:', error));
+// };
+
 const getProfile = () => {
   return {
     id: user.id,
@@ -82,4 +98,4 @@ const getProfile = () => {
   };
 };
 
-export { user, isAuthenticated, getCSRFToken, logout, getProfile };
+export { user, isAuthenticated, getCSRFToken, logout, getProfile, fetchCsrfToken };

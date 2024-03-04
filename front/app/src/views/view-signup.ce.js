@@ -1,5 +1,6 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
+// import { fetchCsrfToken } from '@/auth.js';
 
 class ViewSigUp extends HTMLElement {
   constructor() {
@@ -149,23 +150,23 @@ class ViewSigUp extends HTMLElement {
     if (!verif) return;
 
     // Ajout : Récupération du CSRF Token
-    // let csrfToken;
-    // try {
-    //   const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
-    //     method: 'GET',
-    //     credentials: 'include', // Pour inclure les cookies dans la requête
-    //   });
-    //   if (!response.ok) {
-    //     throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
-    //   }
-    //   const data = await response.json();
-    //   csrfToken = data.csrfToken;
-    //   console.log(csrfToken);
-    // } catch (error) {
-    //   console.error('Erreur lors de la récupération du CSRF token:', error);
-    //   // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
-    //   return;
-    // }
+    let csrfToken;
+    try {
+      const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+        method: 'GET',
+        credentials: 'include', // Pour inclure les cookies dans la requête
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
+      }
+      const data = await response.json();
+      csrfToken = data.csrfToken;
+      console.log(csrfToken);
+    } catch (error) {
+      console.error('Erreur lors de la récupération du CSRF token:', error);
+      // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
+      return;
+    }
 
     const formData = {
       username: this.username.value,
@@ -178,8 +179,9 @@ class ViewSigUp extends HTMLElement {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'X-CSRFToken': csrfToken,
-        'X-CSRFToken': this.getCSRFToken(),
+        'X-CSRFToken': csrfToken,
+        // 'X-CSRFToken': this.getCSRFToken(),
+        // 'X-CSRFToken': fetchCsrfToken(),
       },
       credentials: 'include',
       body: JSON.stringify(formData),

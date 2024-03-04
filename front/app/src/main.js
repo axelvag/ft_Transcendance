@@ -20,5 +20,8 @@ import '@/router.js';
 // theme
 import { initTheme } from '@/theme.js';
 
+// import { fetchCsrfToken } from '@/auth.js';
+
 // init theme
+// fetchCsrfToken();
 initTheme();
