@@ -398,12 +398,13 @@ function updatePaddleLeftMove(data = {}) {
   } else if (data.hasOwnProperty('targetY')) {
     const targetY = data.targetY;
 
-    paddleLeft.stop();
     const currentY = paddleLeft.center().y;
-    paddleLeft.endCenter.y = targetY;
+    paddleLeft.stop();
     if (targetY > currentY + paddleHeight / 2) {
+      paddleLeft.endCenter.y = targetY;
       paddleLeft.endTime = paddleLeft.startTime + ((targetY - currentY) / paddleSpeed) * 1000;
     } else if (targetY < currentY - paddleHeight / 2) {
+      paddleLeft.endCenter.y = targetY;
       paddleLeft.endTime = paddleLeft.startTime + ((currentY - targetY) / paddleSpeed) * 1000;
     }
   }
