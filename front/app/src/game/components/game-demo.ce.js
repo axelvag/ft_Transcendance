@@ -1,12 +1,7 @@
+import './game-demo.ce.scss';
 import './game-renderer-3d.ce.js';
 import GameWorker from '../localApi/GameWorker.js?worker';
 import calculateNextAiPosition from '../localApi/calculateNextAiPosition.js';
-
-const template = `
-<div class="gameDemo" hidden>
-  <game-renderer-3d class="gameDemo-renderer"></game-renderer-3d>
-</div>
-`;
 
 class GameDemo extends HTMLElement {
   #gameState = null;
@@ -24,7 +19,11 @@ class GameDemo extends HTMLElement {
   }
 
   connectedCallback() {
-    this.innerHTML = template;
+    this.innerHTML = `
+      <div class="gameDemo">
+        <game-renderer-3d demo class="gameDemo-renderer"></game-renderer-3d>
+      </div>
+    `;
 
     // Players
     this.#playerLeft = {
@@ -79,7 +78,6 @@ class GameDemo extends HTMLElement {
     };
     this.rendererEl.init(this.#gameState);
     this.rendererEl.start();
-    this.querySelector('.gameDemo').hidden = false;
 
     this.gameWorker.postMessage({ type: 'start' });
 

@@ -7,6 +7,7 @@ class GameRenderer3D extends HTMLElement {
   #gameState = null;
   #animationId = null;
   #theme;
+  #isDemo;
 
   #ball;
   #paddleLeft;
@@ -29,6 +30,7 @@ class GameRenderer3D extends HTMLElement {
 
   connectedCallback() {
     this.#theme = getAppliedTheme();
+    this.#isDemo = this.hasAttribute('demo');
   }
 
   disconnectedCallback() {
@@ -96,9 +98,12 @@ class GameRenderer3D extends HTMLElement {
 
     // set CSS
     this.style.display = 'block';
-    this.style.aspectRatio = `${gameState.width} / ${gameState.height}`;
-    this.style.position = 'relative';
     this.style.overflow = 'hidden';
+    if (this.#isDemo) {
+      this.style.aspectRatio = 2;
+    } else {
+      this.style.aspectRatio = `${gameState.width} / ${gameState.height}`;
+    }
 
     // get CSS variables
     const style = getComputedStyle(this);
@@ -111,13 +116,39 @@ class GameRenderer3D extends HTMLElement {
     this.#csgEvaluator = new CSG.Evaluator();
 
     // camera
-    this.#camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 10000);
-    this.#camera.position.set(0, 0, 1000);
-    this.#camera.lookAt(0, 0, 0);
+    if (this.#isDemo) {
+      this.#camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 0.1, 10000);
+      this.#camera.position.set(0, -1500, 600);
+      this.#camera.lookAt(0, -this.#gameState.height * 0.75, 0);
+    } else {
+      this.#camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 10000);
+      this.#camera.position.set(0, 0, 1000);
+      this.#camera.lookAt(0, 0, 0);
+    }
 
-    const light = new THREE.PointLight(0xffffff, 1000000);
+    const light = new THREE.PointLight(0xffffff, 500000);
     light.position.set(0, 0, 700);
     this.#scene.add(light);
+
+    const light2 = new THREE.PointLight(0xffffff, 500000);
+    light2.position.set(-500, 0, 700);
+    this.#scene.add(light2);
+
+    const light3 = new THREE.PointLight(0xffffff, 500000);
+    light3.position.set(500, 0, 700);
+    this.#scene.add(light3);
+
+    const bottomLight = new THREE.PointLight(0xffffff, 100000);
+    bottomLight.position.set(0, 0, -500);
+    this.#scene.add(bottomLight);
+
+    const bottomLight2 = new THREE.PointLight(0xffffff, 500000);
+    bottomLight2.position.set(0, -700, 200);
+    this.#scene.add(bottomLight2);
+
+    const bottomLight3 = new THREE.PointLight(0xffffff, 500000);
+    bottomLight3.position.set(0, 700, 200);
+    this.#scene.add(bottomLight3);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.#scene.add(ambientLight);
@@ -129,8 +160,14 @@ class GameRenderer3D extends HTMLElement {
 
     // table
     const tableMaterial = new THREE.MeshStandardMaterial({ color: cssvar('--bs-body-bg') });
-    // this.#table = this.#getTableMesh(tableMaterial);
-    this.#table = new THREE.Mesh(new THREE.PlaneGeometry(this.#gameState.width, this.#gameState.height), tableMaterial);
+    if (this.#isDemo) {
+      this.#table = this.#getTableMesh(tableMaterial);
+    } else {
+      this.#table = new THREE.Mesh(
+        new THREE.PlaneGeometry(this.#gameState.width, this.#gameState.height),
+        tableMaterial
+      );
+    }
     this.#scene.add(this.#table);
 
     // walls
@@ -172,12 +209,15 @@ class GameRenderer3D extends HTMLElement {
     this.#scene.add(this.#paddleRight);
 
     // clipping planes
-    this.#renderer.clippingPlanes = [
-      new THREE.Plane(new THREE.Vector3(1, 0, 0), this.#gameState.width / 2),
-      new THREE.Plane(new THREE.Vector3(-1, 0, 0), this.#gameState.width / 2),
-      new THREE.Plane(new THREE.Vector3(0, 1, 0), this.#gameState.height / 2),
-      new THREE.Plane(new THREE.Vector3(0, -1, 0), this.#gameState.height / 2),
-    ];
+    if (!this.#isDemo) {
+      this.#renderer.clippingPlanes = [
+        new THREE.Plane(new THREE.Vector3(1, 0, 0), this.#gameState.width / 2 + 0.1),
+        new THREE.Plane(new THREE.Vector3(-1, 0, 0), this.#gameState.width / 2 + 0.1),
+        new THREE.Plane(new THREE.Vector3(0, 1, 0), this.#gameState.height / 2 + 0.1),
+        new THREE.Plane(new THREE.Vector3(0, -1, 0), this.#gameState.height / 2 + 0.1),
+        new THREE.Plane(new THREE.Vector3(0, 0, 1), 0.1),
+      ];
+    }
 
     this.#isReady = true;
   }
@@ -192,10 +232,9 @@ class GameRenderer3D extends HTMLElement {
 
   render() {
     if (!this.#isReady) return;
+    this.#renderer.setSize(this.clientWidth, this.clientHeight);
 
-    const rect = this.getBoundingClientRect();
-    this.#renderer.setSize(rect.width, rect.height);
-    this.#camera.aspect = rect.width / rect.height;
+    this.#camera.aspect = this.clientWidth / this.clientHeight;
     this.#camera.updateProjectionMatrix();
 
     // ball
