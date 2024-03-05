@@ -129,13 +129,6 @@ def register_user(request):
         print("yoo")
         return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
 
-# def get_csrf_token(request):
-#     """
-#     Vue pour obtenir le jeton CSRF et le renvoyer sous forme de réponse JSON.
-#     """
-#     csrf_token = get_token(request)
-#     return JsonResponse({"csrfToken": csrf_token})
-
 def get_csrf_token(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
@@ -176,37 +169,6 @@ def resend_email_confirmation(request, uidb64):
         return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm and complete the registration. Note: Check your spam folder.'}, status=200)
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
-
-# def password_reset(request):
-#     User = get_user_model()
-#     if request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             email = data.get('email')
-#             if not email:
-#                 return JsonResponse({'error': 'Adresse e-mail manquante.'}, status=400)
-#             user = User.objects.get(email=email)
-#             if user is not None:
-#                 to_email = user.email
-#                 mail_subject = "Réinitialisation de votre mot de passe sur Transcendence"
-#                 message = render_to_string("template_forget_pass.html", {
-#                     'user': user.username,
-#                     'domain': get_current_site(request).domain,
-#                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-#                     'token': account_activation_token.make_token(user),
-#                     "protocol": 'https' if request.is_secure() else 'http'
-#                 })
-#                 email = EmailMessage(mail_subject, message, to=[to_email])
-#                 if email.send():
-#                     return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm the renitialisation of your password.'}, status=200)
-#                 else:
-#                     return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
-#             else:
-#                 return JsonResponse({'error': 'Aucun utilisateur trouvé avec cette adresse e-mail.'}, status=404)
-#         except json.JSONDecodeError:
-#             return JsonResponse({'error': 'Données invalides.'}, status=400)
-#     else:
-#         return JsonResponse({'error': 'Méthode de requête non autorisée.'}, status=405)
 
 def password_reset(request):
     User = get_user_model()
@@ -332,29 +294,3 @@ def is_user_logged_in(request):
         return JsonResponse({"success": True, "message": "User is login.", "username": request.user.username, "email": request.user.email, "id": request.user.id}, status=200)
     else:
         return JsonResponse({"success": False, "message": "User is not login."}, status=400)
-
-# @csrf_exempt
-# @require_http_methods(["POST"])  # Accepte uniquement les requêtes POST
-# def update_user(request):
-#     try:
-#         # Assurez-vous que le corps de la requête est au format JSON
-#         data = json.loads(request.body)
-#         username = data.get('username')
-#         email = data.get('email')
-#         user_id = data.get('id')  # Identifiant de l'utilisateur à mettre à jour
-
-#         # Recherche de l'utilisateur par son ID
-#         user = User.objects.get(pk=user_id)
-        
-#         # Mise à jour de l'utilisateur
-#         if username:
-#             user.username = username
-#         if email:
-#             user.email = email
-#         user.save()
-
-#         return JsonResponse({"success": True, "message": "Utilisateur mis à jour avec succès."})
-#     except ObjectDoesNotExist:
-#         return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
-#     except Exception as e:
-#         return JsonResponse({"success": False, "message": str(e)}, status=500)
