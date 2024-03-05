@@ -40,7 +40,7 @@ class ViewDash extends HTMLElement {
       <!-- RANK -->
 
       <div class="d-flex justify-content-end mt-3">
-        <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg ml-auto mt-5" style="--bs-btn-color: var(--bs-body-color); font-size: 2rem;" href="#" data-link="/game">
+        <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg ml-auto mt-5" style="--bs-btn-color: var(--bs-body-color); font-size: 2rem;" href="#" data-link="/rank">
           <span class="d-inline-block py-1">
             <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
             RANK
@@ -48,45 +48,12 @@ class ViewDash extends HTMLElement {
         </a>
       </div>
         
-      <div id="supp">
-        <a href="#" id="delete-account-link">
-          <h3> supprimer le compte</h3>
-        </a>
-      </div>
+
     </default-layout-main>
     `;
-    this.querySelector('#delete-account-link').addEventListener('click', event => {
-      event.preventDefault();
-      this.suppUser();
-    });
   }
 
-  suppUser() {
-    const url = `http://127.0.0.1:8001/accounts/delete_user/${user.username}`;
-    fetch(url, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': this.getCSRFToken(),
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          user.isAuthenticated = false;
-          redirectTo('/');
-        }
-      })
-      .catch(error => console.error('Error:', error));
-  }
-  getCSRFToken() {
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith('csrftoken='))
-      .split('=')[1];
-  }
+  
 }
 
 customElements.define('view-dash', ViewDash);
