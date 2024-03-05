@@ -136,4 +136,17 @@ const passwordReset = async (formData, csrfToken) => {
   return response.json();
 }
 
-export { user, isAuthenticated, getCSRFToken, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset };
+const sendEmailPasswordReset = async (formData, csrfToken, url) => {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
+  });
+  return response.json();
+}
+
+export { user, isAuthenticated, getCSRFToken, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset };

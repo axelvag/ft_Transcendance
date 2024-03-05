@@ -1,6 +1,7 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { getCsrfToken } from '@/auth.js';
+import { sendEmailPasswordReset } from '@/auth.js';
 
 class ViewNewPass extends HTMLElement {
   async connectedCallback() {
@@ -94,17 +95,17 @@ class ViewNewPass extends HTMLElement {
     };
 
     console.log(JSON.stringify(formData));
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    });
+    // const response = await fetch(url, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'X-CSRFToken': csrfToken,
+    //   },
+    //   credentials: 'include',
+    //   body: JSON.stringify(formData),
+    // });
 
-    const data = await response.json();
+    const data = await sendEmailPasswordReset(formData, csrfToken, url);
     console.log(data);
     if (data.success) {
       redirectTo('/login');
