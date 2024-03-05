@@ -16,50 +16,70 @@ class ViewRank extends HTMLElement {
         <table class="table table-striped table-dark">
           <thead>
             <tr>
-              <th scope="col">#</th>
+              <th scope="col">Rank</th>
               <th scope="col">Avatar</th>
               <th scope="col">Name</th>
               <th scope="col">Victories</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td><img src="https://www.exobaston.com/wp-content/uploads/2023/01/Meta-Knight-personnage-SSBU-1.jpg" width="30" height="30" alt="character"></td>
-              <td>Davfront</td>
-              <td>115151531</td>
-            </tr>
+
+            <!-- ma boucle de génération de lignes de tableau -->
+            <tbody id="table-body">
+
+            <!-- Exemple -->
             <tr>
               <th scope="row">2</th>
-              <td><img src="https://pbs.twimg.com/media/E3-FSn5XwAMwOYR.jpg" width="30" height="30" alt="character"></td>
-              <td>Axel</td>
-              <td>46</td>
+              <td><img src="https://www.exobaston.com/wp-content/uploads/2023/01/Meta-Knight-personnage-SSBU-1.jpg" width="30" height="30" alt="character"></td>
+              <td>Davfront</td>
+              <td>115151531145351</td>
             </tr>
             <tr>
               <th scope="row">3</th>
-              <td><img src="https://cdn.gamekult.com/images/gallery/34/342893/the-legend-of-zelda-link-s-awakening-switch-4e108cad.jpg" width="30" height="30" alt="character"></td>
-              <td>Lucas</td>
-              <td>30</td>
+              <td><img src="https://pbs.twimg.com/media/E3-FSn5XwAMwOYR.jpg" width="30" height="30" alt="character"></td>
+              <td>Axel</td>
+              <td>46156</td>
             </tr>
             <tr>
               <th scope="row">4</th>
-              <td><img src="https://i.pinimg.com/736x/c9/d3/b1/c9d3b164c7d010b4ed2c516e30d5c607.jpg" width="30" height="30" alt="character"></td>
-              <td>Alessio</td>
-              <td>12</td>
+              <td><img src="https://cdn.gamekult.com/images/gallery/34/342893/the-legend-of-zelda-link-s-awakening-switch-4e108cad.jpg" width="30" height="30" alt="character"></td>
+              <td>Lucas</td>
+              <td>3021</td>
             </tr>
             <tr>
               <th scope="row">5</th>
+              <td><img src="https://i.pinimg.com/736x/c9/d3/b1/c9d3b164c7d010b4ed2c516e30d5c607.jpg" width="30" height="30" alt="character"></td>
+              <td>Alessio</td>
+              <td>1254</td>
+            </tr>
+            <tr>
+              <th scope="row">6</th>
               <td><img src="https://preview.redd.it/should-heihachi-mishima-ever-return-as-a-hidden-character-v0-dc586neuiawa1.jpg?width=640&crop=smart&auto=webp&s=be83f31083bcc91c73f20ae6bbd83a0c277e6502" width="30" height="30" alt="character"></td>
               <td>the Bird</td>
-              <td>3</td>
+              <td>399</td>
             </tr>
+
           </tbody>
         </table>
 
       </default-layout-main>
     `;
-  }
 
+    // Récupérer la référence du tbody
+    const tbody = document.getElementById('table-body');
+
+    // Boucle pour générer les lignes de la table
+    for (let i = 0; i < user.nbtotal; i++) {
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <th scope="row">${i + 1}</th>
+          <td><img src="https://i.pravatar.cc/300?u=6${user.id}" width="30" height="30" alt="character"></td>
+          <td>${user.username}</td>
+          <td>${user.victories}</td>
+        </tr>
+      `);
+      }
+  }
   
 }
 customElements.define('view-rank', ViewRank);

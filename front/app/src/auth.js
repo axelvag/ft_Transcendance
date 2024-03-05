@@ -5,6 +5,11 @@ const user = {
   id: null,
   username: null,
   email: null,
+  victories: null,
+  lost: null,
+  online: null,
+  local: null,
+  nbtotal: null,
 };
 
 const setLocalUser = data => {
@@ -12,6 +17,11 @@ const setLocalUser = data => {
   user.id = data.id;
   user.email = data.email;
   user.username = data.username;
+  user.victories = 183;
+  user.lost = 13;
+  user.online = 160;
+  user.local = 27;
+  user.nbtotal = 1;
 };
 
 const resetLocalUser = () => {
@@ -19,6 +29,11 @@ const resetLocalUser = () => {
   user.id = null;
   user.email = null;
   user.username = null;
+  user.victories = null;
+  user.lost = null;
+  user.online = null;
+  user.local = null;
+  user.nbtotal = null;
 };
 
 const isAuthenticated = async () => {
