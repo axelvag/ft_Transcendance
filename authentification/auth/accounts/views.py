@@ -321,4 +321,4 @@ def update_profile(request):
     user.save()
     
     logging.critical("blablabla")
-    return JsonResponse({"success": True, "message": "Informations utilisateur mises à jour avec succès."})
+    return JsonResponse({"success": True, "message": "Informations utilisateur mises à jour avec succès.", "username": user.username, "email": user.email})

@@ -5,6 +5,9 @@ const user = {
   id: null,
   username: null,
   email: null,
+  avatar: null,
+  firstname: null,
+  lastname: null,
 };
 
 const isAuthenticated = () => {

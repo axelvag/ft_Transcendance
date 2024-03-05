@@ -10,11 +10,11 @@ const fake_getUser = async () => {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve({
-        username: 'Philou',
-        firstname: 'Philippe',
-        lastname: 'Martin',
-        email: 'philippe.martin@gmail.com',
-        avatar: 'https://i.pravatar.cc/128?img=7',
+        username: user.username,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        avatar: user.avatar,
       });
     }, 1000);
   });
@@ -49,6 +49,11 @@ const saveUser = async (newUser) => {
     }
 
     const data = await response.json();
+    console.log("data", data);
+    console.log(data.avatar);
+    user.firstname = data.firstname;
+    user.lastname = data.lastname;
+    user.avatar = data.avatar;
     return data; // Renvoie les données de réponse pour un traitement ultérieur
   } catch (error) {
     console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
@@ -133,6 +138,8 @@ const editProfileTemplate = user => `
         <label class="form-label" for="firstname">Profile picture</label>
         <div>
           <img src="${user.avatar}" class="img-thumbnail" width="128" height="128" alt="${user.username}">
+          <input type="file" id="avatarFile" name="avatar" accept="image/*">
+
         </div>
       </div>
       <div class="row">
@@ -237,10 +244,49 @@ class ViewProfil extends HTMLElement {
       e.preventDefault();
       this.#saveProfile();
     });
+
+    const avatarInput = this.querySelector('#avatarFile');
+  avatarInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const avatarImage = this.querySelector('img');
+      avatarImage.src = URL.createObjectURL(file);
+    }
+  });
   }
 
   #resetProfile() {
     this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
+  }
+
+  async saveAvatar(avatarFile) {
+    const formData = new FormData();
+    formData.append('avatar', avatarFile);
+    formData.append('id', user.id); // Assurez-vous que l'ID de l'utilisateur est correctement défini.
+
+    console.log(formData);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8002/save_avatar/', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Échec de la mise à jour de l'avatar avec le statut ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        this.#user.avatar = data.avatar; // Mettez à jour l'URL de l'avatar si nécessaire.
+      } else {
+        throw new Error('Échec de la mise à jour de l\'avatar');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de l\'avatar:', error);
+      throw error;
+    }
   }
 
   async #saveProfile() {
@@ -254,6 +300,18 @@ class ViewProfil extends HTMLElement {
         avatar: this.#user.avatar,
         id: user.id,
       };
+      const avatarFile = profileEditForm.querySelector('#avatarFile').files[0];
+      if (avatarFile) {
+      // Créez une URL pour l'objet fichier
+      const avatarURL = URL.createObjectURL(avatarFile);
+      
+      // Mettez à jour la source de l'image dans le formulaire d'édition de profil
+      const avatarImage = profileEditForm.querySelector('img');
+      avatarImage.src = avatarURL;
+
+      // Continuez avec l'envoi du fichier à votre backend
+      await this.saveAvatar(avatarFile);
+      }
       try {
         this.querySelector('#profile-edit-loader').hidden = false;
         this.querySelector('#profile-edit').classList.add('opacity-25');
