@@ -1,4 +1,4 @@
-import './game-renderer-2d.ce.js';
+import './game-renderer-3d.ce.js';
 import './game-player.ce.js';
 import './game-scoreboard.ce.js';
 import './game-dialog.ce.js';
@@ -26,7 +26,7 @@ const template = `
       </div>
       </div>
       <div class="gamePlay-body-center">
-        <game-renderer-2d class="gamePlay-renderer"></game-renderer-2d>
+        <game-renderer-3d class="gamePlay-renderer"></game-renderer-3d>
       </div>
       <div class="gamePlay-body-right">
         <div class="gamePlay-touchBtn is-playerRight is-up">
@@ -167,6 +167,9 @@ class GamePlay extends HTMLElement {
   }
 
   disconnectedCallback() {
+    // stop renderer
+    this.rendererEl.stop();
+
     // remove events
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);

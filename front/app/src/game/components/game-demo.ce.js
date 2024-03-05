@@ -1,10 +1,10 @@
-import './game-renderer-2d.ce.js';
+import './game-renderer-3d.ce.js';
 import GameWorker from '../localApi/GameWorker.js?worker';
 import calculateNextAiPosition from '../localApi/calculateNextAiPosition.js';
 
 const template = `
 <div class="gameDemo" hidden>
-  <game-renderer-2d class="gameDemo-renderer"></game-renderer-2d>
+  <game-renderer-3d class="gameDemo-renderer"></game-renderer-3d>
 </div>
 `;
 
@@ -57,6 +57,10 @@ class GameDemo extends HTMLElement {
   }
 
   disconnectedCallback() {
+    // stop renderer
+    this.rendererEl.stop();
+
+    // stop game
     this.gameWorker.postMessage({ type: 'reset' });
     this.gameWorker.terminate();
 
