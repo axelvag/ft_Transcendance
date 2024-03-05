@@ -22,7 +22,7 @@ class ViewCareers extends HTMLElement {
           </div>
           <div class="col-md-6 mt-5">
             <h1 class="display-5 fw-bold mb-4 text-center text-lg irish-grover extra-large" style="margin-left: -250px;">
-              ${user.id} / 4
+              ${user.id} / ${user.nbtotal}
             </h1>
           </div>
         </div>
@@ -57,7 +57,7 @@ class ViewCareers extends HTMLElement {
             <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_victories" style="width: 50px; height: 50px; margin-right: 10px;">
-                &nbsp;183&nbsp;&nbsp;
+                &nbsp;${user.victories}&nbsp;&nbsp;
               </span>
             </div>
           </div>
@@ -70,7 +70,7 @@ class ViewCareers extends HTMLElement {
             <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://purplex.ca/wp-content/uploads/2023/03/purple-x-sigle.png" alt="logo_lost" style="width: 50px; height: 50px; margin-right: 10px;">
-                &nbsp;13&nbsp;&nbsp;
+                &nbsp;${user.lost}&nbsp;&nbsp;
               </span>
             </div>
           </div>
@@ -88,7 +88,7 @@ class ViewCareers extends HTMLElement {
             <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://cdn-icons-png.flaticon.com/512/4562/4562970.png" alt="logo_online" style="width: 50px; height: 50px; margin-right: 10px;">
-                &nbsp;160&nbsp;&nbsp;
+                &nbsp;${user.online}&nbsp;&nbsp;
               </span>
             </div>
           </div>
@@ -101,7 +101,7 @@ class ViewCareers extends HTMLElement {
             <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
               <span class="d-inline-block py-1">
                 <img src="https://static.vecteezy.com/system/resources/previews/023/561/259/non_2x/purple-and-white-keyboard-icon-in-3d-render-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
-                &nbsp;27&nbsp;&nbsp;
+                &nbsp;${user.local}&nbsp;&nbsp;
               </span>
             </div>
           </div>
@@ -122,7 +122,7 @@ class ViewCareers extends HTMLElement {
           <div class="btn border border-white rounded-pill btn-lg" style="font-size: 2rem; pointer-events: none;">
             <span class="d-inline-block py-1">
               <img src="https://static.vecteezy.com/system/resources/previews/022/541/253/non_2x/3d-render-purple-pastel-color-alarm-clock-3d-circle-clock-icon-png.png" alt="logo_local" style="width: 50px; height: 50px; margin-right: 10px;">
-              &nbsp;130H&nbsp;&nbsp;
+              &nbsp;${user.timeplay}H&nbsp;&nbsp;
             </span>
           </div>
         </div>

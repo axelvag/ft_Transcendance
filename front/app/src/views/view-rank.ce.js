@@ -29,31 +29,31 @@ class ViewRank extends HTMLElement {
 
             <!-- Exemple -->
             <tr>
-              <th scope="row">2</th>
+              <th scope="row">1</th>
               <td><img src="https://www.exobaston.com/wp-content/uploads/2023/01/Meta-Knight-personnage-SSBU-1.jpg" width="30" height="30" alt="character"></td>
               <td>Davfront</td>
               <td>115151531145351</td>
             </tr>
             <tr>
-              <th scope="row">3</th>
+              <th scope="row">2</th>
               <td><img src="https://pbs.twimg.com/media/E3-FSn5XwAMwOYR.jpg" width="30" height="30" alt="character"></td>
               <td>Axel</td>
               <td>46156</td>
             </tr>
             <tr>
-              <th scope="row">4</th>
+              <th scope="row">3</th>
               <td><img src="https://cdn.gamekult.com/images/gallery/34/342893/the-legend-of-zelda-link-s-awakening-switch-4e108cad.jpg" width="30" height="30" alt="character"></td>
               <td>Lucas</td>
               <td>3021</td>
             </tr>
             <tr>
-              <th scope="row">5</th>
+              <th scope="row">4</th>
               <td><img src="https://i.pinimg.com/736x/c9/d3/b1/c9d3b164c7d010b4ed2c516e30d5c607.jpg" width="30" height="30" alt="character"></td>
               <td>Alessio</td>
               <td>1254</td>
             </tr>
             <tr>
-              <th scope="row">6</th>
+              <th scope="row">5</th>
               <td><img src="https://preview.redd.it/should-heihachi-mishima-ever-return-as-a-hidden-character-v0-dc586neuiawa1.jpg?width=640&crop=smart&auto=webp&s=be83f31083bcc91c73f20ae6bbd83a0c277e6502" width="30" height="30" alt="character"></td>
               <td>the Bird</td>
               <td>399</td>

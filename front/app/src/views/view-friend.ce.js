@@ -21,7 +21,7 @@ class ViewFriend extends HTMLElement {
             </div>
             <div class="col-md-6">
               <h1 class="display-4 mb-3 mt-5 fw-bold">${user.username}</h1>
-              <h4 class="text-bicolor">0 Friends</h4>
+              <h4 class="text-bicolor">${user.friends} Friends</h4>
             </div>
           </div>
         </div>

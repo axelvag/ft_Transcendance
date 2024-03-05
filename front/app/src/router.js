@@ -106,6 +106,7 @@ const routes = {
   '/rank': {
     title: 'Rank',
     template: '<view-rank></view-rank>',
+    beforeEnter: isLoggedInGuard,
   },
 };
 
