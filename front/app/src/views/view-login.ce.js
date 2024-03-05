@@ -2,6 +2,7 @@ import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
 import { getCsrfToken } from '@/auth.js';
+import { loginUser } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -69,18 +70,6 @@ class ViewSignIn extends HTMLElement {
     this.emailError = this.querySelector('#email-error');
   }
 
-  // async getCsrfToken() {
-  //   const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
-  //     method: 'GET',
-  //     credentials: 'include',
-  //   });
-  //   if (response.ok) {
-  //     const data = await response.json();
-  //     return data.csrfToken;
-  //   }
-  //   throw new Error('Could not retrieve CSRF token');
-  // }
-
   async submitForm(event) {
     event.preventDefault();
 
@@ -96,33 +85,25 @@ class ViewSignIn extends HTMLElement {
     };
 
     const csrfToken = await getCsrfToken();
-
-    console.log(JSON.stringify(formData));
-    const response = await fetch('http://127.0.0.1:8001/accounts/login/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    });
-
-    const data = await response.json();
-    console.log('error', data);
-    if (data.success) {
-      console.log('Sucess!');
-      localStorage.setItem('isLogged', 'true');
-      user.isAuthenticated = true;
-      user.id = data.id;
-      user.email = data.email;
-      user.username = data.username;
-      redirectTo('/dashboard');
-    } else {
-      if (data.message === 'User not active.') this.emailError.style.display = 'block';
-      else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
+    try {
+      const data = await loginUser(formData, csrfToken); // Utilisez la nouvelle fonction pour la requête
+      console.log('error', data);
+      if (data.success) {
+          console.log('Sucess!');
+          localStorage.setItem('isLogged', 'true');
+          user.isAuthenticated = true;
+          user.id = data.id;
+          user.email = data.email;
+          user.username = data.username;
+          redirectTo('/dashboard'); // Assurez-vous que redirectTo est correctement importé
+      }  else {
+          if (data.message === 'User not active.') this.emailError.style.display = 'block';
+          else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Login failed:', error);
     }
-  }
+  }  
 }
 
 customElements.define('view-signin', ViewSignIn);

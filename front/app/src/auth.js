@@ -97,4 +97,43 @@ const getProfile = () => {
   };
 };
 
-export { user, isAuthenticated, getCSRFToken, logout, getProfile, getCsrfToken };
+const loginUser = async (formData, csrfToken) => {
+  const response = await fetch('http://127.0.0.1:8001/accounts/login/', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+  });
+  return response.json(); // Retourne la promesse résolue avec les données JSON
+}
+
+const sendSignUpRequest = async (formData, csrfToken) => {
+  const response = await fetch('http://127.0.0.1:8001/accounts/register/', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+  });
+  return response.json(); // Retourne la promesse résolue avec les données JSON
+}
+
+const passwordReset = async (formData, csrfToken) => {
+  const response = await fetch('http://127.0.0.1:8001/accounts/password_reset/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
+  return response.json();
+}
+
+export { user, isAuthenticated, getCSRFToken, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset };
