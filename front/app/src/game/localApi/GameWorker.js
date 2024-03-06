@@ -5,14 +5,23 @@ import PausableTimeout from './PausableTimeout.js';
 let width = 800;
 let height = 600;
 let wallThickness = 10;
+let wallDepth = 30;
 let ballSize = 20;
 let ballSpeedOnStart = 300;
 let ballAcceleration = 1.05;
 let ballSpeedMax = 500;
 let paddleHeight = 100;
 let paddleWidth = 20;
+let paddleDepth = 20;
 let paddlePadding = 30;
 let paddleSpeed = 300;
+
+let tableWidth = 1200;
+let tableHeight = 650;
+let tableDepth = 510;
+let tableLegsSize = 340;
+let tableBoardHoleDepth = 30;
+
 let scoreMax = 5;
 let startRoundDelay = 500;
 let endRoundDelay = 500;
@@ -46,6 +55,7 @@ function getState() {
     width,
     height,
     wallThickness,
+    wallDepth,
     ballSize,
     ballSpeedOnStart,
     ballAcceleration,
@@ -54,9 +64,15 @@ function getState() {
     ballXOnPaddleCollision,
     paddleHeight,
     paddleWidth,
+    paddleDepth,
     paddlePadding,
     paddleSpeed,
     paddleMaxCenterY,
+    tableWidth,
+    tableHeight,
+    tableDepth,
+    tableLegsSize,
+    tableBoardHoleDepth,
     scoreMax,
     innerWidth,
     innerHeight,
