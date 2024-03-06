@@ -5,13 +5,13 @@ const user = {
   id: null,
   username: null,
   email: null,
-  victories: null,
-  lost: null,
-  online: null,
-  local: null,
-  timeplay: null,
-  nbtotal: null,
-  friends: null,
+  victories: 0,
+  lost: 0,
+  online: 0,
+  local: 0,
+  timeplay: 0,
+  nbtotal: 0,
+  friends: 0,
 };
 
 const setLocalUser = data => {
@@ -34,13 +34,13 @@ const resetLocalUser = () => {
   user.id = null;
   user.email = null;
   user.username = null;
-  user.victories = null;
-  user.lost = null;
-  user.online = null;
-  user.local = null;
-  user.timeplay = null;
-  user.nbtotal = null;
-  user.friends = null;
+  user.victories = 0;
+  user.lost = 0;
+  user.online = 0;
+  user.local = 0;
+  user.timeplay = 0;
+  user.nbtotal = 0;
+  user.friends = 0;
 };
 
 const isAuthenticated = async () => {
