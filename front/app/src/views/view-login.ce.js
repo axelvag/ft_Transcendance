@@ -1,11 +1,11 @@
-import { user } from '@/auth.js';
-import '@/components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
+import { user } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <login-layout>
+      <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
           <span class="text-bicolor">Log In</span>
         </h1>
@@ -14,7 +14,14 @@ class ViewSignIn extends HTMLElement {
             <label class="form-label" for="username">
               Username
             </label>
-            <input class="form-control form-control-lg" type="username" id="username" name="username" required />
+            <input
+              class="form-control form-control-lg"
+              type="username"
+              id="username"
+              name="username"
+              required
+              autocomplete="username"
+            />
           </div>
           <div class="mb-4">
             <div class="d-flex justify-content-between">
@@ -25,7 +32,14 @@ class ViewSignIn extends HTMLElement {
                 Forgot password?
               </a>
             </div>
-            <input class="form-control form-control-lg" type="password" id="password" name="password" required />
+            <input
+              class="form-control form-control-lg"
+              type="password"
+              id="password"
+              name="password"
+              required
+              autocomplete="current-password"
+            />
             <div id="password-error" class="alert alert-danger mt-4" style="display: none;">Identifiants ou mot de passe incorrects.</div>
             <div id="email-error" class="alert alert-danger mt-4" style="display: none;">Verifier vos emails.</div>
           </div>
@@ -40,7 +54,7 @@ class ViewSignIn extends HTMLElement {
             </div>
           </div>
         </form>
-      </login-layout>
+      </auth-layout>
     `;
 
     // this.querySelector('a[data-link="/forget-pass"]').addEventListener('click', (event) => {

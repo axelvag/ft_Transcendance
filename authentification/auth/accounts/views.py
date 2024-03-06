@@ -22,6 +22,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import logging
 
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.decorators import method_decorator
 # Create your views here.
 User = get_user_model()
 

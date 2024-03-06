@@ -10,9 +10,6 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 // router
 import './router.js';
 
-import { verifyUserLoginMain } from './auth.js';
-
-verifyUserLoginMain();
 // ui components
 import '@/components/icons/ui-icon.ce.js';
 import '@/components/ui-loader.ce.js';

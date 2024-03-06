@@ -1,0 +1,43 @@
+.gameScoreboard {
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5em 0 1.25em;
+
+  &-scores {
+    display: flex;
+    align-items: center;
+  }
+
+  &-score {
+    flex: 0 0 auto;
+    font-size: 3em;
+    line-height: 1;
+    padding: 0.1em 0 0.15em;
+    min-width: 1.75em;
+  }
+
+  &-score-separator {
+    flex: 0 0 auto;
+    font-size: 2em;
+    line-height: 1;
+    margin-top: -0.1em;
+    padding: 0 0.375em;
+  }
+
+  &-hr {
+    height: 0.125em;
+    width: 20em;
+    background: linear-gradient(
+      to right,
+      rgba($primary, 0),
+      rgba(mix($primary, $secondary, 75%), 0.5),
+      rgba(mix($primary, $secondary, 50%), 1),
+      rgba(mix($primary, $secondary, 25%), 0.5),
+      rgba($secondary, 0)
+    );
+    margin: 0.25em 0;
+  }
+}

@@ -1,0 +1,7 @@
+html:fullscreen .fullscreen-hidden {
+  display: none !important;
+}
+
+html:not(:fullscreen) .fullscreen-visible {
+  display: none !important;
+}

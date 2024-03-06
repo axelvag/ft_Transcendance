@@ -1,10 +1,10 @@
-import '@/components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 
 class ViewNewPass extends HTMLElement {
   async connectedCallback() {
     this.innerHTML = `
-      <login-layout>
+      <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
           <span class="text-bicolor">New password</span>
         </h1>
@@ -35,7 +35,7 @@ class ViewNewPass extends HTMLElement {
           <p id="email-confirm-error-msg">Something didn't work!</p>
           <button class="btn btn-primary">Renvoyer un Email</button>
         </div>
-      </login-layout>
+      </auth-layout>
     `;
 
     console.log(document.location.href);

@@ -1,5 +1,6 @@
 import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
+import '@/game/components/game-demo.ce.js';
 
 class ViewWelcome extends HTMLElement {
   connectedCallback() {
@@ -50,21 +51,30 @@ class ViewWelcome extends HTMLElement {
         </div>
       </nav>
 
-      <section class="min-vh-100 d-flex align-items-center pt-5 halo-bicolor">
-        <div class="container text-center">
-          <h1 class="display-2 fw-bold mb-4">
+      <section class="min-vh-100 d-flex flex-column pt-5 halo-bicolor">
+        <div class="my-auto"></div>
+        <div class="my-auto"></div>
+        <div class="container text-center py-4">
+          <h1 class="display-4 fw-bold mb-4">
             Ultimate <span class="text-bicolor">Pong</span> Game 
           </h1>
-          <p class="fs-3 fw-semibold mb-4">
+          <p class="fs-4 fw-semibold mb-4">
             Engage in the classic battle with friends or solo, online and offline.
           </p>
-          <p class="py-3">
+          <p class="pt-3">
             <a class="btn btn-primary px-sm-5 py-sm-3 fw-bold" href="#" data-link="/game">
               Play now
             </a>
           </p>
         </div>
+        <div class="my-auto"></div>
+        <div>
+
+        <div class="d-flex justify-content-center">
+          <game-demo class="w-100" style="max-width: 50rem;"></game-demo>
+        </div>
       </section>
+      
     `;
 
     this.querySelector('.theme-toggle')?.addEventListener('click', e => {

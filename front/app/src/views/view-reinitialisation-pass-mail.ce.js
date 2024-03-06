@@ -1,9 +1,9 @@
-import '@/components/layouts/auth-layout.ce.js';
+import '@/components/layouts/auth-layout/auth-layout.ce.js';
 
 class ViewForgetPass extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <login-layout>
+      <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
           <span class="text-bicolor">Reset password</span>
         </h1>
@@ -20,7 +20,7 @@ class ViewForgetPass extends HTMLElement {
             </button>
           </div>
         </form>
-      </login-layout>
+      </auth-layout>
     `;
 
     this.querySelector('#pass-form').addEventListener('submit', this.submitForm.bind(this));

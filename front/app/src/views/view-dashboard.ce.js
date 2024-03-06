@@ -1,21 +1,10 @@
+import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
+import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
-import { isAuthenticated } from '@/auth.js';
-import '@/components/layouts/default-layout-sidebar.ce.js';
-import '@/components/layouts/default-layout-main.ce.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
-    // verifyUserLoginAndDisplayDashboard(this.displayDashboard.bind(this));
-    const isAuth = isAuthenticated();
-    if (!isAuth) {
-      redirectTo('/login');
-    } else {
-      this.displayDashboard();
-    }
-  }
-
-  displayDashboard() {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
@@ -25,7 +14,7 @@ class ViewDash extends HTMLElement {
           </div>
           <h2>Bienvenue, ${user.username}, ${user.id}</h2>
           <div class="big-button-play">
-            <button type="button" class="btn btn-outline-light btn-lg">Play Now</button>
+            <button type="button" class="btn btn-outline-light btn-lg" data-link="/game">Play Now</button>
           </div>
         </div>
         <div id="supp">

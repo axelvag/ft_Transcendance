@@ -1,16 +1,4 @@
-@import 'bootstrap/scss/mixins/banner';
-@include bsBanner('');
-
-// scss-docs-start import-stack
-// Configuration
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/variables-dark';
-@import 'bootstrap/scss/maps';
-@import 'bootstrap/scss/mixins';
-@import 'bootstrap/scss/utilities';
-
-// Layout & components
+// Bootstrap Layout & components
 @import 'bootstrap/scss/root';
 @import 'bootstrap/scss/reboot';
 @import 'bootstrap/scss/type';
@@ -43,10 +31,10 @@
 @import 'bootstrap/scss/offcanvas';
 @import 'bootstrap/scss/placeholders';
 
-// Helpers
+// Bootstrap Helpers
 @import 'bootstrap/scss/helpers';
 
-// Utilities
+// Bootstrap Utilities (built with api)
 $utilities: map-merge(
   $utilities,
   (
@@ -64,8 +52,13 @@ $utilities: map-merge(
           responsive: true,
         )
       ),
+    'font-size':
+      map-merge(
+        map-get($utilities, 'font-size'),
+        (
+          responsive: true,
+        )
+      ),
   )
 );
-
 @import 'bootstrap/scss/utilities/api';
-// scss-docs-end import-stack

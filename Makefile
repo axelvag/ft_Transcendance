@@ -2,7 +2,7 @@ PROFILE ?= prod
 
 .PHONY: all build rebuild stop stop volumes fclean sh-% prune
 
-all: volumes build up migrate restart
+all: volumes build up migrate
 
 build:
 	docker compose -f docker-compose.yml --profile $(PROFILE) --env-file .env build
@@ -45,11 +45,5 @@ prune:
 	-docker buildx prune -a -f 2>/dev/null
 
 migrate:
-	docker compose run --rm authentification python manage.py makemigrations
-	docker compose run --rm authentification python manage.py migrate
-
-restart: 
-	docker stop authentification
-	docker start authentification
-	docker stop friendship
-	docker start friendship
+	chmod +x migrate.sh
+	./migrate.sh

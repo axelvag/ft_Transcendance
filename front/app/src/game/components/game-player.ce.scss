@@ -1,0 +1,129 @@
+.gamePlayer {
+  --gamePlayer-inset: auto auto auto 0;
+  --gamePlayer-color: var(--bs-primary);
+  --gamePlayer-avatar-transform: none;
+  --gamePlayer-avatar-margin: 0;
+  --gamePlayer-score-flex-direction: row;
+  --gamePlayer-crow-display: none;
+  --gamePlayer-type-inset: auto auto 0 0;
+
+  &.is-right {
+    --gamePlayer-inset: auto 0 auto auto;
+    --gamePlayer-color: var(--bs-secondary);
+    --gamePlayer-avatar-transform: scale(-1, 1);
+    --gamePlayer-score-flex-direction: row-reverse;
+    --gamePlayer-type-inset: auto 0 0 auto;
+  }
+
+  &.is-winner {
+    --gamePlayer-avatar-margin: 0 1em 1em;
+    --gamePlayer-crow-display: block;
+  }
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75em;
+  position: relative;
+  inset: var(--gamePlayer-inset);
+
+  &-avatar {
+    flex: 0 0 auto;
+    position: relative;
+    margin: var(--gamePlayer-avatar-margin);
+
+    &-img {
+      width: 8em;
+      height: 8em;
+      border: 0.25em solid var(--gamePlayer-color);
+      background: #fff;
+      border-radius: 100%;
+      overflow: hidden;
+      transform: var(--gamePlayer-avatar-transform);
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+
+      &:error {
+        display: none;
+      }
+    }
+  }
+
+  &-type {
+    position: absolute;
+    z-index: 2;
+    margin: 0.75em;
+    inset: var(--gamePlayer-type-inset);
+
+    font-size: 0.75em;
+    line-height: 1.5;
+    padding: 0 0.35em;
+    background: var(--bs-danger);
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 0.25em;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &-crown {
+    display: var(--gamePlayer-crow-display);
+
+    color: gold;
+    font-size: 9.75em;
+
+    position: absolute;
+    z-index: 1;
+    top: -13.5%;
+    left: 49.4%;
+    transform: translateX(-50%);
+  }
+
+  &-details {
+    flex: 1 1 auto;
+    max-width: 20em;
+    position: relative;
+    z-index: 2;
+  }
+
+  &-name {
+    font-size: 1.25em;
+    line-height: 1.5;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-score {
+    display: flex;
+    flex-direction: var(--gamePlayer-score-flex-direction);
+    gap: 0.375em;
+    margin-top: 0.75em;
+
+    &:empty {
+      display: none;
+    }
+
+    &-point {
+      flex: 0 0 auto;
+      width: 1em;
+      height: 1em;
+      border-radius: 0.125em;
+      background: var(--bs-gray-900);
+    }
+
+    &-point.is-active {
+      background: var(--gamePlayer-color);
+    }
+  }
+}
