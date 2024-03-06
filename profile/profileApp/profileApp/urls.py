@@ -26,15 +26,3 @@ urlpatterns = [
     path('save_avatar/', views.save_avatar, name='save_avatar'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# if settings.DEBUG:
-#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# Dans votre fichier urls.py
-# from django.urls import path
-# from .views import update_user
-# from django.contrib import admin
-
-# urlpatterns = [
-#     path('update_user/', update_user, name='update_user'),
-#     # ... autres routes ...
-# ]

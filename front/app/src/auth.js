@@ -5,7 +5,7 @@ const user = {
   id: null,
   username: null,
   email: null,
-  avatar: null,
+  avatar: '/src/assets/img/profile.jpg',
   firstname: null,
   lastname: null,
 };

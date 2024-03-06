@@ -108,7 +108,9 @@ const viewProfileTemplate = user => `
   </h2>
   <div>
     <div class="mb-4">
-      <img src="${user.avatar}" class="img-thumbnail" width="128" height="128">
+      <!-- Apply border-radius to make the image circular. -->
+      <!-- Adjust the default avatar path as needed. -->
+      <img src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; border: 3px solid #ffffff;">
     </div>
     <div class="mb-4">
       <div class="form-label opacity-75 mb-1">Username</div>
@@ -120,96 +122,10 @@ const viewProfileTemplate = user => `
     </div>
     <div class="mb-4">
       <div class="form-label opacity-75 mb-1">Name</div>
-      <div class="fs-5 fw-semibold">${user.firstname} ${user.lastname}</div>
+      <div class="fs-5 fw-semibold">${user.firstname || 'Not provided'} ${user.lastname || ''}</div>
     </div>
   </div>
 `;
-
-// const viewProfileTemplate = user => `
-//   <h1 class="display-5 fw-bold mb-4">
-//     Hi <span class="text-bicolor">${user.username}</span>!
-//   </h1>
-//   <h2 class="h3 fw-semibold border-bottom py-3 my-4 d-flex">
-//     <span class="flex-grow-1 flex-shrink-1 text-truncate">Profile information</span>
-//     <button class="btn btn-outline-primary btn-sm" id="edit-profile">
-//       <ui-icon name="edit" scale="1.125" class="me-1"></ui-icon>
-//       Edit
-//     </button>
-//   </h2>
-//   <div>
-//     <div class="mb-4">
-//       <img src="/front/app/src/assets/img/profile.jpg" class="rounded-circle img-thumbnail" style="object-fit: cover; width: 128px; height: 128px;">  
-//     </div>
-//     <div class="mb-4">
-//       <div class="form-label opacity-75 mb-1">Username</div>
-//       <div class="fs-5 fw-semibold">${user.username}</div>
-//     </div>
-//     <div class="mb-4">
-//       <div class="form-label opacity-75 mb-1">Email</div>
-//       <div class="fs-5 fw-semibold">${user.email}</div>
-//     </div>
-//     <div class="mb-4">
-//       <div class="form-label opacity-75 mb-1">Name</div>
-//       <div class="fs-5 fw-semibold">${user.firstname || 'null'} ${user.lastname || 'null'}</div>
-//     </div>
-//   </div>
-// `;
-
-
-// const editProfileTemplate = user => `
-//   <h1 class="display-5 fw-bold mb-4">
-//     Hi <span class="text-bicolor">${user.username}</span>!
-//   </h1>
-//   <h2 class="h3 fw-semibold border-bottom py-3 my-4">
-//     Profile information
-//   </h2>
-//   <div class="position-relative">
-//     <form id="profile-edit">
-//       <div class="mb-4">
-//         <label class="form-label" for="firstname">Profile picture</label>
-//         <div>
-//           <img src="${user.avatar}" class="img-thumbnail" width="128" height="128" alt="${user.username}">
-//           <input type="file" id="avatarFile" name="avatar" accept="image/*">
-
-//         </div>
-//       </div>
-      // <div class="row">
-      //   <div class="col-lg-6 mb-4">
-      //     <label class="form-label" for="username">Username</label>
-      //     <input class="form-control form-control-lg" type="text" id="username" value="${user.username}" required>
-      //   </div>
-      //   <div class="col-lg-6 mb-4">
-      //     <label class="form-label" for="email">Email</label>
-      //     <input class="form-control form-control-lg" type="email" id="email" value="${user.email}" required>
-      //   </div>
-      // </div>
-      // <div class="row">
-      //   <div class="col-lg-6 mb-4">
-      //     <label class="form-label" for="firstname">First Name</label>
-      //     <input class="form-control form-control-lg" type="text" id="firstname" value="${user.firstname}" required>
-      //   </div>
-      //   <div class="col-lg-6 mb-4">
-      //     <label class="form-label" for="lastname">Last Name</label>
-      //     <input class="form-control form-control-lg" type="text" id="lastname" value="${user.lastname}" required>
-      //   </div>
-      // </div>
-      // <div class="py-3 mb-4 d-flex gap-3">
-      //   <button id="reset-profile" class="btn btn-outline-primary">Cancel</button>
-      //   <button type="submit" class="btn btn-primary">Save</button>
-      // </div>
-//     </form>
-//     <div
-//       class="
-//         position-absolute top-0 bottom-0 start-0 end-0 z-1
-//         d-flex align-items-center justify-content-center
-//       "
-//       id="profile-edit-loader"
-//       hidden
-//     >
-//       <ui-loader></ui-loader>
-//     </div>
-//   </div>
-// `;
 
 const editProfileTemplate = user => `
   <h1 class="display-5 fw-bold mb-4">
@@ -223,9 +139,9 @@ const editProfileTemplate = user => `
       <div class="mb-4 text-center">
         <label class="form-label d-block" for="avatarFile">Profile picture</label>
         <div class="d-inline-block position-relative" style="width: 128px; height: 128px;">
-          <img src="/front/app/src/assets/img/profile.jpg" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover;">
+          <img src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; cover; border: 3px solid #ffffff;">
           <input type="file" id="avatarFile" name="avatar" accept="image/*" style="display: none;">
-          <button type="button" class="btn btn-primary btn-sm position-absolute bottom-0 end-0" onclick="document.getElementById('avatarFile').click()">
+          <button type="button" class="btn btn-primary btn-sm mt-2" onclick="document.getElementById('avatarFile').click()">
             Change Avatar
           </button>
         </div>
@@ -364,9 +280,9 @@ class ViewProfil extends HTMLElement {
 
       const data = await response.json();
       console.log(data.avatar);
-      user.avatar = data.avatar;
       if (data.success) {
-        this.#user.avatar = data.avatar; // Mettez à jour l'URL de l'avatar si nécessaire.
+        user.avatar = data.avatar;
+        // this.#user.avatar = data.avatar; // Mettez à jour l'URL de l'avatar si nécessaire.
       } else {
         throw new Error('Échec de la mise à jour de l\'avatar');
       }
