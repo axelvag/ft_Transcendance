@@ -8,7 +8,7 @@ class ViewFriend extends HTMLElement {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
-        <h1 class="display-5 fw-bold mb-4 text-center" style="margin-top: -50px;">
+        <h1 class="display-5 fw-bold mb-4 text-center mt-n5">
           Friends
         </h1>
 

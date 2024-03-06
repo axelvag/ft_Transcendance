@@ -8,8 +8,8 @@ class ViewRank extends HTMLElement {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
-        <h1 class="display-5 fw-bold mb-4 text-center" style="margin-top: -50px;">
-          <img src="assets/img/rank-icon.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
+        <h1 class="display-5 fw-bold mb-4 text-center mt-n5">
+          <img src="assets/img/rank-icon.png" alt="logo_rank" style="width: 70px; height: 80px; margin-right: 10px;">
           Rank
         </h1>
 
@@ -72,11 +72,17 @@ class ViewRank extends HTMLElement {
 
     // Boucle pour générer les lignes de la table
     for (let i = 0; i < user.nbtotal; i++) {
+      let myusernamebicolor = `<td>${user.username}</td>`; // Par défaut, la balise td pour le nom d'utilisateur
+      if (i === 0)
+      {
+        myusernamebicolor = `<td class="text-bicolor">${user.username}</td>`; // Si i est égal à 0, ajoute la classe text-bicolor
+      }
+
       tbody.insertAdjacentHTML('beforeend', `
         <tr>
           <th scope="row">${i + 1}</th>
           <td><img src="https://i.pravatar.cc/300?u=6${user.id}" width="30" height="30" alt="character"></td>
-          <td>${user.username}</td>
+          ${myusernamebicolor}
           <td>${user.victories}</td>
         </tr>
       `);
