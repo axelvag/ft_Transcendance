@@ -17,5 +17,7 @@ urlpatterns = [
     path('password-change/<uidb64>', views.password_change, name='password_change'),
     path('delete_user/<username>', views.delete_user, name='delete_user'),
     path('is_user_logged_in/', views.is_user_logged_in, name='is_user_logged_in'),
+    path('oauth/login/', views.oauth_login, name='oauth_login'),
+    path('oauth/callback/', views.oauth_callback, name='oauth_callback'),
     # path('update_user/', views.update_user, name='update_user'),
 ]

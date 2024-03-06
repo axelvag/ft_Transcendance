@@ -1,6 +1,8 @@
 import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import '@/game/components/game-demo.ce.js';
+import { getCsrfToken } from '@/auth.js';
+import { redirectTo } from '@/router.js';
 
 class ViewWelcome extends HTMLElement {
   connectedCallback() {
@@ -79,7 +81,37 @@ class ViewWelcome extends HTMLElement {
       e.preventDefault();
       toggleTheme();
     });
+
+    this.handleOAuthResponse();
   }
+  async handleOAuthResponse() {
+    // Vérifier si l'URL contient un paramètre `code`
+    if (window.location.search.includes("code=")) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        console.log(code);
+        const csrfToken = await getCsrfToken();
+        // Envoyer le code d'autorisation au serveur pour obtenir un token d'accès
+        fetch('http://127.0.0.1:8001/accounts/oauth/callback/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            credentials: 'include',
+            body: JSON.stringify({ code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Traiter la réponse
+            if (data.access_token) {
+                // Par exemple, rediriger l'utilisateur ou afficher un message de succès
+                redirectTo('/dashboard'); // Mettez à jour selon votre logique de navigation
+            }
+        })
+        .catch(error => console.error('Erreur:', error));
+    }
+}
 }
 
 customElements.define('view-welcome', ViewWelcome);

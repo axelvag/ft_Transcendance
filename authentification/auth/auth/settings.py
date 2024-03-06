@@ -168,3 +168,9 @@ CORS_ALLOW_HEADERS = [
 # PASSWORD_RESET_TIMEOUT = 1
 
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+
+OAUTH_CLIENT_ID = 'u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0'
+OAUTH_CLIENT_SECRET = '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'
+OAUTH_REDIRECT_URI = 'http://127.0.0.1:8000/'  # Ajustez selon votre URI de redirection
+OAUTH_AUTHORIZATION_URL = 'https://api.intra.42.fr/oauth/authorize'
+OAUTH_TOKEN_URL = 'https://api.intra.42.fr/oauth/token'
