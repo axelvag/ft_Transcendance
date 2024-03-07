@@ -70,36 +70,86 @@ def update_user(request):
         logging.critical("close3")
         return JsonResponse({"success": False, "message": "Méthode HTTP non autorisée."}, status=405)
 
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def save_avatar(request):
+#     # La fonction devrait être modifiée pour traiter les données multipart/form-data
+#     logging.critical("Received avatar upload request")
+#     user_id = request.POST.get('id')
+#     avatar = request.FILES.get('avatar')
+#     logging.critical(f"User ID: {user_id}, Avatar: {avatar}")
+
+#     # if not user_id:
+#     #     return JsonResponse({"success": False, "message": "ID utilisateur non fourni."}, status=400)
+
+#     profile, created = Profile.objects.get_or_create(
+#             user_id=user_id,  # Supposons que vous avez un champ user_id dans votre modèle Profile
+#             defaults={
+#                 'avatar': avatar,
+#             }
+#         )
+
+#         # Si le profil existait déjà et que nous voulons le mettre à jour avec de nouvelles valeurs
+#     if not created:
+#         profile.avatar = avatar
+#         profile.save()
+
+#     # if not avatar:
+#         # return JsonResponse({"success": False, "message": "Aucun avatar fourni."}, status=400)
+
+#     try:
+#         # Assurez-vous que le 'user_id' est un entier
+#         user_id = int(user_id)
+#         profile = Profile.objects.get(user_id=user_id)
+
+#         # Sauvegarde ou mise à jour de l'avatar
+#         profile.avatar = avatar
+#         profile.save()
+
+#         # Si vous servez les fichiers média via Django en mode DEBUG, vous pouvez utiliser `request.build_absolute_uri(profile.avatar.url)` pour obtenir l'URL complète
+#         avatar_url = profile.avatar.url if profile.avatar else None
+
+#         logging.critical("Avatar updated successfully")
+#         # return JsonResponse({"success": True, "avatar": profile.avatar})
+#         return JsonResponse({"success": True, "avatar": request.build_absolute_uri(avatar_url)})
+
+#     except ValueError:
+#         return JsonResponse({"success": False, "message": "L'ID utilisateur doit être un entier."}, status=400)
+#     except Profile.DoesNotExist:
+#         logging.critical("Profile not found")
+#         return JsonResponse({"success": False, "message": "Profil non trouvé."}, status=404)
+#     except Exception as e:
+#         logging.error("Unexpected error: %s", e)
+#         return JsonResponse({"success": False, "message": "Une erreur inattendue est survenue."}, status=500)
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def save_avatar(request):
-    # La fonction devrait être modifiée pour traiter les données multipart/form-data
     logging.critical("Received avatar upload request")
     user_id = request.POST.get('id')
     avatar = request.FILES.get('avatar')
     logging.critical(f"User ID: {user_id}, Avatar: {avatar}")
 
-    if not user_id:
-        return JsonResponse({"success": False, "message": "ID utilisateur non fourni."}, status=400)
-
-    if not avatar:
-        return JsonResponse({"success": False, "message": "Aucun avatar fourni."}, status=400)
-
     try:
         # Assurez-vous que le 'user_id' est un entier
         user_id = int(user_id)
-        profile = Profile.objects.get(user_id=user_id)
 
-        # Sauvegarde ou mise à jour de l'avatar
-        profile.avatar = avatar
-        profile.save()
+        # Tentez de récupérer ou de créer le profil
+        profile, created = Profile.objects.get_or_create(
+            user_id=user_id,
+            defaults={'avatar': avatar},
+        )
 
-        # Si vous servez les fichiers média via Django en mode DEBUG, vous pouvez utiliser `request.build_absolute_uri(profile.avatar.url)` pour obtenir l'URL complète
-        avatar_url = profile.avatar.url if profile.avatar else None
+        # Si le profil existait déjà et que nous voulons le mettre à jour avec de nouvelles valeurs
+        if not created:
+            profile.avatar = avatar
+            profile.save()
+
+        # Construction de l'URL absolue de l'avatar
+        avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
 
         logging.critical("Avatar updated successfully")
-        # return JsonResponse({"success": True, "avatar": profile.avatar})
-        return JsonResponse({"success": True, "avatar": request.build_absolute_uri(avatar_url)})
+        return JsonResponse({"success": True, "avatar": avatar_url})
 
     except ValueError:
         return JsonResponse({"success": False, "message": "L'ID utilisateur doit être un entier."}, status=400)
@@ -107,5 +157,5 @@ def save_avatar(request):
         logging.critical("Profile not found")
         return JsonResponse({"success": False, "message": "Profil non trouvé."}, status=404)
     except Exception as e:
-        logging.error("Unexpected error: %s", e)
+        logging.error(f"Unexpected error: {e}")
         return JsonResponse({"success": False, "message": "Une erreur inattendue est survenue."}, status=500)
