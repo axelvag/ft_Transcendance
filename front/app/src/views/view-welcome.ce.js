@@ -1,9 +1,43 @@
 import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import '@/game/components/game-demo.ce.js';
+import { isAuthenticated, getProfile, logout } from '@/auth.js';
+import { redirectTo } from '@/router.js';
 
 class ViewWelcome extends HTMLElement {
-  connectedCallback() {
+  async connectedCallback() {
+    const isLoggedIn = await isAuthenticated();
+    let authMenuHtml;
+
+    if (isLoggedIn) {
+      const user = getProfile();
+      authMenuHtml = `
+        <li class="nav-item mx-lg-2">
+          <a class="nav-link" href="#" data-link="/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item mx-lg-2">
+          <a class="nav-link logout" href="#">Log out</a>
+        </li>
+        <li class="nav-item mx-lg-2">
+          <a class="nav-link d-flex align-items-center" href="#" data-link="/profile">
+            <div class="flex-shrink-0 flex-grow-0">
+              <img src="${user.avatar}" class="d-block object-fit-cover rounded-circle m-n1" width="28" height="28" alt="${user.username}">
+            </div>
+            <span class="ms-2 ps-2 flex-shrink-1 flex-grow-1 text-truncate d-lg-none">${user.username}</span>
+          </a>
+        </li>
+      `;
+    } else {
+      authMenuHtml = `
+        <li class="nav-item mx-lg-2">
+          <a class="nav-link" href="#" data-link="/login">Log in</a>
+        </li>
+        <li class="nav-item mx-lg-2">
+          <a class="nav-link" href="#" data-link="/signup">Sign up</a>
+        </li>
+      `;
+    }
+
     this.innerHTML = `
       <nav class="navbar navbar-expand-lg fixed-top z-2">
         <div class="container-fluid">
@@ -25,13 +59,8 @@ class ViewWelcome extends HTMLElement {
               <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-              <ul class="navbar-nav justify-content-end flex-grow-1 pe-2">
-                <li class="nav-item mx-lg-2">
-                  <a class="nav-link" href="#" data-link="/login">Log in</a>
-                </li>
-                <li class="nav-item mx-lg-2">
-                  <a class="nav-link" href="#" data-link="/signup">Sign up</a>
-                </li>
+              <ul class="navbar-nav justify-content-end align-items-lg-center flex-grow-1 pe-2">
+                ${authMenuHtml}
                 <li class="nav-item mx-lg-2 py-2 py-lg-1 col-12 col-lg-auto">
                   <div class="navbar-text p-0 vr d-none d-lg-flex h-100 y-2 mx-2"></div>
                   <hr class="navbar-text p-0 d-lg-none my-2">
@@ -81,6 +110,16 @@ class ViewWelcome extends HTMLElement {
       e.preventDefault();
       toggleTheme();
     });
+
+    this.querySelector('.logout')?.addEventListener('click', e => {
+      e.preventDefault();
+      this.handleLogout();
+    });
+  }
+
+  async handleLogout() {
+    await logout();
+    redirectTo('/');
   }
 }
 

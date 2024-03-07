@@ -132,11 +132,7 @@ def register_user(request):
         return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
 
 def get_csrf_token(request):
-    """
-    Vue pour obtenir le jeton CSRF et le renvoyer sous forme de réponse JSON.
-    """
-    csrf_token = get_token(request)
-    return JsonResponse({"csrfToken": csrf_token})
+    return JsonResponse({'csrfToken': get_token(request)})
 
 def is_user_active(request, uidb64, token):
     print("je passe")
@@ -184,8 +180,8 @@ def password_reset(request):
             email = data.get('email')
             if not email:
                 return JsonResponse({'error': 'Adresse e-mail manquante.'}, status=400)
-            user = User.objects.get(email=email)
-            if user is not None:
+            try:
+                user = User.objects.get(email=email)
                 to_email = user.email
                 mail_subject = "Réinitialisation de votre mot de passe sur Transcendence"
                 message = render_to_string("template_forget_pass.html", {
@@ -197,10 +193,10 @@ def password_reset(request):
                 })
                 email = EmailMessage(mail_subject, message, to=[to_email])
                 if email.send():
-                    return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm the renitialisation of your password.'}, status=200)
+                    return JsonResponse({"success": True, "message": f'Dear {user.username}, please go to your email {to_email} inbox and click on the received activation link to confirm the renitialisation of your password.'}, status=200)
                 else:
-                    return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
-            else:
+                    return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=500)  # Utilisez status=500 pour les erreurs serveur
+            except User.DoesNotExist:
                 return JsonResponse({'error': 'Aucun utilisateur trouvé avec cette adresse e-mail.'}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Données invalides.'}, status=400)

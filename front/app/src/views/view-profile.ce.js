@@ -122,7 +122,7 @@ const viewProfileTemplate = user => `
     <div class="mb-4">
       <!-- Apply border-radius to make the image circular. -->
       <!-- Adjust the default avatar path as needed. -->
-      <img src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; border: 3px solid #ffffff;">
+      <img src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; border: 3px solid #b558f6;">
     </div>
     <div class="mb-4">
       <div class="form-label opacity-75 mb-1">Username</div>
@@ -151,7 +151,7 @@ const editProfileTemplate = user => `
       <div class="mb-4 text-center">
         <label class="form-label d-block" for="avatarFile">Profile picture</label>
         <div class="d-inline-block position-relative" style="width: 128px; height: 128px;">
-          <img src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; cover; border: 3px solid #ffffff;">
+          <img src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; cover; border: 3px solid #b558f6;">
           <input type="file" id="avatarFile" name="avatar" accept="image/*" style="display: none;">
           <button type="button" class="btn btn-primary btn-sm mt-2" onclick="document.getElementById('avatarFile').click()">
             Change Avatar

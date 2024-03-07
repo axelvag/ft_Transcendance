@@ -5,6 +5,14 @@ import { user } from '@/auth.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
+    window.addEventListener('storage', (event) => {
+    if (event.key === 'isLogged' && event.newValue === 'false') {
+      // Logique pour gérer la déconnexion, par exemple :
+      console.log("logout logout");
+      window.location.href = '/login'; // Rediriger vers la page de connexion
+      return;
+    }
+  });
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
@@ -45,6 +53,7 @@ class ViewDash extends HTMLElement {
       .then(data => {
         if (data.success) {
           user.isAuthenticated = false;
+          localStorage.setItem('isLogged', 'false');
           redirectTo('/');
         }
       })

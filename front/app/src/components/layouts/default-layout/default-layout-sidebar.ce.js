@@ -134,6 +134,7 @@ class DefaultLayoutSidebar extends HTMLElement {
 
   async handleLogout() {
     await logout();
+    localStorage.setItem('isLogged', 'false');
     redirectTo('/');
   }
 
