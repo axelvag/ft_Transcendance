@@ -49,6 +49,7 @@ class ViewGameOffline extends HTMLElement {
         title="${this.#duo ? 'Choose Player Left' : 'Choose your character'}"
         selected-id="${this.#playerLeft?.id}"
         type="${this.#playerLeft?.type}"
+        include-user
       ></game-select-player>
     `;
 

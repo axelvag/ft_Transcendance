@@ -17,6 +17,8 @@ class GameSelectPlayer extends HTMLElement {
 
     // options
     this.#options = characters.map(character => ({ ...character, type: this.#playerType }));
+
+    if (this.hasAttribute('include-user')) {
       const isLoggedIn = await isAuthenticated();
       if (isLoggedIn) {
         const profile = getProfile();
@@ -26,10 +28,14 @@ class GameSelectPlayer extends HTMLElement {
           avatar: profile.avatar,
           type: this.#playerType,
         });
+      }
     }
 
     // selected
     this.#selected = this.#options.find(option => option.id == this.getAttribute('selected-id'));
+    if (!this.#selected) {
+      this.#selected = this.#options[0];
+    }
 
     const optionsHtml = this.#options
       .map(option => {
