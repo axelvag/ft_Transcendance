@@ -5,6 +5,9 @@ const user = {
   id: null,
   username: null,
   email: null,
+  avatar: null,
+  first_name: null,
+  last_name: null,
 };
 
 const setLocalUser = data => {
@@ -93,7 +96,8 @@ const getProfile = () => {
     email: user.email,
     firstname: '',
     lastname: '',
-    avatar: `https://i.pravatar.cc/300?u=6${user.id}`,
+    avatar: user.avatar,
+    // avatar: `https://i.pravatar.cc/300?u=6${user.id}`,
   };
 };
 

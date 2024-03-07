@@ -330,16 +330,45 @@ def oauth_callback(request):
         response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data)
         print(response.status_code)
         if response.status_code == 200:
-            # Ici, vous devez traiter le token d'accès selon votre logique d'application.
-            # Par exemple, vous pourriez vouloir le stocker en session ou l'utiliser directement pour faire des requêtes à l'API.
             access_token = response.json().get('access_token')
             print(access_token)
             profile_data = requests.get(
                 "https://api.intra.42.fr/v2/me",
-                headers={"Authorization": access_token},
+                headers={"Authorization": f"Bearer {access_token}"},
             )
             print(profile_data)
-            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token})
+            if profile_data.status_code == 200:
+                profile_data_json = profile_data.json()
+                print(profile_data_json)
+                if not User.objects.filter(email=profile_data_json['email']).exists():
+                    # Créez l'utilisateur s'il n'existe pas
+                    user = User.objects.create_user(
+                        username=profile_data_json['login'],
+                        email=profile_data_json['email'],
+                        # first_name=profile_data_json.get('first_name', ''),  # Utilisez `.get` pour éviter KeyError si la clé n'existe pas
+                        # last_name=profile_data_json.get('last_name', '')
+                    )
+                    user.set_password('un_mot_de_passe_temporaire_ou_sécurisé')
+                    user.is_active = True
+                    user.save()
+                    print(f"L'utilisateur {user.username} a été créé avec succès.")
+                    user = authenticate(username=user.username, password='un_mot_de_passe_temporaire_ou_sécurisé')
+                    if user is not None:
+                        login(request, user)
+                    else:
+                        return JsonResponse({'error': 'Authentification fail'}, status=400)
+                else:
+                    user = User.objects.get(email=profile_data_json.get('email'))
+                    if not user.check_password('un_mot_de_passe_temporaire_ou_sécurisé'):  # Vérifie le mot de passe pour l'email
+                        user = None
+                    # user = authenticate(username=profile_data_json.get('login'), password='un_mot_de_passe_temporaire_ou_sécurisé')
+                    if user is not None:
+                        login(request, user)
+                    else:
+                        return JsonResponse({'error': 'Authentification fail user exist'}, status=400)
+            else:
+                return JsonResponse({'error': f"Erreur lors de la récupération des données de profil: {profile_data.status_code}"}, status=400)
+            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token, "username": user.username, "id": user.id, "email": user.email, "avatar": profile_data_json.get('image'), "first_name": profile_data_json.get('first_name'), "last_name": profile_data_json.get('last_name')})
         else:
             return JsonResponse({'error': 'Erreur lors de l\'obtention du token d\'accès'}, status=400)
     else:

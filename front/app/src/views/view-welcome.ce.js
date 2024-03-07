@@ -2,6 +2,7 @@ import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import '@/game/components/game-demo.ce.js';
 import { getCsrfToken } from '@/auth.js';
+import { user } from '@/auth.js';
 import { redirectTo } from '@/router.js';
 
 class ViewWelcome extends HTMLElement {
@@ -106,6 +107,15 @@ class ViewWelcome extends HTMLElement {
             console.log(data); // Traiter la réponse
             if (data.access_token) {
                 // Par exemple, rediriger l'utilisateur ou afficher un message de succès
+                localStorage.setItem('isLogged', 'true');
+                user.isAuthenticated = true;
+                user.id = data.id;
+                user.email = data.email;
+                user.username = data.username;
+                user.avatar = data.avatar.link;
+                user.first_name = data.first_name;
+                user.last_name = data.last_name;
+                console.log(user.avatar);
                 redirectTo('/dashboard'); // Mettez à jour selon votre logique de navigation
             }
         })
