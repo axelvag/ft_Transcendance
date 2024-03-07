@@ -1,3 +1,5 @@
+// import profileSvg from '@/assets/img/profile.svg';
+import profilePic from './assets/img/profile.jpg';
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
@@ -5,7 +7,7 @@ const user = {
   id: null,
   username: null,
   email: null,
-  avatar: null,
+  avatar: profilePic,
   firstname: null,
   lastname: null,
 };
@@ -81,7 +83,8 @@ const getProfile = () => {
     email: user.email,
     firstname: '',
     lastname: '',
-    avatar: `https://i.pravatar.cc/300?u=6${user.id}`,
+    avatar: user.avatar,
+    // avatar: `https://i.pravatar.cc/300?u=6${user.id}`,
   };
 };
 

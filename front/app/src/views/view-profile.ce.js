@@ -248,7 +248,7 @@ class ViewProfile extends HTMLElement {
     });
 
     const avatarInput = this.querySelector('#avatarFile');
-  avatarInput.addEventListener('change', (event) => {
+    avatarInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (file) {
       const avatarImage = this.querySelector('img');
@@ -267,7 +267,10 @@ class ViewProfile extends HTMLElement {
     formData.append('avatar', avatarFile);
     formData.append('id', user.id); // Assurez-vous que l'ID de l'utilisateur est correctement défini.
 
+    console.log("avatarFile:", avatarFile);
+    console.log("avatarFile:", user.id);
     console.log(formData);
+
 
     try {
       const response = await fetch('http://127.0.0.1:8002/save_avatar/', {

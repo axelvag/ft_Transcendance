@@ -111,7 +111,6 @@ class DefaultLayoutSidebar extends HTMLElement {
                     class="d-block object-fit-cover rounded-circle m-n1"
                     width="28"
                     height="28"
-                    alt="${user.username}"
                   />
                 </div>
                 <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">${user.username}</span>
