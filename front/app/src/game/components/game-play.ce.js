@@ -3,11 +3,11 @@ import './game-player.ce.js';
 import './game-scoreboard.ce.js';
 import './game-dialog.ce.js';
 import './game-play.ce.scss';
-import GameWorker from '../localApi/GameWorker.js?worker';
-import AudioPlayer from '../localApi/AudioPlayer.js';
+import GameWorker from '../utils/GameWorker.js?worker';
+import AudioPlayer from '../utils/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
-import calculateNextAiPosition from '../localApi/calculateNextAiPosition.js';
+import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
 
 const template = `
 <div class="gamePlay" hidden>
