@@ -1,4 +1,6 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
+import { getCsrfToken } from '@/auth.js';
+import { passwordReset } from '@/auth.js';
 
 class ViewForgetPass extends HTMLElement {
   connectedCallback() {
@@ -32,37 +34,13 @@ class ViewForgetPass extends HTMLElement {
     const form = event.target;
     const email = document.getElementById('email').value;
 
-    let csrfToken;
-    try {
-      const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
-        method: 'GET',
-        credentials: 'include', // Pour inclure les cookies dans la requête
-      });
-      if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
-      }
-      const data = await response.json();
-      csrfToken = data.csrfToken;
-    } catch (error) {
-      console.error('Erreur lors de la récupération du CSRF token:', error);
-      // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
-      return;
-    }
+    const csrfToken = await getCsrfToken();
 
     const formData = {
       email: email,
     };
     console.log(JSON.stringify(formData));
-    const response = await fetch('http://127.0.0.1:8001/accounts/password_reset/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    });
-    const data = await response.json();
+    const data = await passwordReset(formData, csrfToken);
     console.log(data);
     if (data.success) {
       // Redirection vers la page de connexion

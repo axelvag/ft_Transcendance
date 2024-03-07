@@ -8,6 +8,7 @@ const user = {
 };
 
 const setLocalUser = data => {
+  localStorage.setItem('isLogged', 'true');
   user.isAuthenticated = true;
   user.id = data.id;
   user.email = data.email;
@@ -15,6 +16,7 @@ const setLocalUser = data => {
 };
 
 const resetLocalUser = () => {
+  // localStorage.setItem('isLogged', 'false');
   user.isAuthenticated = false;
   user.id = null;
   user.email = null;
@@ -71,6 +73,19 @@ const logout = async () => {
   resetLocalUser();
 };
 
+const getCsrfToken = async () => {
+  const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (response.ok) {
+    const data = await response.json();
+    console.log(data.csrfToken);
+    return data.csrfToken;
+  }
+  throw new Error('Could not retrieve CSRF token');
+}
+
 const getProfile = () => {
   return {
     id: user.id,
@@ -82,4 +97,56 @@ const getProfile = () => {
   };
 };
 
-export { user, isAuthenticated, getCSRFToken, logout, getProfile };
+const loginUser = async (formData, csrfToken) => {
+  const response = await fetch('http://127.0.0.1:8001/accounts/login/', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+  });
+  return response.json(); // Retourne la promesse résolue avec les données JSON
+}
+
+const sendSignUpRequest = async (formData, csrfToken) => {
+  const response = await fetch('http://127.0.0.1:8001/accounts/register/', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+  });
+  return response.json(); // Retourne la promesse résolue avec les données JSON
+}
+
+const passwordReset = async (formData, csrfToken) => {
+  const response = await fetch('http://127.0.0.1:8001/accounts/password_reset/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
+  return response.json();
+}
+
+const sendEmailPasswordReset = async (formData, csrfToken, url) => {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
+  });
+  return response.json();
+}
+
+export { user, isAuthenticated, getCSRFToken, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset };

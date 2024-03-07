@@ -22,3 +22,7 @@ import { initTheme } from '@/theme.js';
 
 // init theme
 initTheme();
+
+if (localStorage.getItem('isLogged') === null) {
+  localStorage.setItem('isLogged', 'false');
+}
