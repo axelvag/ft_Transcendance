@@ -1,4 +1,5 @@
 import { isAuthenticated } from '@/auth.js';
+import Router from '@/utils/Router.js';
 
 import '@/views/view-not-found.ce.js';
 import '@/views/view-welcome.ce.js';
@@ -8,16 +9,13 @@ import '@/views/view-email-confirmation.ce.js';
 import '@/views/view-login.ce.js';
 import '@/game/view-game-set-mode.ce.js';
 import '@/game/view-game-offline.ce.js';
+import '@/game/view-game-online.ce.js';
 import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
 import '@/views/view-dashboard.ce.js';
 import '@/views/view-settings.ce.js';
 import '@/views/view-careers.ce.js';
-
-const useHash = true;
-
-const baseUrl = '';
 
 const isLoggedOutGuard = async () => {
   const isLoggedin = await isAuthenticated();
@@ -31,151 +29,129 @@ const isLoggedInGuard = async () => {
   return isLoggedin;
 };
 
-const routes = {
-  '/': {
-    title: 'Pong',
-    template: '<view-welcome></view-welcome>',
-  },
-  // auth routes
-  '/login': {
-    title: 'Login',
-    template: '<view-signin></view-signin>',
-    beforeEnter: isLoggedOutGuard,
-  },
-  '/signup': {
-    title: 'Signup',
-    template: '<view-signup></view-signup>',
-    beforeEnter: isLoggedOutGuard,
-  },
-  '/forget-pass': {
-    title: 'Forget password',
-    template: '<view-forget-pass></view-forget-pass>',
-  },
-  '/new-pass': {
-    title: 'New password',
-    template: '<view-new-pass></view-new-pass>',
-  },
-  '/email-confirmation': {
-    title: 'Email confirmation',
-    template: '<view-email-confirmation></view-email-confirmation>',
-  },
-  // logged in routes
-  '/dashboard': {
-    title: 'Dashboard',
-    template: '<view-dash></view-dash>',
-    beforeEnter: isLoggedInGuard,
-  },
-  '/profile': {
-    title: 'Profile',
-    template: '<view-profile></view-profile>',
-    beforeEnter: isLoggedInGuard,
-  },
-  '/friends': {
-    title: 'Friends',
-    template: '<view-friend></view-friend>',
-    beforeEnter: isLoggedInGuard,
-  },
-  '/careers': {
-    title: 'Careers',
-    template: '<view-careers></view-careers>',
-    beforeEnter: isLoggedInGuard,
-  },
-  '/settings': {
-    title: 'Settings',
-    template: '<view-settings></view-settings>',
-    beforeEnter: isLoggedInGuard,
-  },
-  '/game': {
-    title: 'Game',
-    template: '<view-game-set-mode></view-game-set-mode>',
-  },
-  '/game/solo': {
-    title: 'Game',
-    template: '<view-game-offline></view-game-offline>',
-  },
-  '/game/duo': {
-    title: 'Game',
-    template: '<view-game-offline duo></view-game-offline>',
-  },
-  // not found
-  '/not-found': {
-    title: 'Not Found',
-    template: '<view-not-found></view-not-found>',
-  },
-};
-
-const updateActiveNavLink = () => {
-  const links = document.querySelectorAll('[data-link]');
-  const currentPath = useHash
-    ? // with hash
-      location.hash.replace('#', '') || '/'
-    : // without hash
-      location.pathname.substring(baseUrl.length);
-
-  let index = 0;
-  while (index < links.length) {
-    const link = links[index];
-
-    if (link.getAttribute('data-link') === currentPath) link.classList.add('active');
-    else link.classList.remove('active');
-
-    index++;
-  }
-};
-
-const router = async () => {
-  const relativePath = useHash
-    ? // with hash
-      (window.location.hash || '#/').substring(1)
-    : // without hash
-      location.pathname.substring(baseUrl.length);
-  const pathname = relativePath.split('?')[0];
-  const view = routes[pathname];
-  const appEl = document.querySelector('#app');
-
-  if (!appEl) console.error('#app not found');
-
-  if (view) {
-    if (view.beforeEnter) {
-      const canEnterRoute = await view.beforeEnter();
-      if (!canEnterRoute) return;
-    }
-    document.title = view.title;
-    appEl.innerHTML = view.template;
-    updateActiveNavLink();
-  } else {
-    document.title = routes['/not-found'].title;
-    appEl.innerHTML = routes['/not-found'].template;
-  }
-};
-
-document.addEventListener('click', e => {
-  const linkEl = e.target.closest('[data-link]');
-  if (linkEl) {
-    e.preventDefault();
-    const path = useHash
-      ? // with hash
-        '/#' + linkEl.getAttribute('data-link')
-      : // without hash
-        linkEl.getAttribute('data-link');
-    history.pushState('', '', baseUrl + path);
-    router();
-  }
+const router = new Router({
+  useHash: true,
+  baseUrl: '',
+  linkAttribute: 'data-link',
+  linkActiveClass: 'active',
+  routes: [
+    {
+      name: 'welcome',
+      path: '/',
+      title: 'Pong',
+      template: '<view-welcome></view-welcome>',
+    },
+    // auth routes
+    {
+      name: 'login',
+      path: '/login',
+      title: 'Login',
+      template: '<view-signin></view-signin>',
+      beforeEnter: isLoggedOutGuard,
+    },
+    {
+      name: 'signup',
+      path: '/signup',
+      title: 'Signup',
+      template: '<view-signup></view-signup>',
+      beforeEnter: isLoggedOutGuard,
+    },
+    {
+      name: 'forget-pass',
+      path: '/forget-pass',
+      title: 'Forget password',
+      template: '<view-forget-pass></view-forget-pass>',
+    },
+    {
+      name: 'new-pass',
+      path: '/new-pass',
+      title: 'New password',
+      template: '<view-new-pass></view-new-pass>',
+    },
+    {
+      name: 'email-confirmation',
+      path: '/email-confirmation',
+      title: 'Email confirmation',
+      template: '<view-email-confirmation></view-email-confirmation>',
+    },
+    // logged in routes
+    {
+      name: 'dashboard',
+      path: '/dashboard',
+      title: 'Dashboard',
+      template: '<view-dash></view-dash>',
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'profile',
+      path: '/profile',
+      title: 'Profile',
+      template: '<view-profile></view-profile>',
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'friends',
+      path: '/friends',
+      title: 'Friends',
+      template: '<view-friend></view-friend>',
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'careers',
+      path: '/careers',
+      title: 'Careers',
+      template: '<view-careers></view-careers>',
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'settings',
+      path: '/settings',
+      title: 'Settings',
+      template: '<view-settings></view-settings>',
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'game-mode',
+      path: '/game',
+      title: 'Game mode',
+      template: '<view-game-set-mode></view-game-set-mode>',
+    },
+    {
+      name: 'game-solo',
+      path: '/game/solo',
+      title: 'Game solo',
+      template: '<view-game-offline></view-game-offline>',
+    },
+    {
+      name: 'game-duo',
+      path: '/game/duo',
+      title: 'Game duo',
+      template: '<view-game-offline duo></view-game-offline>',
+    },
+    {
+      name: 'game-online-search-player',
+      path: '/game/online',
+      title: 'Game online',
+      template: '<view-game-online></view-game-online>',
+    },
+    {
+      name: 'game-online-play',
+      path: '/game/online/:gameId',
+      title: 'Game online',
+      template: params => `<view-game-online game-id="${params.gameId}"></view-game-online>`,
+    },
+    {
+      name: 'not-found',
+      path: '/not-found',
+      title: 'Not Found',
+      template: '<view-not-found></view-not-found>',
+    },
+  ],
+  fallbackRouteName: 'not-found',
+  renderTarget: '#app',
 });
 
-const redirectTo = pathKey => {
-  const path = useHash
-    ? // with hash
-      '/#' + pathKey
-    : // without hash
-      pathKey;
-  history.pushState('', '', baseUrl + path);
-  router();
-};
+router.init();
 
-window.addEventListener('popstate', router);
-window.addEventListener('DOMContentLoaded', router);
-// Écouteur d'événements pour les changements de hash
-window.addEventListener('hashchange', router);
-
-export { redirectTo };
+export let redirectTo = router.push;
+export let currentRoute = router.currentRoute;

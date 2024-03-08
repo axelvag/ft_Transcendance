@@ -127,7 +127,7 @@ class ViewGameSetMode extends HTMLElement {
             redirectTo('/game/duo');
             break;
           case 'online':
-            alert('Coming soon!');
+            redirectTo('/game/online');
             break;
           case 'tournament':
             alert('Coming soon!');
