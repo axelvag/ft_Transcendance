@@ -20,6 +20,8 @@ const applyPreferredTheme = () => {
   }
 };
 
+const getAppliedTheme = () => document.documentElement.getAttribute('data-bs-theme');
+
 const selectTheme = theme => {
   setStoredTheme(theme);
   applyPreferredTheme();
@@ -40,4 +42,4 @@ const initTheme = () => {
   });
 };
 
-export { initTheme, selectTheme, toggleTheme };
+export { initTheme, selectTheme, toggleTheme, getAppliedTheme };

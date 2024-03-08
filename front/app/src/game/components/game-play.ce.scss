@@ -41,6 +41,10 @@
       height: 100%;
       max-width: calc(100% - 28em);
       position: relative;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     &-left,
