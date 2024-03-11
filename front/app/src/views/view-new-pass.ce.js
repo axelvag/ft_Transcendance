@@ -1,5 +1,7 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
+import { getCsrfToken } from '@/auth.js';
+import { sendEmailPasswordReset } from '@/auth.js';
 
 class ViewNewPass extends HTMLElement {
   async connectedCallback() {
@@ -83,22 +85,7 @@ class ViewNewPass extends HTMLElement {
     const password1 = document.getElementById('password1').value;
     const password2 = document.getElementById('password2').value;
 
-    let csrfToken;
-    try {
-      const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
-        method: 'GET',
-        credentials: 'include', // Pour inclure les cookies dans la requête
-      });
-      if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération du CSRF token: ${response.statusText}`);
-      }
-      const data = await response.json();
-      csrfToken = data.csrfToken;
-    } catch (error) {
-      console.error('Erreur lors de la récupération du CSRF token:', error);
-      // Gérer l'erreur (par exemple, afficher un message d'erreur à l'utilisateur)
-      return;
-    }
+    const csrfToken = await getCsrfToken();
 
     const url = `http://127.0.0.1:8001/accounts/password-change/${this.uidb64}`; // Ajout de uidb64 à l'URL
     console.log(url);
@@ -108,17 +95,17 @@ class ViewNewPass extends HTMLElement {
     };
 
     console.log(JSON.stringify(formData));
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    });
+    // const response = await fetch(url, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'X-CSRFToken': csrfToken,
+    //   },
+    //   credentials: 'include',
+    //   body: JSON.stringify(formData),
+    // });
 
-    const data = await response.json();
+    const data = await sendEmailPasswordReset(formData, csrfToken, url);
     console.log(data);
     if (data.success) {
       redirectTo('/login');

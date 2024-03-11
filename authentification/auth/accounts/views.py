@@ -23,6 +23,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
+from django.conf import settings
+import requests
 # Create your views here.
 User = get_user_model()
 
@@ -130,11 +132,7 @@ def register_user(request):
         return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
 
 def get_csrf_token(request):
-    """
-    Vue pour obtenir le jeton CSRF et le renvoyer sous forme de réponse JSON.
-    """
-    csrf_token = get_token(request)
-    return JsonResponse({"csrfToken": csrf_token})
+    return JsonResponse({'csrfToken': get_token(request)})
 
 def is_user_active(request, uidb64, token):
     print("je passe")
@@ -182,8 +180,8 @@ def password_reset(request):
             email = data.get('email')
             if not email:
                 return JsonResponse({'error': 'Adresse e-mail manquante.'}, status=400)
-            user = User.objects.get(email=email)
-            if user is not None:
+            try:
+                user = User.objects.get(email=email)
                 to_email = user.email
                 mail_subject = "Réinitialisation de votre mot de passe sur Transcendence"
                 message = render_to_string("template_forget_pass.html", {
@@ -195,10 +193,10 @@ def password_reset(request):
                 })
                 email = EmailMessage(mail_subject, message, to=[to_email])
                 if email.send():
-                    return JsonResponse({"success": True, "message": f'Dear {user}, please go to your email {to_email} inbox and click on the received activation link to confirm the renitialisation of your password.'}, status=200)
+                    return JsonResponse({"success": True, "message": f'Dear {user.username}, please go to your email {to_email} inbox and click on the received activation link to confirm the renitialisation of your password.'}, status=200)
                 else:
-                    return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
-            else:
+                    return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=500)  # Utilisez status=500 pour les erreurs serveur
+            except User.DoesNotExist:
                 return JsonResponse({'error': 'Aucun utilisateur trouvé avec cette adresse e-mail.'}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Données invalides.'}, status=400)
@@ -299,28 +297,79 @@ def is_user_logged_in(request):
     else:
         return JsonResponse({"success": False, "message": "User is not login."}, status=400)
 
-# @csrf_exempt
-# @require_http_methods(["POST"])  # Accepte uniquement les requêtes POST
-# def update_user(request):
-#     try:
-#         # Assurez-vous que le corps de la requête est au format JSON
-#         data = json.loads(request.body)
-#         username = data.get('username')
-#         email = data.get('email')
-#         user_id = data.get('id')  # Identifiant de l'utilisateur à mettre à jour
+def oauth_login(request):
+    # Construire l'URL pour la demande d'autorisation
+    params = {
+        'client_id': settings.OAUTH_CLIENT_ID,
+        'redirect_uri': settings.OAUTH_REDIRECT_URI,
+        'response_type': 'code',
+        'scope': 'public',  # Ajustez cette portée selon les besoins de votre application
+    }
+    url_params = "&".join(f"{key}={value}" for key, value in params.items())
+    authorization_url = f"{settings.OAUTH_AUTHORIZATION_URL}?{url_params}"
+    
+    return redirect(authorization_url)
 
-#         # Recherche de l'utilisateur par son ID
-#         user = User.objects.get(pk=user_id)
-        
-#         # Mise à jour de l'utilisateur
-#         if username:
-#             user.username = username
-#         if email:
-#             user.email = email
-#         user.save()
-
-#         return JsonResponse({"success": True, "message": "Utilisateur mis à jour avec succès."})
-#     except ObjectDoesNotExist:
-#         return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
-#     except Exception as e:
-#         return JsonResponse({"success": False, "message": str(e)}, status=500)
+def oauth_callback(request):
+    try:
+        data = json.loads(request.body.decode('utf8'))
+        print("Received data:", data)
+    except json.JSONDecodeError:
+        return JsonResponse(data={'errors': "Invalid JSON format"}, status=406)
+    code = data.get('code')
+    print(code)
+    print(settings.OAUTH_CLIENT_ID)
+    if code:
+        token_data = {
+            'grant_type': 'authorization_code',
+            'client_id': settings.OAUTH_CLIENT_ID,
+            'client_secret': settings.OAUTH_CLIENT_SECRET,
+            'code': code,
+            'redirect_uri': settings.OAUTH_REDIRECT_URI,
+        }
+        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data)
+        print(response.status_code)
+        if response.status_code == 200:
+            access_token = response.json().get('access_token')
+            print(access_token)
+            profile_data = requests.get(
+                "https://api.intra.42.fr/v2/me",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            print(profile_data)
+            if profile_data.status_code == 200:
+                profile_data_json = profile_data.json()
+                print(profile_data_json)
+                if not User.objects.filter(email=profile_data_json['email']).exists():
+                    # Créez l'utilisateur s'il n'existe pas
+                    user = User.objects.create_user(
+                        username=profile_data_json['login'],
+                        email=profile_data_json['email'],
+                        # first_name=profile_data_json.get('first_name', ''),  # Utilisez `.get` pour éviter KeyError si la clé n'existe pas
+                        # last_name=profile_data_json.get('last_name', '')
+                    )
+                    user.set_password('un_mot_de_passe_temporaire_ou_sécurisé')
+                    user.is_active = True
+                    user.save()
+                    print(f"L'utilisateur {user.username} a été créé avec succès.")
+                    user = authenticate(username=user.username, password='un_mot_de_passe_temporaire_ou_sécurisé')
+                    if user is not None:
+                        login(request, user)
+                    else:
+                        return JsonResponse({'error': 'Authentification fail'}, status=400)
+                else:
+                    user = User.objects.get(email=profile_data_json.get('email'))
+                    if not user.check_password('un_mot_de_passe_temporaire_ou_sécurisé'):  # Vérifie le mot de passe pour l'email
+                        user = None
+                    # user = authenticate(username=profile_data_json.get('login'), password='un_mot_de_passe_temporaire_ou_sécurisé')
+                    if user is not None:
+                        login(request, user)
+                    else:
+                        return JsonResponse({'error': 'Authentification fail user exist'}, status=400)
+            else:
+                return JsonResponse({'error': f"Erreur lors de la récupération des données de profil: {profile_data.status_code}"}, status=400)
+            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token, "username": user.username, "id": user.id, "email": user.email, "avatar": profile_data_json.get('image'), "first_name": profile_data_json.get('first_name'), "last_name": profile_data_json.get('last_name')})
+        else:
+            return JsonResponse({'error': 'Erreur lors de l\'obtention du token d\'accès'}, status=400)
+    else:
+        return JsonResponse({'error': 'Code d\'autorisation manquant'}, status=400)

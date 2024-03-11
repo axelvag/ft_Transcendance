@@ -3,14 +3,11 @@
 
   background-color: rgba(var(--halo-bicolor-bg-rgb), 1);
   background-image: radial-gradient(
-      closest-side,
+      circle at 50% 50%,
       rgba(var(--halo-bicolor-bg-rgb), 0) 0%,
       rgba(var(--halo-bicolor-bg-rgb), 1) 100%
     ),
-    linear-gradient(to right, rgba(var(--bs-primary-rgb), 0.25) 0%, rgba(var(--bs-secondary-rgb), 0.25) 100%);
-  background-size: 1000px 1000px, 1000px 1000px;
-  background-repeat: no-repeat;
-  background-position: center center;
+    linear-gradient(to right, rgba(var(--bs-primary-rgb), 0.2) 0%, rgba(var(--bs-secondary-rgb), 0.2) 100%);
   background-attachment: fixed;
 }
 
