@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('update_user/', views.update_user, name='update_user'),
-    path('save_avatar/', views.save_avatar, name='save_avatar'),
+    # path('save_avatar/', views.save_avatar, name='save_avatar'),
+    # path('manage_user_and_avatar/', views.save_avatar, name='manage_user_and_avatar'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

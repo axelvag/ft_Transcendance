@@ -2,7 +2,7 @@ import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
 import { getCsrfToken } from '@/auth.js';
-import { loginUser } from '@/auth.js';
+import { loginUser, setLocalUser } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -89,21 +89,22 @@ class ViewSignIn extends HTMLElement {
       const data = await loginUser(formData, csrfToken); // Utilisez la nouvelle fonction pour la requête
       console.log('error', data);
       if (data.success) {
-          console.log('Sucess!');
-          localStorage.setItem('isLogged', 'true');
-          user.isAuthenticated = true;
-          user.id = data.id;
-          user.email = data.email;
-          user.username = data.username;
-          redirectTo('/dashboard'); // Assurez-vous que redirectTo est correctement importé
-      }  else {
-          if (data.message === 'User not active.') this.emailError.style.display = 'block';
-          else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
-        }
+        console.log('Sucess!');
+        localStorage.setItem('isLogged', 'true');
+        user.isAuthenticated = true;
+        user.id = data.id;
+        user.email = data.email;
+        user.username = data.username;
+        setLocalUser(user);
+        redirectTo('/dashboard'); // Assurez-vous que redirectTo est correctement importé
+      } else {
+        if (data.message === 'User not active.') this.emailError.style.display = 'block';
+        else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
+      }
     } catch (error) {
-        console.error('Login failed:', error);
+      console.error('Login failed:', error);
     }
-  }  
+  }
 }
 
 customElements.define('view-signin', ViewSignIn);

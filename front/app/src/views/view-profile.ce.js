@@ -1,77 +1,6 @@
-// import { redirectTo } from '@/router.js';
-// import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
-// import { getCSRFToken } from '@/auth.js';
-import { user } from '@/auth.js';
-// import { isAuthenticated } from '@/auth.js';
-// import '@/components/layouts/default-layout-sidebar.ce.js';
-// import '@/components/layouts/default-layout-main.ce.js';
+import { user, getProfile, saveAvatar, saveUser } from '@/auth.js';
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-// import { getCSRFToken, getProfile } from '@/auth.js';
-
-const fake_getUser = async () => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve({
-        username: user.username,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        avatar: user.avatar,
-      });
-      // resolve(getProfile());
-    }, 1000);
-  });
-};
-
-// const fake_getUser = async () => {
-//   return new Promise(resolve => {
-//     setTimeout(() => {
-//       resolve(getProfile());
-//     }, 1000);
-//   });
-// };
-
-// const fake_saveUser = async data => {
-//   return new Promise(resolve => {
-//     setTimeout(() => {
-//       resolve({
-//         success: true,
-//         user: { ...data },
-//       });
-//     }, 1000);
-//   });
-// };
-
-const saveUser = async (newUser) => {
-  try {
-    const response = await fetch('http://127.0.0.1:8002/update_user/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'X-CSRFToken': getCSRFToken(),
-        // Ajoutez ici d'autres en-têtes nécessaires, comme les tokens CSRF ou d'authentification
-      },
-      credentials: 'include',
-      body: JSON.stringify(newUser),
-    });
-
-    if (!response.ok) {
-      throw new Error('La requête a échoué avec le statut ' + response.status);
-    }
-
-    const data = await response.json();
-    console.log("data", data);
-    user.firstname = data.firstname;
-    user.lastname = data.lastname;
-    user.username = data.username;
-    user.email = data.email; 
-    return data; // Renvoie les données de réponse pour un traitement ultérieur
-  } catch (error) {
-    console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
-    throw error; // Renvoie l'erreur pour une gestion ultérieure
-  }
-};
 
 const loadingProfileTemplate = `
   <div class="placeholder-glow">
@@ -122,7 +51,9 @@ const viewProfileTemplate = user => `
     <div class="mb-4">
       <!-- Apply border-radius to make the image circular. -->
       <!-- Adjust the default avatar path as needed. -->
-      <img src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; border: 3px solid #b558f6;">
+      <img src="${
+        user.avatar
+      }" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; border: 3px solid #b558f6;">
     </div>
     <div class="mb-4">
       <div class="form-label opacity-75 mb-1">Username</div>
@@ -134,7 +65,7 @@ const viewProfileTemplate = user => `
     </div>
     <div class="mb-4">
       <div class="form-label opacity-75 mb-1">Name</div>
-      <div class="fs-5 fw-semibold">${user.firstname || 'Not provided'} ${user.lastname || ''}</div>
+      <div class="fs-5 fw-semibold">${[user.firstname, user.lastname].filter(Boolean).join(' ') || '-'}</div>
     </div>
   </div>
 `;
@@ -150,12 +81,12 @@ const editProfileTemplate = user => `
     <form id="profile-edit">
       <div class="mb-4 text-center">
         <label class="form-label d-block" for="avatarFile">Profile picture</label>
-        <div class="d-inline-block position-relative" style="width: 128px; height: 128px;">
-          <img src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; cover; border: 3px solid #b558f6;">
-          <input type="file" id="avatarFile" name="avatar" accept="image/*" style="display: none;">
-          <button type="button" class="btn btn-primary btn-sm mt-2" onclick="document.getElementById('avatarFile').click()">
+        <div class="d-inline-block d-flex flex-column align-items-center position-relative">
+          <img id="viewProfile-edit-avatarImg" src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; cover; border: 3px solid #b558f6;">
+          <input type="file" id="avatarFile" name="avatar" accept="image/*" hidden>
+          <label class="btn btn-primary btn-sm mt-2" for="avatarFile">
             Change Avatar
-          </button>
+          </label>
         </div>
       </div>
       <div class="row">
@@ -171,11 +102,11 @@ const editProfileTemplate = user => `
       <div class="row">
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="firstname">First Name</label>
-          <input class="form-control form-control-lg" type="text" id="firstname" value="${user.firstname}" required>
+          <input class="form-control form-control-lg" type="text" id="firstname" value="${user.firstname}">
         </div>
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="lastname">Last Name</label>
-          <input class="form-control form-control-lg" type="text" id="lastname" value="${user.lastname}" required>
+          <input class="form-control form-control-lg" type="text" id="lastname" value="${user.lastname}">
         </div>
       </div>
       <div class="py-3 mb-4 d-flex gap-3">
@@ -233,7 +164,7 @@ class ViewProfile extends HTMLElement {
 
   async #loadUser() {
     try {
-      this.#user = await fake_getUser();
+      this.#user = getProfile();
       this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
     } catch (err) {
       console.error(err);
@@ -248,85 +179,47 @@ class ViewProfile extends HTMLElement {
     });
 
     const avatarInput = this.querySelector('#avatarFile');
-    avatarInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const avatarImage = this.querySelector('img');
-      avatarImage.src = URL.createObjectURL(file);
-      // user.avatar = URL.createObjectURL(file);
-    }
-  });
+    avatarInput.addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (file) {
+        const avatarImage = this.querySelector('#viewProfile-edit-avatarImg');
+        avatarImage.src = URL.createObjectURL(file);
+      }
+    });
   }
 
   #resetProfile() {
     this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
   }
 
-  async saveAvatar(avatarFile) {
-    const formData = new FormData();
-    formData.append('avatar', avatarFile);
-    formData.append('id', user.id); // Assurez-vous que l'ID de l'utilisateur est correctement défini.
-
-    console.log("avatarFile:", avatarFile);
-    console.log("avatarFile:", user.id);
-    console.log(formData);
-
-
-    try {
-      const response = await fetch('http://127.0.0.1:8002/save_avatar/', {
-        method: 'POST',
-        credentials: 'include',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Échec de la mise à jour de l'avatar avec le statut ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log(data.avatar);
-      if (data.success) {
-        user.avatar = data.avatar;
-        // this.#user.avatar = data.avatar; // Mettez à jour l'URL de l'avatar si nécessaire.
-      } else {
-        throw new Error('Échec de la mise à jour de l\'avatar');
-      }
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi de l\'avatar:', error);
-      throw error;
-    }
-  }
-
   async #saveProfile() {
     const profileEditForm = this.querySelector('#profile-edit');
     if (profileEditForm) {
+      const avatarFile = profileEditForm.querySelector('#avatarFile').files[0];
+      let avatarURL;
+      if (avatarFile) {
+        // Créez une URL pour l'objet fichier
+        avatarURL = URL.createObjectURL(avatarFile);
+        const avatarImage = profileEditForm.querySelector('img');
+        avatarImage.src = avatarURL;
+        // await saveAvatar(avatarFile);
+        
+      }
       const newUser = {
         username: profileEditForm.querySelector('#username').value,
         email: profileEditForm.querySelector('#email').value,
         firstname: profileEditForm.querySelector('#firstname').value,
         lastname: profileEditForm.querySelector('#lastname').value,
-        avatar: this.#user.avatar,
         id: user.id,
+        avatarFile: avatarFile,
       };
-      const avatarFile = profileEditForm.querySelector('#avatarFile').files[0];
-      if (avatarFile) {
-      // Créez une URL pour l'objet fichier
-      const avatarURL = URL.createObjectURL(avatarFile);
-      
-      // Mettez à jour la source de l'image dans le formulaire d'édition de profil
-      const avatarImage = profileEditForm.querySelector('img');
-      // user.avatar = avatarURL;
-      avatarImage.src = avatarURL;
-
-      // Continuez avec l'envoi du fichier à votre backend
-      await this.saveAvatar(avatarFile);
-      }
+      console.log("object newuser", newUser);
       try {
         this.querySelector('#profile-edit-loader').hidden = false;
         this.querySelector('#profile-edit').classList.add('opacity-25');
         const response = await saveUser(newUser);
         if (response.success) {
-          this.#user = response.user;
+          this.#user = getProfile();
           this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
         } else {
           this.querySelector('#profile-edit-loader').hidden = true;

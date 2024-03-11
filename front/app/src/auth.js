@@ -1,5 +1,4 @@
-// import profileSvg from '@/assets/img/profile.svg';
-import profilePic from './assets/img/profile.jpg';
+// import profilePic from './assets/img/profile.jpg';
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
@@ -7,17 +6,24 @@ const user = {
   id: null,
   username: null,
   email: null,
-  avatar: profilePic,
-  firstname: "...",
-  lastname: "...",
+  avatar: null,
+  firstname: null,
+  lastname: null,
+};
+
+const setLocalAvatar = avatar => {
+  user.avatar = avatar || 'assets/img/default-profile.jpg';
 };
 
 const setLocalUser = data => {
   localStorage.setItem('isLogged', 'true');
   user.isAuthenticated = true;
-  user.id = data.id;
-  user.email = data.email;
-  user.username = data.username;
+  user.id = data.id || '';
+  user.email = data.email || '';
+  user.username = data.username || '';
+  setLocalAvatar(data.avatar);
+  user.firstname = data.firstname || '';
+  user.lastname = data.lastname || '';
 };
 
 const resetLocalUser = () => {
@@ -26,6 +32,9 @@ const resetLocalUser = () => {
   user.id = null;
   user.email = null;
   user.username = null;
+  user.avatar = null;
+  user.firstname = null;
+  user.lastname = null;
 };
 
 const isAuthenticated = async () => {
@@ -54,7 +63,8 @@ const getCSRFToken = () => {
   const csrfTokenCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
   if (csrfTokenCookie) {
     console.log('csrf find');
-    return csrfTokenCookie.split('=')[1];
+    //127.0.0.1:8000/#/
+    http: return csrfTokenCookie.split('=')[1];
   }
   console.log('csrf not find');
   return null; // Retourne null si le cookie CSRF n'est pas trouvé
@@ -89,7 +99,7 @@ const getCsrfToken = async () => {
     return data.csrfToken;
   }
   throw new Error('Could not retrieve CSRF token');
-}
+};
 
 const getProfile = () => {
   return {
@@ -99,48 +109,160 @@ const getProfile = () => {
     firstname: user.firstname,
     lastname: user.lastname,
     avatar: user.avatar,
-    // avatar: `https://i.pravatar.cc/300?u=6${user.id}`,
   };
 };
 
+const saveAvatar = async formData => {
+  try {
+    const response = await fetch('http://127.0.0.1:8002/save_avatar/', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Échec de la mise à jour de l'avatar avec le statut ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error("Échec de la mise à jour de l'avatar");
+    }
+    setLocalAvatar(data.avatar);
+    return data;
+  } catch (error) {
+    return { success: false, avatar: '' };
+  }
+};
+
+// const saveUser = async newUser => {
+//   try {
+//     const response = await fetch('http://127.0.0.1:8002/update_user/', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         // 'X-CSRFToken': getCSRFToken(),
+//       },
+//       credentials: 'include',
+//       body: JSON.stringify(newUser),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error('La requête a échoué avec le statut ' + response.status);
+//     }
+
+//     const data = await response.json();
+
+//     console.log(data);
+
+//     user.firstname = data.firstname;
+//     user.lastname = data.lastname;
+//     user.username = data.username;
+//     user.email = data.email;
+//     user.avatar = data.avatar;
+
+//     return data;
+//   } catch (error) {
+//     console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
+//     return null;
+//   }
+// };
+
+const saveUser = async newUser => {
+
+  console.log("object newUser saveUser", newUser);
+
+  const formData = new FormData();
+  formData.append('username', newUser.username);
+  formData.append('email', newUser.email);
+  formData.append('firstname', newUser.firstname);
+  formData.append('lastname', newUser.lastname);
+  formData.append('id', newUser.id);
+
+  // Vérifiez si avatarURL est un blob et ajoutez-le seulement dans ce cas
+  // if (newUser.avatar && newUser.avatar.startsWith('blob:')) {
+  //   formData.append('avatar', newUser.avatarFile); // Assurez-vous de passer l'objet File, pas l'URL
+  // }
+
+  if (newUser.avatarFile) { // Assurez-vous que newUser.avatarFile est défini et contient l'objet File de l'avatar
+    formData.append('avatar', newUser.avatarFile);
+  }
+
+  console.log("formData", formData);
+
+  // Pour afficher le contenu de formData
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}: ${value}`);
+  }
+
+  try {
+    const response = await fetch('http://127.0.0.1:8002/update_user/', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('La requête a échoué avec le statut ' + response.status);
+    }
+
+    const data = await response.json();
+    console.log(data);
+
+    //MAJ object user
+    user.firstname = data.firstname;
+    user.lastname = data.lastname;
+    user.username = data.username;
+    user.email = data.email;
+    user.avatar = data.avatar;
+    newUser.avatar = data.avatar;
+
+    return data;
+  } catch (error) {
+    console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
+    return null;
+  }
+};
+
+
 const loginUser = async (formData, csrfToken) => {
   const response = await fetch('http://127.0.0.1:8001/accounts/login/', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
   });
   return response.json(); // Retourne la promesse résolue avec les données JSON
-}
+};
 
 const sendSignUpRequest = async (formData, csrfToken) => {
   const response = await fetch('http://127.0.0.1:8001/accounts/register/', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
   });
   return response.json(); // Retourne la promesse résolue avec les données JSON
-}
+};
 
 const passwordReset = async (formData, csrfToken) => {
   const response = await fetch('http://127.0.0.1:8001/accounts/password_reset/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    });
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
+  });
   return response.json();
-}
+};
 
 const sendEmailPasswordReset = async (formData, csrfToken, url) => {
   const response = await fetch(url, {
@@ -153,6 +275,20 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
     body: JSON.stringify(formData),
   });
   return response.json();
-}
+};
 
-export { user, isAuthenticated, getCSRFToken, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset };
+export {
+  user,
+  isAuthenticated,
+  getCSRFToken,
+  logout,
+  getProfile,
+  saveAvatar,
+  saveUser,
+  getCsrfToken,
+  loginUser,
+  sendSignUpRequest,
+  passwordReset,
+  sendEmailPasswordReset,
+  setLocalUser,
+};
