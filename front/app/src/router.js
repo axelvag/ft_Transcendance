@@ -16,6 +16,7 @@ import '@/views/view-new-pass.ce.js';
 import '@/views/view-dashboard.ce.js';
 import '@/views/view-settings.ce.js';
 import '@/views/view-careers.ce.js';
+import '@/views/view-rank.ce.js';
 
 const isLoggedOutGuard = async () => {
   const isLoggedin = await isAuthenticated();
@@ -133,12 +134,21 @@ const router = new Router({
       path: '/game/online',
       title: 'Game online',
       template: '<view-game-online></view-game-online>',
+      beforeEnter: isLoggedInGuard,
     },
     {
       name: 'game-online-play',
       path: '/game/online/:gameId',
       title: 'Game online',
       template: params => `<view-game-online game-id="${params.gameId}"></view-game-online>`,
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'rank',
+      path: '/rank',
+      title: 'Rank',
+      template: '<view-rank></view-rank>',
+      beforeEnter: isLoggedInGuard,
     },
     {
       name: 'not-found',

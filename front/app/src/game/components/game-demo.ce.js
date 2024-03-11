@@ -1,7 +1,7 @@
 import './game-demo.ce.scss';
 import './game-renderer-3d.ce.js';
-import GameWorker from '../localApi/GameWorker.js?worker';
-import calculateNextAiPosition from '../localApi/calculateNextAiPosition.js';
+import GameWorker from '../utils/GameWorker.js?worker';
+import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
 
 class GameDemo extends HTMLElement {
   #gameState = null;

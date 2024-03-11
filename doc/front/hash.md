@@ -25,6 +25,7 @@ const routes = {
   '/not-found': { title: 'Not Found', template: notFound },
   '/game': { title: 'Game', template: '<view-game></view-game>' },
   '/logout': { title: 'Logout', template: logout },
+  '/rank': { title: 'Rank', template: rank },
 };
 ```
 
