@@ -51,34 +51,6 @@ const isAuthenticated = async () => {
   return user.isAuthenticated;
 };
 
-const getCSRFToken = () => {
-  const csrfTokenCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
-  if (csrfTokenCookie) {
-    console.log('csrf find');
-    return csrfTokenCookie.split('=')[1];
-  }
-  console.log('csrf not find');
-  return null; // Retourne null si le cookie CSRF n'est pas trouvé
-};
-
-const logout = async () => {
-  try {
-    await fetch(`${API_BASE_URL}/accounts/logout/`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': getCSRFToken(),
-      },
-    });
-  } catch (error) {
-    console.error('Error:', error);
-  }
-
-  resetLocalUser();
-};
-
 const getCsrfToken = async () => {
   const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
     method: 'GET',
@@ -91,6 +63,26 @@ const getCsrfToken = async () => {
   }
   throw new Error('Could not retrieve CSRF token');
 }
+
+const logout = async () => {
+  try {
+    const csrfToken = await getCsrfToken();
+    await fetch(`${API_BASE_URL}/accounts/logout/`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': csrfToken,
+      },
+    });
+  } catch (error) {
+    console.error('Error:', error);
+  }
+
+  resetLocalUser();
+};
+
 
 const getProfile = () => {
   return {
@@ -155,4 +147,4 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
   return response.json();
 }
 
-export { user, isAuthenticated, getCSRFToken, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset };
+export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset };

@@ -1,6 +1,6 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { getCSRFToken, getProfile } from '@/auth.js';
+import { getCsrfToken, getProfile } from '@/auth.js';
 
 const fake_getUser = async () => {
   return new Promise(resolve => {
@@ -27,7 +27,7 @@ const saveUser = async newUser => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': getCSRFToken(),
+        'X-CSRFToken': getCsrfToken(),
         // Ajoutez ici d'autres en-têtes nécessaires, comme les tokens CSRF ou d'authentification
       },
       credentials: 'include',

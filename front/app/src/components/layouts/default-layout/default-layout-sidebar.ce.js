@@ -138,14 +138,6 @@ class DefaultLayoutSidebar extends HTMLElement {
     localStorage.setItem('isLogged', 'false');
     redirectTo('/');
   }
-
-  // Fonction pour obtenir le token CSRF depuis le cookie
-  getCSRFToken() {
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith('csrftoken='))
-      .split('=')[1];
-  }
 }
 
 customElements.define('default-layout-sidebar', DefaultLayoutSidebar);
