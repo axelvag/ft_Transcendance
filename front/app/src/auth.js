@@ -96,8 +96,8 @@ const getProfile = () => {
     id: user.id,
     username: user.username,
     email: user.email,
-    firstname: '',
-    lastname: '',
+    firstname: user.firstname,
+    lastname: user.lastname,
     avatar: user.avatar,
     // avatar: `https://i.pravatar.cc/300?u=6${user.id}`,
   };

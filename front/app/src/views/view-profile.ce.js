@@ -1,8 +1,8 @@
-import { redirectTo } from '@/router.js';
-import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
+// import { redirectTo } from '@/router.js';
+// import { verifyUserLoginAndDisplayDashboard } from '@/auth.js';
 // import { getCSRFToken } from '@/auth.js';
 import { user } from '@/auth.js';
-import { isAuthenticated } from '@/auth.js';
+// import { isAuthenticated } from '@/auth.js';
 // import '@/components/layouts/default-layout-sidebar.ce.js';
 // import '@/components/layouts/default-layout-main.ce.js';
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
