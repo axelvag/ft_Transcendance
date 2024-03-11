@@ -1,13 +1,13 @@
-import './game-renderer-2d.ce.js';
+import './game-renderer-3d.ce.js';
 import './game-player.ce.js';
 import './game-scoreboard.ce.js';
 import './game-dialog.ce.js';
 import './game-play.ce.scss';
-import GameWorker from '../localApi/GameWorker.js?worker';
-import AudioPlayer from '../localApi/AudioPlayer.js';
+import GameWorker from '../utils/GameWorker.js?worker';
+import AudioPlayer from '../utils/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
-import calculateNextAiPosition from '../localApi/calculateNextAiPosition.js';
+import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
 
 const template = `
 <div class="gamePlay" hidden>
@@ -26,7 +26,7 @@ const template = `
       </div>
       </div>
       <div class="gamePlay-body-center">
-        <game-renderer-2d class="gamePlay-renderer"></game-renderer-2d>
+        <game-renderer-3d class="gamePlay-renderer"></game-renderer-3d>
       </div>
       <div class="gamePlay-body-right">
         <div class="gamePlay-touchBtn is-playerRight is-up">
@@ -39,12 +39,9 @@ const template = `
       </div>
     </div>
     <div class="gamePlay-footer">
-      <div class="gamePlay-tip">
-        <span class="gamePlay-tip-icon">
-          <ui-icon name="bulb"></ui-icon>
-        </span>
-        <span class="gamePlay-tip-text">Press Spacebar to pause / resume the game.</span>
-      </div>
+      <a href="#" class="gamePlay-footer-btn pause">
+        <ui-icon name="pause"></ui-icon>
+      </a>
     </div>
   </div>
   <game-dialog class="gamePlay-dialog"></game-dialog>
@@ -161,16 +158,23 @@ class GamePlay extends HTMLElement {
     // UI Events
     document.addEventListener('keydown', this.handleKeyDown);
     document.addEventListener('keyup', this.handleKeyUp);
-    document.addEventListener('click', this.handleClick);
     document.addEventListener('touchstart', this.handleTouchStart);
     document.addEventListener('touchend', this.handleTouchEnd);
+
+    // pause button
+    this.querySelector('.pause').addEventListener('click', e => {
+      e.preventDefault();
+      this.gameWorker.postMessage({ type: 'pause' });
+    });
   }
 
   disconnectedCallback() {
+    // stop renderer
+    this.rendererEl.stop();
+
     // remove events
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);
-    document.removeEventListener('click', this.handleClick);
     document.removeEventListener('touchstart', this.handleTouchStart);
     document.removeEventListener('touchend', this.handleTouchEnd);
 

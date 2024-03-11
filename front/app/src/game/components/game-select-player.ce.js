@@ -1,5 +1,5 @@
 import { isAuthenticated, getProfile } from '@/auth.js';
-import { characters } from '../localApi/characters';
+import { characters } from '../utils/characters';
 
 class GameSelectPlayer extends HTMLElement {
   #title = 'Select Player';
@@ -17,19 +17,25 @@ class GameSelectPlayer extends HTMLElement {
 
     // options
     this.#options = characters.map(character => ({ ...character, type: this.#playerType }));
-    const isLoggedIn = await isAuthenticated();
-    if (isLoggedIn) {
-      const profile = getProfile();
-      this.#options.unshift({
-        id: profile.id,
-        name: profile.username,
-        avatar: profile.avatar,
-        type: this.#playerType,
-      });
+
+    if (this.hasAttribute('include-user')) {
+      const isLoggedIn = await isAuthenticated();
+      if (isLoggedIn) {
+        const profile = getProfile();
+        this.#options.unshift({
+          id: profile.id,
+          name: profile.username,
+          avatar: profile.avatar,
+          type: this.#playerType,
+        });
+      }
     }
 
     // selected
     this.#selected = this.#options.find(option => option.id == this.getAttribute('selected-id'));
+    if (!this.#selected) {
+      this.#selected = this.#options[0];
+    }
 
     const optionsHtml = this.#options
       .map(option => {
