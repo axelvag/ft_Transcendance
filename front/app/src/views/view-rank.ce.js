@@ -8,7 +8,7 @@ class ViewRank extends HTMLElement {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
-        <h1 class="display-5 fw-bold mb-4 text-center mt-n5">
+        <h1 class="display-5 fw-bold mb-4 text-center mt-md-n5 mt-0">
           <img src="assets/img/rank-icon.png" alt="logo_rank" style="width: 70px; height: 80px; margin-right: 10px;">
           Rank
         </h1>
