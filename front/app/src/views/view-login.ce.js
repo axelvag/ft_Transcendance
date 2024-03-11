@@ -105,6 +105,13 @@ class ViewSignIn extends HTMLElement {
           user.id = data.id;
           user.email = data.email;
           user.username = data.username;
+          user.victories = data.victories;
+          user.lost = data.lost;
+          user.online = data.online;
+          user.local = data.local;
+          user.nbtotal = data.nbtotal;
+          user.timeplay = data.timeplay;
+          user.friends = data.friends;
           redirectTo('/dashboard'); // Assurez-vous que redirectTo est correctement importé
       }  else {
           if (data.message === 'User not active.') this.emailError.style.display = 'block';

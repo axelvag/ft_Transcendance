@@ -8,7 +8,7 @@ class ViewFriend extends HTMLElement {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>
-        <h1 class="display-5 fw-bold mb-4 text-center" style="margin-top: -50px;">
+        <h1 class="display-5 fw-bold mb-4 text-center mt-md-n5 mt-0">
           Friends
         </h1>
 
@@ -17,11 +17,11 @@ class ViewFriend extends HTMLElement {
         <div class="container">
           <div class="row">
             <div class="col-md-3 ms-md-auto">
-                <img src="https://pbs.twimg.com/media/E3-FSn5XwAMwOYR.jpg" class="img-thumbnail rounded-circle mx-auto d-block" width="200" height="200" alt="character">
+                <img src="assets/img/avatar-careers.jpg" class="img-thumbnail rounded-circle mx-auto d-block" width="200" height="200" alt="character">
             </div>
             <div class="col-md-6">
               <h1 class="display-4 mb-3 mt-5 fw-bold">${user.username}</h1>
-              <h4 class="text-bicolor">0 Friends</h4>
+              <h4 class="text-bicolor">${user.friends} Friends</h4>
             </div>
           </div>
         </div>

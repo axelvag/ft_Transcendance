@@ -5,6 +5,13 @@ const user = {
   id: null,
   username: null,
   email: null,
+  victories: 0,
+  lost: 0,
+  online: 0,
+  local: 0,
+  timeplay: 0,
+  nbtotal: 0,
+  friends: 0,
   avatar: null,
   first_name: null,
   last_name: null,
@@ -16,6 +23,14 @@ const setLocalUser = data => {
   user.id = data.id;
   user.email = data.email;
   user.username = data.username;
+
+  user.victories = 183;
+  user.lost = 13;
+  user.online = 160;
+  user.local = 27;
+  user.timeplay = 130;
+  user.nbtotal = 1;
+  user.friends = 0;
 };
 
 const resetLocalUser = () => {
@@ -24,6 +39,13 @@ const resetLocalUser = () => {
   user.id = null;
   user.email = null;
   user.username = null;
+  user.victories = 0;
+  user.lost = 0;
+  user.online = 0;
+  user.local = 0;
+  user.timeplay = 0;
+  user.nbtotal = 0;
+  user.friends = 0;
   user.avatar = null;
   user.first_name = null;
   user.last_name = null;
