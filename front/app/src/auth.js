@@ -5,6 +5,9 @@ const user = {
   id: null,
   username: null,
   email: null,
+  avatar: null,
+  first_name: null,
+  last_name: null,
 };
 
 const setLocalUser = data => {
@@ -21,6 +24,9 @@ const resetLocalUser = () => {
   user.id = null;
   user.email = null;
   user.username = null;
+  user.avatar = null;
+  user.first_name = null;
+  user.last_name = null;
 };
 
 const isAuthenticated = async () => {
@@ -91,9 +97,9 @@ const getProfile = () => {
     id: user.id,
     username: user.username,
     email: user.email,
-    firstname: '',
-    lastname: '',
-    avatar: `https://i.pravatar.cc/300?u=6${user.id}`,
+    firstname: user.first_name ?? "",
+    lastname: user.last_name ?? "",
+    avatar: user.avatar ?? `https://i.pravatar.cc/300?u=6${user.id}`,
   };
 };
 
