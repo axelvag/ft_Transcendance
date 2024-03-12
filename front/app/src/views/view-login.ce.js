@@ -86,17 +86,22 @@ class ViewSignIn extends HTMLElement {
 
     const csrfToken = await getCsrfToken();
     try {
-      const data = await loginUser(formData, csrfToken); // Utilisez la nouvelle fonction pour la requête
+      const data = await loginUser(formData, csrfToken);
       console.log('error', data);
       if (data.success) {
-        console.log('Sucess!');
-        localStorage.setItem('isLogged', 'true');
-        user.isAuthenticated = true;
-        user.id = data.id;
-        user.email = data.email;
-        user.username = data.username;
-        setLocalUser(user);
-        redirectTo('/dashboard'); // Assurez-vous que redirectTo est correctement importé
+        setLocalUser(data);
+        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const userProfileData = await userProfileResponse.json();
+        console.log(userProfileData);
+        if (userProfileData.success) {
+          setLocalUser(userProfileData);
+        } else {
+          console.error('Failed to load user profile:', userProfileData.message);
+        }
+        redirectTo('/dashboard');
       } else {
         if (data.message === 'User not active.') this.emailError.style.display = 'block';
         else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';

@@ -48,6 +48,18 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
+        console.log("dwedededee",user.id);
+        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const userProfileData = await userProfileResponse.json();
+        console.log(userProfileData);
+        if (userProfileData.success) {
+          setLocalUser(userProfileData);
+        } else {
+          console.error('Failed to load user profile:', userProfileData.message);
+        }
       } else {
         resetLocalUser();
       }
@@ -112,28 +124,28 @@ const getProfile = () => {
   };
 };
 
-const saveAvatar = async formData => {
-  try {
-    const response = await fetch('http://127.0.0.1:8002/save_avatar/', {
-      method: 'POST',
-      credentials: 'include',
-      body: formData,
-    });
+// const saveAvatar = async formData => {
+//   try {
+//     const response = await fetch('http://127.0.0.1:8002/save_avatar/', {
+//       method: 'POST',
+//       credentials: 'include',
+//       body: formData,
+//     });
 
-    if (!response.ok) {
-      throw new Error(`Échec de la mise à jour de l'avatar avec le statut ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`Échec de la mise à jour de l'avatar avec le statut ${response.status}`);
+//     }
 
-    const data = await response.json();
-    if (!data.success) {
-      throw new Error("Échec de la mise à jour de l'avatar");
-    }
-    setLocalAvatar(data.avatar);
-    return data;
-  } catch (error) {
-    return { success: false, avatar: '' };
-  }
-};
+//     const data = await response.json();
+//     if (!data.success) {
+//       throw new Error("Échec de la mise à jour de l'avatar");
+//     }
+//     setLocalAvatar(data.avatar);
+//     return data;
+//   } catch (error) {
+//     return { success: false, avatar: '' };
+//   }
+// };
 
 // const saveUser = async newUser => {
 //   try {
@@ -179,12 +191,7 @@ const saveUser = async newUser => {
   formData.append('lastname', newUser.lastname);
   formData.append('id', newUser.id);
 
-  // Vérifiez si avatarURL est un blob et ajoutez-le seulement dans ce cas
-  // if (newUser.avatar && newUser.avatar.startsWith('blob:')) {
-  //   formData.append('avatar', newUser.avatarFile); // Assurez-vous de passer l'objet File, pas l'URL
-  // }
-
-  if (newUser.avatarFile) { // Assurez-vous que newUser.avatarFile est défini et contient l'objet File de l'avatar
+  if (newUser.avatarFile) { 
     formData.append('avatar', newUser.avatarFile);
   }
 
@@ -283,7 +290,6 @@ export {
   getCSRFToken,
   logout,
   getProfile,
-  saveAvatar,
   saveUser,
   getCsrfToken,
   loginUser,

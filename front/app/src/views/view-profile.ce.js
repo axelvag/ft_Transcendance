@@ -1,4 +1,4 @@
-import { user, getProfile, saveAvatar, saveUser } from '@/auth.js';
+import { user, getProfile, saveUser } from '@/auth.js';
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 
@@ -96,7 +96,7 @@ const editProfileTemplate = user => `
         </div>
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="email">Email</label>
-          <input class="form-control form-control-lg" type="email" id="email" value="${user.email}" required>
+          <input class="form-control form-control-lg" type="email" id="email" value="${user.email}" disabled>
         </div>
       </div>
       <div class="row">

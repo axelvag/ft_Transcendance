@@ -307,6 +307,11 @@ def update_profile(request):
     username = data.get('username')
     email = data.get('email')
 
+    logging.critical(data)
+    logging.critical(request)
+    print(user_id)
+    logging.critical(user_id)
+
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
@@ -321,3 +326,20 @@ def update_profile(request):
     
     logging.critical("blablabla")
     return JsonResponse({"success": True, "message": "Informations utilisateur mises à jour avec succès.", "username": user.username, "email": user.email})
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_profile(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        logging.critical("Utilisateur non trouvé.")
+        return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+
+    # Renvoi des informations de l'utilisateur
+    return JsonResponse({
+        "success": True,
+        "message": "Informations utilisateur récupérées avec succès.",
+        "username": user.username,
+        "email": user.email
+    })
