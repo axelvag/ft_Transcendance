@@ -1,7 +1,7 @@
 import './components/game-select-player.ce.js';
 import './components/game-play.ce.js';
 import { redirectTo } from '@/router.js';
-import { characters } from './localApi/characters.js';
+import { characters } from './utils/characters.js';
 import { isAuthenticated, getProfile } from '@/auth.js';
 
 class ViewGameOffline extends HTMLElement {
@@ -49,6 +49,7 @@ class ViewGameOffline extends HTMLElement {
         title="${this.#duo ? 'Choose Player Left' : 'Choose your character'}"
         selected-id="${this.#playerLeft?.id}"
         type="${this.#playerLeft?.type}"
+        include-user
       ></game-select-player>
     `;
 

@@ -94,6 +94,11 @@ class GameRenderer3D extends HTMLElement {
   }
 
   init(gameState) {
+    if (this.#gameState) {
+      this.update(gameState);
+      return;
+    }
+
     this.#gameState = gameState;
 
     // set CSS

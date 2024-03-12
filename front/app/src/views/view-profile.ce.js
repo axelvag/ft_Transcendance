@@ -103,7 +103,7 @@ const viewProfileTemplate = user => `
       <div class="form-label opacity-75 mb-1">Email</div>
       <div class="fs-5 fw-semibold">${user.email}</div>
     </div>
-    <div class="mb-4">
+    <div class="mb-4" ${!user.firstname && !user.lastname && 'hidden'}>
       <div class="form-label opacity-75 mb-1">Name</div>
       <div class="fs-5 fw-semibold">${user.firstname} ${user.lastname}</div>
     </div>
