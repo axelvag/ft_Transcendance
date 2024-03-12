@@ -1,3 +1,5 @@
+import { redirectTo } from '@/router.js';
+
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
@@ -147,4 +149,45 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
   return response.json();
 }
 
-export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset };
+const handleOAuthResponse = async () => {
+  if (window.location.search.includes("code=")) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      console.log(code);
+      const csrfToken = await getCsrfToken();
+      // Envoyer le code d'autorisation au serveur pour obtenir un token d'accès
+      fetch('http://127.0.0.1:8001/accounts/oauth/callback/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfToken,
+          },
+          credentials: 'include',
+          body: JSON.stringify({ code: code })
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log(data); // Traiter la réponse
+          if (data.access_token) {
+              localStorage.setItem('isLogged', 'true');
+              user.isAuthenticated = true;
+              user.id = data.id;
+              user.email = data.email;
+              user.username = data.username;
+              user.avatar = data.avatar.link;
+              user.first_name = data.first_name;
+              user.last_name = data.last_name;
+              console.log(user.avatar);
+              redirectTo('/dashboard');
+          }
+      })
+      .catch(error => console.error('Erreur:', error));
+  }
+}
+
+const getAuthorizationCode = () => {
+  const url = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2F&response_type=code`;
+  window.location.href = url;
+}  
+
+export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode };
