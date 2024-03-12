@@ -17,7 +17,7 @@ import '@/views/view-dashboard.ce.js';
 import '@/views/view-settings.ce.js';
 import '@/views/view-careers.ce.js';
 import '@/views/view-rank.ce.js';
-import '@/views/view-loading.ce.js';
+import '@/views/view-auth42-callback.ce.js';
 
 const isLoggedOutGuard = async () => {
   const isLoggedin = await isAuthenticated();
@@ -158,10 +158,10 @@ const router = new Router({
       template: '<view-not-found></view-not-found>',
     },
     {
-      name: 'loading',
-      path: '/loading',
-      title: 'Loading',
-      template: '<<view-loading></view-loading>>',
+      name: 'auth42-callback',
+      path: '/auth42-callback',
+      title: 'Auth42-callback',
+      template: '<<view-auth42-callback></view-auth42-callback>>',
       beforeEnter: isLoggedOutGuard,
     },
   ],
