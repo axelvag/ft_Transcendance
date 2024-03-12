@@ -45,6 +45,11 @@ class ViewSignIn extends HTMLElement {
             <div id="password-error" class="alert alert-danger mt-4" style="display: none;">Identifiants ou mot de passe incorrects.</div>
             <div id="email-error" class="alert alert-danger mt-4" style="display: none;">Verifier vos emails.</div>
           </div>
+          <div id="OAuth42">
+              <a href="#" id="OAuth-42">
+              Se connecter avec 42
+              </a>
+            </div>
           <div class="d-grid pt-3">
             <button type="submit" class="btn btn-primary btn-lg fw-bold">
               Log In
@@ -68,6 +73,11 @@ class ViewSignIn extends HTMLElement {
     this.querySelector('#signin-form').addEventListener('submit', this.submitForm.bind(this));
     this.passwordError = this.querySelector('#password-error');
     this.emailError = this.querySelector('#email-error');
+
+    this.querySelector('#OAuth-42').addEventListener('click', event => {
+      event.preventDefault();
+      this.getAuthorizationCode();
+    });
   }
 
   async submitForm(event) {
@@ -110,6 +120,19 @@ class ViewSignIn extends HTMLElement {
       console.error('Login failed:', error);
     }
   }
+
+  getAuthorizationCode() {
+    const authorizationUrl =
+        "https://api.intra.42.fr/oauth/authorize";
+    const clientId =
+        "u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0";
+    const redirectUri =
+        "https%3A%2F%2F127.0.0.1%3A5500%2FWeb%2Fbackend%2Fauthentification%2Ftemplates%2Flogin_with42api.html";
+    const responseType = "code";
+    // const url = `${authorizationUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}`;
+    const url = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2F&response_type=code`;
+    window.location.href = url;
+  }  
 }
 
 customElements.define('view-signin', ViewSignIn);

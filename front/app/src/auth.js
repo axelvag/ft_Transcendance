@@ -9,6 +9,16 @@ const user = {
   avatar: null,
   firstname: null,
   lastname: null,
+  avatar: null,
+
+  //stat
+  victories: 0,
+  lost: 0,
+  online: 0,
+  local: 0,
+  timeplay: 0,
+  nbtotal: 0,
+  friends: 0,
 };
 
 const setLocalAvatar = avatar => {
@@ -24,6 +34,25 @@ const setLocalUser = data => {
   setLocalAvatar(data.avatar);
   user.firstname = data.firstname || '';
   user.lastname = data.lastname || '';
+  user.id = data.id;
+  user.email = data.email;
+  user.username = data.username;
+
+  //stat
+  user.victories = 183;
+  user.lost = 13;
+  user.online = 160;
+  user.local = 27;
+  user.timeplay = 130;
+  user.nbtotal = 1;
+  user.friends = 0;
+  // user.victories = data.victories;
+  // user.lost = data.lost;
+  // user.online = data.online;
+  // user.local = data.local;
+  // user.nbtotal = data.nbtotal;
+  // user.timeplay = data.timeplay;
+  // user.friends = data.friends;
 };
 
 const resetLocalUser = () => {
@@ -35,6 +64,16 @@ const resetLocalUser = () => {
   user.avatar = null;
   user.firstname = null;
   user.lastname = null;
+
+  //stat
+  user.victories = 0;
+  user.lost = 0;
+  user.online = 0;
+  user.local = 0;
+  user.timeplay = 0;
+  user.nbtotal = 0;
+  user.friends = 0;
+  user.avatar = null;
 };
 
 const isAuthenticated = async () => {
