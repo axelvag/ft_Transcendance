@@ -11,3 +11,8 @@
 .no-wrap {
   flex-wrap: nowrap !important; /* Utilisation de !important pour s'assurer que cette règle CSS est prioritaire */
 }
+
+.spinner-border {
+  width: 12rem;
+  height: 12rem;
+}
