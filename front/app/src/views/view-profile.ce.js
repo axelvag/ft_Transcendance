@@ -1,6 +1,7 @@
 import { user, getProfile, saveUser } from '@/auth.js';
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
+// import { getCsrfToken} from '@/auth.js';
 
 const loadingProfileTemplate = `
   <div class="placeholder-glow">

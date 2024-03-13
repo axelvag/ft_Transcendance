@@ -73,6 +73,9 @@ def login_user(request):
         password = data["password"]
         user = None
 
+        if len(password) < 8:
+            return JsonResponse({"success": False, "message": "Invalid username or password."}, status=HttpResponseBadRequest.status_code)
+
         if '@' in username_or_email:
             try:
                 user = User.objects.get(email=username_or_email)
@@ -405,18 +408,20 @@ def oauth_callback(request):
                         # first_name=profile_data_json.get('first_name', ''),  # Utilisez `.get` pour éviter KeyError si la clé n'existe pas
                         # last_name=profile_data_json.get('last_name', '')
                     )
-                    user.set_password('un_mot_de_passe_temporaire_ou_sécurisé')
+                    user.set_password('Api42')
                     user.is_active = True
                     user.save()
+                    register = True
                     print(f"L'utilisateur {user.username} a été créé avec succès.")
-                    user = authenticate(username=user.username, password='un_mot_de_passe_temporaire_ou_sécurisé')
+                    user = authenticate(username=user.username, password='Api42')
                     if user is not None:
                         login(request, user)
                     else:
                         return JsonResponse({'error': 'Authentification fail'}, status=400)
                 else:
+                    register = False
                     user = User.objects.get(email=profile_data_json.get('email'))
-                    if not user.check_password('un_mot_de_passe_temporaire_ou_sécurisé'):  # Vérifie le mot de passe pour l'email
+                    if not user.check_password('Api42'):  # Vérifie le mot de passe pour l'email
                         user = None
                     # user = authenticate(username=profile_data_json.get('login'), password='un_mot_de_passe_temporaire_ou_sécurisé')
                     if user is not None:
@@ -425,7 +430,7 @@ def oauth_callback(request):
                         return JsonResponse({'error': 'Authentification fail user exist'}, status=400)
             else:
                 return JsonResponse({'error': f"Erreur lors de la récupération des données de profil: {profile_data.status_code}"}, status=400)
-            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token, "username": user.username, "id": user.id, "email": user.email, "avatar": profile_data_json.get('image'), "first_name": profile_data_json.get('first_name'), "last_name": profile_data_json.get('last_name')})
+            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token, "username": user.username, "id": user.id, "email": user.email, "avatar": profile_data_json.get('image'), "first_name": profile_data_json.get('first_name'), "last_name": profile_data_json.get('last_name'), "register": register})
         else:
             return JsonResponse({'error': 'Erreur lors de l\'obtention du token d\'accès'}, status=400)
     else:

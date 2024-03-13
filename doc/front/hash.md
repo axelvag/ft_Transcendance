@@ -26,6 +26,7 @@ const routes = {
   '/game': { title: 'Game', template: '<view-game></view-game>' },
   '/logout': { title: 'Logout', template: logout },
   '/rank': { title: 'Rank', template: rank },
+  '/loading': { title: 'Loading', template: loading },
 };
 ```
 

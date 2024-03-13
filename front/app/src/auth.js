@@ -110,35 +110,6 @@ const isAuthenticated = async () => {
   return user.isAuthenticated;
 };
 
-const getCSRFToken = () => {
-  const csrfTokenCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
-  if (csrfTokenCookie) {
-    console.log('csrf find');
-    //127.0.0.1:8000/#/
-    http: return csrfTokenCookie.split('=')[1];
-  }
-  console.log('csrf not find');
-  return null; // Retourne null si le cookie CSRF n'est pas trouvé
-};
-
-const logout = async () => {
-  try {
-    await fetch(`${API_BASE_URL}/accounts/logout/`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': getCSRFToken(),
-      },
-    });
-  } catch (error) {
-    console.error('Error:', error);
-  }
-
-  resetLocalUser();
-};
-
 const getCsrfToken = async () => {
   const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
     method: 'GET',
@@ -150,7 +121,27 @@ const getCsrfToken = async () => {
     return data.csrfToken;
   }
   throw new Error('Could not retrieve CSRF token');
+}
+
+const logout = async () => {
+  try {
+    const csrfToken = await getCsrfToken();
+    await fetch(`${API_BASE_URL}/accounts/logout/`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': csrfToken,
+      },
+    });
+  } catch (error) {
+    console.error('Error:', error);
+  }
+
+  resetLocalUser();
 };
+
 
 const getProfile = () => {
   return {
@@ -274,17 +265,46 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
   return response.json();
 };
 
-export {
-  user,
-  isAuthenticated,
-  getCSRFToken,
-  logout,
-  getProfile,
-  saveUser,
-  getCsrfToken,
-  loginUser,
-  sendSignUpRequest,
-  passwordReset,
-  sendEmailPasswordReset,
-  setLocalUser,
-};
+const handleOAuthResponse = async () => {
+  if (window.location.search.includes("code=")) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      console.log(code);
+      const csrfToken = await getCsrfToken();
+      // Envoyer le code d'autorisation au serveur pour obtenir un token d'accès
+      fetch('http://127.0.0.1:8001/accounts/oauth/callback/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfToken,
+          },
+          credentials: 'include',
+          body: JSON.stringify({ code: code })
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log(data); // Traiter la réponse
+          if (data.access_token) {
+              localStorage.setItem('isLogged', 'true');
+              user.isAuthenticated = true;
+              user.id = data.id;
+              user.email = data.email;
+              user.username = data.username;
+              user.avatar = data.avatar.link;
+              user.first_name = data.first_name;
+              user.last_name = data.last_name;
+              console.log(user.avatar);
+              console.log(data.register);
+              redirectTo('/dashboard');
+          }
+      })
+      .catch(error => console.error('Erreur:', error));
+  }
+}
+
+const getAuthorizationCode = () => {
+  const url = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth42-callback&response_type=code`;
+  window.location.href = url;
+}  
+
+export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser};
