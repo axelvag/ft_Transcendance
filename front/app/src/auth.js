@@ -163,62 +163,6 @@ const getProfile = () => {
   };
 };
 
-// const saveAvatar = async formData => {
-//   try {
-//     const response = await fetch('http://127.0.0.1:8002/save_avatar/', {
-//       method: 'POST',
-//       credentials: 'include',
-//       body: formData,
-//     });
-
-//     if (!response.ok) {
-//       throw new Error(`Échec de la mise à jour de l'avatar avec le statut ${response.status}`);
-//     }
-
-//     const data = await response.json();
-//     if (!data.success) {
-//       throw new Error("Échec de la mise à jour de l'avatar");
-//     }
-//     setLocalAvatar(data.avatar);
-//     return data;
-//   } catch (error) {
-//     return { success: false, avatar: '' };
-//   }
-// };
-
-// const saveUser = async newUser => {
-//   try {
-//     const response = await fetch('http://127.0.0.1:8002/update_user/', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         // 'X-CSRFToken': getCSRFToken(),
-//       },
-//       credentials: 'include',
-//       body: JSON.stringify(newUser),
-//     });
-
-//     if (!response.ok) {
-//       throw new Error('La requête a échoué avec le statut ' + response.status);
-//     }
-
-//     const data = await response.json();
-
-//     console.log(data);
-
-//     user.firstname = data.firstname;
-//     user.lastname = data.lastname;
-//     user.username = data.username;
-//     user.email = data.email;
-//     user.avatar = data.avatar;
-
-//     return data;
-//   } catch (error) {
-//     console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
-//     return null;
-//   }
-// };
-
 const saveUser = async newUser => {
 
   console.log("object newUser saveUser", newUser);
@@ -253,15 +197,22 @@ const saveUser = async newUser => {
     }
 
     const data = await response.json();
-    console.log(data);
+    console.log("Ladataaaaaa", data);
 
-    //MAJ object user
-    user.firstname = data.firstname;
-    user.lastname = data.lastname;
-    user.username = data.username;
-    user.email = data.email;
-    user.avatar = data.avatar;
-    newUser.avatar = data.avatar;
+    if (data.success){
+      //MAJ object user
+      user.firstname = data.firstname;
+      user.lastname = data.lastname;
+      user.username = data.username;
+      user.email = data.email;
+
+      if (!data.avatar){
+        user.avatar = 'assets/img/default-profile.jpg';
+      }
+      else{
+        user.avatar = data.avatar;
+      }
+    }
 
     return data;
   } catch (error) {
