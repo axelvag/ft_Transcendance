@@ -3,6 +3,32 @@ import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user, isAuthenticated } from '@/auth.js';
 
+const fetchStat = async newStat => {
+  try {
+    const response = await fetch('http://127.0.0.1:8004/statistic/update_stat/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken(),
+        // Ajoutez ici d'autres en-têtes nécessaires, comme les tokens CSRF ou d'authentification
+      },
+      credentials: 'include',
+      body: JSON.stringify(newStat),
+    });
+
+    if (!response.ok) {
+      throw new Error('La requête a échoué avec le statut ' + response.status);
+    }
+
+    const data = await response.json();
+    return data; // Renvoie les données de réponse pour un traitement ultérieur
+  } catch (error) {
+    console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
+    throw error; // Renvoie l'erreur pour une gestion ultérieure
+  }
+};
+
+
 class ViewCareers extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `

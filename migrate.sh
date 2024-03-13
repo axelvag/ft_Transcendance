@@ -7,5 +7,5 @@ docker stop authentification
 docker start authentification
 docker stop friendship
 docker start friendship
-
-# echo "SUCCESS"
+docker stop statistic
+docker start statistic
