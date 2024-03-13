@@ -1,7 +1,7 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
-import { user } from '@/auth.js';
+import { user , getCsrfToken} from '@/auth.js';
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
@@ -60,8 +60,6 @@ class ViewDash extends HTMLElement {
     </default-layout-main>
     `;
   }
-
-  
 }
 
 customElements.define('view-dash', ViewDash);

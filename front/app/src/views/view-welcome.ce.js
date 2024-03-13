@@ -1,7 +1,7 @@
 import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import '@/game/components/game-demo.ce.js';
-import { isAuthenticated, getProfile, logout, getCsrfToken, user } from '@/auth.js';
+import { isAuthenticated, getProfile, logout, getCsrfToken, user, handleOAuthResponse } from '@/auth.js';
 import { redirectTo } from '@/router.js';
 
 class ViewWelcome extends HTMLElement {
@@ -115,50 +115,11 @@ class ViewWelcome extends HTMLElement {
       e.preventDefault();
       this.handleLogout();
     });
-
-
-    this.handleOAuthResponse();
   }
 
   async handleLogout() {
     await logout();
     redirectTo('/');
-  }
-
-  async handleOAuthResponse() {
-    if (window.location.search.includes("code=")) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        console.log(code);
-        const csrfToken = await getCsrfToken();
-        // Envoyer le code d'autorisation au serveur pour obtenir un token d'accès
-        fetch('http://127.0.0.1:8001/accounts/oauth/callback/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-            },
-            credentials: 'include',
-            body: JSON.stringify({ code: code })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data); // Traiter la réponse
-            if (data.access_token) {
-                localStorage.setItem('isLogged', 'true');
-                user.isAuthenticated = true;
-                user.id = data.id;
-                user.email = data.email;
-                user.username = data.username;
-                user.avatar = data.avatar.link;
-                user.first_name = data.first_name;
-                user.last_name = data.last_name;
-                console.log(user.avatar);
-                redirectTo('/dashboard');
-            }
-        })
-        .catch(error => console.error('Erreur:', error));
-    }
   }
 }
 

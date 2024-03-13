@@ -17,6 +17,7 @@ import '@/views/view-dashboard.ce.js';
 import '@/views/view-settings.ce.js';
 import '@/views/view-careers.ce.js';
 import '@/views/view-rank.ce.js';
+import '@/views/view-auth42-callback.ce.js';
 
 const isLoggedOutGuard = async () => {
   const isLoggedin = await isAuthenticated();
@@ -31,7 +32,7 @@ const isLoggedInGuard = async () => {
 };
 
 const router = new Router({
-  useHash: true,
+  useHash: false,
   baseUrl: '',
   linkAttribute: 'data-link',
   linkActiveClass: 'active',
@@ -155,6 +156,13 @@ const router = new Router({
       path: '/not-found',
       title: 'Not Found',
       template: '<view-not-found></view-not-found>',
+    },
+    {
+      name: 'auth42-callback',
+      path: '/auth42-callback',
+      title: 'Auth42-callback',
+      template: '<view-auth42-callback></view-auth42-callback>',
+      beforeEnter: isLoggedOutGuard,
     },
   ],
   fallbackRouteName: 'not-found',
