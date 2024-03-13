@@ -1,50 +1,7 @@
+import { user, getProfile, saveUser } from '@/auth.js';
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { getCsrfToken, getProfile } from '@/auth.js';
-
-const fake_getUser = async () => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(getProfile());
-    }, 1000);
-  });
-};
-
-// const fake_saveUser = async data => {
-//   return new Promise(resolve => {
-//     setTimeout(() => {
-//       resolve({
-//         success: true,
-//         user: { ...data },
-//       });
-//     }, 1000);
-//   });
-// };
-
-const saveUser = async newUser => {
-  try {
-    const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCsrfToken(),
-        // Ajoutez ici d'autres en-têtes nécessaires, comme les tokens CSRF ou d'authentification
-      },
-      credentials: 'include',
-      body: JSON.stringify(newUser),
-    });
-
-    if (!response.ok) {
-      throw new Error('La requête a échoué avec le statut ' + response.status);
-    }
-
-    const data = await response.json();
-    return data; // Renvoie les données de réponse pour un traitement ultérieur
-  } catch (error) {
-    console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
-    throw error; // Renvoie l'erreur pour une gestion ultérieure
-  }
-};
+// import { getCsrfToken} from '@/auth.js';
 
 const loadingProfileTemplate = `
   <div class="placeholder-glow">
@@ -93,7 +50,11 @@ const viewProfileTemplate = user => `
   </h2>
   <div>
     <div class="mb-4">
-      <img src="${user.avatar}" class="img-thumbnail" width="128" height="128" alt="${user.username}">
+      <!-- Apply border-radius to make the image circular. -->
+      <!-- Adjust the default avatar path as needed. -->
+      <img src="${
+        user.avatar
+      }" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; border: 3px solid #b558f6;">
     </div>
     <div class="mb-4">
       <div class="form-label opacity-75 mb-1">Username</div>
@@ -105,7 +66,7 @@ const viewProfileTemplate = user => `
     </div>
     <div class="mb-4" ${!user.firstname && !user.lastname && 'hidden'}>
       <div class="form-label opacity-75 mb-1">Name</div>
-      <div class="fs-5 fw-semibold">${user.firstname} ${user.lastname}</div>
+      <div class="fs-5 fw-semibold">${[user.firstname, user.lastname].filter(Boolean).join(' ') || '-'}</div>
     </div>
   </div>
 `;
@@ -119,10 +80,14 @@ const editProfileTemplate = user => `
   </h2>
   <div class="position-relative">
     <form id="profile-edit">
-      <div class="mb-4">
-        <label class="form-label" for="firstname">Profile picture</label>
-        <div>
-          <img src="${user.avatar}" class="img-thumbnail" width="128" height="128" alt="${user.username}">
+      <div class="mb-4 text-center">
+        <label class="form-label d-block" for="avatarFile">Profile picture</label>
+        <div class="d-inline-block d-flex flex-column align-items-center position-relative">
+          <img id="viewProfile-edit-avatarImg" src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; cover; border: 3px solid #b558f6;">
+          <input type="file" id="avatarFile" name="avatar" accept="image/*" hidden>
+          <label class="btn btn-primary btn-sm mt-2" for="avatarFile">
+            Change Avatar
+          </label>
         </div>
       </div>
       <div class="row">
@@ -132,17 +97,17 @@ const editProfileTemplate = user => `
         </div>
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="email">Email</label>
-          <input class="form-control form-control-lg" type="email" id="email" value="${user.email}" required>
+          <input class="form-control form-control-lg" type="email" id="email" value="${user.email}" disabled>
         </div>
       </div>
       <div class="row">
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="firstname">First Name</label>
-          <input class="form-control form-control-lg" type="text" id="firstname" value="${user.firstname}" required>
+          <input class="form-control form-control-lg" type="text" id="firstname" value="${user.firstname}">
         </div>
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="lastname">Last Name</label>
-          <input class="form-control form-control-lg" type="text" id="lastname" value="${user.lastname}" required>
+          <input class="form-control form-control-lg" type="text" id="lastname" value="${user.lastname}">
         </div>
       </div>
       <div class="py-3 mb-4 d-flex gap-3">
@@ -151,10 +116,7 @@ const editProfileTemplate = user => `
       </div>
     </form>
     <div
-      class="
-        position-absolute top-0 bottom-0 start-0 end-0 z-1
-        d-flex align-items-center justify-content-center
-      "
+      class="position-absolute top-0 bottom-0 start-0 end-0 z-1 d-flex align-items-center justify-content-center"
       id="profile-edit-loader"
       hidden
     >
@@ -203,7 +165,7 @@ class ViewProfile extends HTMLElement {
 
   async #loadUser() {
     try {
-      this.#user = await fake_getUser();
+      this.#user = getProfile();
       this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
     } catch (err) {
       console.error(err);
@@ -216,6 +178,15 @@ class ViewProfile extends HTMLElement {
       e.preventDefault();
       this.#saveProfile();
     });
+
+    const avatarInput = this.querySelector('#avatarFile');
+    avatarInput.addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (file) {
+        const avatarImage = this.querySelector('#viewProfile-edit-avatarImg');
+        avatarImage.src = URL.createObjectURL(file);
+      }
+    });
   }
 
   #resetProfile() {
@@ -225,20 +196,31 @@ class ViewProfile extends HTMLElement {
   async #saveProfile() {
     const profileEditForm = this.querySelector('#profile-edit');
     if (profileEditForm) {
+      const avatarFile = profileEditForm.querySelector('#avatarFile').files[0];
+      let avatarURL;
+      if (avatarFile) {
+        // Créez une URL pour l'objet fichier
+        avatarURL = URL.createObjectURL(avatarFile);
+        const avatarImage = profileEditForm.querySelector('img');
+        avatarImage.src = avatarURL;
+        // await saveAvatar(avatarFile);
+        
+      }
       const newUser = {
         username: profileEditForm.querySelector('#username').value,
         email: profileEditForm.querySelector('#email').value,
         firstname: profileEditForm.querySelector('#firstname').value,
         lastname: profileEditForm.querySelector('#lastname').value,
-        avatar: this.#user.avatar,
         id: user.id,
+        avatarFile: avatarFile,
       };
+      console.log("object newuser", newUser);
       try {
         this.querySelector('#profile-edit-loader').hidden = false;
         this.querySelector('#profile-edit').classList.add('opacity-25');
         const response = await saveUser(newUser);
         if (response.success) {
-          this.#user = response.user;
+          this.#user = getProfile();
           this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
         } else {
           this.querySelector('#profile-edit-loader').hidden = true;

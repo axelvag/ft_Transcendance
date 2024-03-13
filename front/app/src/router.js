@@ -32,7 +32,7 @@ const isLoggedInGuard = async () => {
 };
 
 const router = new Router({
-  useHash: false,
+  useHash: true,
   baseUrl: '',
   linkAttribute: 'data-link',
   linkActiveClass: 'active',

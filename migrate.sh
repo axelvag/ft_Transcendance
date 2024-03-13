@@ -7,5 +7,7 @@ docker stop authentification
 docker start authentification
 docker stop friendship
 docker start friendship
+docker stop profile
+docker start profile
 
 # echo "SUCCESS"

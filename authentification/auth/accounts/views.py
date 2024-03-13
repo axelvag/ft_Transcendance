@@ -20,6 +20,8 @@ from django.views.decorators.http import require_POST
 import json
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+import logging
+
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
@@ -111,7 +113,7 @@ def logout_user(request):
     else:
         return JsonResponse({"success": False, "message": "Méthode non autorisée."}, status=405)
 
-# @csrf_exempt
+@csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:
@@ -300,6 +302,52 @@ def is_user_logged_in(request):
     else:
         return JsonResponse({"success": False, "message": "User is not login."}, status=400)
 
+# Dans le service d'authentification
+@csrf_exempt
+# @require_http_methods(["POST"])
+def update_profile(request):
+    logging.critical("Enter1")
+    data = json.loads(request.body)
+    user_id = data.get('id')
+    username = data.get('username')
+    email = data.get('email')
+
+    logging.critical(data)
+    logging.critical(request)
+    print(user_id)
+    logging.critical(user_id)
+
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        logging.critical("closeBackAuth")
+        return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+    user.save()
+    
+    logging.critical("blablabla")
+    return JsonResponse({"success": True, "message": "Informations utilisateur mises à jour avec succès.", "username": user.username, "email": user.email})
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_profile(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        logging.critical("Utilisateur non trouvé.")
+        return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+
+    # Renvoi des informations de l'utilisateur
+    return JsonResponse({
+        "success": True,
+        "message": "Informations utilisateur récupérées avec succès.",
+        "username": user.username,
+        "email": user.email
+    })
 def oauth_login(request):
     # Construire l'URL pour la demande d'autorisation
     params = {

@@ -1,5 +1,4 @@
-import { redirectTo } from '@/router.js';
-
+// import profilePic from './assets/img/profile.jpg';
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
@@ -7,6 +6,12 @@ const user = {
   id: null,
   username: null,
   email: null,
+  avatar: null,
+  firstname: null,
+  lastname: null,
+  avatar: null,
+
+  //stat
   victories: 0,
   lost: 0,
   online: 0,
@@ -14,18 +19,26 @@ const user = {
   timeplay: 0,
   nbtotal: 0,
   friends: 0,
-  avatar: null,
-  first_name: null,
-  last_name: null,
+};
+
+const setLocalAvatar = avatar => {
+  user.avatar = avatar || 'assets/img/default-profile.jpg';
 };
 
 const setLocalUser = data => {
   localStorage.setItem('isLogged', 'true');
   user.isAuthenticated = true;
+  user.id = data.id || '';
+  user.email = data.email || '';
+  user.username = data.username || '';
+  setLocalAvatar(data.avatar);
+  user.firstname = data.firstname || '';
+  user.lastname = data.lastname || '';
   user.id = data.id;
   user.email = data.email;
   user.username = data.username;
 
+  //stat
   user.victories = 183;
   user.lost = 13;
   user.online = 160;
@@ -33,6 +46,13 @@ const setLocalUser = data => {
   user.timeplay = 130;
   user.nbtotal = 1;
   user.friends = 0;
+  // user.victories = data.victories;
+  // user.lost = data.lost;
+  // user.online = data.online;
+  // user.local = data.local;
+  // user.nbtotal = data.nbtotal;
+  // user.timeplay = data.timeplay;
+  // user.friends = data.friends;
 };
 
 const resetLocalUser = () => {
@@ -41,6 +61,11 @@ const resetLocalUser = () => {
   user.id = null;
   user.email = null;
   user.username = null;
+  user.avatar = null;
+  user.firstname = null;
+  user.lastname = null;
+
+  //stat
   user.victories = 0;
   user.lost = 0;
   user.online = 0;
@@ -49,8 +74,6 @@ const resetLocalUser = () => {
   user.nbtotal = 0;
   user.friends = 0;
   user.avatar = null;
-  user.first_name = null;
-  user.last_name = null;
 };
 
 const isAuthenticated = async () => {
@@ -64,6 +87,18 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
+        console.log("dwedededee",user.id);
+        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const userProfileData = await userProfileResponse.json();
+        console.log(userProfileData);
+        if (userProfileData.success) {
+          setLocalUser(userProfileData);
+        } else {
+          console.error('Failed to load user profile:', userProfileData.message);
+        }
       } else {
         resetLocalUser();
       }
@@ -113,50 +148,102 @@ const getProfile = () => {
     id: user.id,
     username: user.username,
     email: user.email,
-    firstname: user.first_name ?? "",
-    lastname: user.last_name ?? "",
-    avatar: user.avatar ?? `https://i.pravatar.cc/300?u=6${user.id}`,
+    firstname: user.firstname,
+    lastname: user.lastname,
+    avatar: user.avatar,
   };
 };
 
+const saveUser = async newUser => {
+
+  console.log("object newUser saveUser", newUser);
+
+  const formData = new FormData();
+  formData.append('username', newUser.username);
+  formData.append('email', newUser.email);
+  formData.append('firstname', newUser.firstname);
+  formData.append('lastname', newUser.lastname);
+  formData.append('id', newUser.id);
+
+  if (newUser.avatarFile) { 
+    formData.append('avatar', newUser.avatarFile);
+  }
+
+  console.log("formData", formData);
+
+  // Pour afficher le contenu de formData
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}: ${value}`);
+  }
+
+  try {
+    const response = await fetch('http://127.0.0.1:8002/update_user/', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('La requête a échoué avec le statut ' + response.status);
+    }
+
+    const data = await response.json();
+    console.log(data);
+
+    //MAJ object user
+    user.firstname = data.firstname;
+    user.lastname = data.lastname;
+    user.username = data.username;
+    user.email = data.email;
+    user.avatar = data.avatar;
+    newUser.avatar = data.avatar;
+
+    return data;
+  } catch (error) {
+    console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
+    return null;
+  }
+};
+
+
 const loginUser = async (formData, csrfToken) => {
   const response = await fetch('http://127.0.0.1:8001/accounts/login/', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
   });
   return response.json(); // Retourne la promesse résolue avec les données JSON
-}
+};
 
 const sendSignUpRequest = async (formData, csrfToken) => {
   const response = await fetch('http://127.0.0.1:8001/accounts/register/', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
   });
   return response.json(); // Retourne la promesse résolue avec les données JSON
-}
+};
 
 const passwordReset = async (formData, csrfToken) => {
   const response = await fetch('http://127.0.0.1:8001/accounts/password_reset/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    });
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
+  });
   return response.json();
-}
+};
 
 const sendEmailPasswordReset = async (formData, csrfToken, url) => {
   const response = await fetch(url, {
@@ -169,7 +256,7 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
     body: JSON.stringify(formData),
   });
   return response.json();
-}
+};
 
 const handleOAuthResponse = async () => {
   if (window.location.search.includes("code=")) {
@@ -213,4 +300,4 @@ const getAuthorizationCode = () => {
   window.location.href = url;
 }  
 
-export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode };
+export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser};
