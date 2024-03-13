@@ -4,6 +4,7 @@ import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user, isAuthenticated } from '@/auth.js';
 
 const fetchStat = async newStat => {
+  console.log("object newStat fetchStat", newStat);
   try {
     const response = await fetch('http://127.0.0.1:8004/statistic/update_stat/', {
       method: 'POST',
@@ -28,9 +29,25 @@ const fetchStat = async newStat => {
   }
 };
 
-
+// asynchrone obliged to use "await" for fetch
 class ViewCareers extends HTMLElement {
-  connectedCallback() {
+  async connectedCallback() {
+
+    try
+    {
+      const newStat = {
+        // Définissez les nouvelles statistiques à envoyer
+      };
+      // Appeler la fonction fetchStat pour mettre à jour les statistiques
+      const updatedStat = await fetchStat(newStat);
+      console.log('Statistiques mises à jour:', updatedStat);
+    }
+    catch (error)
+    {
+      // Gestion des erreurs
+      console.error("Erreur lors de la mise à jour des statistiques :", error);
+    }
+
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
       <default-layout-main>

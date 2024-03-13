@@ -24,14 +24,27 @@ const setLocalUser = data => {
   user.email = data.email;
   user.username = data.username;
 
-  user.victories = 183;
-  user.lost = 13;
-  user.online = 160;
-  user.local = 27;
-  user.timeplay = 130;
-  user.nbtotal = 1;
-  user.friends = 0;
+  // user.victories = 183;
+  // user.lost = 13;
+  // user.online = 160;
+  // user.local = 27;
+  // user.timeplay = 130;
+  // user.nbtotal = 1;
+  // user.friends = 0;
 };
+
+const setStat = data => {
+  localStorage.setItem('isLogged', 'true');
+  user.isAuthenticated = true;
+  user.id = data.id;
+  user.victories = data.victories;
+  user.lost = data.lost;
+  user.online = data.online;
+  user.local = data.local;
+  user.timeplay = data.timeplay;
+  user.nbtotal = data.nbtotal;
+  user.friends = data.friends;
+}
 
 const resetLocalUser = () => {
   // localStorage.setItem('isLogged', 'false');
@@ -62,7 +75,19 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
-      } else {
+        console.log('OUIIII');
+        const responseStat = await fetch(`http://127.0.0.1:8004/statistic/update_stat/`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        console.log('ICI');
+        const dataStat = await responseStat.json();
+        if (dataStat.success) {
+          setStat(dataStat);
+        }
+      }
+      else {
+        console.log('NONNNN');
         resetLocalUser();
       }
     }
