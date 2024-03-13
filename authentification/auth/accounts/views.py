@@ -348,6 +348,7 @@ def get_profile(request, user_id):
         "username": user.username,
         "email": user.email
     })
+
 def oauth_login(request):
     # Construire l'URL pour la demande d'autorisation
     params = {

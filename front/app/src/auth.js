@@ -1,4 +1,5 @@
 // import profilePic from './assets/img/profile.jpg';
+import { redirectTo } from '@/router.js';
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
@@ -284,8 +285,8 @@ const handleOAuthResponse = async () => {
               user.email = data.email;
               user.username = data.username;
               user.avatar = data.avatar.link;
-              user.first_name = data.first_name;
-              user.last_name = data.last_name;
+              user.firstname = data.firstname;
+              user.lastname = data.lastname;
               console.log(user.avatar);
               console.log(data.register);
               redirectTo('/dashboard');

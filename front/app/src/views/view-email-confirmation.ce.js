@@ -25,9 +25,7 @@ class ViewEmailConfirmation extends HTMLElement {
 
       </auth-layout>
     `;
-    console.log(document.location.href);
-    const hash = location.hash;
-    const queryString = hash.slice(hash.indexOf('?') + 1);
+    const queryString = location.search;
     const params = new URLSearchParams(queryString);
     const uidb64 = params.get('uidb64');
     const token = params.get('token');
