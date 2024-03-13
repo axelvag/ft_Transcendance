@@ -161,7 +161,7 @@ const router = new Router({
       name: 'auth42-callback',
       path: '/auth42-callback',
       title: 'Auth42-callback',
-      template: '<<view-auth42-callback></view-auth42-callback>>',
+      template: '<view-auth42-callback></view-auth42-callback>',
       beforeEnter: isLoggedOutGuard,
     },
   ],

@@ -1,4 +1,4 @@
-// import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
+import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { handleOAuthResponse } from '@/auth.js';
 
@@ -18,7 +18,6 @@ class ViewLoading extends HTMLElement {
         <h1 class="text-bicolor display-3 fw-bolder">
           TRANSCENDANCE PONG
         </h1>
-
         <div class="d-flex flex-column justify-content-center align-items-center vh-100">
           <h2 class="display-6 fw-bolder">
             Authentification en cours...
@@ -33,8 +32,6 @@ class ViewLoading extends HTMLElement {
     `;
     handleOAuthResponse();
   }
-
-  
 }
 
 customElements.define('view-auth42-callback', ViewLoading);
