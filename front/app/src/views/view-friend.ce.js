@@ -1,7 +1,6 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { redirectTo } from '@/router.js';
-import { user, isAuthenticated } from '@/auth.js';
+import { user } from '@/auth.js';
 
 class ViewFriend extends HTMLElement {
   connectedCallback() {
@@ -111,11 +110,13 @@ class ViewFriend extends HTMLElement {
       </default-layout-main>
     `;
 
+    this.checkForNotifications();
+    this.startNotificationPolling();
     this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
     this.generalErrorFriend = document.getElementById('general-error-friend');
   }
 
-  handleFormSubmit(event) {
+  async handleFormSubmit(event) {
     event.preventDefault();
 
     this.generalErrorFriend.style.display = 'none';
@@ -125,36 +126,79 @@ class ViewFriend extends HTMLElement {
     const friendName = this.querySelector('#friend-name').value;
     console.log('friend-->', friendName);
 
-    fetch('http://127.0.0.1:8003/home/', {
+    try {
+        const response = await fetch('http://127.0.0.1:8003/send_invitation/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ username: friendName, user_id: user.id}),
+        });
+        const data = await response.json();
+        console.log('data:', data);
+        
+        // Traiter la réponse du serveur
+        if (!data.status || data.status !== 'success') {
+            // Afficher une erreur spécifique si disponible, sinon un message générique
+            const errorMessage = data.message || "An error occurred while sending the invitation.";
+            console.error('Error:', errorMessage);
+            this.generalErrorFriend.textContent = errorMessage;
+            this.generalErrorFriend.style.display = 'block';
+        } else {
+            // Afficher une notification de succès
+            console.log('Invitation sent successfully.'); 
+            if (successNotificationFriend) successNotificationFriend.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
+        this.generalErrorFriend.style.display = 'block';
+    }
+}
+
+
+  // Ajoutez cette nouvelle méthode pour démarrer le polling
+  startNotificationPolling() {
+    this.pollingInterval = setInterval(() => this.checkForNotifications(), 5000); // Poll toutes les 5 secondes
+  }
+  
+  // Méthode pour interroger les notifications
+  checkForNotifications() {
+    console.log("test");
+    fetch('http://127.0.0.1:8003/notifications/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify({ username: friendName }),
+      body: JSON.stringify({user_id: user.id }),
     })
       .then(response => response.json())
       .then(data => {
-        console.log('data:', data);
-        // Traiter la réponse du serveur
-        // if (!data.success){
-        if (data.username) {
-          console.log('salut');
-          this.generalErrorFriend.textContent = data.username[0];
-          this.generalErrorFriend.style.display = 'block';
-        } else {
-          console.log('salut123');
-          const successNotificationFriend = document.getElementById('success-notification-friend');
-          if (successNotificationFriend) successNotificationFriend.style.display = 'block';
+        console.log("datanotification", data);
+        if (data.notifications && data.notifications.length > 0) {
+          console.log("lariate");
+          // Affichez les notifications ici
+          // Par exemple, si vous avez une méthode pour afficher des notifications, vous pouvez l'appeler ici
+          data.notifications.forEach(notification => this.displayNotification(notification));
         }
       })
-      .catch(error => {
-        console.error('Errorrrrrr:', error);
-        // return JSON.parse(text);
-        this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
-        this.generalErrorFriend.style.display = 'block';
-        // Gérer les erreurs de la requête
-      });
+      .catch(error => console.error('Erreur lors de la vérification des notifications:', error));
+  }
+
+  // Méthode pour afficher les notifications
+  displayNotification(notification) {
+    // Vous pouvez choisir comment vous souhaitez afficher les notifications
+    // Par exemple, afficher une alerte ou ajouter une entrée dans un élément de liste de notifications
+    alert('Nouvelle notification : ' + notification.message);
+  }
+
+  // Assurez-vous de nettoyer l'intervalle lorsque l'élément est déconnecté
+  disconnectedCallback() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
   }
 }
 

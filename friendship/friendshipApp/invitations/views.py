@@ -1,71 +1,68 @@
 # # Create your views here.
 
-# from django.shortcuts import render, redirect
-# from .forms import InvitationForm
-# from .models import Invitation
-# from django.contrib.auth.decorators import login_required
-
-# # @login_required
-# def home(request):
-#     if request.method == "POST":
-#         form = InvitationForm(request.POST)
-#         if form.is_valid():
-#             invitation = form.save(commit=False)
-#             invitation.from_user = request.user
-#             invitation.save()
-#             # Ici, vous pourriez également envoyer un email d'invitation
-#             return redirect('home')
-#     else:
-#         form = InvitationForm()
-#     return render(request, 'invitations/home.html', {'form': form})
-
-# # Vous pouvez ajouter plus de vues pour gérer l'acceptation ou le refus d'invitations.
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import InvitationForm
-from .models import Invitation
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.http import JsonResponse
+from django.contrib.auth.models import User
+from .models import Invitation
 from django.views.decorators.csrf import csrf_exempt
+from .models import Notification
+from django.contrib.auth import get_user_model
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 import json
 
 
-@login_required
+User = get_user_model()
+
 @csrf_exempt
-def home(request):
-    if not request.user.is_authenticated:
-        print("Pusssyyyyyyyyyyyyyyyyyyyyyyyy")
+@require_http_methods(["POST"])
+def send_invitation(request):
 
+    data = json.loads(request.body)
+    user_id = data.get('user_id')
+    username = data.get('username')
+
+    # username = request.POST.get('username')  # Récupère le username du formulaire
+    # from_user = request.user
     try:
-        data = json.loads(request.body.decode('utf8'))
-    except json.JSONDecodeError:
-        return JsonResponse({"errors": "Invalid JSON format"}, status=406)
-
-    print("data-->", data)
-    
-    if request.method == "POST":
-        # form = InvitationForm(request.POST)
-        form = InvitationForm(data)
-        # print("salut", form)
-        if form.is_valid():
-            invitation = form.save(commit=False)
-            invitation.from_user = request.user
-            invitation.save()
-            # messages.success(request, "L'invitation a été envoyée avec succès !")
-            # return redirect('home')
-            return JsonResponse({"message": "L'invitation a été envoyée avec succès !"}, status=200)
+        to_user = User.objects.get(username=username)  # Recherche l'utilisateur par son username
+        from_user = User.objects.get(id=user_id)
+        if from_user != to_user:
+            if not Invitation.objects.filter(from_user=from_user, to_user=to_user).exists():
+                Invitation.objects.create(from_user=from_user, to_user=to_user)
+                # Mettre à jour les notifications pour le destinataire
+                Notification.objects.create(
+                    user=to_user,
+                    message=f"You have a new invitation from {from_user.username}."
+                )
+                return JsonResponse({"status": "success", "message": "Invitation sent."}, status=200)
+            else:
+                return JsonResponse({"status": "error", "message": "Invitation already sent."}, status=409)
         else:
-            print("hellooooo")
-            return JsonResponse(form.errors, status=400)
-    else:
-        form = InvitationForm()
-        # Query for invitations should match the expected field (to_user or to_email)
-        invitations = Invitation.objects.filter(to_user=request.user, accepted=False)
-        # Serialize your invitations data to JSON
-        invitations_data = list(invitations.values('from_user__username', 'accepted'))
-        # Return a JSON response with the form and invitations data
-        return JsonResponse({
-            'form': form.as_p(),  # You might want to handle form rendering on the frontend instead
-            'invitations': invitations_data,
-        })
+            return JsonResponse({"status": "error", "message": "Cannot invite yourself."}, status=400)
+    except User.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def notifications(request):
+    try:
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        user = User.objects.get(id=user_id)
+
+        user_notifications = Notification.objects.filter(
+            user=user, seen=False
+        ).values('id', 'message', 'seen', 'created_at')
+        
+        # Convertir le QuerySet en liste pour la sérialisation JSON
+        user_notifications_list = list(user_notifications)
+
+        # Optionnellement, marquer les notifications comme vues
+        Notification.objects.filter(user=user, seen=False).update(seen=True)
+
+        return JsonResponse({"notifications": user_notifications_list}, status=200, safe=False)
+    
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User does not exist."}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON."}, status=400)
