@@ -38,22 +38,22 @@ const setLocalUser = data => {
   user.email = data.email;
   user.username = data.username;
 
-  //stat
-  user.victories = 183;
-  user.lost = 13;
-  user.online = 160;
-  user.local = 27;
-  user.timeplay = 130;
-  user.nbtotal = 1;
-  user.friends = 0;
-  // user.victories = data.victories;
-  // user.lost = data.lost;
-  // user.online = data.online;
-  // user.local = data.local;
-  // user.nbtotal = data.nbtotal;
-  // user.timeplay = data.timeplay;
-  // user.friends = data.friends;
 };
+
+const setStat = data => {
+  localStorage.setItem('isLogged', 'true');
+  user.isAuthenticated = true;
+  user.id = data.id || '';
+  user.victories = data.victories || 15;
+  user.lost = data.lost || 15;
+  user.online = data.online || 15;
+  user.local = data.local || 15;
+  user.timeplay = data.timeplay || 15;
+  user.nbtotal = data.nbtotal || 15;
+  user.friends = data.friends || 15;
+}
+
+
 
 const resetLocalUser = () => {
   // localStorage.setItem('isLogged', 'false');
@@ -99,7 +99,10 @@ const isAuthenticated = async () => {
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
-      } else {
+
+        setStat(data);
+      }
+      else {
         resetLocalUser();
       }
     }
@@ -151,6 +154,19 @@ const getProfile = () => {
     firstname: user.firstname,
     lastname: user.lastname,
     avatar: user.avatar,
+  };
+};
+
+const getStat = () => {
+  return {
+    id: user.id,
+    victories: user.victories,
+    lost: user.lost,
+    online: user.online,
+    local: user.local,
+    timeplay: user.timeplay,
+    nbtotal: user.nbtotal,
+    friends: user.friends,
   };
 };
 
@@ -300,4 +316,4 @@ const getAuthorizationCode = () => {
   window.location.href = url;
 }  
 
-export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser};
+export { user, isAuthenticated, logout, getProfile, getStat, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser, setStat};

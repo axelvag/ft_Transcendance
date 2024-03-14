@@ -4,6 +4,7 @@ import { user } from '@/auth.js';
 import { getCsrfToken } from '@/auth.js';
 import { loginUser, setLocalUser } from '@/auth.js';
 import { getAuthorizationCode } from '@/auth.js';
+import { setStat } from '../auth';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -112,6 +113,13 @@ class ViewSignIn extends HTMLElement {
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
+
+        setStat(data);
+        // const statResponse = await fetch(`http://127.0.0.1:8004/statistic/getter_stat/${user.id}/`, {
+        //   method: 'GET',
+        //   credentials: 'include',
+        // });
+
         redirectTo('/dashboard');
       } else {
         if (data.message === 'User not active.') this.emailError.style.display = 'block';
