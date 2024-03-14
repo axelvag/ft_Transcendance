@@ -38,26 +38,26 @@ const setLocalUser = data => {
   user.email = data.email;
   user.username = data.username;
 
-  user.victories = 183;
-  user.lost = 13;
-  user.online = 160;
-  user.local = 27;
-  user.timeplay = 130;
-  user.nbtotal = 1;
-  user.friends = 0;
+  // user.victories = 183;
+  // user.lost = 13;
+  // user.online = 160;
+  // user.local = 27;
+  // user.timeplay = 130;
+  // user.nbtotal = 1;
+  // user.friends = 0;
 };
 
 const setStat = data => {
   localStorage.setItem('isLogged', 'true');
   user.isAuthenticated = true;
-  user.id = data.id;
-  user.victories = data.victories;
-  user.lost = data.lost;
-  user.online = data.online;
-  user.local = data.local;
-  user.timeplay = data.timeplay;
-  user.nbtotal = data.nbtotal;
-  user.friends = data.friends;
+  user.id = data.id || '';
+  user.victories = data.victories || 0;
+  user.lost = data.lost || 0;
+  user.online = data.online || 0;
+  user.local = data.local || 0;
+  user.timeplay = data.timeplay || 0;
+  user.nbtotal = data.nbtotal || 0;
+  user.friends = data.friends || 0;
 }
 
 const resetLocalUser = () => {
@@ -92,6 +92,18 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
+        console.log("dwedededee",user.id);
+        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const userProfileData = await userProfileResponse.json();
+        console.log(userProfileData);
+        if (userProfileData.success) {
+          setLocalUser(userProfileData);
+        } else {
+          console.error('Failed to load user profile:', userProfileData.message);
+        }
       } else {
         resetLocalUser();
       }
@@ -144,6 +156,19 @@ const getProfile = () => {
     firstname: user.firstname,
     lastname: user.lastname,
     avatar: user.avatar,
+  };
+};
+
+const getStat = () => {
+  return {
+    id: user.id,
+    victories: user.victories,
+    lost: user.lost,
+    online: user.online,
+    local: user.local,
+    timeplay: user.timeplay,
+    nbtotal: user.nbtotal,
+    friends: user.friends,
   };
 };
 
@@ -293,4 +318,4 @@ const getAuthorizationCode = () => {
   window.location.href = url;
 }  
 
-export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser};
+export { user, isAuthenticated, logout, getProfile, getStat, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser, setStat};

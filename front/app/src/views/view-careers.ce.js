@@ -6,7 +6,7 @@ import { user, isAuthenticated } from '@/auth.js';
 const fetchStat = async newStat => {
   console.log("object newStat fetchStat", newStat);
   try {
-    const response = await fetch('http://127.0.0.1:8004/statistic/update_stat/', {
+    const response = await fetch('http://127.0.0.1:8004/statistic/setter_stat/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

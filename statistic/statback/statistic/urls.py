@@ -4,5 +4,6 @@ from . import views
 app_name = "statistic"
 
 urlpatterns = [
-    path('update_stat/', views.update_stat, name='update_stat'),
+    path('setter_stat/', views.setter_stat, name='setter_stat'),
+    path('getter_stat/<int:user_id>/', views.getter_stat, name='getter_stat'),
 ]

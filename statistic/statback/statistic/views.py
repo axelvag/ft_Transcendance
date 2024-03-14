@@ -12,7 +12,7 @@ User = get_user_model()
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def update_stat(request):
+def setter_stat(request):
   logging.critical("Received request")
   logging.debug("START")
   if request.content_type.startswith('multipart/form-data'): # grace au formData envoyer
@@ -78,3 +78,44 @@ def update_stat(request):
     response["Access-Control-Allow-Headers"] = "Content-Type"  # En-têtes autorisés
 
     return response
+
+
+@csrf_exempt
+@require_http_methods(["GET"])  # Utilisez GET si vous récupérez simplement des informations, ajustez selon besoin
+def getter_stat(request, user_id):  # Assurez-vous que user_id est correctement capturé depuis l'URL
+    
+    logging.critical("ENTRE DANS GETTER_STAT")
+    logging.critical(user_id)
+
+    try:
+        # Recherche du profil par user_id
+        profile = Profile.objects.get(user_id=user_id)
+    except Profile.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Profile not found."}, status=404)
+
+    # # Faites un appel au service d'authentification pour obtenir username et email
+    # auth_service_url = "http://authentification:8001/accounts/get_profile/"
+    # try:
+    #     auth_response = requests.get(f"{auth_service_url}{user_id}")
+    #     if auth_response.status_code == 200:
+    #         auth_data = auth_response.json()
+    #         username = auth_data.get('username', '')
+    #         email = auth_data.get('email', '')
+    #     else:
+    #         return JsonResponse({"success": False, "message": "Failed to retrieve authentication information."})
+    # except requests.exceptions.RequestException as e:
+    #     logging.error(f"Error calling authentication service: {e}")
+    #     return JsonResponse({"success": False, "message": "Error calling authentication service."})
+
+    # Réponse avec les informations récupérées
+    return JsonResponse({
+        "success": True,
+        "id": user_id,
+        "victories": 0,
+        "lost": 0,
+        "online": 0,
+        "local": 0,
+        "timeplay": 0,
+        "nbtotal": 0,
+        "friends": 0
+    })

@@ -112,6 +112,22 @@ class ViewSignIn extends HTMLElement {
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
+
+        // mettre init stat
+        setStat(data);
+        //appel de mon getter
+        const statResponse = await fetch('http://127.0.0.1:8004/statistic/getter_stat/${user.id}/', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const statData = await statResponse.json();
+        console.log(statData);
+        if (statData.success) {
+          setLocalUser(statData);
+        } else {
+          console.error('Failed to init stat:', statData.message);
+        }
+
         redirectTo('/dashboard');
       } else {
         if (data.message === 'User not active.') this.emailError.style.display = 'block';
