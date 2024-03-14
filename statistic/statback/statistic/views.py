@@ -59,7 +59,7 @@ def update_stat(request):
       return JsonResponse({"success": False, "message": "Error updating user statistics."})
 
   # Réponse de succès
-  return JsonResponse({
+  response = JsonResponse({
       "success": True,
       "message": "User statistics updated successfully.",
       "id": user_id,
@@ -71,3 +71,10 @@ def update_stat(request):
       "nbtotal": nbtotal,
       "friends": friends
   })
+
+   # Ajouter les en-têtes CORS
+    response["Access-Control-Allow-Origin"] = "*"  # Ou vous pouvez spécifier les origines autorisées
+    response["Access-Control-Allow-Methods"] = "POST, OPTIONS"  # Méthodes HTTP autorisées
+    response["Access-Control-Allow-Headers"] = "Content-Type"  # En-têtes autorisés
+
+    return response
