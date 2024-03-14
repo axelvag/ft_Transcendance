@@ -154,5 +154,5 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         "email": email,  # Ces informations proviennent du service d'authentification
         "avatar": avatar_url,
         "id": user_id,
-        # "avatar42": profil.avatar42,
+        "avatar42": profile.avatar42,
     })
