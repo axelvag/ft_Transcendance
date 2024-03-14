@@ -23,6 +23,10 @@ def update_user(request):
         username = request.POST.get('username', '')
         email = request.POST.get('email', '')
         avatar = request.FILES.get('avatar', None)
+        if avatar is None:
+            avatar42 = request.POST.get('avatar', None)
+        else:
+            avatar42 = None
     else:
         # Tentative d'extraction des données JSON
         try:
@@ -34,6 +38,10 @@ def update_user(request):
             username = data.get('username', '')
             email = data.get('email', '')
             avatar = request.FILES.get('avatar', None)  # Pas d'avatar dans les données JSON
+            if avatar is None:
+                avatar42 = data.get('avatar', None)
+            else:
+                avatar42 = None
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "message": "Invalid or missing JSON data."}, status=400)
 
@@ -58,6 +66,7 @@ def update_user(request):
         defaults = {
         'firstName': first_name,
         'lastName': last_name,
+        'avatar42': avatar42,
         }
     
         # Si un avatar est fourni, ajoutez-le aux valeurs par défaut pour la mise à jour/création
@@ -74,6 +83,7 @@ def update_user(request):
             user_id=user_id,
             firstName=first_name,
             lastName=last_name,
+            avatar42=avatar42,
             # Initialisez d'autres champs si nécessaire
         )
     except Exception as e:
@@ -82,7 +92,9 @@ def update_user(request):
 
     # Construction de l'URL de l'avatar
     avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
-
+    if avatar is None:
+        if avatar42 is not None:
+            avatar_url = avatar42
     # Réponse de succès avec les informations mises à jour
     return JsonResponse({
         "success": True,
@@ -125,7 +137,8 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
 
     # Construction de l'URL de l'avatar si disponible
     avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
-
+    if avatar_url is None:
+        avatar_url = profile.avatar42
     # Réponse avec les informations récupérées
     return JsonResponse({
         "success": True,

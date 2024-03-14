@@ -7,7 +7,7 @@ class Profile(models.Model):
     firstName = models.CharField(max_length=100, verbose_name="First Name", null=True)
     lastName = models.CharField(max_length=100, verbose_name="Last Name", null=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-
+    avatar42 = models.CharField(max_length=100, verbose_name="url42", null=True)
 
     def __str__(self):
         return f"{self.firstName} {self.lastName}"
