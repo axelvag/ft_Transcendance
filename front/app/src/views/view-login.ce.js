@@ -2,7 +2,8 @@ import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
 import { getCsrfToken } from '@/auth.js';
-import { loginUser } from '@/auth.js';
+import { loginUser, setLocalUser } from '@/auth.js';
+import { getAuthorizationCode } from '@/auth.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -76,7 +77,7 @@ class ViewSignIn extends HTMLElement {
 
     this.querySelector('#OAuth-42').addEventListener('click', event => {
       event.preventDefault();
-      this.getAuthorizationCode();
+      getAuthorizationCode();
     });
   }
 
@@ -96,44 +97,30 @@ class ViewSignIn extends HTMLElement {
 
     const csrfToken = await getCsrfToken();
     try {
-      const data = await loginUser(formData, csrfToken); // Utilisez la nouvelle fonction pour la requête
+      const data = await loginUser(formData, csrfToken);
       console.log('error', data);
       if (data.success) {
-          console.log('Sucess!');
-          localStorage.setItem('isLogged', 'true');
-          user.isAuthenticated = true;
-          user.id = data.id;
-          user.email = data.email;
-          user.username = data.username;
-          user.victories = data.victories;
-          user.lost = data.lost;
-          user.online = data.online;
-          user.local = data.local;
-          user.nbtotal = data.nbtotal;
-          user.timeplay = data.timeplay;
-          user.friends = data.friends;
-          redirectTo('/dashboard'); // Assurez-vous que redirectTo est correctement importé
-      }  else {
-          if (data.message === 'User not active.') this.emailError.style.display = 'block';
-          else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
+        setLocalUser(data);
+        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const userProfileData = await userProfileResponse.json();
+        console.log(userProfileData);
+        if (userProfileData.success) {
+          setLocalUser(userProfileData);
+        } else {
+          console.error('Failed to load user profile:', userProfileData.message);
         }
+        redirectTo('/dashboard');
+      } else {
+        if (data.message === 'User not active.') this.emailError.style.display = 'block';
+        else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
+      }
     } catch (error) {
-        console.error('Login failed:', error);
+      console.error('Login failed:', error);
     }
   }
-
-  getAuthorizationCode() {
-    const authorizationUrl =
-        "https://api.intra.42.fr/oauth/authorize";
-    const clientId =
-        "u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0";
-    const redirectUri =
-        "https%3A%2F%2F127.0.0.1%3A5500%2FWeb%2Fbackend%2Fauthentification%2Ftemplates%2Flogin_with42api.html";
-    const responseType = "code";
-    // const url = `${authorizationUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}`;
-    const url = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2F&response_type=code`;
-    window.location.href = url;
-  }  
 }
 
 customElements.define('view-signin', ViewSignIn);

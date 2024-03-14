@@ -26,7 +26,7 @@ COPY . /app/
 # Exposer le port sur lequel l'application Django écoute à l'intérieur du conteneur
 EXPOSE 8002
 
-WORKDIR /app/dashback
+WORKDIR /app/profileApp
 
 RUN chmod +x ./script_python.sh
 

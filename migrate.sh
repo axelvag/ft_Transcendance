@@ -9,3 +9,5 @@ docker stop friendship
 docker start friendship
 docker stop statistic
 docker start statistic
+docker stop profile
+docker start profile
