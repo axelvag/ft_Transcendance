@@ -27,6 +27,8 @@ def update_user(request):
             avatar42 = request.POST.get('avatar', None)
         else:
             avatar42 = None
+        logging.critical(avatar)
+        logging.critical(avatar42)
     else:
         # Tentative d'extraction des données JSON
         try:
@@ -95,6 +97,9 @@ def update_user(request):
     if avatar is None:
         if avatar42 is not None:
             avatar_url = avatar42
+            profile.avatar = None
+            profile.save()
+            
     # Réponse de succès avec les informations mises à jour
     return JsonResponse({
         "success": True,
@@ -138,6 +143,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
     # Construction de l'URL de l'avatar si disponible
     avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
     if avatar_url is None:
+        logging.critical("avatar null")
         avatar_url = profile.avatar42
     # Réponse avec les informations récupérées
     return JsonResponse({
@@ -148,4 +154,5 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         "email": email,  # Ces informations proviennent du service d'authentification
         "avatar": avatar_url,
         "id": user_id,
+        # "avatar42": profil.avatar42,
     })

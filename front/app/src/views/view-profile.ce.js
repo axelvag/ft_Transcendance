@@ -88,6 +88,9 @@ const editProfileTemplate = user => `
           <label class="btn btn-primary btn-sm mt-2" for="avatarFile">
             Change Avatar
           </label>
+          <button type="button" class="btn btn-secondary btn-sm mt-2" id="defaultAvatar">
+            Default Avatar
+          </button>
         </div>
       </div>
       <div class="row">
@@ -185,7 +188,26 @@ class ViewProfile extends HTMLElement {
       if (file) {
         const avatarImage = this.querySelector('#viewProfile-edit-avatarImg');
         avatarImage.src = URL.createObjectURL(file);
+        avatarImage.setAttribute('data-default-avatar', 'false');
       }
+    });
+
+    // Ajoutez un gestionnaire pour le bouton "Default Avatar"
+    const defaultAvatarButton = this.querySelector('#defaultAvatar');
+    defaultAvatarButton.addEventListener('click', () => {
+      // Définissez ici l'URL de l'avatar par défaut
+      console.log("Default Avatar");
+      let defaultAvatarUrl;
+      if (user.avatarDefault42 !== null) {
+        defaultAvatarUrl = user.avatarDefault42;
+      } else {
+        defaultAvatarUrl = user.avatarDefault;
+      }
+      const avatarImage = this.querySelector('#viewProfile-edit-avatarImg');
+      avatarImage.src = defaultAvatarUrl;
+      avatarImage.setAttribute('data-default-avatar', 'true');
+      // Optionnel: Réinitialisez l'input file en cas de sélection préalable d'un fichier
+      avatarInput.value = '';
     });
   }
 
@@ -196,15 +218,35 @@ class ViewProfile extends HTMLElement {
   async #saveProfile() {
     const profileEditForm = this.querySelector('#profile-edit');
     if (profileEditForm) {
-      const avatarFile = profileEditForm.querySelector('#avatarFile').files[0];
-      let avatarURL;
-      if (avatarFile) {
-        // Créez une URL pour l'objet fichier
-        avatarURL = URL.createObjectURL(avatarFile);
-        const avatarImage = profileEditForm.querySelector('img');
-        avatarImage.src = avatarURL;
-        // await saveAvatar(avatarFile);
+      // const avatarFile = profileEditForm.querySelector('#avatarFile').files[0];
+      // let avatarURL;
+      // if (avatarFile) {
+      //   // Créez une URL pour l'objet fichier
+      //   avatarURL = URL.createObjectURL(avatarFile);
+      //   const avatarImage = profileEditForm.querySelector('img');
+      //   avatarImage.src = avatarURL;
+      //   // await saveAvatar(avatarFile);
         
+      // }
+      const avatarImage = profileEditForm.querySelector('#viewProfile-edit-avatarImg');
+      const isDefaultAvatar = avatarImage.getAttribute('data-default-avatar') === 'true';
+      let avatarPayload;
+      let avatarURL;
+
+      if (isDefaultAvatar) {
+        if (user.avatarDefault42 !== null) {
+          avatarPayload = user.avatarDefault42;
+        } else {
+          avatarPayload = user.avatarDefault;
+        }
+      } else {
+        const avatarFile = profileEditForm.querySelector('#avatarFile').files[0];
+        if (avatarFile) {
+          avatarURL = URL.createObjectURL(avatarFile);
+          const avatarImage = profileEditForm.querySelector('img');
+          avatarImage.src = avatarURL;
+          avatarPayload = avatarFile; // Le fichier de l'avatar sélectionné par l'utilisateur.
+        }
       }
       const newUser = {
         username: profileEditForm.querySelector('#username').value,
@@ -212,7 +254,8 @@ class ViewProfile extends HTMLElement {
         firstname: profileEditForm.querySelector('#firstname').value,
         lastname: profileEditForm.querySelector('#lastname').value,
         id: user.id,
-        avatarFile: avatarFile,
+        avatarFile: avatarPayload,
+        // avatarFile: isDefaultAvatar ? user.avatarDefault : avatarFile,
       };
       console.log("object newuser", newUser);
       try {

@@ -11,6 +11,8 @@ const user = {
   firstname: null,
   lastname: null,
   avatar: null,
+  avatarDefault: null,
+  avatarDefault42: null,
 
   //stat
   victories: 0,
@@ -38,6 +40,8 @@ const setLocalUser = data => {
   user.id = data.id;
   user.email = data.email;
   user.username = data.username;
+  user.avatarDefault = 'assets/img/default-profile.jpg';
+  user.avatarDefault42 = data.avatar42;
 
   //stat
   user.victories = 183;
@@ -65,6 +69,8 @@ const resetLocalUser = () => {
   user.avatar = null;
   user.firstname = null;
   user.lastname = null;
+  user.avatarDefault = null;
+  user.avatarDefault42 = null;
 
   //stat
   user.victories = 0;
@@ -152,6 +158,8 @@ const getProfile = () => {
     firstname: user.firstname,
     lastname: user.lastname,
     avatar: user.avatar,
+    avatarDefault: user.avatarDefault,
+    avatarDefault42: user.avatarDefault42,
   };
 };
 
@@ -259,55 +267,6 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
   return response.json();
 };
 
-// const handleOAuthResponse = async () => {
-//   if (window.location.search.includes("code=")) {
-//       const urlParams = new URLSearchParams(window.location.search);
-//       const code = urlParams.get('code');
-//       console.log(code);
-//       const csrfToken = await getCsrfToken();
-//       fetch('http://127.0.0.1:8001/accounts/oauth/callback/', {
-//           method: 'POST',
-//           headers: {
-//               'Content-Type': 'application/json',
-//               'X-CSRFToken': csrfToken,
-//           },
-//           credentials: 'include',
-//           body: JSON.stringify({ code: code })
-//       })
-//       .then(response => response.json())
-//       .then(data => {
-//       console.log(data); // Traiter la réponse
-//       if (data.access_token) {
-//         // localStorage.setItem('isLogged', 'true');
-//         // user.isAuthenticated = true;
-//           // user.id = data.id;
-//           // user.email = data.email;
-//           // user.username = data.username;
-//           // user.avatar = data.avatar.link;
-//           // user.firstname = data.firstname;
-//           // user.lastname = data.lastname;
-//           // console.log(user.avatar);
-//           // console.log(data.register);
-//           // redirectTo('/dashboard');
-//           setLocalUser(data);
-//           const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
-//             method: 'GET',
-//             credentials: 'include',
-//           });
-//           const userProfileData = await userProfileResponse.json();
-//           console.log(userProfileData);
-//           if (userProfileData.success) {
-//             setLocalUser(userProfileData);
-//           } else {
-//             console.error('Failed to load user profile:', userProfileData.message);
-//           }
-//           redirectTo('/dashboard');
-//             }
-//       })
-//       .catch(error => console.error('Erreur:', error));
-//   }
-// }
-
 const handleOAuthResponse = async () => {
   if (window.location.search.includes("code=")) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -334,16 +293,7 @@ const handleOAuthResponse = async () => {
         user.avatar = data.avatar.link;
         user.firstname = data.firstname;
         user.lastname = data.lastname;
-        // const dataToSend = JSON.stringify({
-        //   firstname: data.firstname,
-        //   lastname: data.lastname,
-        //   id: data.id,
-        //   email: data.email,
-        //   username: data.username,
-        //   avatar: data.avatar.link,
-        // });
-        // data.avatar = data.avatar.link;
-        // setLocalUser(data);
+        user.avatarDefault42 = data.avatar.link;
         const formData = new FormData();
         formData.append('username', user.username);
         formData.append('email', user.email);
@@ -370,14 +320,6 @@ const handleOAuthResponse = async () => {
         
             const data = await response.json();
             console.log(data);
-        
-            // //MAJ object user
-            // user.firstname = data.firstname;
-            // user.lastname = data.lastname;
-            // user.username = data.username;
-            // user.email = data.email;
-            // user.avatar = data.avatar;
-            // newUser.avatar = data.avatar;
         
           } catch (error) {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
