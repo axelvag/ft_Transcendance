@@ -7,6 +7,7 @@ from .models import Statistic
 from django.contrib.auth import get_user_model
 import logging
 import requests
+from .models import Statistic
 
 User = get_user_model()
 
@@ -79,8 +80,8 @@ def getter_stat(request, user_id):  # Assurez-vous que user_id est correctement 
 
     try:
         # Recherche du profil par user_id
-        profile = Profile.objects.get(user_id=user_id)
-    except Profile.DoesNotExist:
+        statistic = Statistic.objects.get(user_id=user_id)
+    except Statistic.DoesNotExist:
         return JsonResponse({"success": False, "message": "Profile not found."}, status=404)
 
     # # Faites un appel au service d'authentification pour obtenir username et email
@@ -98,7 +99,7 @@ def getter_stat(request, user_id):  # Assurez-vous que user_id est correctement 
     #     return JsonResponse({"success": False, "message": "Error calling authentication service."})
 
     # Réponse avec les informations récupérées
-    return JsonResponse({
+    response = JsonResponse({
         "success": True,
         "id": user_id,
         "victories": 0,
@@ -109,3 +110,10 @@ def getter_stat(request, user_id):  # Assurez-vous que user_id est correctement 
         "nbtotal": 0,
         "friends": 0
     })
+
+    # Ajouter les en-têtes CORS
+    response["Access-Control-Allow-Origin"] = "*"  # Ou vous pouvez spécifier les origines autorisées
+    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"  # Méthodes HTTP autorisées
+    response["Access-Control-Allow-Headers"] = "Content-Type"  # En-têtes autorisés
+
+    return response
