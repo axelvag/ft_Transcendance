@@ -9,19 +9,11 @@ class ViewGameOnlineMatchmaking extends HTMLElement {
     this.handleError = this.handleError.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
 
-    this.ws = new WebSocket(wsBaseUrl + '/search-opponent');
+    const user = getProfile();
+    this.ws = new WebSocket(wsBaseUrl + `/search-opponent/${user.id}`);
     this.ws.onerror = this.handleError;
     this.ws.onmessage = this.handleMessage;
-    this.ws.onopen = () => {
-      console.log('WebSocket opened');
-      const user = getProfile();
-      this.ws.send(
-        JSON.stringify({
-          action: 'search-opponent',
-          user_id: user.id,
-        })
-      );
-    };
+    this.ws.onopen = () => console.log('WebSocket opened');
     this.ws.onclose = () => console.log('WebSocket closed');
   }
   async connectedCallback() {

@@ -2,24 +2,19 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.core.exceptions import ValidationError
 import json
-import logging
 from game.models import Game
 
 class SearchOpponentConsumer(AsyncWebsocketConsumer):
   
   async def connect(self):
-    await self.accept()
-
-  async def receive(self, text_data):
-    data_json = json.loads(text_data)
-    user_id = data_json['user_id']
+    self.user_id = self.scope['url_route']['kwargs']['user_id']
     
-    if not user_id:
+    if not self.user_id:
       await self.close()
       return
 
     # todo: check if user is authenticated
-    self.user_id = user_id
+    await self.accept()
     self.opponent_found = False
     await self.channel_layer.group_add("searching_players", self.channel_name)
     await self.search_opponent()
