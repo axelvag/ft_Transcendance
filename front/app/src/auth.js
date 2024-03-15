@@ -101,6 +101,19 @@ const isAuthenticated = async () => {
         }
 
         setStat(data);
+        console.log("Valeur de user.id :", user.id);
+        const statResponse = await fetch(`http://127.0.0.1:8004/statistic/getter_stat/${user.id}/`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const statData = await statResponse.json();
+        console.log(statData);
+        if (statData.success) {
+          setStat(statData);
+        }
+        else {
+          console.error('Failed to load statistic data:', statData.message);
+        }
       }
       else {
         resetLocalUser();
