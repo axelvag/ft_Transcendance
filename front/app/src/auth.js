@@ -102,6 +102,7 @@ const isAuthenticated = async () => {
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
         if (userProfileData.success) {
+          console.log(userProfileData.avatar42);
           setLocalUser(userProfileData);
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
@@ -333,6 +334,8 @@ const handleOAuthResponse = async () => {
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
         if (userProfileData.success) {
+          console.log("yo");
+          console.log(userProfileData.avatar42);
           setLocalUser(userProfileData);
           redirectTo('/dashboard');
         } else {

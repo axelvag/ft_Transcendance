@@ -68,8 +68,8 @@ def update_user(request):
         defaults = {
         'firstName': first_name,
         'lastName': last_name,
-        'avatar42': avatar42,
         }
+
     
         # Si un avatar est fourni, ajoutez-le aux valeurs par défaut pour la mise à jour/création
         if avatar is not None:
@@ -79,6 +79,10 @@ def update_user(request):
             user_id=user_id,
             defaults=defaults
         )
+
+        if profile.avatar42 is None and avatar42 is not None:
+            profile.avatar42 = avatar42
+            profile.save()  # Sauvegarder les modifications sur le profil
     except Profile.DoesNotExist:
         # Si aucun profil n'existe pour cet utilisateur et qu'aucun avatar n'est fourni
         profile = Profile.objects.create(
@@ -146,6 +150,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         logging.critical("avatar null")
         avatar_url = profile.avatar42
     # Réponse avec les informations récupérées
+    logging.critical(profile.avatar42)
     return JsonResponse({
         "success": True,
         "firstname": profile.firstName,
