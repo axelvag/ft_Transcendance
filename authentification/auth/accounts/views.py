@@ -20,6 +20,8 @@ from django.views.decorators.http import require_POST
 import json
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+import logging
+
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
@@ -71,6 +73,9 @@ def login_user(request):
         password = data["password"]
         user = None
 
+        if len(password) < 8:
+            return JsonResponse({"success": False, "message": "Invalid username or password."}, status=HttpResponseBadRequest.status_code)
+
         if '@' in username_or_email:
             try:
                 user = User.objects.get(email=username_or_email)
@@ -108,7 +113,7 @@ def logout_user(request):
     else:
         return JsonResponse({"success": False, "message": "Méthode non autorisée."}, status=405)
 
-# @csrf_exempt
+@csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:
@@ -297,6 +302,52 @@ def is_user_logged_in(request):
     else:
         return JsonResponse({"success": False, "message": "User is not login."}, status=400)
 
+# Dans le service d'authentification
+@csrf_exempt
+# @require_http_methods(["POST"])
+def update_profile(request):
+    logging.critical("Enter1")
+    data = json.loads(request.body)
+    user_id = data.get('id')
+    username = data.get('username')
+    email = data.get('email')
+
+    logging.critical(data)
+    logging.critical(request)
+    print(user_id)
+    logging.critical(user_id)
+
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        logging.critical("closeBackAuth")
+        return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+    user.save()
+    
+    logging.critical("blablabla")
+    return JsonResponse({"success": True, "message": "Informations utilisateur mises à jour avec succès.", "username": user.username, "email": user.email})
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_profile(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        logging.critical("Utilisateur non trouvé.")
+        return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
+
+    # Renvoi des informations de l'utilisateur
+    return JsonResponse({
+        "success": True,
+        "message": "Informations utilisateur récupérées avec succès.",
+        "username": user.username,
+        "email": user.email
+    })
 def oauth_login(request):
     # Construire l'URL pour la demande d'autorisation
     params = {
@@ -348,18 +399,20 @@ def oauth_callback(request):
                         # first_name=profile_data_json.get('first_name', ''),  # Utilisez `.get` pour éviter KeyError si la clé n'existe pas
                         # last_name=profile_data_json.get('last_name', '')
                     )
-                    user.set_password('un_mot_de_passe_temporaire_ou_sécurisé')
+                    user.set_password('Api42')
                     user.is_active = True
                     user.save()
+                    register = True
                     print(f"L'utilisateur {user.username} a été créé avec succès.")
-                    user = authenticate(username=user.username, password='un_mot_de_passe_temporaire_ou_sécurisé')
+                    user = authenticate(username=user.username, password='Api42')
                     if user is not None:
                         login(request, user)
                     else:
                         return JsonResponse({'error': 'Authentification fail'}, status=400)
                 else:
+                    register = False
                     user = User.objects.get(email=profile_data_json.get('email'))
-                    if not user.check_password('un_mot_de_passe_temporaire_ou_sécurisé'):  # Vérifie le mot de passe pour l'email
+                    if not user.check_password('Api42'):  # Vérifie le mot de passe pour l'email
                         user = None
                     # user = authenticate(username=profile_data_json.get('login'), password='un_mot_de_passe_temporaire_ou_sécurisé')
                     if user is not None:
@@ -368,7 +421,7 @@ def oauth_callback(request):
                         return JsonResponse({'error': 'Authentification fail user exist'}, status=400)
             else:
                 return JsonResponse({'error': f"Erreur lors de la récupération des données de profil: {profile_data.status_code}"}, status=400)
-            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token, "username": user.username, "id": user.id, "email": user.email, "avatar": profile_data_json.get('image'), "first_name": profile_data_json.get('first_name'), "last_name": profile_data_json.get('last_name')})
+            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token, "username": user.username, "id": user.id, "email": user.email, "avatar": profile_data_json.get('image'), "first_name": profile_data_json.get('first_name'), "last_name": profile_data_json.get('last_name'), "register": register})
         else:
             return JsonResponse({'error': 'Erreur lors de l\'obtention du token d\'accès'}, status=400)
     else:

@@ -1,5 +1,5 @@
 """
-URL configuration for dashback project.
+URL configuration for profileApp project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -15,9 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from pages import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('pages/', include('pages.urls')),
-]
+    path('update_user/', views.update_user, name='update_user'),
+    path('get_user_profile/<int:user_id>/', views.get_user_profile, name='get_user_profile'),
+    # path('save_avatar/', views.save_avatar, name='save_avatar'),
+    # path('manage_user_and_avatar/', views.save_avatar, name='manage_user_and_avatar'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

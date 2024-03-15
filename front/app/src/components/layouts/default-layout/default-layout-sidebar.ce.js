@@ -111,7 +111,6 @@ class DefaultLayoutSidebar extends HTMLElement {
                     class="d-block object-fit-cover rounded-circle m-n1"
                     width="28"
                     height="28"
-                    alt="${user.username}"
                   />
                 </div>
                 <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">${user.username}</span>
@@ -137,14 +136,6 @@ class DefaultLayoutSidebar extends HTMLElement {
     await logout();
     localStorage.setItem('isLogged', 'false');
     redirectTo('/');
-  }
-
-  // Fonction pour obtenir le token CSRF depuis le cookie
-  getCSRFToken() {
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith('csrftoken='))
-      .split('=')[1];
   }
 }
 
