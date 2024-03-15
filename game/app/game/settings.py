@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+  'daphne',
+  'channels',
   'django.contrib.admin',
   'django.contrib.auth',
   'django.contrib.contenttypes',
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
   'django.contrib.staticfiles',
   'corsheaders',
   'game',
+  'ws_api'
 ]
 
 MIDDLEWARE = [
@@ -138,3 +141,12 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+
+# Channels
+ASGI_APPLICATION = 'game.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    },
+}

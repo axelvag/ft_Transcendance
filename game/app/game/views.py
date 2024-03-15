@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.core.exceptions import ValidationError
 from .models import Game
 import json
 
@@ -19,23 +20,14 @@ class GameListView(View):
     # Create a new game
     try:
       data = json.loads(request.body)
-
-      # Data validation
-      if not data.get('player1_id'):
-        return JsonResponse({'error': 'player1_id is required'}, status=400)
-      if not data.get('player2_id'):
-        return JsonResponse({'error': 'player2_id is required'}, status=400)
-      if data.get('player1_id') == data.get('player2_id'):
-        return JsonResponse({'error': 'player1_id and player2_id cannot be the same'}, status=400)
-      # todo check if player1_id  and player2_id exist
-
-      game = Game.objects.create(
-        player1_id=data.get('player1_id'),
-        player2_id=data.get('player2_id'),
-      )
+      game = Game(player1_id=data.get('player1_id'), player2_id=data.get('player2_id'))
+      game.save()
       return JsonResponse(game.json(), status=201)
     except json.JSONDecodeError:
       return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except ValidationError as e:
+      errors = {field: message for field, message in e.message_dict.items()}
+      return JsonResponse({'error': errors}, status=400)
     except Exception as e:
       return JsonResponse({'error': str(e)}, status=500)
 
