@@ -17,3 +17,4 @@ class Notification(models.Model):
     message = models.CharField(max_length=255)
     seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
