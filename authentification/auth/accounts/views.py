@@ -323,8 +323,16 @@ def update_profile(request):
         logging.critical("closeBackAuth")
         return JsonResponse({"success": False, "message": "Utilisateur non trouvé."}, status=404)
 
+    # if username:
+    #     user.username = username
     if username:
+        # Vérifie si un autre utilisateur utilise déjà ce username
+        if User.objects.exclude(pk=user_id).filter(username=username).exists():
+            # Si oui, renvoyez une erreur sans mettre à jour les informations de l'utilisateur
+            return JsonResponse({"success": False, "message": "Ce nom d'utilisateur est déjà pris."}, status=400)
+
         user.username = username
+
     if email:
         user.email = email
     user.save()
@@ -348,6 +356,7 @@ def get_profile(request, user_id):
         "username": user.username,
         "email": user.email
     })
+    
 def oauth_login(request):
     # Construire l'URL pour la demande d'autorisation
     params = {

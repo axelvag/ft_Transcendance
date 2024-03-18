@@ -21,7 +21,7 @@ def update_user(request):
         first_name = request.POST.get('firstname', '')
         last_name = request.POST.get('lastname', '')
         username = request.POST.get('username', '')
-        email = request.POST.get('email', '')
+        # email = request.POST.get('email', '')
         avatar = request.FILES.get('avatar', None)
     else:
         # Tentative d'extraction des données JSON
@@ -32,7 +32,7 @@ def update_user(request):
             first_name = data.get('firstname', '')
             last_name = data.get('lastname', '')
             username = data.get('username', '')
-            email = data.get('email', '')
+            # email = data.get('email', '')
             avatar = request.FILES.get('avatar', None)  # Pas d'avatar dans les données JSON
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "message": "Invalid or missing JSON data."}, status=400)
@@ -40,13 +40,15 @@ def update_user(request):
     logging.critical(avatar)
     # Mise à jour des informations d'authentification via un service externe
     auth_service_url = "http://authentification:8001/accounts/update_profile/"
-    auth_data = {'id': user_id, 'username': username, 'email': email}
+    auth_data = {'id': user_id, 'username': username}#, 'email': email}
 
     logging.critical(auth_data)
     logging.critical(user_id)
 
     try:
         auth_response = requests.post(auth_service_url, json=auth_data)
+        if auth_response.status_code == 400:
+            return JsonResponse({"success": False, "message": "This user name is already taken."})
         if auth_response.status_code != 200:
             return JsonResponse({"success": False, "message": "Failed to update authentication information."})
     except requests.exceptions.RequestException as e:
@@ -91,7 +93,7 @@ def update_user(request):
         "firstname": profile.firstName,
         "lastname": profile.lastName,
         "username": username,
-        "email": email,
+        # "email": email,
         "avatar": avatar_url,
     })
 
