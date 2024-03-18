@@ -97,6 +97,7 @@ const editProfileTemplate = user => `
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="username">Username</label>
           <input class="form-control form-control-lg" type="text" id="username" value="${user.username}" required>
+          <div id="error-username-existing" class="alert alert-danger mt-3" style="display: none;"></div>
         </div>
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="email">Email</label>
@@ -198,9 +199,13 @@ class ViewProfile extends HTMLElement {
       // Définissez ici l'URL de l'avatar par défaut
       console.log("Default Avatar");
       let defaultAvatarUrl;
-      if (user.avatarDefault42 !== null) {
+      console.log(user.avatarDefault42);
+      console.log(user.avatarDefault);
+      if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) {
+        console.log("passe1");
         defaultAvatarUrl = user.avatarDefault42;
       } else {
+        console.log("passe2");
         defaultAvatarUrl = user.avatarDefault;
       }
       const avatarImage = this.querySelector('#viewProfile-edit-avatarImg');
@@ -218,23 +223,13 @@ class ViewProfile extends HTMLElement {
   async #saveProfile() {
     const profileEditForm = this.querySelector('#profile-edit');
     if (profileEditForm) {
-      // const avatarFile = profileEditForm.querySelector('#avatarFile').files[0];
-      // let avatarURL;
-      // if (avatarFile) {
-      //   // Créez une URL pour l'objet fichier
-      //   avatarURL = URL.createObjectURL(avatarFile);
-      //   const avatarImage = profileEditForm.querySelector('img');
-      //   avatarImage.src = avatarURL;
-      //   // await saveAvatar(avatarFile);
-        
-      // }
       const avatarImage = profileEditForm.querySelector('#viewProfile-edit-avatarImg');
       const isDefaultAvatar = avatarImage.getAttribute('data-default-avatar') === 'true';
       let avatarPayload;
       let avatarURL;
 
       if (isDefaultAvatar) {
-        if (user.avatarDefault42 !== null) {
+        if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) {
           avatarPayload = user.avatarDefault42;
         } else {
           avatarPayload = user.avatarDefault;
@@ -266,6 +261,12 @@ class ViewProfile extends HTMLElement {
           this.#user = getProfile();
           this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
         } else {
+          // if (response.message === "This user name is already taken.")
+          {
+            this.errorUsernameExisting = document.getElementById('error-username-existing');
+            this.errorUsernameExisting.textContent = "An error has occurred"; // categorie special d'erreur
+            this.errorUsernameExisting.style.display = 'block';
+          }
           this.querySelector('#profile-edit-loader').hidden = true;
           this.querySelector('#profile-edit').classList.remove('opacity-25');
           console.error(err);
