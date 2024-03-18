@@ -188,15 +188,22 @@ const saveUser = async newUser => {
     }
 
     const data = await response.json();
-    console.log(data);
+    console.log("Ladataaaaaa", data);
 
-    //MAJ object user
-    user.firstname = data.firstname;
-    user.lastname = data.lastname;
-    user.username = data.username;
-    user.email = data.email;
-    user.avatar = data.avatar;
-    newUser.avatar = data.avatar;
+    if (data.success){
+      //MAJ object user
+      user.firstname = data.firstname;
+      user.lastname = data.lastname;
+      user.username = data.username;
+      user.email = user.email;
+
+      if (!data.avatar){
+        user.avatar = 'assets/img/default-profile.jpg';
+      }
+      else{
+        user.avatar = data.avatar;
+      }
+    }
 
     return data;
   } catch (error) {
@@ -300,4 +307,4 @@ const getAuthorizationCode = () => {
   window.location.href = url;
 }  
 
-export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser};
+export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser, resetLocalUser};

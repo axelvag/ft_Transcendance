@@ -94,6 +94,7 @@ const editProfileTemplate = user => `
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="username">Username</label>
           <input class="form-control form-control-lg" type="text" id="username" value="${user.username}" required>
+          <div id="error-username-existing" class="alert alert-danger mt-3" style="display: none;"></div>
         </div>
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="email">Email</label>
@@ -223,6 +224,12 @@ class ViewProfile extends HTMLElement {
           this.#user = getProfile();
           this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
         } else {
+          // if (response.message === "This user name is already taken.")
+          {
+            this.errorUsernameExisting = document.getElementById('error-username-existing');
+            this.errorUsernameExisting.textContent = "An error has occurred"; // categorie special d'erreur
+            this.errorUsernameExisting.style.display = 'block';
+          }
           this.querySelector('#profile-edit-loader').hidden = true;
           this.querySelector('#profile-edit').classList.remove('opacity-25');
           console.error(err);
