@@ -138,3 +138,18 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         "avatar": avatar_url,
         "id": user_id,
     })
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def delete_user_profile(request, user_id):
+    logging.info(f"Attempting to delete profile for user_id: {user_id}")
+
+    try:
+        profile = Profile.objects.get(user_id=user_id)
+        profile.delete()
+        return JsonResponse({"success": True, "message": "Profile deleted successfully."})
+    except Profile.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Profile not found."}, status=404)
+    except Exception as e:
+        logging.error(f"Error deleting profile: {e}")
+        return JsonResponse({"success": False, "message": "Error deleting profile."}, status=500)
