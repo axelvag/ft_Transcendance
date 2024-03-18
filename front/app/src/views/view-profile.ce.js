@@ -224,9 +224,10 @@ class ViewProfile extends HTMLElement {
           this.#user = getProfile();
           this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
         } else {
-          if (response.message === "Ce nom d'utilisateur est déjà pris."){
+          // if (response.message === "This user name is already taken.")
+          {
             this.errorUsernameExisting = document.getElementById('error-username-existing');
-            this.errorUsernameExisting.textContent = "This user name is already taken."; // categorie special d'erreur
+            this.errorUsernameExisting.textContent = "An error has occurred"; // categorie special d'erreur
             this.errorUsernameExisting.style.display = 'block';
           }
           this.querySelector('#profile-edit-loader').hidden = true;

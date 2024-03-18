@@ -48,7 +48,7 @@ def update_user(request):
     try:
         auth_response = requests.post(auth_service_url, json=auth_data)
         if auth_response.status_code == 400:
-            return JsonResponse({"success": False, "message": "Ce nom d'utilisateur est déjà pris."})
+            return JsonResponse({"success": False, "message": "This user name is already taken."})
         if auth_response.status_code != 200:
             return JsonResponse({"success": False, "message": "Failed to update authentication information."})
     except requests.exceptions.RequestException as e:
