@@ -112,7 +112,18 @@ class GameRenderer3D extends HTMLElement {
 
     // get CSS variables
     const style = getComputedStyle(this);
-    const cssvar = name => style.getPropertyValue(name);
+    const cssVarColor = name => {
+      let colorHex = style.getPropertyValue(name).replace('#', '').replace(' ', '');
+      if (colorHex.length === 3) {
+        colorHex = colorHex
+          .split('')
+          .filter(Boolean)
+          .map(char => char + char)
+          .join('');
+      }
+      const colorInt = parseInt(colorHex, 16);
+      return colorInt;
+    };
 
     // scene
     this.#scene = new THREE.Scene();
@@ -164,7 +175,7 @@ class GameRenderer3D extends HTMLElement {
     this.appendChild(this.#renderer.domElement);
 
     // table
-    const tableMaterial = new THREE.MeshStandardMaterial({ color: cssvar('--bs-body-bg') });
+    const tableMaterial = new THREE.MeshStandardMaterial({ color: cssVarColor('--bs-body-bg') });
     if (this.#isDemo) {
       this.#table = this.#getTableMesh(tableMaterial);
     } else {
@@ -176,7 +187,7 @@ class GameRenderer3D extends HTMLElement {
     this.#scene.add(this.#table);
 
     // walls
-    const wallMaterial = new THREE.MeshStandardMaterial({ color: cssvar('--bs-body-color') });
+    const wallMaterial = new THREE.MeshStandardMaterial({ color: cssVarColor('--bs-body-color') });
     this.#walls = this.#getWallMesh(wallMaterial);
     this.#scene.add(this.#walls);
 
@@ -186,7 +197,7 @@ class GameRenderer3D extends HTMLElement {
       this.#gameState.ball.height,
       this.#gameState.ballSize
     );
-    const ballMaterial = new THREE.MeshStandardMaterial({ color: cssvar('--bs-body-color') });
+    const ballMaterial = new THREE.MeshStandardMaterial({ color: cssVarColor('--bs-body-color') });
     this.#ball = new THREE.Mesh(ballGeometry, ballMaterial);
     this.#ball.position.z = this.#gameState.ballSize / 2;
     this.#scene.add(this.#ball);
@@ -197,7 +208,7 @@ class GameRenderer3D extends HTMLElement {
       this.#gameState.paddleLeft.height,
       this.#gameState.paddleDepth
     );
-    const paddleLeftMaterial = new THREE.MeshStandardMaterial({ color: cssvar('--bs-primary') });
+    const paddleLeftMaterial = new THREE.MeshStandardMaterial({ color: cssVarColor('--bs-primary') });
     this.#paddleLeft = new THREE.Mesh(paddleLeftGeometry, paddleLeftMaterial);
     this.#paddleLeft.position.z = this.#gameState.paddleDepth / 2;
     this.#scene.add(this.#paddleLeft);
@@ -208,7 +219,7 @@ class GameRenderer3D extends HTMLElement {
       this.#gameState.paddleRight.height,
       this.#gameState.paddleDepth
     );
-    const paddleRightMaterial = new THREE.MeshStandardMaterial({ color: cssvar('--bs-secondary') });
+    const paddleRightMaterial = new THREE.MeshStandardMaterial({ color: cssVarColor('--bs-secondary') });
     this.#paddleRight = new THREE.Mesh(paddleRightGeometry, paddleRightMaterial);
     this.#paddleRight.position.z = this.#gameState.paddleDepth / 2;
     this.#scene.add(this.#paddleRight);
@@ -262,10 +273,21 @@ class GameRenderer3D extends HTMLElement {
     if (this.#theme !== newTheme) {
       this.#theme = newTheme;
       const style = getComputedStyle(this);
-      const cssvar = name => style.getPropertyValue(name);
-      (this.#table.material[0] || this.#table.material).color.setStyle(cssvar('--bs-body-bg'));
-      this.#walls.material[0].color.setStyle(cssvar('--bs-body-color'));
-      this.#ball.material.color.setStyle(cssvar('--bs-body-color'));
+      const cssVarColor = name => {
+        let colorHex = style.getPropertyValue(name).replace('#', '').replace(' ', '');
+        if (colorHex.length === 3) {
+          colorHex = colorHex
+            .split('')
+            .filter(Boolean)
+            .map(char => char + char)
+            .join('');
+        }
+        const colorInt = parseInt(colorHex, 16);
+        return colorInt;
+      };
+      (this.#table.material[0] || this.#table.material).color.setStyle(cssVarColor('--bs-body-bg'));
+      this.#walls.material[0].color.setStyle(cssVarColor('--bs-body-color'));
+      this.#ball.material.color.setStyle(cssVarColor('--bs-body-color'));
     }
 
     this.#renderer.render(this.#scene, this.#camera);
