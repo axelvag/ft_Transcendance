@@ -208,7 +208,10 @@ const saveUser = async newUser => {
       user.email = user.email;
 
       if (!data.avatar){
-        user.avatar = 'assets/img/default-profile.jpg';
+        if(user.avatarDefault42 !== null && user.avatarDefault42 !== undefined)
+          user.avatar = user.avatarDefault42;
+        else
+          user.avatar = 'assets/img/default-profile.jpg';
       }
       else{
         user.avatar = data.avatar;
