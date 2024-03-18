@@ -7,9 +7,11 @@ from .models import Profile
 from django.contrib.auth import get_user_model
 import logging
 import requests
+from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
 
+@login_required
 @csrf_exempt
 @require_http_methods(["POST"])
 def update_user(request):
@@ -119,6 +121,7 @@ def update_user(request):
     })
 
 
+@login_required
 @csrf_exempt
 @require_http_methods(["GET"])  # Utilisez GET si vous récupérez simplement des informations, ajustez selon besoin
 def get_user_profile(request, user_id):  # Assurez-vous que user_id est correctement capturé depuis l'URL
@@ -163,6 +166,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         "id": user_id,
         "avatar42": profile.avatar42,
     })
+
 
 @csrf_exempt
 @require_http_methods(["DELETE"])

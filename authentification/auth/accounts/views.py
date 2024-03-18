@@ -435,3 +435,8 @@ def oauth_callback(request):
             return JsonResponse({'error': 'Erreur lors de l\'obtention du token d\'accès'}, status=400)
     else:
         return JsonResponse({'error': 'Code d\'autorisation manquant'}, status=400)
+
+
+# @login_required
+# @require_http_methods(["POST"])
+# def update_user(request):
