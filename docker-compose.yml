@@ -11,8 +11,6 @@ services:
       - "8000:80"
     networks:
       - front
-    depends_on:
-      - authentification
     restart: on-failure
     profiles:
       - prod
@@ -50,8 +48,6 @@ services:
       - back
     depends_on:
       - data_base
-      - profile
-      - friendship
     environment:
       - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
       - POSTGRES_DB=transcendence
@@ -110,20 +106,20 @@ services:
       - back
 
   # Back - api gateway
-  api_gateway:
-    build:
-      context: ./api_gateway
-      dockerfile: Dockerfile
-    container_name: api_gateway
-    ports:
-      - "5000:5000"
-    networks:
-      - back
-    depends_on:
-      - authentification
-      - profile
-      - data_base
-    restart: on-failure
+  # api_gateway:
+  #   build:
+  #     context: ./api_gateway
+  #     dockerfile: Dockerfile
+  #   container_name: api_gateway
+  #   ports:
+  #     - "5000:5000"
+  #   networks:
+  #     - back
+  #   depends_on:
+  #     - authentification
+  #     - profile
+  #     - data_base
+  #   restart: on-failure
 
   friendship:
     build:

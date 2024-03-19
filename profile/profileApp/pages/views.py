@@ -109,7 +109,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         # Recherche du profil par user_id
         profile = Profile.objects.get(user_id=user_id)
     except Profile.DoesNotExist:
-        return JsonResponse({"success": False, "message": "Profile not found."}, status=404)
+        profile = None
 
     # Faites un appel au service d'authentification pour obtenir username et email
     auth_service_url = "http://authentification:8001/accounts/get_profile/"
@@ -126,13 +126,13 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         return JsonResponse({"success": False, "message": "Error calling authentication service."})
 
     # Construction de l'URL de l'avatar si disponible
-    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
+    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile and profile.avatar else None
 
     # Réponse avec les informations récupérées
     return JsonResponse({
         "success": True,
-        "firstname": profile.firstName,
-        "lastname": profile.lastName,
+        "firstname": profile.firstName if profile else '',
+        "lastname": profile.lastName if profile else '',
         "username": username,  # Ces informations proviennent du service d'authentification
         "email": email,  # Ces informations proviennent du service d'authentification
         "avatar": avatar_url,
