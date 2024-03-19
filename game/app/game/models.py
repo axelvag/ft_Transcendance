@@ -12,8 +12,8 @@ class Game(models.Model):
 
   created_at = models.DateTimeField(auto_now_add=True)
   ended_at = models.DateTimeField(null=True, blank=True)
-  player1_id = models.CharField(max_length=255)
-  player2_id = models.CharField(max_length=255)
+  player_left_id = models.CharField(max_length=255)
+  player_right_id = models.CharField(max_length=255)
   player1_score = models.IntegerField(default=0)
   player2_score = models.IntegerField(default=0)
   winner_id = models.CharField(max_length=255, null=True, blank=True)
@@ -25,8 +25,8 @@ class Game(models.Model):
   def json(self):
     return {
       'id': self.id,
-      'player1_id': self.player1_id,
-      'player2_id': self.player2_id,
+      'player_left_id': self.player_left_id,
+      'player_right_id': self.player_right_id,
       'status': self.status,
       'winner': self.winner_id,
       'created_at': self.created_at,
@@ -34,8 +34,8 @@ class Game(models.Model):
     }
   
   def clean(self):
-    if self.player1_id == self.player2_id:
-      raise ValidationError({'player2_id': 'player1_id and player2_id cannot be the same'})
+    if self.player_left_id == self.player_right_id:
+      raise ValidationError({'player_right_id': 'player_left_id and player_right_id cannot be the same'})
 
   def save(self, *args, **kwargs):
     self.full_clean()

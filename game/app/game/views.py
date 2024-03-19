@@ -20,7 +20,7 @@ class GameListView(View):
     # Create a new game
     try:
       data = json.loads(request.body)
-      game = Game(player1_id=data.get('player1_id'), player2_id=data.get('player2_id'))
+      game = Game(player_left_id=data.get('player_left_id'), player_right_id=data.get('player_right_id'))
       game.save()
       return JsonResponse(game.json(), status=201)
     except json.JSONDecodeError:
@@ -51,14 +51,14 @@ class GameItemView(View):
       game = Game.objects.get(id=game_id)
 
       # Data validation
-      if data.get('player1_id') and data.get('player1_id') == game.player2_id:
-        return JsonResponse({'error': 'player1_id and player2_id cannot be the same'}, status=400)
-      if data.get('player2_id') and data.get('player2_id') == game.player1_id:
-        return JsonResponse({'error': 'player1_id and player2_id cannot be the same'}, status=400)
-      # todo check if player1_id  and player2_id exist
+      if data.get('player_left_id') and data.get('player_left_id') == game.player_right_id:
+        return JsonResponse({'error': 'player_left_id and player_right_id cannot be the same'}, status=400)
+      if data.get('player_right_id') and data.get('player_right_id') == game.player_left_id:
+        return JsonResponse({'error': 'player_left_id and player_right_id cannot be the same'}, status=400)
+      # todo check if player_left_id  and player_right_id exist
 
-      game.player1_id = data.get('player1_id', game.player1_id)
-      game.player2_id = data.get('player2_id', game.player2_id)
+      game.player_left_id = data.get('player_left_id', game.player_left_id)
+      game.player_right_id = data.get('player_right_id', game.player_right_id)
       game.save()
       return JsonResponse(game.json(), status=200)
     except json.JSONDecodeError:
