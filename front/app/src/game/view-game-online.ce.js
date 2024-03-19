@@ -3,12 +3,15 @@ import { getProfile } from '@/auth.js';
 import { getCsrfToken } from '@/auth.js';
 
 class ViewGameOnline extends HTMLElement {
+  #user;
   #playerLeft;
   #playerRight;
 
   constructor() {
     super();
     this.handleError = this.handleError.bind(this);
+
+    this.#user = getProfile();
   }
 
   async connectedCallback() {
@@ -33,21 +36,31 @@ class ViewGameOnline extends HTMLElement {
         },
         title: 'Ready?',
       });
+      console.log({
+        playerLeft: this.#playerLeft,
+        playerRight: this.#playerRight,
+      });
     } catch (error) {
       this.handleError(error);
     }
   }
 
   async getPlayerProfile(playerId) {
-    // todo: implement profile fetching
-    const user = getProfile();
-    const isYou = String(user.id) === String(playerId);
-    const profile = await fetch(`http://127.0.0.1:8001/accounts/get_profile/${playerId}`).then(res => res.json());
+    if (String(this.#user.id) === String(playerId)) {
+      return {
+        id: String(this.#user.id),
+        name: this.#user.username,
+        avatar: this.#user.avatar,
+        type: 'you',
+      };
+    }
+
+    const profile = await fetch(`http://127.0.0.1:8002/get_user_profile/${playerId}`).then(res => res.json());
     return {
       id: String(profile.id),
       name: profile.username,
-      avatar: isYou ? user.avatar : 'assets/img/default-profile.jpg',
-      type: isYou ? 'you' : '',
+      avatar: profile.avatar || '/assets/img/default-profile.jpg',
+      type: '',
     };
   }
 
