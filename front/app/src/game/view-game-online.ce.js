@@ -23,8 +23,8 @@ class ViewGameOnline extends HTMLElement {
     const gameId = this.getAttribute('game-id');
     try {
       const game = await fetch(`http://127.0.0.1:8009/games/${gameId}`).then(res => res.json());
-      this.#playerLeft = await this.getPlayerProfile(game.player1_id);
-      this.#playerRight = await this.getPlayerProfile(game.player2_id);
+      this.#playerLeft = await this.getPlayerProfile(game.player_left_id);
+      this.#playerRight = await this.getPlayerProfile(game.player_right_id);
 
       this.innerHTML = `<game-dialog></game-dialog>`;
       const gameDialog = this.querySelector('game-dialog');
