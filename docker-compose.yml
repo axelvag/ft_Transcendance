@@ -138,6 +138,9 @@ services:
       - data_base
     restart: on-failure
 
+volumes:
+  data_base_data:
+
 networks:
   front:
     driver: bridge
