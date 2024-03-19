@@ -187,9 +187,14 @@ const saveUser = async newUser => {
   }
 
   try {
-    const response = await fetch('http://127.0.0.1:8002/update_user/', {
+    const csrfToken = await getCsrfToken();
+    const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
       method: 'POST',
       credentials: 'include',
+      headers: {
+        // 'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
       body: formData,
     });
 
@@ -282,9 +287,11 @@ const handleOAuthResponse = async () => {
   if (window.location.search.includes("code=")) {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    console.log(code);
+    // console.log(code);
     try {
       const csrfToken = await getCsrfToken();
+      console.log("csrftoken1");
+      console.log(csrfToken);
       const authResponse = await fetch('http://127.0.0.1:8001/accounts/oauth/callback/', {
         method: 'POST',
         headers: {
@@ -296,7 +303,6 @@ const handleOAuthResponse = async () => {
       });
 
       const data = await authResponse.json();
-      console.log(data); // Traiter la réponse
       if (data.access_token) {
         user.id = data.id;
         user.email = data.email;
@@ -315,12 +321,18 @@ const handleOAuthResponse = async () => {
         if(data.register === true){
           console.log("register trueeeeeeeeeeee");
           try {
-            for (let [key, value] of formData.entries()) {
-              console.log(`${key}: ${value}`);
-          }
-
-            const response = await fetch('http://127.0.0.1:8002/update_user/', {
+          //   for (let [key, value] of formData.entries()) {
+          //     console.log(`${key}: ${value}`);
+          // }
+            const csrfToken = await getCsrfToken();
+            console.log("csrftoken2");
+            console.log(csrfToken);
+            const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
               method: 'POST',
+              headers: {
+                // 'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+              },
               credentials: 'include',
               body: formData,
             });

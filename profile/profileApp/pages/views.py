@@ -10,13 +10,11 @@ import requests
 from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
-
-@login_required
 @csrf_exempt
+# @login_required
 @require_http_methods(["POST"])
 def update_user(request):
-    logging.critical("Received request")
-    
+    logging.critical("iciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
     if request.content_type.startswith('multipart/form-data'): # grace au formData envoyer
         # Extraction des données depuis une requête multipart/form-data
         user_id = request.POST.get('id')
@@ -169,6 +167,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
 
 
 @csrf_exempt
+# @login_required
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
     logging.info(f"Attempting to delete profile for user_id: {user_id}")

@@ -27,6 +27,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.conf import settings
 import requests
+from django.middleware.csrf import CsrfViewMiddleware
 # Create your views here.
 User = get_user_model()
 
@@ -436,7 +437,20 @@ def oauth_callback(request):
     else:
         return JsonResponse({'error': 'Code d\'autorisation manquant'}, status=400)
 
+#Profile
 
-# @login_required
-# @require_http_methods(["POST"])
-# def update_user(request):
+@login_required
+@require_http_methods(["POST"])
+def update_user(request):
+    print("yo")
+    update_url = "http://profile:8002/update_user/"
+    
+    
+    
+    payload = request.POST
+    response = requests.post(update_url, json=payload)
+    
+    if response.status_code == 200:
+        return JsonResponse({"status": "success", "data": response.json()})
+    else:
+        return JsonResponse({"status": "error"}, status=500)
