@@ -10,7 +10,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 import json
 from django.db.models import F
-
+import logging
 
 User = get_user_model()
 
@@ -102,35 +102,44 @@ def accept_invitation(request):
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
-# @csrf_exempt
-# @require_http_methods(["POST"])
-# def get_friends(request):
-#     try:
-#         data = json.loads(request.body)
-#         user_id = data.get('user_id')
-#         user = User.objects.get(id=user_id)
+@csrf_exempt
+@require_http_methods(["POST"])
+def get_friends(request):
+    try:
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        user = User.objects.get(id=user_id)
+        
+        logging.critical(user_id)
+        logging.critical(user)
 
-#         # Récupérer les amis où l'utilisateur est le destinataire de l'invitation acceptée
-#         friends_from_invitations = User.objects.filter(
-#             invitations_received__from_user=user,
-#             invitations_received__accepted=True
-#         ).distinct()
+        # Récupérer les amis où l'utilisateur est le destinataire de l'invitation acceptée
+        friends_from_invitations = User.objects.filter(
+            invitations_received__from_user=user,
+            invitations_received__accepted=True
+        ).distinct()
 
-#         # Récupérer les amis où l'utilisateur est l'expéditeur de l'invitation acceptée
-#         friends_to_invitations = User.objects.filter(
-#             invitations_sent__to_user=user,
-#             invitations_sent__accepted=True
-#         ).distinct()
+        logging.critical("Yo")
 
-#         # Fusionner les deux listes d'amis sans doublons
-#         friends = (friends_from_invitations | friends_to_invitations).distinct()
+        # Récupérer les amis où l'utilisateur est l'expéditeur de l'invitation acceptée
+        friends_to_invitations = User.objects.filter(
+            invitations_sent__to_user=user,
+            invitations_sent__accepted=True
+        ).distinct()
 
-#         # Préparer les données des amis pour la réponse JSON
-#         friends_data = list(friends.values('id', 'username'))
+        logging.critical("Yo2")
 
-#         return JsonResponse({"status": "success", "friends": friends_data}, status=200)
+        # Fusionner les deux listes d'amis sans doublons
+        friends = (friends_from_invitations | friends_to_invitations).distinct()
+        logging.critical("Yo3")
 
-#     except User.DoesNotExist:
-#         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
-#     except Exception as e:
-#         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+        # Préparer les données des amis pour la réponse JSON
+        friends_data = list(friends.values('id', 'username'))
+        logging.critical("Yo4")
+
+        return JsonResponse({"status": "success", "friends": friends_data}, status=200)
+
+    except User.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)

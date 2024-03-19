@@ -13,6 +13,8 @@ class ViewFriend extends HTMLElement {
 
         <!--avatar-->
         <div id="notification-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div> <!-- Ajouté pour les notifications -->
+        <div id="friends-list">Vous êtes amis avec :</div>
+
 
         <div class="container">
           <div class="row">
@@ -112,7 +114,6 @@ class ViewFriend extends HTMLElement {
     `;
 
     this.checkForNotifications();
-    // this.fetchFriends();
     this.startNotificationPolling();
     this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
     this.generalErrorFriend = document.getElementById('general-error-friend');
@@ -191,12 +192,6 @@ class ViewFriend extends HTMLElement {
       .catch(error => console.error('Erreur lors de la vérification des notifications:', error));
   }
 
-  // Méthode pour afficher les notifications
-  // displayNotification(notification) {
-  //   // Vous pouvez choisir comment vous souhaitez afficher les notifications
-  //   // Par exemple, afficher une alerte ou ajouter une entrée dans un élément de liste de notifications
-  //   alert('Nouvelle notification : ' + notification.message);
-  // }
   displayNotification(notification) {
 
     console.log("notif", notification);
@@ -215,42 +210,72 @@ class ViewFriend extends HTMLElement {
     const acceptBtn = notificationDiv.querySelector('#accept-btn');
     const declineBtn = notificationDiv.querySelector('#decline-btn');
 
-    acceptBtn.addEventListener('click', function() {
+    acceptBtn.addEventListener('click', async function() {
       // Logique d'acceptation ici
-      // alert('Notification acceptée !');
-      // notificationContainer.removeChild(notificationDiv);
       const invitationId = notification.invitation_id;
-      const userId = user.id;
-
-      fetch('http://127.0.0.1:8003/accept_invitation/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Assurez-vous d'inclure le CSRF token si nécessaire
-        },
-        body: JSON.stringify({
-          invitation_id: invitationId,
-          user_id: userId,
-        }),
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('La requête a échoué');
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log(data);
-          alert('Invitation acceptée avec succès !');
-          notificationContainer.removeChild(notificationDiv);
-          // fetchFriends(userId);
-        })
-        .catch(error => {
-          console.error("Erreur lors de l'acceptation de l'invitation:", error);
-          alert("Erreur lors de l'acceptation de l'invitation."); // Informez l'utilisateur de l'échec
+      const userId = user.id; // Assurez-vous que 'user.id' est accessible dans ce contexte
+    
+      try {
+        const acceptResponse = await fetch('http://127.0.0.1:8003/accept_invitation/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // Assurez-vous d'inclure le CSRF token si nécessaire
+          },
+          body: JSON.stringify({
+            invitation_id: invitationId,
+            user_id: userId,
+          }),
         });
+    
+        if (!acceptResponse.ok) {
+          throw new Error('La requête a échoué');
+        }
+        const acceptData = await acceptResponse.json();
+        console.log(acceptData);
+        alert('Invitation acceptée avec succès !');
+        notificationContainer.removeChild(notificationDiv);
+    
+        // Après avoir accepté l'invitation, récupérez la liste mise à jour des amis
+        await fetchFriendsList(userId); // Appeler la fonction pour récupérer et traiter la liste des amis
+    
+      } catch (error) {
+        console.error("Erreur lors de l'acceptation de l'invitation:", error);
+        alert("Erreur lors de l'acceptation de l'invitation."); // Informez l'utilisateur de l'échec
+      }
     });
-
+    
+    async function fetchFriendsList(userId) {
+      try {
+        const friendsResponse = await fetch('http://127.0.0.1:8003/get_friends/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id: userId }),
+        });
+    
+        if (!friendsResponse.ok) {
+          throw new Error('Failed to fetch friends list');
+        }
+        const friendsData = await friendsResponse.json();
+        console.log('Friends:', friendsData);
+    
+        // Trouvez l'élément où afficher la liste des amis
+        const friendsListElement = document.getElementById('friends-list');
+        // Assurez-vous de nettoyer la liste précédente avant d'afficher les nouveaux amis
+        friendsListElement.innerHTML = 'Vous êtes amis avec :<br>';
+    
+        // Parcourez la liste des amis et ajoutez-les à l'élément
+        friendsData.friends.forEach(friend => {
+          friendsListElement.innerHTML += `<span>${friend.username}</span><br>`; // Utilisez des éléments appropriés selon votre mise en page
+        });
+    
+      } catch (error) {
+        console.error('Error fetching friends list:', error);
+      }
+    }
+    
     declineBtn.addEventListener('click', function() {
       // Logique de déclin ici
       alert('Notification déclinée.');
@@ -266,33 +291,6 @@ class ViewFriend extends HTMLElement {
       clearInterval(this.pollingInterval);
     }
   }
-
-  // fetchFriends(userId) {
-  //   fetch('http://127.0.0.1:8003/get_friends/', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       // Assurez-vous d'inclure le CSRF token si nécessaire
-  //     },
-  //     body: JSON.stringify({
-  //       user_id: userId,
-  //     }),
-  //   })
-  //   .then(response => {
-  //     if (!response.ok) {
-  //       throw new Error('La requête a échoué');
-  //     }
-  //     return response.json();
-  //   })
-  //   .then(data => {
-  //     console.log("Amis récupérés avec succès :", data.friends);
-  //     // Ici, vous pouvez mettre à jour l'interface utilisateur avec la liste des amis
-  //     // Par exemple, en les affichant dans un élément spécifique de la page
-  //   })
-  //   .catch(error => {
-  //     console.error("Erreur lors de la récupération des amis:", error);
-  //   });
-  // }
   
 }
 
