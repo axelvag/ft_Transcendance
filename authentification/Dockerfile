@@ -21,8 +21,6 @@ COPY . /app/
 # COPY ./script_python.sh /app/
 # RUN chmod 777 ./script_python.sh
 
-
-
 EXPOSE 8001
 
 # WORKDIR /app/auth
@@ -32,8 +30,8 @@ EXPOSE 8001
 
 WORKDIR /app/auth
 
-# Les droit ne marche pas donc je ne peux pas lancer le script !!!
-RUN chmod +x ./script_python.sh
+RUN chmod +x ./script_python.sh 
+RUN chmod +x ./wait-for-it.sh
 
 # CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
 CMD ["./script_python.sh"]

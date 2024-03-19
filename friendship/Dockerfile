@@ -29,6 +29,7 @@ EXPOSE 8003
 WORKDIR /app/friendshipApp
 
 RUN chmod +x ./script_python.sh
+RUN chmod +x ./wait-for-it.sh
 
 # Commande pour lancer l'application Django
 # CMD ["python3", "manage.py", "runserver", "0.0.0.0:8002"]

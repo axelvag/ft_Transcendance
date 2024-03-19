@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# sleep 10
+
 # Pour utiliser Postgres
 python3 manage.py makemigrations
 
