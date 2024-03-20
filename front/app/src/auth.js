@@ -204,26 +204,25 @@ const saveUser = async newUser => {
 
     const data = await response.json();
     console.log("Ladataaaaaa", data);
-
-    if (data.success){
+    if (data.data.success){
       //MAJ object user
-      user.firstname = data.firstname;
-      user.lastname = data.lastname;
-      user.username = data.username;
+      user.firstname = data.data.firstname;
+      user.lastname = data.data.lastname;
+      user.username = data.data.username;
       user.email = user.email;
 
-      if (!data.avatar){
+      if (!data.data.avatar){
         if(user.avatarDefault42 !== null && user.avatarDefault42 !== undefined)
           user.avatar = user.avatarDefault42;
         else
           user.avatar = 'assets/img/default-profile.jpg';
       }
       else{
-        user.avatar = data.avatar;
+        user.avatar = data.data.avatar;
       }
     }
 
-    return data;
+    return data.data;
   } catch (error) {
     console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
     return null;

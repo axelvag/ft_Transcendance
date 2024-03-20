@@ -40,17 +40,20 @@ class ViewSettings extends HTMLElement {
   
       const data = await response.json();
       if (data.success) {
-        user.isAuthenticated = false;
-  
-        const deleteProfile = await fetch(`http://127.0.0.1:8002/delete_user_profile/${user.id}/`, {
+        
+        const deleteProfile = await fetch(`http://127.0.0.1:8001/accounts/delete_user_profile/${user.id}/`, {
           method: 'DELETE',
           credentials: 'include',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
         });
-  
+        
         const deleteProfileData = await deleteProfile.json();
         console.log(deleteProfileData);
-  
+        
         if (deleteProfileData.success) {
+          user.isAuthenticated = false;
           resetLocalUser(deleteProfileData);
         } else {
           console.error('Failed to load user profile:', deleteProfileData.message);

@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
 @csrf_exempt
-# @login_required
 @require_http_methods(["POST"])
 def update_user(request):
     logging.critical("iciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
@@ -99,7 +98,11 @@ def update_user(request):
         return JsonResponse({"success": False, "message": "Error updating or creating profile."})
 
     # Construction de l'URL de l'avatar
-    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
+    base_url = 'http://127.0.0.1:8002'
+
+    logging.critical(request.build_absolute_uri)
+    # avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
+    avatar_url = base_url + profile.avatar.url if profile.avatar else None
     if avatar is None:
         if avatar42 is not None:
             avatar_url = avatar42
@@ -170,6 +173,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
 # @login_required
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
+    logging.critical("delete user")
     logging.info(f"Attempting to delete profile for user_id: {user_id}")
 
     try:
