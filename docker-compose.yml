@@ -49,10 +49,10 @@ services:
     depends_on:
       - data_base
     environment:
-      - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+      - POSTGRES_HOST=${POSTGRES_HOST} # Utilisez le nom du service comme hôte
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: on-failure
 
   profile:
@@ -67,10 +67,10 @@ services:
     depends_on:
       - data_base
     environment:
-      - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+      - POSTGRES_HOST=${POSTGRES_HOST} # Utilisez le nom du service comme hôte
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: on-failure
 
   # Back - data base
@@ -80,9 +80,9 @@ services:
       dockerfile: Dockerfile
     container_name: data_base
     environment:
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -119,10 +119,10 @@ services:
     depends_on:
       - data_base
     environment:
-      - POSTGRES_HOST=data_base
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: on-failure
 
   statistic:
