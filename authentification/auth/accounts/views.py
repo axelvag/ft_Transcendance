@@ -27,6 +27,18 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.conf import settings
 import requests
+import os
+from dotenv import load_dotenv
+
+# Déterminez le chemin absolu vers le fichier .env
+# dotenv_path = '../../.env'
+
+dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '.env'))
+
+# Charger les variables d'environnement à partir du fichier .env
+load_dotenv(dotenv_path)
+# load_dotenv()
+
 # Create your views here.
 User = get_user_model()
 
@@ -49,7 +61,9 @@ def activate(request, uidb64, token):
 
 def activateEmail(request, user, to_email):
     mail_subject = "Activate your user account"
+    print("URL: ", os.getenv('URL'))
     message = render_to_string("template_activate_account.html", {
+        'url': os.getenv('URL'),
         'user': user.username,
         'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -272,6 +286,7 @@ def resend_email_rest(request, uidb64):
     to_email = user.email
     mail_subject = "Réinitialisation de votre mot de passe sur Transcendence"
     message = render_to_string("template_forget_pass.html", {
+        'url': os.getenv('URL'),
         'user': user.username,
         'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
