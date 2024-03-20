@@ -13,7 +13,6 @@ User = get_user_model()
 @csrf_exempt
 @require_http_methods(["POST"])
 def update_user(request):
-    logging.critical("iciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
     if request.content_type.startswith('multipart/form-data'): # grace au formData envoyer
         # Extraction des données depuis une requête multipart/form-data
         user_id = request.POST.get('id')
@@ -26,12 +25,9 @@ def update_user(request):
             avatar42 = request.POST.get('avatar', None)
         else:
             avatar42 = None
-        logging.critical(avatar)
-        logging.critical(avatar42)
     else:
         # Tentative d'extraction des données JSON
         try:
-            logging.critical("yooo")
             data = json.loads(request.body.decode('utf-8'))
             user_id = data.get('id')
             first_name = data.get('firstname', '')
@@ -46,13 +42,9 @@ def update_user(request):
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "message": "Invalid or missing JSON data."}, status=400)
 
-    logging.critical(avatar)
     # Mise à jour des informations d'authentification via un service externe
     auth_service_url = "http://authentification:8001/accounts/update_profile/"
     auth_data = {'id': user_id, 'username': username}#, 'email': email}
-
-    logging.critical(auth_data)
-    logging.critical(user_id)
 
     try:
         auth_response = requests.post(auth_service_url, json=auth_data)
@@ -170,7 +162,6 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
 
 
 @csrf_exempt
-# @login_required
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
     logging.critical("delete user")

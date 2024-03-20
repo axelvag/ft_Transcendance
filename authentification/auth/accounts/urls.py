@@ -25,6 +25,5 @@ urlpatterns = [
 
     #profile
     path('update_user/', views.update_user, name='update_user'),
-    # path('validate_csrf_token/', views.validate_csrf_token, name='validate_csrf_token'),
     path('delete_user_profile/<int:user_id>/', views.delete_user_profile, name='delete_user_profile'),
 ]
