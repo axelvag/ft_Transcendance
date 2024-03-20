@@ -92,9 +92,8 @@ def update_user(request):
     # Construction de l'URL de l'avatar
     base_url = 'http://127.0.0.1:8002'
 
-    logging.critical(request.build_absolute_uri)
     # avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
-    avatar_url = base_url + profile.avatar.url if profile.avatar else None
+    avatar_url = base_url + profile.avatar.url if profile and profile.avatar else None
     if avatar is None:
         if avatar42 is not None:
             avatar_url = avatar42
@@ -126,7 +125,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         # Recherche du profil par user_id
         profile = Profile.objects.get(user_id=user_id)
     except Profile.DoesNotExist:
-        return JsonResponse({"success": False, "message": "Profile not found."}, status=404)
+        profile = None
 
     # Faites un appel au service d'authentification pour obtenir username et email
     auth_service_url = "http://authentification:8001/accounts/get_profile/"
@@ -151,8 +150,8 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
     logging.critical(profile.avatar42)
     return JsonResponse({
         "success": True,
-        "firstname": profile.firstName,
-        "lastname": profile.lastName,
+        "firstname": profile.firstName if profile else '',
+        "lastname": profile.lastName if profile else '',
         "username": username,  # Ces informations proviennent du service d'authentification
         "email": email,  # Ces informations proviennent du service d'authentification
         "avatar": avatar_url,

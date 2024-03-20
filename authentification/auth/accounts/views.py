@@ -437,6 +437,7 @@ def oauth_callback(request):
     else:
         return JsonResponse({'error': 'Code d\'autorisation manquant'}, status=400)
 
+
 #Profile
 
 @login_required
@@ -461,7 +462,6 @@ def update_user(request):
             "status_code": response.status_code
         }, status=500)
 
-# @login_required
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
     print("ici deleteeeeeeeeeeeeee")
