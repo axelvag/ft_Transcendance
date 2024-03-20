@@ -23,6 +23,12 @@ def update_user(request):
         username = request.POST.get('username', '')
         # email = request.POST.get('email', '')
         avatar = request.FILES.get('avatar', None)
+        if avatar is None:
+            avatar42 = request.POST.get('avatar', None)
+        else:
+            avatar42 = None
+        logging.critical(avatar)
+        logging.critical(avatar42)
     else:
         # Tentative d'extraction des données JSON
         try:
@@ -34,6 +40,10 @@ def update_user(request):
             username = data.get('username', '')
             # email = data.get('email', '')
             avatar = request.FILES.get('avatar', None)  # Pas d'avatar dans les données JSON
+            if avatar is None:
+                avatar42 = data.get('avatar', None)
+            else:
+                avatar42 = None
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "message": "Invalid or missing JSON data."}, status=400)
 
@@ -61,6 +71,7 @@ def update_user(request):
         'firstName': first_name,
         'lastName': last_name,
         }
+
     
         # Si un avatar est fourni, ajoutez-le aux valeurs par défaut pour la mise à jour/création
         if avatar is not None:
@@ -70,12 +81,17 @@ def update_user(request):
             user_id=user_id,
             defaults=defaults
         )
+
+        if profile.avatar42 is None:
+            profile.avatar42 = avatar42
+            profile.save()  # Sauvegarder les modifications sur le profil
     except Profile.DoesNotExist:
         # Si aucun profil n'existe pour cet utilisateur et qu'aucun avatar n'est fourni
         profile = Profile.objects.create(
             user_id=user_id,
             firstName=first_name,
             lastName=last_name,
+            avatar42=avatar42,
             # Initialisez d'autres champs si nécessaire
         )
     except Exception as e:
@@ -83,8 +99,13 @@ def update_user(request):
         return JsonResponse({"success": False, "message": "Error updating or creating profile."})
 
     # Construction de l'URL de l'avatar
-    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
-
+    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile and profile.avatar else None
+    if avatar is None:
+        if avatar42 is not None:
+            avatar_url = avatar42
+            profile.avatar = None
+            profile.save()
+            
     # Réponse de succès avec les informations mises à jour
     return JsonResponse({
         "success": True,
@@ -126,9 +147,12 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         return JsonResponse({"success": False, "message": "Error calling authentication service."})
 
     # Construction de l'URL de l'avatar si disponible
-    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile and profile.avatar else None
-
+    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
+    if avatar_url is None:
+        logging.critical("avatar null")
+        avatar_url = profile.avatar42
     # Réponse avec les informations récupérées
+    logging.critical(profile.avatar42)
     return JsonResponse({
         "success": True,
         "firstname": profile.firstName if profile else '',
@@ -137,6 +161,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         "email": email,  # Ces informations proviennent du service d'authentification
         "avatar": avatar_url,
         "id": user_id,
+        "avatar42": profile.avatar42,
     })
 
 @csrf_exempt

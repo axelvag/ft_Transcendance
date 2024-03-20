@@ -430,7 +430,7 @@ def oauth_callback(request):
                         return JsonResponse({'error': 'Authentification fail user exist'}, status=400)
             else:
                 return JsonResponse({'error': f"Erreur lors de la récupération des données de profil: {profile_data.status_code}"}, status=400)
-            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token, "username": user.username, "id": user.id, "email": user.email, "avatar": profile_data_json.get('image'), "first_name": profile_data_json.get('first_name'), "last_name": profile_data_json.get('last_name'), "register": register})
+            return JsonResponse({'message': 'Authentification réussie', 'access_token': access_token, "username": user.username, "id": user.id, "email": user.email, "avatar": profile_data_json.get('image'), "firstname": profile_data_json.get('first_name'), "lastname": profile_data_json.get('last_name'), "register": register})
         else:
             return JsonResponse({'error': 'Erreur lors de l\'obtention du token d\'accès'}, status=400)
     else:
