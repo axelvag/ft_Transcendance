@@ -139,6 +139,24 @@ services:
       - POSTGRES_PASSWORD=postgresTranscendence123
     restart: on-failure
 
+  tournament:
+    build:
+      context: ./tournament
+      dockerfile: Dockerfile
+    container_name: tournament
+    ports:
+      - "8005:8005"
+    networks:
+      - back
+    depends_on:
+      - data_base
+    environment:
+      - POSTGRES_HOST=data_base
+      - POSTGRES_DB=transcendence
+      - POSTGRES_USER=postgresTranscendence
+      - POSTGRES_PASSWORD=postgresTranscendence123
+    restart: on-failure
+
   statistic:
     build:
       context: ./statistic
