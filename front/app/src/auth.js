@@ -125,7 +125,7 @@ const getCsrfToken = async () => {
   });
   if (response.ok) {
     const data = await response.json();
-    console.log(data.csrfToken);
+    // console.log(data.csrfToken);
     return data.csrfToken;
   }
   throw new Error('Could not retrieve CSRF token');
@@ -166,7 +166,7 @@ const getProfile = () => {
 
 const saveUser = async newUser => {
 
-  console.log("object newUser saveUser", newUser);
+  // console.log("object newUser saveUser", newUser);
 
   const formData = new FormData();
   formData.append('username', newUser.username);
@@ -179,12 +179,12 @@ const saveUser = async newUser => {
     formData.append('avatar', newUser.avatarFile);
   }
 
-  console.log("formData", formData);
+  // console.log("formData", formData);
 
   // Pour afficher le contenu de formData
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}: ${value}`);
-  }
+  // for (let [key, value] of formData.entries()) {
+  //   console.log(`${key}: ${value}`);
+  // }
 
   try {
     const csrfToken = await getCsrfToken();
@@ -192,7 +192,6 @@ const saveUser = async newUser => {
       method: 'POST',
       credentials: 'include',
       headers: {
-        // 'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
       body: formData,
@@ -203,7 +202,6 @@ const saveUser = async newUser => {
     }
 
     const data = await response.json();
-    console.log("Ladataaaaaa", data);
     if (data.update.success){
       //MAJ object user
       user.firstname = data.update.firstname;
@@ -286,11 +284,8 @@ const handleOAuthResponse = async () => {
   if (window.location.search.includes("code=")) {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    // console.log(code);
     try {
       const csrfToken = await getCsrfToken();
-      console.log("csrftoken1");
-      console.log(csrfToken);
       const authResponse = await fetch('http://127.0.0.1:8001/accounts/oauth/callback/', {
         method: 'POST',
         headers: {
@@ -318,14 +313,11 @@ const handleOAuthResponse = async () => {
         formData.append('id', user.id);
         formData.append('avatar', user.avatar);
         if(data.register === true){
-          console.log("register trueeeeeeeeeeee");
           try {
           //   for (let [key, value] of formData.entries()) {
           //     console.log(`${key}: ${value}`);
           // }
             const csrfToken = await getCsrfToken();
-            console.log("csrftoken2");
-            console.log(csrfToken);
             const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
               method: 'POST',
               headers: {
@@ -341,7 +333,6 @@ const handleOAuthResponse = async () => {
             }
         
             const data = await response.json();
-            console.log(data);
         
           } catch (error) {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
@@ -355,8 +346,6 @@ const handleOAuthResponse = async () => {
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
         if (userProfileData.success) {
-          console.log("yo");
-          console.log(userProfileData.avatar42);
           setLocalUser(userProfileData);
           redirectTo('/dashboard');
         } else {

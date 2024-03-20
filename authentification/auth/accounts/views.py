@@ -464,14 +464,10 @@ def update_user(request):
 
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
-    print("ici deleteeeeeeeeeeeeee")
     update_url = f"http://profile:8002/delete_user_profile/{user_id}/"
     try:
-        print(update_url)
-        # Envoie la requête DELETE
         response = requests.delete(update_url)
 
-        # Vérifiez la réponse et transmettez-la
         if response.status_code == 200:
             return JsonResponse({"success": True, "message": "Profile deletion initiated successfully."})
         else:

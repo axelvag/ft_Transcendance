@@ -49,8 +49,7 @@ class ViewSettings extends HTMLElement {
           },
         });
         
-        const deleteProfileData = await deleteProfile.json();
-        console.log(deleteProfileData);
+        const deleteProfileData = await deleteProfile.json()
         
         if (deleteProfileData.success) {
           user.isAuthenticated = false;
