@@ -205,6 +205,7 @@ def password_reset(request):
                 to_email = user.email
                 mail_subject = "Réinitialisation de votre mot de passe sur Transcendence"
                 message = render_to_string("template_forget_pass.html", {
+                    'url': os.getenv('URL'),
                     'user': user.username,
                     'domain': get_current_site(request).domain,
                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
