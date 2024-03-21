@@ -60,6 +60,7 @@ CORS_ALLOW_HEADERS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -68,7 +69,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'invitations',
     'corsheaders',
+    'channels'
 ]
+
+# Specify the default ASGI application
+ASGI_APPLICATION = 'friendshipApp.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

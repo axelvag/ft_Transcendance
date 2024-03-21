@@ -3,6 +3,12 @@ import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user } from '@/auth.js';
 
 class ViewFriend extends HTMLElement {
+
+  constructor() {
+    super();
+    this.websocket = null;
+  }
+
   connectedCallback() {
     this.innerHTML = `
       <default-layout-sidebar></default-layout-sidebar>
@@ -113,8 +119,9 @@ class ViewFriend extends HTMLElement {
       </default-layout-main>
     `;
 
-    this.checkForNotifications();
-    this.startNotificationPolling();
+    // this.checkForNotifications();
+    // this.startNotificationPolling();
+    this.initWebSocket();
     this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
     this.generalErrorFriend = document.getElementById('general-error-friend');
   }
@@ -130,168 +137,188 @@ class ViewFriend extends HTMLElement {
     console.log('friend-->', friendName);
 
     try {
-        const response = await fetch('http://127.0.0.1:8003/send_invitation/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ username: friendName, user_id: user.id}),
-        });
-        const data = await response.json();
-        console.log('data:', data);
-        
-        // Traiter la réponse du serveur
-        if (!data.status || data.status !== 'success') {
-            // Afficher une erreur spécifique si disponible, sinon un message générique
-            const errorMessage = data.message || "An error occurred while sending the invitation.";
-            console.error('Error:', errorMessage);
-            this.generalErrorFriend.textContent = errorMessage;
-            this.generalErrorFriend.style.display = 'block';
-        } else {
-            // Afficher une notification de succès
-            console.log('Invitation sent successfully.'); 
-            if (successNotificationFriend) successNotificationFriend.style.display = 'block';
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
-        this.generalErrorFriend.style.display = 'block';
-    }
-}
+      const response = await fetch('http://127.0.0.1:8003/send_invitation/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username: friendName, user_id: user.id }),
+      });
+      const data = await response.json();
+      console.log('data:', data);
 
+      // Traiter la réponse du serveur
+      if (!data.status || data.status !== 'success') {
+        // Afficher une erreur spécifique si disponible, sinon un message générique
+        const errorMessage = data.message || 'An error occurred while sending the invitation.';
+        console.error('Error:', errorMessage);
+        this.generalErrorFriend.textContent = errorMessage;
+        this.generalErrorFriend.style.display = 'block';
+      } else {
+        // Afficher une notification de succès
+        console.log('Invitation sent successfully.');
+        if (successNotificationFriend) successNotificationFriend.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
+      this.generalErrorFriend.style.display = 'block';
+    }
+  }
+
+  initWebSocket() {
+    // Remplacer ws://127.0.0.1:8000/ws/some_path/ par votre URL de WebSocket réelle
+    this.websocket = new WebSocket('ws://127.0.0.1:8003/ws/invitations/');
+
+    this.websocket.onopen = function (event) {
+      console.log('WebSocket connection established:', event);
+    };
+
+    this.websocket.onmessage = function (event) {
+      console.log('WebSocket message received:', event);
+      // Traiter le message reçu ici
+    };
+
+    this.websocket.onerror = function (event) {
+      console.error('WebSocket error observed:', event);
+    };
+
+    this.websocket.onclose = function (event) {
+      console.log('WebSocket connection closed:', event);
+    };
+  }
 
   // Ajoutez cette nouvelle méthode pour démarrer le polling
-  startNotificationPolling() {
-    this.pollingInterval = setInterval(() => this.checkForNotifications(), 5000); // Poll toutes les 5 secondes
-  }
-  
-  // Méthode pour interroger les notifications
-  checkForNotifications() {
-    console.log("test");
-    fetch('http://127.0.0.1:8003/notifications/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({user_id: user.id }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log("datanotification", data);
-        // console.log("notif", data.notification);
-        // console.log("data.notification.invitation_id", data.notification.invitation_id);
-        if (data.notifications && data.notifications.length > 0) {
-          // console.log("lariate", notification);
-          // Affichez les notifications ici
-          // Par exemple, si vous avez une méthode pour afficher des notifications, vous pouvez l'appeler ici
-          data.notifications.forEach(notification => this.displayNotification(notification));
-        }
-      })
-      .catch(error => console.error('Erreur lors de la vérification des notifications:', error));
-  }
+  // startNotificationPolling() {
+  //   this.pollingInterval = setInterval(() => this.checkForNotifications(), 5000); // Poll toutes les 5 secondes
+  // }
 
-  displayNotification(notification) {
+  // // Méthode pour interroger les notifications
+  // checkForNotifications() {
+  //   console.log("test");
+  //   fetch('http://127.0.0.1:8003/notifications/', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     credentials: 'include',
+  //     body: JSON.stringify({user_id: user.id }),
+  //   })
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       console.log("datanotification", data);
+  //       // console.log("notif", data.notification);
+  //       // console.log("data.notification.invitation_id", data.notification.invitation_id);
+  //       if (data.notifications && data.notifications.length > 0) {
+  //         // console.log("lariate", notification);
+  //         // Affichez les notifications ici
+  //         // Par exemple, si vous avez une méthode pour afficher des notifications, vous pouvez l'appeler ici
+  //         data.notifications.forEach(notification => this.displayNotification(notification));
+  //       }
+  //     })
+  //     .catch(error => console.error('Erreur lors de la vérification des notifications:', error));
+  // }
 
-    console.log("notif", notification);
-    console.log("data.notification.invitation_id", notification.invitation_id);
+  // displayNotification(notification) {
 
-    const notificationContainer = document.getElementById('notification-container');
-    const notificationDiv = document.createElement('div');
-    notificationDiv.innerHTML = `
-      <div style="background: white; padding: 20px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,.2);">
-        <p>${notification.message}</p>
-        <button id="accept-btn" style="margin-right: 10px;">Accepter</button>
-        <button id="decline-btn">Décliner</button>
-      </div>
-    `;
+  //   console.log("notif", notification);
+  //   console.log("data.notification.invitation_id", notification.invitation_id);
 
-    const acceptBtn = notificationDiv.querySelector('#accept-btn');
-    const declineBtn = notificationDiv.querySelector('#decline-btn');
+  //   const notificationContainer = document.getElementById('notification-container');
+  //   const notificationDiv = document.createElement('div');
+  //   notificationDiv.innerHTML = `
+  //     <div style="background: white; padding: 20px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,.2);">
+  //       <p>${notification.message}</p>
+  //       <button id="accept-btn" style="margin-right: 10px;">Accepter</button>
+  //       <button id="decline-btn">Décliner</button>
+  //     </div>
+  //   `;
 
-    acceptBtn.addEventListener('click', async function() {
-      // Logique d'acceptation ici
-      const invitationId = notification.invitation_id;
-      const userId = user.id; // Assurez-vous que 'user.id' est accessible dans ce contexte
-    
-      try {
-        const acceptResponse = await fetch('http://127.0.0.1:8003/accept_invitation/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // Assurez-vous d'inclure le CSRF token si nécessaire
-          },
-          body: JSON.stringify({
-            invitation_id: invitationId,
-            user_id: userId,
-          }),
-        });
-    
-        if (!acceptResponse.ok) {
-          throw new Error('La requête a échoué');
-        }
-        const acceptData = await acceptResponse.json();
-        console.log(acceptData);
-        alert('Invitation acceptée avec succès !');
-        notificationContainer.removeChild(notificationDiv);
-    
-        // Après avoir accepté l'invitation, récupérez la liste mise à jour des amis
-        await fetchFriendsList(userId); // Appeler la fonction pour récupérer et traiter la liste des amis
-    
-      } catch (error) {
-        console.error("Erreur lors de l'acceptation de l'invitation:", error);
-        alert("Erreur lors de l'acceptation de l'invitation."); // Informez l'utilisateur de l'échec
-      }
-    });
-    
-    async function fetchFriendsList(userId) {
-      try {
-        const friendsResponse = await fetch('http://127.0.0.1:8003/get_friends/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ user_id: userId }),
-        });
-    
-        if (!friendsResponse.ok) {
-          throw new Error('Failed to fetch friends list');
-        }
-        const friendsData = await friendsResponse.json();
-        console.log('Friends:', friendsData);
-    
-        // Trouvez l'élément où afficher la liste des amis
-        const friendsListElement = document.getElementById('friends-list');
-        // Assurez-vous de nettoyer la liste précédente avant d'afficher les nouveaux amis
-        friendsListElement.innerHTML = 'Vous êtes amis avec :<br>';
-    
-        // Parcourez la liste des amis et ajoutez-les à l'élément
-        friendsData.friends.forEach(friend => {
-          friendsListElement.innerHTML += `<span>${friend.username}</span><br>`; // Utilisez des éléments appropriés selon votre mise en page
-        });
-    
-      } catch (error) {
-        console.error('Error fetching friends list:', error);
-      }
-    }
-    
-    declineBtn.addEventListener('click', function() {
-      // Logique de déclin ici
-      alert('Notification déclinée.');
-      notificationContainer.removeChild(notificationDiv);
-    });
+  //   const acceptBtn = notificationDiv.querySelector('#accept-btn');
+  //   const declineBtn = notificationDiv.querySelector('#decline-btn');
 
-    notificationContainer.appendChild(notificationDiv);
-  }
+  //   acceptBtn.addEventListener('click', async function() {
+  //     // Logique d'acceptation ici
+  //     const invitationId = notification.invitation_id;
+  //     const userId = user.id; // Assurez-vous que 'user.id' est accessible dans ce contexte
 
-  // Assurez-vous de nettoyer l'intervalle lorsque l'élément est déconnecté
-  disconnectedCallback() {
-    if (this.pollingInterval) {
-      clearInterval(this.pollingInterval);
-    }
-  }
-  
+  //     try {
+  //       const acceptResponse = await fetch('http://127.0.0.1:8003/accept_invitation/', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           // Assurez-vous d'inclure le CSRF token si nécessaire
+  //         },
+  //         body: JSON.stringify({
+  //           invitation_id: invitationId,
+  //           user_id: userId,
+  //         }),
+  //       });
+
+  //       if (!acceptResponse.ok) {
+  //         throw new Error('La requête a échoué');
+  //       }
+  //       const acceptData = await acceptResponse.json();
+  //       console.log(acceptData);
+  //       alert('Invitation acceptée avec succès !');
+  //       notificationContainer.removeChild(notificationDiv);
+
+  //       // Après avoir accepté l'invitation, récupérez la liste mise à jour des amis
+  //       await fetchFriendsList(userId); // Appeler la fonction pour récupérer et traiter la liste des amis
+
+  //     } catch (error) {
+  //       console.error("Erreur lors de l'acceptation de l'invitation:", error);
+  //       alert("Erreur lors de l'acceptation de l'invitation."); // Informez l'utilisateur de l'échec
+  //     }
+  //   });
+
+  //   async function fetchFriendsList(userId) {
+  //     try {
+  //       const friendsResponse = await fetch('http://127.0.0.1:8003/get_friends/', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify({ user_id: userId }),
+  //       });
+
+  //       if (!friendsResponse.ok) {
+  //         throw new Error('Failed to fetch friends list');
+  //       }
+  //       const friendsData = await friendsResponse.json();
+  //       console.log('Friends:', friendsData);
+
+  //       // Trouvez l'élément où afficher la liste des amis
+  //       const friendsListElement = document.getElementById('friends-list');
+  //       // Assurez-vous de nettoyer la liste précédente avant d'afficher les nouveaux amis
+  //       friendsListElement.innerHTML = 'Vous êtes amis avec :<br>';
+
+  //       // Parcourez la liste des amis et ajoutez-les à l'élément
+  //       friendsData.friends.forEach(friend => {
+  //         friendsListElement.innerHTML += `<span>${friend.username}</span><br>`; // Utilisez des éléments appropriés selon votre mise en page
+  //       });
+
+  //     } catch (error) {
+  //       console.error('Error fetching friends list:', error);
+  //     }
+  //   }
+
+  //   declineBtn.addEventListener('click', function() {
+  //     // Logique de déclin ici
+  //     alert('Notification déclinée.');
+  //     notificationContainer.removeChild(notificationDiv);
+  //   });
+
+  //   notificationContainer.appendChild(notificationDiv);
+  // }
+
+  // // Assurez-vous de nettoyer l'intervalle lorsque l'élément est déconnecté
+  // disconnectedCallback() {
+  //   if (this.pollingInterval) {
+  //     clearInterval(this.pollingInterval);
+  //   }
+  // }
 }
 
 customElements.define('view-friend', ViewFriend);
