@@ -105,22 +105,6 @@ services:
     networks:
       - back
 
-  # Back - api gateway
-  # api_gateway:
-  #   build:
-  #     context: ./api_gateway
-  #     dockerfile: Dockerfile
-  #   container_name: api_gateway
-  #   ports:
-  #     - "5000:5000"
-  #   networks:
-  #     - back
-  #   depends_on:
-  #     - authentification
-  #     - profile
-  #     - data_base
-  #   restart: on-failure
-
   friendship:
     build:
       context: ./friendship

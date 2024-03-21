@@ -90,9 +90,9 @@ def update_user(request):
         return JsonResponse({"success": False, "message": "Error updating or creating profile."})
 
     # Construction de l'URL de l'avatar
-    base_url = 'http://127.0.0.1:8002'
+    base_url = 'http://127.0.0.1:8001/'
 
-    # avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
+    # avatar_url = request.build_absolute_uri(profile.avatar.url) if profile and profile.avatar else None
     avatar_url = base_url + profile.avatar.url if profile and profile.avatar else None
     if avatar is None:
         if avatar42 is not None:

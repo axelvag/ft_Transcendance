@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = "accounts"
 
@@ -26,4 +28,4 @@ urlpatterns = [
     path('update_user/', views.update_user, name='update_user'),
     path('delete_user_profile/<int:user_id>/', views.delete_user_profile, name='delete_user_profile'),
     path('get_user_profile/<int:user_id>/', views.get_user_profile, name='get_user_profile'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

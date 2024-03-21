@@ -18,6 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # chemin du système de fichiers où Django stockera les fichiers téléchargés par l'ImageField (ou FileField)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+print(MEDIA_ROOT)
 MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
