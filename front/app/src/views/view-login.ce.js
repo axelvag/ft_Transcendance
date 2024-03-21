@@ -98,17 +98,18 @@ class ViewSignIn extends HTMLElement {
     const csrfToken = await getCsrfToken();
     try {
       const data = await loginUser(formData, csrfToken);
-      console.log('error', data);
       if (data.success) {
         setLocalUser(data);
-        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
           method: 'GET',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
-        console.log(userProfileData);
-        if (userProfileData.success) {
-          setLocalUser(userProfileData);
+        if (userProfileData.getProfile.success) {
+          setLocalUser(userProfileData.getProfile);
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }

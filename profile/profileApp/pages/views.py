@@ -113,7 +113,7 @@ def update_user(request):
     })
 
 
-@login_required
+# @login_required
 @csrf_exempt
 @require_http_methods(["GET"])  # Utilisez GET si vous récupérez simplement des informations, ajustez selon besoin
 def get_user_profile(request, user_id):  # Assurez-vous que user_id est correctement capturé depuis l'URL
@@ -142,12 +142,12 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         return JsonResponse({"success": False, "message": "Error calling authentication service."})
 
     # Construction de l'URL de l'avatar si disponible
-    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
-    if avatar_url is None:
+    avatar_url = request.build_absolute_uri(profile.avatar.url) if profile and profile.avatar else None
+    if profile is not None and avatar_url is None:
         logging.critical("avatar null")
         avatar_url = profile.avatar42
     # Réponse avec les informations récupérées
-    logging.critical(profile.avatar42)
+    # logging.critical(profile.avatar42)
     return JsonResponse({
         "success": True,
         "firstname": profile.firstName if profile else '',
@@ -156,7 +156,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         "email": email,  # Ces informations proviennent du service d'authentification
         "avatar": avatar_url,
         "id": user_id,
-        "avatar42": profile.avatar42,
+        "avatar42": profile.avatar42 if profile else None,
     })
 
 

@@ -94,16 +94,20 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
+        const csrfToken = await getCsrfToken();
         console.log("dwedededee",user.id);
-        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
           method: 'GET',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
-        if (userProfileData.success) {
-          console.log(userProfileData.avatar42);
-          setLocalUser(userProfileData);
+        if (userProfileData.getProfile.success) {
+          console.log(userProfileData.getProfile.avatar42);
+          setLocalUser(userProfileData.getProfile);
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
@@ -125,7 +129,6 @@ const getCsrfToken = async () => {
   });
   if (response.ok) {
     const data = await response.json();
-    // console.log(data.csrfToken);
     return data.csrfToken;
   }
   throw new Error('Could not retrieve CSRF token');
@@ -166,8 +169,6 @@ const getProfile = () => {
 
 const saveUser = async newUser => {
 
-  // console.log("object newUser saveUser", newUser);
-
   const formData = new FormData();
   formData.append('username', newUser.username);
   formData.append('email', newUser.email);
@@ -178,13 +179,6 @@ const saveUser = async newUser => {
   if (newUser.avatarFile) { 
     formData.append('avatar', newUser.avatarFile);
   }
-
-  // console.log("formData", formData);
-
-  // Pour afficher le contenu de formData
-  // for (let [key, value] of formData.entries()) {
-  //   console.log(`${key}: ${value}`);
-  // }
 
   try {
     const csrfToken = await getCsrfToken();
@@ -238,7 +232,7 @@ const loginUser = async (formData, csrfToken) => {
     credentials: 'include',
     body: JSON.stringify(formData),
   });
-  return response.json(); // Retourne la promesse résolue avec les données JSON
+  return response.json();
 };
 
 const sendSignUpRequest = async (formData, csrfToken) => {
@@ -251,7 +245,7 @@ const sendSignUpRequest = async (formData, csrfToken) => {
     credentials: 'include',
     body: JSON.stringify(formData),
   });
-  return response.json(); // Retourne la promesse résolue avec les données JSON
+  return response.json();
 };
 
 const passwordReset = async (formData, csrfToken) => {
@@ -278,6 +272,26 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
     body: JSON.stringify(formData),
   });
   return response.json();
+};
+
+const deleteUser = async (csrfToken) => {
+  const url = `http://127.0.0.1:8001/accounts/delete_user/${user.username}`;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': csrfToken,
+      },
+    });
+
+    const data = await response.json();
+    if (data.success) {
+    console.log("delete user and profil");
+    user.isAuthenticated = false;
+    resetLocalUser(data);
+  }
 };
 
 const handleOAuthResponse = async () => {
@@ -314,14 +328,10 @@ const handleOAuthResponse = async () => {
         formData.append('avatar', user.avatar);
         if(data.register === true){
           try {
-          //   for (let [key, value] of formData.entries()) {
-          //     console.log(`${key}: ${value}`);
-          // }
             const csrfToken = await getCsrfToken();
             const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
               method: 'POST',
               headers: {
-                // 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken,
               },
               credentials: 'include',
@@ -338,15 +348,18 @@ const handleOAuthResponse = async () => {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
           }
         }
-        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${data.id}/`, {
+        const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${data.id}/`, {
           method: 'GET',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
           credentials: 'include',
         });
         
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
-        if (userProfileData.success) {
-          setLocalUser(userProfileData);
+        if (userProfileData.getProfile.success) {
+          setLocalUser(userProfileData.getProfile);
           redirectTo('/dashboard');
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
@@ -363,4 +376,4 @@ const getAuthorizationCode = () => {
   window.location.href = url;
 }  
 
-export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser, resetLocalUser};
+export { user, isAuthenticated, logout, deleteUser, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser, resetLocalUser};

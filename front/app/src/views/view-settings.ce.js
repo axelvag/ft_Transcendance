@@ -2,7 +2,7 @@ import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
-import { getCsrfToken, resetLocalUser } from '@/auth.js';
+import { getCsrfToken, resetLocalUser, deleteUser } from '@/auth.js';
 
 class ViewSettings extends HTMLElement {
   connectedCallback() {
@@ -27,39 +27,21 @@ class ViewSettings extends HTMLElement {
   async suppUser() {
     try {
       const csrfToken = await getCsrfToken();
-      const url = `http://127.0.0.1:8001/accounts/delete_user/${user.username}`;
-      const response = await fetch(url, {
-        method: 'POST',
+      const deleteProfile = await fetch(`http://127.0.0.1:8001/accounts/delete_user_profile/${user.id}/`, {
+        method: 'DELETE',
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
           'X-CSRFToken': csrfToken,
         },
       });
-  
-      const data = await response.json();
-      if (data.success) {
-        
-        const deleteProfile = await fetch(`http://127.0.0.1:8001/accounts/delete_user_profile/${user.id}/`, {
-          method: 'DELETE',
-          credentials: 'include',
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
-        });
-        
-        const deleteProfileData = await deleteProfile.json()
-        
-        if (deleteProfileData.success) {
-          user.isAuthenticated = false;
-          resetLocalUser(deleteProfileData);
-        } else {
-          console.error('Failed to load user profile:', deleteProfileData.message);
-        }
-  
-        redirectTo('/');
+      const deleteProfileData = await deleteProfile.json()
+      if (deleteProfileData.success) {
+        await deleteUser(csrfToken);
+      } else {
+        await deleteUser(csrfToken);
+        console.error('Failed to load user profile:', deleteProfileData.message);
       }
+      redirectTo('/');
     } catch (error) {
       console.error('Error:', error);
     }
