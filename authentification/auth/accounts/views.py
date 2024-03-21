@@ -179,6 +179,7 @@ def resend_email_confirmation(request, uidb64):
     to_email = user.email
     mail_subject = "Activate your user account"
     message = render_to_string("template_activate_account.html", {
+        'url': os.getenv('URL'),
         'user': user.username,
         'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),

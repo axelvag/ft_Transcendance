@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
+URL = os.getenv('URL')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,8 +34,8 @@ DEBUG = True
 # ALLOWED_HOSTS = ['*']
 # Settings error Cros
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5500",  # Remplacez par l'URL de votre frontend
-    "http://127.0.0.1:8000",
+    f"{URL}:5500",  # Remplacez par l'URL de votre frontend
+    f"{URL}:8000",
 ]
 
 # CORS_ORIGINS_ALLOWED_ALL = True

@@ -1,5 +1,9 @@
 // import profilePic from './assets/img/profile.jpg';
-const API_BASE_URL = 'http://127.0.0.1:8001';
+// const path = require('path');
+// require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
+
+// const API_BASE_URL = `${process.env.URL}:8001`;
+const API_BASE_URL = `http://127.0.0.1:8001`;
 
 const user = {
   isAuthenticated: undefined,
