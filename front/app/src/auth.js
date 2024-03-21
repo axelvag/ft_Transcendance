@@ -1,8 +1,27 @@
-// import profilePic from './assets/img/profile.jpg';
 // const path = require('path');
 // require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
+// require('dotenv').config();
+// import dotenv from 'dotenv';
+// dotenv.config();
 
-// const API_BASE_URL = `${process.env.URL}:8001`;
+// async function loadConfig() {
+//   try {
+//     const response = await fetch('config.json');
+//     const config = await response.json();
+//     return config;
+//   } catch (error) {
+//     console.error('Erreur lors du chargement du fichier de configuration:', error);
+//     return {};
+//   }
+// }
+
+// Utilisation de loadConfig() pour charger les variables d'environnement
+// loadConfig()
+//   .then(config => {
+//     const URL = config.URL;
+//     console.log(URL); // Affichera la valeur de URL définie dans le fichier config.json
+//   });
+
 const API_BASE_URL = `http://127.0.0.1:8001`;
 
 const user = {
@@ -92,7 +111,7 @@ const isAuthenticated = async () => {
       if (data.success) {
         setLocalUser(data);
         console.log("dwedededee",user.id);
-        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(`${URL}:8002/get_user_profile/${user.id}/`, {
           method: 'GET',
           credentials: 'include',
         });
