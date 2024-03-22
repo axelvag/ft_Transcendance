@@ -4,7 +4,7 @@ FROM python:3.12-bookworm
 
 # Autres configurations du Dockerfile
 RUN mkdir /profileApp
-WORKDIR /profileApdamlkafffddsf
+WORKDIR /profileApp
 
 COPY requirements.txt /profileApp/
 RUN pip install --upgrade pip \
@@ -17,7 +17,7 @@ ENTRYPOINT [ "script_python.sh" ]
 EXPOSE 8002
 # CMD ["tail", "-f", "/dev/null"]
 
-##################################################
+##################################################3
 
 # # Dockerfile du service profile
 
