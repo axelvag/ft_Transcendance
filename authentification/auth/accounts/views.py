@@ -61,9 +61,9 @@ def activate(request, uidb64, token):
 
 def activateEmail(request, user, to_email):
     mail_subject = "Activate your user account"
-    print("URL: ", os.getenv('URL'))
+    print("URL: ", os.getenv('BASE_URL'))
     message = render_to_string("template_activate_account.html", {
-        'url': os.getenv('URL'),
+        'url': os.getenv('BASE_URL'),
         'user': user.username,
         'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -179,7 +179,7 @@ def resend_email_confirmation(request, uidb64):
     to_email = user.email
     mail_subject = "Activate your user account"
     message = render_to_string("template_activate_account.html", {
-        'url': os.getenv('URL'),
+        'url': os.getenv('BASE_URL'),
         'user': user.username,
         'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -205,7 +205,7 @@ def password_reset(request):
                 to_email = user.email
                 mail_subject = "Réinitialisation de votre mot de passe sur Transcendence"
                 message = render_to_string("template_forget_pass.html", {
-                    'url': os.getenv('URL'),
+                    'url': os.getenv('BASE_URL'),
                     'user': user.username,
                     'domain': get_current_site(request).domain,
                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -288,7 +288,7 @@ def resend_email_rest(request, uidb64):
     to_email = user.email
     mail_subject = "Réinitialisation de votre mot de passe sur Transcendence"
     message = render_to_string("template_forget_pass.html", {
-        'url': os.getenv('URL'),
+        'url': os.getenv('BASE_URL'),
         'user': user.username,
         'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),

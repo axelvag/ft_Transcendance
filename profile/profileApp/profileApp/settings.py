@@ -16,7 +16,7 @@ import os
 
 
 load_dotenv()
-URL = os.getenv('URL')
+URL = os.getenv('BASE_URL')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -174,7 +174,7 @@ CORS_ALLOW_HEADERS = [
 
 # PASSWORD_RESET_TIMEOUT = 1
 
-CSRF_TRUSTED_ORIGINS = [f'{os.getenv("URL")}:8000']
+CSRF_TRUSTED_ORIGINS = [f'{os.getenv("BASE_URL")}:8000']
 
 # LOGGING = {
 #     'version': 1,

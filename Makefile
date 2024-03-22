@@ -8,7 +8,7 @@ build:
 	docker compose -f docker-compose.yml --profile $(PROFILE) --env-file .env build
 
 up:
-	docker compose -f docker-compose.yml --profile $(PROFILE) --env-file .env up -d
+	docker compose -f docker-compose.yml --profile $(PROFILE) up -d
 
 stop:
 	docker compose -f docker-compose.yml --profile prod --profile dev --env-file .env stop
