@@ -2,13 +2,14 @@
 
 FROM python:3.12-bookworm
 
-# Autres configurations du Dockerfile
 RUN mkdir /profileApp
 WORKDIR /profileApp
 
 COPY requirements.txt /profileApp/
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
+
+COPY /profileApp/. .
 
 COPY script_python.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/script_python.sh

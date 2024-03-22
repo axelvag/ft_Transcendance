@@ -7,5 +7,5 @@ docker stop authentification
 docker start authentification
 docker stop friendship
 docker start friendship
-docker stop profile
-docker start profile
+# docker stop profile
+# docker start profile
