@@ -1,26 +1,6 @@
-// const path = require('path');
-// require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
-// require('dotenv').config();
-// import dotenv from 'dotenv';
-// dotenv.config();
+// import { defineConfig, loadEnv } from 'vite';
 
-// async function loadConfig() {
-//   try {
-//     const response = await fetch('config.json');
-//     const config = await response.json();
-//     return config;
-//   } catch (error) {
-//     console.error('Erreur lors du chargement du fichier de configuration:', error);
-//     return {};
-//   }
-// }
-
-// Utilisation de loadConfig() pour charger les variables d'environnement
-// loadConfig()
-//   .then(config => {
-//     const URL = config.URL;
-//     console.log(URL); // Affichera la valeur de URL définie dans le fichier config.json
-//   });
+const BASE_URL = import.meta.env.BASE_URL;
 
 const API_BASE_URL = `http://127.0.0.1:8001`;
 
