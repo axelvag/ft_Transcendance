@@ -138,6 +138,27 @@ services:
       - data_base
     restart: on-failure
 
+  # Back - game
+  game:
+    build:
+      context: ./game
+      dockerfile: Dockerfile
+    container_name: game
+    ports:
+      - "8009:8009"
+    volumes:
+      - ./game/app:/app
+    networks:
+      - back
+    depends_on:
+      - data_base
+    environment:
+      - POSTGRES_HOST=data_base
+      - POSTGRES_DB=transcendence
+      - POSTGRES_USER=postgresTranscendence
+      - POSTGRES_PASSWORD=postgresTranscendence123
+    restart: on-failure
+
 volumes:
   data_base_data:
 
