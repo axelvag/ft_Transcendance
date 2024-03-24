@@ -93,7 +93,6 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
   def create_game(self, player_left_id, player_right_id):
     try:
       game = Game(player_left_id=player_left_id, player_right_id=player_right_id)
-      print(game.json())
       game.save()
       return game.id
     except ValidationError as e:
