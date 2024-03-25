@@ -46,6 +46,7 @@ services:
       - "8001:8001"
     volumes:
       - ./authentification:/app
+      - shared_media:/app/media
     networks:
       - back
     depends_on:
@@ -59,10 +60,11 @@ services:
       context: ./profile
       dockerfile: Dockerfile
     container_name: profile
-    ports:
-      - "8002:8002"
     volumes:
+      - shared_media:/app/media
       - ./profile/profileApp:/profileApp
+    # ports:
+      # - "8002:8002"
     networks:
       - back
     depends_on:
@@ -86,22 +88,6 @@ services:
     restart: always
     networks:
       - back
-
-  # Back - api gateway
-  # api_gateway:
-  #   build:
-  #     context: ./api_gateway
-  #     dockerfile: Dockerfile
-  #   container_name: api_gateway
-  #   ports:
-  #     - "5000:5000"
-  #   networks:
-  #     - back
-  #   depends_on:
-  #     - authentification
-  #     - profile
-  #     - data_base
-  #   restart: on-failure
 
   friendship:
     build:
@@ -156,6 +142,7 @@ services:
 
 volumes:
   data_base_data:
+  shared_media:
 
 networks:
   front:

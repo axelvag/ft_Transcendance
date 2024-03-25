@@ -27,6 +27,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.conf import settings
 import requests
+from django.middleware.csrf import CsrfViewMiddleware
 import os
 from dotenv import load_dotenv
 
@@ -127,7 +128,6 @@ def logout_user(request):
     else:
         return JsonResponse({"success": False, "message": "Méthode non autorisée."}, status=405)
 
-@csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:
@@ -302,8 +302,9 @@ def resend_email_rest(request, uidb64):
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
 
 @login_required
+@require_http_methods(["DELETE"])
 def delete_user(request, username):
-
+    print("delete userrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
     try:
         user = User.objects.get(username=username)
         user.delete()
@@ -373,19 +374,6 @@ def get_profile(request, user_id):
         "username": user.username,
         "email": user.email
     })
-    
-def oauth_login(request):
-    # Construire l'URL pour la demande d'autorisation
-    params = {
-        'client_id': settings.OAUTH_CLIENT_ID,
-        'redirect_uri': settings.OAUTH_REDIRECT_URI,
-        'response_type': 'code',
-        'scope': 'public',  # Ajustez cette portée selon les besoins de votre application
-    }
-    url_params = "&".join(f"{key}={value}" for key, value in params.items())
-    authorization_url = f"{settings.OAUTH_AUTHORIZATION_URL}?{url_params}"
-    
-    return redirect(authorization_url)
 
 def oauth_callback(request):
     try:
@@ -452,3 +440,55 @@ def oauth_callback(request):
             return JsonResponse({'error': 'Erreur lors de l\'obtention du token d\'accès'}, status=400)
     else:
         return JsonResponse({'error': 'Code d\'autorisation manquant'}, status=400)
+
+
+#Profile
+
+@login_required
+@require_http_methods(["POST"])
+def update_user(request):
+    update_url = "http://profile:8002/update_user/"
+    if request.FILES:
+        files = {'avatar': request.FILES['avatar']} if 'avatar' in request.FILES else {}
+        data = {key: value for key, value in request.POST.items()}
+        response = requests.post(update_url, files=files, data=data)
+    else:
+        payload = request.POST
+        response = requests.post(update_url, json=payload)
+    
+    if response.status_code == 200:
+        return JsonResponse({"status": "success", "update": response.json()})
+    else:
+        return JsonResponse({
+            "status": "error",
+            "message": "Failed to update user profile.",
+            "response": response.text,
+            "status_code": response.status_code
+        }, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def get_user_profile(request, user_id):
+    update_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    try:
+        response = requests.get(update_url)
+        if response.status_code == 200:
+            return JsonResponse({"status": "success", "getProfile": response.json()})
+        else:
+            return JsonResponse({"success": False, "message": "Failed to get profile ."}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["DELETE"])
+def delete_user_profile(request, user_id):
+    update_url = f"http://profile:8002/delete_user_profile/{user_id}/"
+    try:
+        response = requests.delete(update_url)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": "Profile deletion initiated successfully."})
+        else:
+            return JsonResponse({"success": False, "message": "Failed to initiate profile deletion."}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
