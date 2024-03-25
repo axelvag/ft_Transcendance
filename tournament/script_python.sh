@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Pour utiliser Postgres
 python3 manage.py makemigrations
 
