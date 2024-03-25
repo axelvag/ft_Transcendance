@@ -113,15 +113,14 @@ services:
     container_name: tournament
     ports:
       - "8005:8005"
+    volumes:
+      - ./tournament/tournament:/tournament
     networks:
       - back
     depends_on:
       - data_base
-    environment:
-      - POSTGRES_HOST=data_base
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     restart: on-failure
 
   statistic:
