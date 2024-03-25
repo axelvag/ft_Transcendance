@@ -7,3 +7,4 @@ django-cors-headers==3.10.0
 psycopg2-binary
 requests
 Pillow
+python-dotenv==0.19.1

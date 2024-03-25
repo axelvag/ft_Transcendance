@@ -3,6 +3,8 @@ import { redirectTo } from '@/router.js';
 import { getCsrfToken } from '@/auth.js';
 import { sendEmailPasswordReset } from '@/auth.js';
 
+const BASE_URL = import.meta.env.BASE_URL;
+
 class ViewNewPass extends HTMLElement {
   async connectedCallback() {
     this.innerHTML = `

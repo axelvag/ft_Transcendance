@@ -14,6 +14,8 @@ services:
     restart: on-failure
     profiles:
       - prod
+    env_file:
+      - .env
 
   # Front - dev (live server)
   front_dev:
@@ -48,11 +50,8 @@ services:
       - back
     depends_on:
       - data_base
-    environment:
-      - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     restart: on-failure
 
   profile:
@@ -66,11 +65,8 @@ services:
       - back
     depends_on:
       - data_base
-    environment:
-      - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     restart: on-failure
 
   # Back - data base
@@ -79,10 +75,8 @@ services:
       context: ./data_base
       dockerfile: Dockerfile
     container_name: data_base
-    environment:
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
@@ -118,11 +112,8 @@ services:
       - back
     depends_on:
       - data_base
-    environment:
-      - POSTGRES_HOST=data_base
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     restart: on-failure
 
   statistic:

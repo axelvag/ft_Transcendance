@@ -5,6 +5,8 @@ import { getCsrfToken } from '@/auth.js';
 import { loginUser, setLocalUser } from '@/auth.js';
 import { getAuthorizationCode } from '@/auth.js';
 
+const BASE_URL = import.meta.env.BASE_URL;
+
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
