@@ -81,7 +81,7 @@ class ViewRank extends HTMLElement {
       tbody.insertAdjacentHTML('beforeend', `
         <tr>
           <th scope="row">${i + 1}</th>
-          <td><img src="https://i.pravatar.cc/300?u=6${user.id}" width="30" height="30" alt="character"></td>
+          <td><img src="assets/img/avatar_careers.jpg" width="30" height="30" alt="character"></td>
           ${myusernamebicolor}
           <td>${user.victories}</td>
         </tr>
