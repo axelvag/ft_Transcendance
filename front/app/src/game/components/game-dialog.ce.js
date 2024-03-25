@@ -80,11 +80,11 @@ class GameDialog extends HTMLElement {
     }
 
     this.playerRightEl = this.querySelector('.gameDialog-player.is-right');
-    if (this.playerLeftEl) {
+    if (this.playerRightEl) {
       this.playerRightEl.setAttribute('name', players?.playerRight?.name);
       this.playerRightEl.setAttribute('avatar', players?.playerRight?.avatar);
       this.playerRightEl.setAttribute('type', players?.playerRight?.type);
-      if (players?.playerLeft?.type) {
+      if (players?.playerRight?.type) {
         this.playerRightEl.setAttribute('type', players.playerRight.type);
       } else {
         this.playerRightEl.removeAttribute('type');

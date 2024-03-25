@@ -4,6 +4,8 @@ import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
 import { getCsrfToken, resetLocalUser, deleteUser } from '@/auth.js';
 
+const BASE_URL = import.meta.env.BASE_URL;
+
 class ViewSettings extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `

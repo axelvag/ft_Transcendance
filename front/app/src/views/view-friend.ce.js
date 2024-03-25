@@ -3,6 +3,8 @@ import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 import { user, isAuthenticated } from '@/auth.js';
 
+const BASE_URL = import.meta.env.BASE_URL;
+
 class ViewFriend extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `

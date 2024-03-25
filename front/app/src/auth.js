@@ -1,4 +1,4 @@
-// import profilePic from './assets/img/profile.jpg';
+const BASE_URL = import.meta.env.BASE_URL;
 import { redirectTo } from '@/router.js';
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
