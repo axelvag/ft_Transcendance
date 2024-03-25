@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     container_name: front
     ports:
-      - "8000:80"
+      - "8000:8443"
     networks:
       - front
     restart: on-failure
