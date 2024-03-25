@@ -65,102 +65,71 @@ def send_invitation(request):
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
-@csrf_exempt
-@require_http_methods(["POST"])
-def notifications(request):
-    try:
-        data = json.loads(request.body)
-        user_id = data.get('user_id')
-        user = User.objects.get(id=user_id)
-
-        user_notifications = Notification.objects.filter(
-            user=user, seen=False
-        ).prefetch_related('invitation').values(
-            'id', 'message', 'seen', 'created_at', 
-            'invitation_id', 
-            from_user_id=F('invitation__from_user_id'), 
-            to_user_id=F('invitation__to_user_id')
-        )
-        # ).values('id', 'message', 'seen', 'created_at')
-        
-        # Convertir le QuerySet en liste pour la sérialisation JSON
-        user_notifications_list = list(user_notifications)
-
-        # Optionnellement, marquer les notifications comme vues
-        Notification.objects.filter(user=user, seen=False).update(seen=True)
-
-        return JsonResponse({"notifications": user_notifications_list}, status=200, safe=False)
-    
-    except User.DoesNotExist:
-        return JsonResponse({"error": "User does not exist."}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "Invalid JSON."}, status=400)
-
 # accept-invitation ==> deviens amis 
 # reject-invitation ==> supprime la demande d'amis
 
-@csrf_exempt
-@require_http_methods(["POST"])
-def accept_invitation(request):
-    try:
-        data = json.loads(request.body)
-        invitation_id = data.get('invitation_id')
-        user_id = data.get('user_id')  # L'ID de l'utilisateur acceptant l'invitation
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def accept_invitation(request):
+#     try:
+#         data = json.loads(request.body)
+#         invitation_id = data.get('invitation_id')
+#         user_id = data.get('user_id')  # L'ID de l'utilisateur acceptant l'invitation
 
-        # Trouver l'invitation correspondante
-        invitation = Invitation.objects.get(id=invitation_id, to_user_id=user_id, accepted=False)
+#         # Trouver l'invitation correspondante
+#         invitation = Invitation.objects.get(id=invitation_id, to_user_id=user_id, accepted=False)
 
-        # Marquer l'invitation comme acceptée
-        invitation.accepted = True
-        invitation.save()
+#         # Marquer l'invitation comme acceptée
+#         invitation.accepted = True
+#         invitation.save()
 
-        # Ici, vous pouvez ajouter la logique pour créer une relation d'amitié
-        # entre invitation.from_user et invitation.to_user
+#         # Ici, vous pouvez ajouter la logique pour créer une relation d'amitié
+#         # entre invitation.from_user et invitation.to_user
 
-        return JsonResponse({"status": "success", "message": "Invitation accepted."}, status=200)
-    except Invitation.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "Invitation does not exist or has already been accepted."}, status=404)
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+#         return JsonResponse({"status": "success", "message": "Invitation accepted."}, status=200)
+#     except Invitation.DoesNotExist:
+#         return JsonResponse({"status": "error", "message": "Invitation does not exist or has already been accepted."}, status=404)
+#     except Exception as e:
+#         return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
-@csrf_exempt
-@require_http_methods(["POST"])
-def get_friends(request):
-    try:
-        data = json.loads(request.body)
-        user_id = data.get('user_id')
-        user = User.objects.get(id=user_id)
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def get_friends(request):
+#     try:
+#         data = json.loads(request.body)
+#         user_id = data.get('user_id')
+#         user = User.objects.get(id=user_id)
         
-        logging.critical(user_id)
-        logging.critical(user)
+#         logging.critical(user_id)
+#         logging.critical(user)
 
-        # Récupérer les amis où l'utilisateur est le destinataire de l'invitation acceptée
-        friends_from_invitations = User.objects.filter(
-            invitations_received__from_user=user,
-            invitations_received__accepted=True
-        ).distinct()
+#         # Récupérer les amis où l'utilisateur est le destinataire de l'invitation acceptée
+#         friends_from_invitations = User.objects.filter(
+#             invitations_received__from_user=user,
+#             invitations_received__accepted=True
+#         ).distinct()
 
-        logging.critical("Yo")
+#         logging.critical("Yo")
 
-        # Récupérer les amis où l'utilisateur est l'expéditeur de l'invitation acceptée
-        friends_to_invitations = User.objects.filter(
-            invitations_sent__to_user=user,
-            invitations_sent__accepted=True
-        ).distinct()
+#         # Récupérer les amis où l'utilisateur est l'expéditeur de l'invitation acceptée
+#         friends_to_invitations = User.objects.filter(
+#             invitations_sent__to_user=user,
+#             invitations_sent__accepted=True
+#         ).distinct()
 
-        logging.critical("Yo2")
+#         logging.critical("Yo2")
 
-        # Fusionner les deux listes d'amis sans doublons
-        friends = (friends_from_invitations | friends_to_invitations).distinct()
-        logging.critical("Yo3")
+#         # Fusionner les deux listes d'amis sans doublons
+#         friends = (friends_from_invitations | friends_to_invitations).distinct()
+#         logging.critical("Yo3")
 
-        # Préparer les données des amis pour la réponse JSON
-        friends_data = list(friends.values('id', 'username'))
-        logging.critical("Yo4")
+#         # Préparer les données des amis pour la réponse JSON
+#         friends_data = list(friends.values('id', 'username'))
+#         logging.critical("Yo4")
 
-        return JsonResponse({"status": "success", "friends": friends_data}, status=200)
+#         return JsonResponse({"status": "success", "friends": friends_data}, status=200)
 
-    except User.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+#     except User.DoesNotExist:
+#         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
+#     except Exception as e:
+#         return JsonResponse({"status": "error", "message": str(e)}, status=500)
