@@ -2,7 +2,7 @@ PROFILE ?= prod
 
 .PHONY: all build rebuild stop stop volumes fclean sh-% prune
 
-all: volumes build up migrate
+all: volumes build up
 
 build:
 	docker compose -f docker-compose.yml --profile $(PROFILE) --env-file .env build
@@ -43,7 +43,3 @@ prune:
 	-docker volume rm $$(docker volume ls -q)
 	-docker network rm $$(docker network ls -q) 2>/dev/null
 	-docker buildx prune -a -f 2>/dev/null
-
-migrate:
-	chmod +x migrate.sh
-	./migrate.sh
