@@ -44,6 +44,7 @@ services:
       - "8001:8001"
     volumes:
       - ./authentification:/app
+      - shared_media:/app/media
     networks:
       - back
     depends_on:
@@ -60,8 +61,10 @@ services:
       context: ./profile
       dockerfile: Dockerfile
     container_name: profile
-    ports:
-      - "8002:8002"
+    volumes:
+      - shared_media:/app/media
+    # ports:
+      # - "8002:8002"
     networks:
       - back
     depends_on:
@@ -144,6 +147,8 @@ volumes:
     #   type: 'none' # aucun type specifique
     #   o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
     #   device: data_base
+  shared_media:
+    # external: true
 
 networks:
   front:
