@@ -18,3 +18,4 @@ class Notification(models.Model):
     seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
+    delivered = models.BooleanField(default=False)

@@ -169,7 +169,8 @@ class ViewFriend extends HTMLElement {
 
   initWebSocket() {
     // Remplacer ws://127.0.0.1:8000/ws/some_path/ par votre URL de WebSocket réelle
-    this.websocket = new WebSocket('ws://127.0.0.1:8003/ws/invitations/');
+    // const user_id_ws = user.id;
+    this.websocket = new WebSocket(`ws://127.0.0.1:8003/ws/invitations/${user.id}/`);
 
     this.websocket.onopen = function (event) {
       console.log('WebSocket connection established:', event);
@@ -177,7 +178,8 @@ class ViewFriend extends HTMLElement {
 
     this.websocket.onmessage = function (event) {
       console.log('WebSocket message received:', event);
-      // Traiter le message reçu ici
+      const data = JSON.parse(event.data);
+      alert(data.message); 
     };
 
     this.websocket.onerror = function (event) {

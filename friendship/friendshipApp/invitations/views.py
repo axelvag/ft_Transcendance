@@ -14,6 +14,11 @@ import logging
 
 User = get_user_model()
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+# Channel_layer ==> permet de communiquer avec les WS asynchromes
+#       send, receive
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def send_invitation(request):
@@ -36,6 +41,22 @@ def send_invitation(request):
                     message=f"You have a new invitation from {from_user.username}.",
                     invitation=invitation
                 )
+
+                logging.critical(to_user.id)
+
+                channel_layer = get_channel_layer()
+
+                group_name = f"user{to_user.id}"
+                logging.critical(f"Envoi au groupe: {group_name}")
+
+                async_to_sync(channel_layer.group_send)(
+                    group_name,
+                    {
+                        "type": "invitation_notification",
+                        "message": f"You have a new invitation from {from_user.username}."
+                    }
+                )
+
                 return JsonResponse({"status": "success", "message": "Invitation sent."}, status=200)
             else:
                 return JsonResponse({"status": "error", "message": "Invitation already sent."}, status=409)
