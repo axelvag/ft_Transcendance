@@ -62,6 +62,7 @@ services:
     container_name: profile
     volumes:
       - shared_media:/app/media
+      - ./profile/profileApp:/profileApp
     # ports:
       # - "8002:8002"
     networks:
@@ -95,6 +96,8 @@ services:
     container_name: friendship
     ports:
       - "8003:8003"
+    volumes:
+      - ./friendship/friendshipApp:/friendshipApp
     networks:
       - back
     depends_on:
