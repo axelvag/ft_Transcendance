@@ -9,8 +9,6 @@ COPY requirements.txt /friendshipApp/
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-COPY /friendshipApp/. .
-
 COPY script_python.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/script_python.sh
 ENTRYPOINT [ "script_python.sh" ]

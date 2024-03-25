@@ -62,6 +62,8 @@ services:
     container_name: profile
     ports:
       - "8002:8002"
+    volumes:
+      - ./profile/profileApp:/profileApp
     networks:
       - back
     depends_on:
@@ -128,6 +130,8 @@ services:
     container_name: friendship
     ports:
       - "8003:8003"
+    volumes:
+      - ./friendship/friendshipApp:/friendshipApp
     networks:
       - back
     depends_on:
