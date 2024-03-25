@@ -1,5 +1,7 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 
+const BASE_URL = import.meta.env.BASE_URL;
+
 class ViewEmailConfirmation extends HTMLElement {
   async connectedCallback() {
     this.innerHTML = `

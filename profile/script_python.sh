@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# sleep 10
+set -e
 
 # Pour utiliser Postgres
 python3 manage.py makemigrations
@@ -9,4 +9,4 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 
 # Lancer l'application Django
-python3 manage.py runserver 0.0.0.0:8004
+python3 manage.py runserver 0.0.0.0:8002

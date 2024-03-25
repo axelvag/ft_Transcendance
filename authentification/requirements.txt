@@ -6,3 +6,4 @@ typing-extensions==4.9.0
 django-cors-headers==3.10.0
 psycopg2-binary
 requests
+python-dotenv==0.19.1

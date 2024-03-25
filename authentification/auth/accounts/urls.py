@@ -19,11 +19,11 @@ urlpatterns = [
     path('is_user_logged_in/', views.is_user_logged_in, name='is_user_logged_in'),
     path('update_profile/', views.update_profile, name='update_profile'),
     path('get_profile/<int:user_id>/', views.get_profile, name='get_profile'),
-    path('oauth/login/', views.oauth_login, name='oauth_login'),
     path('oauth/callback/', views.oauth_callback, name='oauth_callback'),
     # path('update_user/', views.update_user, name='update_user'),
 
     #profile
     path('update_user/', views.update_user, name='update_user'),
     path('delete_user_profile/<int:user_id>/', views.delete_user_profile, name='delete_user_profile'),
+    path('get_user_profile/<int:user_id>/', views.get_user_profile, name='get_user_profile'),
 ]
