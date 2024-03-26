@@ -89,6 +89,7 @@ const isAuthenticated = async () => {
       resetLocalUser();
       const response = await fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
         method: 'GET',
+        mode: 'cors',
         credentials: 'include',
       });
       const data = await response.json();
@@ -97,6 +98,7 @@ const isAuthenticated = async () => {
         console.log("dwedededee",user.id);
         const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${user.id}/`, {
           method: 'GET',
+          mode: 'cors',
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
@@ -121,6 +123,7 @@ const isAuthenticated = async () => {
 const getCsrfToken = async () => {
   const response = await fetch('https://127.0.0.1:8001/accounts/get-csrf-token/', {
     method: 'GET',
+    mode: 'cors',
     credentials: 'include',
   });
   if (response.ok) {
@@ -136,6 +139,7 @@ const logout = async () => {
     const csrfToken = await getCsrfToken();
     await fetch(`${API_BASE_URL}/accounts/logout/`, {
       method: 'POST',
+      mode: 'cors',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
@@ -189,6 +193,7 @@ const saveUser = async newUser => {
   try {
     const response = await fetch('https://127.0.0.1:8002/update_user/', {
       method: 'POST',
+      mode: 'cors',
       credentials: 'include',
       body: formData,
     });
@@ -233,6 +238,7 @@ const loginUser = async (formData, csrfToken) => {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken,
     },
+    mode: 'cors',
     credentials: 'include',
     body: JSON.stringify(formData),
   });
@@ -246,6 +252,7 @@ const sendSignUpRequest = async (formData, csrfToken) => {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken,
     },
+    mode: 'cors',
     credentials: 'include',
     body: JSON.stringify(formData),
   });
@@ -259,6 +266,7 @@ const passwordReset = async (formData, csrfToken) => {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken,
     },
+    mode: 'cors',
     credentials: 'include',
     body: JSON.stringify(formData),
   });
@@ -272,6 +280,7 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken,
     },
+    mode: 'cors',
     credentials: 'include',
     body: JSON.stringify(formData),
   });
@@ -322,6 +331,7 @@ const handleOAuthResponse = async () => {
 
             const response = await fetch('https://127.0.0.1:8002/update_user/', {
               method: 'POST',
+              mode: 'cors',
               credentials: 'include',
               body: formData,
             });
@@ -339,6 +349,7 @@ const handleOAuthResponse = async () => {
         }
         const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${data.id}/`, {
           method: 'GET',
+          mode: 'cors',
           credentials: 'include',
         });
         

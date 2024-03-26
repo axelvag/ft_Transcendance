@@ -105,6 +105,7 @@ class ViewSignIn extends HTMLElement {
         setLocalUser(data);
         const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${user.id}/`, {
           method: 'GET',
+          mode: 'cors',
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
