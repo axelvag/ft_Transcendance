@@ -29,7 +29,7 @@ class ViewSettings extends HTMLElement {
   async suppUser() {
     try {
       const csrfToken = await getCsrfToken();
-      const url = `http://127.0.0.1:8001/accounts/delete_user/${user.username}`;
+      const url = `https://127.0.0.1:8001/accounts/delete_user/${user.username}`;
       const response = await fetch(url, {
         method: 'POST',
         credentials: 'include',
@@ -44,7 +44,7 @@ class ViewSettings extends HTMLElement {
       if (data.success) {
         user.isAuthenticated = false;
   
-        const deleteProfile = await fetch(`http://127.0.0.1:8002/delete_user_profile/${user.id}/`, {
+        const deleteProfile = await fetch(`https://127.0.0.1:8002/delete_user_profile/${user.id}/`, {
           method: 'DELETE',
           credentials: 'include',
         });

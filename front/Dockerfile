@@ -26,6 +26,9 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -out /etc/ssl/certs/nginx-selfsigned.crt \
     -subj "/C=FR/ST=RHONE/L=LYON/O=42 lyon/OU=42/CN=127.0.0.1/UID=avaganay"
 
-EXPOSE 80
+# Ajouter la configuration de redirection de port
+RUN echo "Source: * Port: 443 TO Destination: server-IP Port: 443" >> /etc/port_forwarding.conf
+
+EXPOSE 8443
 CMD ["nginx", "-g", "daemon off;"]
 # CMD ["tail", "-f", "/dev/null"]

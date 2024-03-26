@@ -22,7 +22,7 @@ class ViewGameOnline extends HTMLElement {
 
     const gameId = this.getAttribute('game-id');
     try {
-      const game = await fetch(`http://127.0.0.1:8009/games/${gameId}`).then(res => res.json());
+      const game = await fetch(`https://127.0.0.1:8009/games/${gameId}`).then(res => res.json());
       this.#playerLeft = await this.getPlayerProfile(game.player1_id);
       this.#playerRight = await this.getPlayerProfile(game.player2_id);
 
@@ -55,7 +55,7 @@ class ViewGameOnline extends HTMLElement {
       };
     }
 
-    const profile = await fetch(`http://127.0.0.1:8002/get_user_profile/${playerId}`).then(res => res.json());
+    const profile = await fetch(`https://127.0.0.1:8002/get_user_profile/${playerId}`).then(res => res.json());
     return {
       id: String(profile.id),
       name: profile.username,

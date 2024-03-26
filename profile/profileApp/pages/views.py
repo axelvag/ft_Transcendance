@@ -49,7 +49,7 @@ def update_user(request):
 
     logging.critical(avatar)
     # Mise à jour des informations d'authentification via un service externe
-    auth_service_url = "http://authentification:8001/accounts/update_profile/"
+    auth_service_url = "https://authentification:8001/accounts/update_profile/"
     auth_data = {'id': user_id, 'username': username}#, 'email': email}
 
     logging.critical(auth_data)
@@ -133,7 +133,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         profile = None
 
     # Faites un appel au service d'authentification pour obtenir username et email
-    auth_service_url = "http://authentification:8001/accounts/get_profile/"
+    auth_service_url = "https://authentification:8001/accounts/get_profile/"
     try:
         auth_response = requests.get(f"{auth_service_url}{user_id}")
         if auth_response.status_code == 200:
