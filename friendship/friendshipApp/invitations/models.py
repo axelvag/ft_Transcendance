@@ -2,6 +2,14 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class Friendship(models.Model):
+    user = models.ForeignKey(User, related_name='friendships', on_delete=models.CASCADE)
+    friend = models.ForeignKey(User, related_name='friends', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class Invitation(models.Model):
     from_user = models.ForeignKey(User, related_name='invitations_sent', on_delete=models.CASCADE, null=True)

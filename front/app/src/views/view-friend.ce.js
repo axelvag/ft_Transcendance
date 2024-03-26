@@ -16,6 +16,14 @@ class ViewFriend extends HTMLElement {
         <h1 class="display-5 fw-bold mb-4 text-center mt-md-n5 mt-0">
           Friends
         </h1>
+
+        <!-- Notification Container -->
+        <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3">
+          <!-- Les toasts notifications seront ajoutés ici dynamiquement -->
+        </div>
+
+
+
         <div class="container">
           <div class="row">
             <div class="col-md-3 ms-md-auto">
@@ -156,6 +164,44 @@ class ViewFriend extends HTMLElement {
       this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
       this.generalErrorFriend.style.display = 'block';
     }
+  }
+
+  createToast(message, notificationId) {
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+  
+    const toast = document.createElement('div');
+    toast.className = 'toast hide';
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.setAttribute('data-bs-autohide', 'false');
+    toast.innerHTML = `
+      <div class="toast-header">
+        <strong class="me-auto">Nouvelle Invitation</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        ${message}
+        <div class="mt-2 pt-2 border-top">
+          <button type="button" class="btn btn-success btn-sm" onclick="acceptInvitation(${notificationId})">Accepter</button>
+          <button type="button" class="btn btn-danger btn-sm" onclick="declineInvitation(${notificationId})">Décliner</button>
+        </div>
+      </div>
+    `;
+  
+    toastContainer.appendChild(toast);
+    
+    // Initialize Bootstrap Toast
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+  }
+  
+  createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    document.body.appendChild(container);
+    return container;
   }
 }
 
