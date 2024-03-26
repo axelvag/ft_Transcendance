@@ -130,7 +130,7 @@ class ViewGameSetMode extends HTMLElement {
             redirectTo('/game/online');
             break;
           case 'tournament':
-            alert('Coming soon!');
+            redirectTo('/game/tournament');
             break;
         }
       });

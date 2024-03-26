@@ -10,6 +10,7 @@ import '@/views/view-login.ce.js';
 import '@/game/view-game-set-mode.ce.js';
 import '@/game/view-game-offline.ce.js';
 import '@/game/view-game-online.ce.js';
+import '@/game/view-game-tournament.ce.js';
 import '@/game/view-game-online-matchmaking.ce.js';
 import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
@@ -130,6 +131,11 @@ const router = new Router({
       path: '/game/duo',
       title: 'Game duo',
       template: '<view-game-offline duo></view-game-offline>',
+    },{
+      name: 'game-tournament',
+      path: '/game/tournament',
+      title: 'Game tournament',
+      template: '<view-game-tournament></view-game-tournament>',
     },
     {
       name: 'game-online-search-player',
