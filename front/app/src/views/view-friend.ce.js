@@ -10,119 +10,119 @@ class ViewFriend extends HTMLElement {
     // this.websocket = null;
     document.addEventListener('invitationReceived', this.handleInvitationReceived.bind(this));
   }
+  
 
-  connectedCallback() {
-    this.innerHTML = `
-      <default-layout-sidebar></default-layout-sidebar>
-      <default-layout-main>
-        <h1 class="display-5 fw-bold mb-4 text-center mt-md-n5 mt-0">
-          Friends
-        </h1>
-
-        <!-- Notification Container -->
+connectedCallback() {
+  this.innerHTML = `
+  <default-layout-sidebar></default-layout-sidebar>
+  <default-layout-main>
+  <h1 class="display-5 fw-bold mb-4 text-center mt-md-n5 mt-0">
+  Friends
+  </h1>
+  
         <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3">
-          <!-- Les toasts notifications seront ajoutés ici dynamiquement -->
+        <!-- Les toasts notifications seront ajoutés ici dynamiquement -->
         </div>
 
-
-
+        
+        
         <div class="container">
-          <div class="row">
+        <div class="row">
             <div class="col-md-3 ms-md-auto">
-                <img src="assets/img/avatar-careers.jpg" class="img-thumbnail rounded-circle mx-auto d-block" width="200" height="200" alt="character">
+            <img src="assets/img/avatar-careers.jpg" class="img-thumbnail rounded-circle mx-auto d-block" width="200" height="200" alt="character">
             </div>
             <div class="col-md-6">
-              <h1 class="display-4 mb-3 mt-5 fw-bold">${user.username}</h1>
-              <h4 class="text-bicolor">${user.friends} Friends</h4>
+            <h1 class="display-4 mb-3 mt-5 fw-bold">${user.username}</h1>
+            <h4 class="text-bicolor">${user.friends} Friends</h4>
             </div>
-          </div>
-        </div>
-
-        <!--Your friends-->
-
+            </div>
+            </div>
+            
+            <!--Your friends-->
+            
         <div class="accordion" id="accordionPanelsFriends">
-          <div class="accordion-item mt-4 mb-4">
+        <div class="accordion-item mt-4 mb-4">
             <h2 class="accordion-header">
-              <button class="accordion-button collapsed bg-bicolor" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+            <button class="accordion-button collapsed bg-bicolor" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="friends"></ui-icon>
                 Your friends
-              </button>
-            </h2>
-            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
-              <div class="accordion-body">
+                </button>
+                </h2>
+                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
+                <div class="accordion-body">
                 <strong>No friend yet</strong>
-              </div>
-            </div>
-          </div>
+                </div>
+                </div>
+                </div>
         </div>
-    
+        
         <!--ADD FRIEND-->
-
+        
         <div class="container">
           <div class="row justify-content-end">
-            <div class="col-md-6">
+          <div class="col-md-6">
               <form class="profile-form">
                 <div class="form-group">
-                  <div class="input-group">
+                <div class="input-group">
                   <div class="input-group-prepend">
                       <span class="input-group-text">Add a friend</span>
-                  </div>
+                      </div>
                   <input type="text" id="friend-name" class="form-control" required>
                 </div>
                 </div>
                 <div id="success-notification-friend" class="alert alert-success mt-3" style="display: none;">
-                  <strong>Success !</strong> Invitation successful !
+                <strong>Success !</strong> Invitation successful !
                 </div>
                 <div id="general-error-friend" class="alert alert-danger mt-3" style="display: none;"></div>
                 <div class="form-actions ms-5 ps-4">
-                    <button type="button" class="btn btn-outline-light cancel-button">Cancel</button>
-                    <button type="submit" class="btn btn-outline-light save-button">Send Invite</button>
+                <button type="button" class="btn btn-outline-light cancel-button">Cancel</button>
+                <button type="submit" class="btn btn-outline-light save-button">Send Invite</button>
                 </div>
-              </form>
-            </div>
-            <div class="col-md-6">
-              <button type="button" class="btn btn-outline-light">Manage Friend List</button>
-            </div>
-          </div>
+                </form>
+                </div>
+                <div class="col-md-6">
+                <button type="button" class="btn btn-outline-light">Manage Friend List</button>
+                </div>
+                </div>
         </div>
 
         <!--Online-->
-
+        
         <div class="row mt-4 no-wrap">
           <div class="col-md-6 text-white">
             <h2>
               Online
               <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="person"></ui-icon>
-            </h2>
+              </h2>
           </div>
         </div>
-
+        
         <div class="row">
           <div class="col-md-6 mt-3 mb-3 ms-5 text-secondary">
             Nobody
           </div>
         </div>
-
+        
         <!--Offline-->
-
+        
         <div class="row mt-4 no-wrap">
           <div class="col-md-6 text-white">
             <h2>
               Offline
               <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="person"></ui-icon>
-            </h2>
-          </div>
+              </h2>
+              </div>
         </div>
 
         <div class="row">
           <div class="col-md-6 mt-3 mb-3 ms-5 text-secondary">
             Nobody
           </div>
-        </div>
-
-      </default-layout-main>
-    `;
-
+          </div>
+          
+          </default-layout-main>
+          `;
+          
     // initWebSocket();
     this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
     this.generalErrorFriend = document.getElementById('general-error-friend');
@@ -130,11 +130,11 @@ class ViewFriend extends HTMLElement {
 
   async handleFormSubmit(event) {
     event.preventDefault();
-
+    
     this.generalErrorFriend.style.display = 'none';
     const successNotificationFriend = document.getElementById('success-notification-friend');
     if (successNotificationFriend) successNotificationFriend.style.display = 'none';
-
+    
     const friendName = this.querySelector('#friend-name').value;
     console.log('friend-->', friendName);
 
@@ -170,12 +170,55 @@ class ViewFriend extends HTMLElement {
   }
 
   handleInvitationReceived(event) {
-    const { message } = event.detail;
-    // Create and display the popup here using the received message
-    // For example:
-    alert(`Invitation received: ${message}`);
-    // You can replace the alert with a custom popup creation logic as described previously
+    console.log('Invitation reçue:', event.detail);
+    // const { message } = event.detail;
+    const { message, recipientId } = event.detail;
+
+    if (recipientId && recipientId !== user.id) return;
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.id = 'toast-container';
+      toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+      document.body.appendChild(toastContainer);
   }
+
+    const toast = document.createElement('div');
+    toast.className = 'toast show';
+    toast.role = 'alert';
+    toast.ariaLive = 'assertive';
+    toast.ariaAtomic = 'true';
+    toast.innerHTML = `
+      <div class="toast-header">
+        <strong class="me-auto">Nouvelle invitation</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        ${message}
+        <div class="mt-2 pt-2 border-top">
+          <button type="button" class="btn btn-primary btn-sm me-2" id="accept-btn">Accepter</button>
+          <button type="button" class="btn btn-danger btn-sm" id="decline-btn">Décliner</button>
+        </div>
+      </div>
+    `;
+  
+    toastContainer.appendChild(toast);
+  
+    toast.querySelector('#accept-btn').addEventListener('click', function() {
+      console.log('Invitation acceptée');
+      toast.remove();
+    });
+  
+    toast.querySelector('#decline-btn').addEventListener('click', function() {
+      console.log('Invitation déclinée');
+      toast.remove();
+    });
+  
+    setTimeout(() => {
+      toast.remove();
+    }, 30000);
+  }
+  
 }
 
 customElements.define('view-friend', ViewFriend);
