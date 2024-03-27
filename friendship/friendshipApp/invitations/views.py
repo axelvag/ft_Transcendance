@@ -3,7 +3,7 @@
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
-from .models import Notification, Friendship, Invitation
+from .models import Notification, Friendship, Invitation, UserStatus
 from django.contrib.auth import get_user_model
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
@@ -87,7 +87,7 @@ def accept_invitation(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def reject_invitation(request)
+def reject_invitation(request):
 
     data = json.loads(request.body)
     invitation_id = data.get('invitation_id')
@@ -104,7 +104,7 @@ def reject_invitation(request)
 # double underscore __ permet de traverser les relations entre modèles pour accéder aux attributs du modèle lié.
 # flat retourne une liste aplatie ['ami1', 'ami2', 'ami3'], au lieu de [('ami1',), ('ami2',), ('ami3',)].
 @require_http_methods(["GET"])
-def get_list_friend(request, user_id)
+def get_list_friend(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         friends = user.friendships.values_list('friend__username', flat=True)
@@ -167,3 +167,25 @@ def remove_friend(request):
         return JsonResponse({"status": "success", "message": "Friend removed."}, status=200)
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User or friend does not exist."}, status=404)
+
+@require_http_methods(["GET"])
+def online_friends(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        friends = user.friends.all()
+        online_friends = UserStatus.objects.filter(user__in=friends, is_online=True).values_list('user__username', flat=True)
+        
+        return JsonResponse({"online_friends": list(online_friends)}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+
+@require_http_methods(["GET"])
+def offline_friends(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        friends = user.friends.all()
+        offline_friends = UserStatus.objects.filter(user__in=friends, is_online=False).values_list('user__username', flat=True)
+        
+        return JsonResponse({"offline_friends": list(offline_friends)}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)

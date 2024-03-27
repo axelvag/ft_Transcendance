@@ -10,8 +10,9 @@ const websocket = new WebSocket(`ws://127.0.0.1:8003/ws/invitations/${user.id}/`
   websocket.onmessage = function (event) {
     console.log('WebSocket message received:', event);
     const data = JSON.parse(event.data);
-    alert(data.message);
+    // alert(data.message);
     console.log("onmessage", data);
+    document.dispatchEvent(new CustomEvent('invitationReceived', { detail: data }));
   };
 
   websocket.onerror = function (event) {

@@ -12,5 +12,6 @@ urlpatterns = [
     path('list_sent_invitations/<int:user_id>/', views.list_sent_invitations, name='list_sent_invitations'),
     path('cancel_sent_invitation/', views.cancel_sent_invitation, name='cancel_sent_invitation'),
     path('remove_friend/', views.remove_friend, name='remove_friend'),
-
+    path('online_friends/<int:user_id>/', views.online_friends, name='online_friends'),
+    path('offline_friends/<int:user_id>/', views.offline_friends, name='offline_friends'),
 ]

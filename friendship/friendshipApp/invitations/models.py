@@ -3,6 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django.utils.timezone import now
 
 User = get_user_model()
 
@@ -27,3 +28,11 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
     delivered = models.BooleanField(default=False)
+
+class UserStatus(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='status')
+    is_online = models.BooleanField(default=False)
+    last_seen = models.DateTimeField(default=now)
+
+    # def __str__(self):
+    #     return f"{self.user.username} is {'online' if self.is_online else 'offline'}"

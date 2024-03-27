@@ -1,12 +1,14 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user } from '@/auth.js';
+// import { initWebSocket } from '@/friends.js';
 
 class ViewFriend extends HTMLElement {
 
   constructor() {
     super();
-    this.websocket = null;
+    // this.websocket = null;
+    document.addEventListener('invitationReceived', this.handleInvitationReceived.bind(this));
   }
 
   connectedCallback() {
@@ -121,6 +123,7 @@ class ViewFriend extends HTMLElement {
       </default-layout-main>
     `;
 
+    // initWebSocket();
     this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
     this.generalErrorFriend = document.getElementById('general-error-friend');
   }
@@ -166,42 +169,12 @@ class ViewFriend extends HTMLElement {
     }
   }
 
-  createToast(message, notificationId) {
-    const toastContainer = document.getElementById('toast-container') || createToastContainer();
-  
-    const toast = document.createElement('div');
-    toast.className = 'toast hide';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    toast.setAttribute('data-bs-autohide', 'false');
-    toast.innerHTML = `
-      <div class="toast-header">
-        <strong class="me-auto">Nouvelle Invitation</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        ${message}
-        <div class="mt-2 pt-2 border-top">
-          <button type="button" class="btn btn-success btn-sm" onclick="acceptInvitation(${notificationId})">Accepter</button>
-          <button type="button" class="btn btn-danger btn-sm" onclick="declineInvitation(${notificationId})">Décliner</button>
-        </div>
-      </div>
-    `;
-  
-    toastContainer.appendChild(toast);
-    
-    // Initialize Bootstrap Toast
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-  }
-  
-  createToastContainer() {
-    const container = document.createElement('div');
-    container.id = 'toast-container';
-    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-    document.body.appendChild(container);
-    return container;
+  handleInvitationReceived(event) {
+    const { message } = event.detail;
+    // Create and display the popup here using the received message
+    // For example:
+    alert(`Invitation received: ${message}`);
+    // You can replace the alert with a custom popup creation logic as described previously
   }
 }
 
