@@ -22,6 +22,19 @@ def create_tournament(request):
         tournoi = Tournoi(name=name, max_players=max_players, start_datetime=start_datetime)
         tournoi.save()
         
-        return JsonResponse({"message": "Tournoi created successfully", "tournoi_id": tournoi.id}, status=201)
+        return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournoi.id}, status=201)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
+
+
+@csrf_exempt
+def view(request):
+    # Filtrez les tournois avec un status égal à 0
+    tournois = Tournoi.objects.filter(status=0)
+
+    # Préparez les données pour la réponse
+    # Note : Adaptez les champs 'name', 'max_players', etc., selon votre modèle
+    data = list(tournois.values('id', 'name', 'status', 'max_players', 'start_datetime'))
+
+    # Retournez les données en JSON
+    return JsonResponse(data, safe=False)

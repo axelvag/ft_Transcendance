@@ -1,34 +1,3 @@
-// import { user } from '@/auth.js';
-// import { getProfile } from '@/auth.js';
-// import { isAuthenticated } from '@/auth.js';
-
-// class ViewTournament extends HTMLElement {
-//   async connectedCallback() {
-//     const isLoggedIn = await isAuthenticated();
-//     const backUrl = isLoggedIn ? '/game' : '/';
-
-//     this.innerHTML = `
-//     <div class="min-vh-100 halo-bicolor d-flex flex-column p-2">
-//       <div class="d-flex justify-content-between align-items-center mb-5">
-//         <div class="d-flex">
-//           <a href="#" data-link="${backUrl}" class="d-inline-block link-body-emphasis link-opacity-75 link-opacity-100-hover fs-4 m-3" title="back">
-//             <ui-icon name="arrow-up" rotate="-90" class="me-2"></ui-icon>
-//           </a>
-//         </div>
-//         <h1 class="fw-bold text-center m-0">Tournament</h1>
-//         <div class="d-grid">
-//           <a class="btn btn-outline-primary border-2 fw-semibold rounded-0" style="--bs-btn-color: var(--bs-body-color);" href="#" data-link="">
-//             <span class="d-inline-block py-1">Create a Tournament</span>
-//           </a>
-//         </div>
-//       </div>
-//     </div>
-//     `;
-//   }
-// }
-
-// customElements.define('view-game-tournament', ViewTournament);
-
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
@@ -53,7 +22,8 @@ class ViewTournament extends HTMLElement {
             <span class="d-inline-block py-1">Create a Tournament</span>
           </button>
         </div>
-      </div>
+        </div>
+        <div id="tournoisList" class="mt-4"></div>
       <div id="formOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0); z-index: 2;">
       <auth-layout>
         <form id="tournamentForm">
@@ -119,6 +89,17 @@ class ViewTournament extends HTMLElement {
       tournamentSizeValueDisplay.textContent = this.value;
     });
 
+    this.querySelector('#tournoisList').addEventListener('click', async (event) => {
+      if (event.target.classList.contains('joinTournamentBtn')) {
+          const tournamentId = event.target.id.replace('joinTournament-', '');
+          console.log(`Rejoindre le tournoi avec l'ID : ${tournamentId}`);
+          // Ici, vous pouvez ajouter votre logique pour rejoindre le tournoi
+          // Par exemple, en faisant une requête POST à votre API
+      }
+    });
+
+    this.loadTournois();
+
     this.querySelector('#tournamentForm').addEventListener('submit', this.submitForm.bind(this));
   }
 
@@ -147,11 +128,51 @@ class ViewTournament extends HTMLElement {
     })
     const data = await response.json();
     if (data.success) {
-      console.log("ici");
+      this.loadTournois();
       this.querySelector('#formOverlay').style.display = 'none';
-      console.log(data);
     } else {
       console.log(data);
+    }
+  }
+
+  async loadTournois() {
+    try {
+        const response = await fetch('http://127.0.0.1:8005/tournament/view/', { // Assurez-vous que l'URL correspond à votre endpoint API
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${token}`, // Si authentification est nécessaire
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const tournois = await response.json();
+
+        const listElement = this.querySelector('#tournoisList');
+        listElement.innerHTML = '<h2>Join a Tournaments</h2><br>'; // Titre pour la section
+
+        tournois.forEach(tournoi => {
+            const tournoiElement = document.createElement('div');
+            tournoiElement.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column;">
+                    <h3>${tournoi.name}</h3>
+                    <div style="display: flex;">
+                        <p style="margin-right: 10px;">Max Players: ${tournoi.max_players}</p>
+                        <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
+                    </div>
+                </div>
+                <button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>
+              </div>
+              <hr style="border-top: 1px solid #ccc; margin: 10px 0;">
+            `;
+            listElement.appendChild(tournoiElement);
+        });
+    } catch (error) {
+        console.error('Could not load tournois:', error);
     }
   }
 }
