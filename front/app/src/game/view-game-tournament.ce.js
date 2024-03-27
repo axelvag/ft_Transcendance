@@ -172,7 +172,7 @@ class ViewTournament extends HTMLElement {
             listElement.appendChild(tournoiElement);
         });
     } catch (error) {
-        console.error('Could not load tournois:', error);
+        console.error('Could not load tournament:', error);
     }
   }
 }
