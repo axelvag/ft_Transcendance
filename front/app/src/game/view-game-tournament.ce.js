@@ -147,6 +147,8 @@ class ViewTournament extends HTMLElement {
     })
     const data = await response.json();
     if (data.success) {
+      console.log("ici");
+      this.querySelector('#formOverlay').style.display = 'none';
       console.log(data);
     } else {
       console.log(data);
