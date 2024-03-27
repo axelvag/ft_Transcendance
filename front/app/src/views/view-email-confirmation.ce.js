@@ -1,5 +1,7 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 
+const BASE_URL = import.meta.env.BASE_URL;
+
 class ViewEmailConfirmation extends HTMLElement {
   async connectedCallback() {
     this.innerHTML = `
@@ -25,9 +27,7 @@ class ViewEmailConfirmation extends HTMLElement {
 
       </auth-layout>
     `;
-    console.log(document.location.href);
-    const hash = location.hash;
-    const queryString = hash.slice(hash.indexOf('?') + 1);
+    const queryString = location.search;
     const params = new URLSearchParams(queryString);
     const uidb64 = params.get('uidb64');
     const token = params.get('token');

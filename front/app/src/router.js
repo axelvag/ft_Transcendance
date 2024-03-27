@@ -11,6 +11,7 @@ import '@/views/view-login.ce.js';
 import '@/game/view-game-set-mode.ce.js';
 import '@/game/view-game-offline.ce.js';
 import '@/game/view-game-online.ce.js';
+import '@/game/view-game-online-matchmaking.ce.js';
 import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
@@ -35,7 +36,7 @@ const isLoggedInGuard = async () => {
 };
 
 const router = new Router({
-  useHash: true,
+  useHash: false,
   baseUrl: '',
   linkAttribute: 'data-link',
   linkActiveClass: 'active',
@@ -137,7 +138,7 @@ const router = new Router({
       name: 'game-online-search-player',
       path: '/game/online',
       title: 'Game online',
-      template: '<view-game-online></view-game-online>',
+      template: '<view-game-online-matchmaking></view-game-online-matchmaking>',
       beforeEnter: isLoggedInGuard,
     },
     {

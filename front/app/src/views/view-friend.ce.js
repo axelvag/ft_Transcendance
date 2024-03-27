@@ -3,14 +3,9 @@ import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user } from '@/auth.js';
 // import { initWebSocket } from '@/friends.js';
 
-class ViewFriend extends HTMLElement {
+const BASE_URL = import.meta.env.BASE_URL;
 
-  constructor() {
-    super();
-    // this.websocket = null;
-    document.addEventListener('invitationReceived', this.handleInvitationReceived.bind(this));
-  }
-  
+class ViewFriend extends HTMLElement {
 
 connectedCallback() {
   this.innerHTML = `
@@ -168,57 +163,6 @@ connectedCallback() {
       this.generalErrorFriend.style.display = 'block';
     }
   }
-
-  handleInvitationReceived(event) {
-    console.log('Invitation reçue:', event.detail);
-    // const { message } = event.detail;
-    const { message, recipientId } = event.detail;
-
-    if (recipientId && recipientId !== user.id) return;
-    let toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) {
-      toastContainer = document.createElement('div');
-      toastContainer.id = 'toast-container';
-      toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-      document.body.appendChild(toastContainer);
-  }
-
-    const toast = document.createElement('div');
-    toast.className = 'toast show';
-    toast.role = 'alert';
-    toast.ariaLive = 'assertive';
-    toast.ariaAtomic = 'true';
-    toast.innerHTML = `
-      <div class="toast-header">
-        <strong class="me-auto">Nouvelle invitation</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        ${message}
-        <div class="mt-2 pt-2 border-top">
-          <button type="button" class="btn btn-primary btn-sm me-2" id="accept-btn">Accepter</button>
-          <button type="button" class="btn btn-danger btn-sm" id="decline-btn">Décliner</button>
-        </div>
-      </div>
-    `;
-  
-    toastContainer.appendChild(toast);
-  
-    toast.querySelector('#accept-btn').addEventListener('click', function() {
-      console.log('Invitation acceptée');
-      toast.remove();
-    });
-  
-    toast.querySelector('#decline-btn').addEventListener('click', function() {
-      console.log('Invitation déclinée');
-      toast.remove();
-    });
-  
-    setTimeout(() => {
-      toast.remove();
-    }, 30000);
-  }
-  
 }
 
 customElements.define('view-friend', ViewFriend);

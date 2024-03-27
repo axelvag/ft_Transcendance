@@ -11,13 +11,18 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
 import os
+
+
+load_dotenv()
+URL = os.getenv('BASE_URL')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # chemin du système de fichiers où Django stockera les fichiers téléchargés par l'ImageField (ou FileField)
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = '/app/media'
 MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
@@ -143,8 +148,9 @@ EMAIL_HOST_PASSWORD = 'zotbqnassvkvftvk'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5500",  # Remplacez par l'URL de votre frontend
-    "http://127.0.0.1:8000",
+    f"{URL}:5500",  # Remplacez par l'URL de votre frontend
+    f"{URL}:8000",
+    f"{URL}:8001",
 ]
 
 # CORS_ORIGINS_ALLOWED_ALL = True
@@ -169,7 +175,7 @@ CORS_ALLOW_HEADERS = [
 
 # PASSWORD_RESET_TIMEOUT = 1
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+CSRF_TRUSTED_ORIGINS = [f'{os.getenv("BASE_URL")}:8000']
 
 # LOGGING = {
 #     'version': 1,

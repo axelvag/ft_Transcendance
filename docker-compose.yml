@@ -11,11 +11,11 @@ services:
       - "8000:80"
     networks:
       - front
-    depends_on:
-      - authentification
     restart: on-failure
     profiles:
       - prod
+    env_file:
+      - .env
 
   # Front - dev (live server)
   front_dev:
@@ -46,17 +46,13 @@ services:
       - "8001:8001"
     volumes:
       - ./authentification:/app
+      - shared_media:/app/media
     networks:
       - back
     depends_on:
       - data_base
-      - profile
-      - friendship
-    environment:
-      - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     restart: on-failure
 
   profile:
@@ -64,43 +60,27 @@ services:
       context: ./profile
       dockerfile: Dockerfile
     container_name: profile
-    ports:
-      - "8002:8002"
+    volumes:
+      - shared_media:/app/media
+      - ./profile/profileApp:/profileApp
+    # ports:
+    # - "8002:8002"
     networks:
       - back
     depends_on:
       - data_base
-    environment:
-      - POSTGRES_HOST=data_base # Utilisez le nom du service comme hôte
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     restart: on-failure
-
-  # Data base PostGreSQL
-  # data_base:
-  #   build:
-  #     context: ./data_base/Docker
-  #     dockerfile: Dockerfile
-  #   container_name: data_base
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - data_base:/custom_postgres_data
-  #   ports:
-  #     - "5432:5432"
-  #   networks:
-  #     - back
-  #   restart: on-failure
 
   # Back - data base
   data_base:
+    build:
+      context: ./data_base
+      dockerfile: Dockerfile
     container_name: data_base
-    image: postgres:16.0-bookworm
-    environment:
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
@@ -109,22 +89,6 @@ services:
     networks:
       - back
 
-  # Back - api gateway
-  api_gateway:
-    build:
-      context: ./api_gateway
-      dockerfile: Dockerfile
-    container_name: api_gateway
-    ports:
-      - "5000:5000"
-    networks:
-      - back
-    depends_on:
-      - authentification
-      - profile
-      - data_base
-    restart: on-failure
-
   friendship:
     build:
       context: ./friendship
@@ -132,15 +96,14 @@ services:
     container_name: friendship
     ports:
       - "8003:8003"
+    volumes:
+      - ./friendship/friendshipApp:/friendshipApp
     networks:
       - back
     depends_on:
       - data_base
-    environment:
-      - POSTGRES_HOST=data_base
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     restart: on-failure
 
   statistic:
@@ -156,19 +119,30 @@ services:
       - data_base
     restart: on-failure
 
+  # Back - game
+  game:
+    build:
+      context: ./game
+      dockerfile: Dockerfile
+    container_name: game
+    ports:
+      - "8009:8009"
+    volumes:
+      - ./game/app:/app
+    networks:
+      - back
+    depends_on:
+      - data_base
+    env_file:
+      - .env
+    restart: on-failure
+
 volumes:
   data_base_data:
-    # name: data_base
-    # driver: local # ici nous stockons le volume en local
-    # driver_opts:
-    #   type: 'none' # aucun type specifique
-    #   o: 'bind' # on monte le volume directement sur le chemin ./src/front/public:/app
-    #   device: data_base
+  shared_media:
 
 networks:
   front:
     driver: bridge
   back:
-    driver: bridge
-  data_base:
     driver: bridge

@@ -1,4 +1,5 @@
 import { user } from '@/auth.js';
+import { notify } from "@/notifications.js";
 
 const initWebSocket = () => {
 const websocket = new WebSocket(`ws://127.0.0.1:8003/ws/invitations/${user.id}/`);
@@ -12,7 +13,7 @@ const websocket = new WebSocket(`ws://127.0.0.1:8003/ws/invitations/${user.id}/`
     const data = JSON.parse(event.data);
     // alert(data.message);
     console.log("onmessage", data);
-    document.dispatchEvent(new CustomEvent('invitationReceived', { detail: data }));
+    notify(data.message);
   };
 
   websocket.onerror = function (event) {

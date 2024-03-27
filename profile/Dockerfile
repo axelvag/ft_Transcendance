@@ -2,36 +2,16 @@
 
 FROM python:3.12-bookworm
 
-# Autres configurations du Dockerfile
+RUN mkdir /profileApp
+WORKDIR /profileApp
 
-WORKDIR /app
-
-COPY requirements.txt /app/
-
-# # Pour fix le probleme backports.zoneinfo
-# RUN pip install --upgrade pip setuptools wheel
-
-# Mise a jour pip et install les dependances
+COPY requirements.txt /profileApp/
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# Copie des fichiers de l'application
-COPY . /app/
-# COPY ./authentification/auth/ /app/
+COPY script_python.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/script_python.sh
+ENTRYPOINT [ "script_python.sh" ]
 
-# WORKDIR /
-
-# COPY ./authentification/auth/ /app/auth/
-
-# Exposer le port sur lequel l'application Django écoute à l'intérieur du conteneur
 EXPOSE 8002
-
-WORKDIR /app/profileApp
-
-RUN chmod +x ./script_python.sh
-
-# Commande pour lancer l'application Django
-# CMD ["python3", "manage.py", "runserver", "0.0.0.0:8002"]
-CMD [ "./script_python.sh" ]
-
 # CMD ["tail", "-f", "/dev/null"]
