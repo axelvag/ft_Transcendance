@@ -50,10 +50,10 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
     await self.channel_layer.group_discard("searching_players", event['channel_name'])
 
     # create a new game
-    player1_id = self.user_id
-    player2_id = event['user_id']
+    player_left_id = self.user_id
+    player_right_id = event['user_id']
 
-    game_id = await database_sync_to_async(self.create_game)(player1_id, player2_id)
+    game_id = await database_sync_to_async(self.create_game)(player_left_id, player_right_id)
     if game_id is None:
       await self.channel_layer.send(event['channel_name'], {
         'type': 'opponent.error',
@@ -68,20 +68,20 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
       await self.channel_layer.send(event['channel_name'], {
         'type': 'opponent.success',
         'game_id': game_id,
-        'player1_id': player1_id,
-        'player2_id': player2_id,
+        'player_left_id': player_left_id,
+        'player_right_id': player_right_id,
       })
       await self.send(text_data=json.dumps({
         'game_id': game_id,
-        'player1_id': player1_id,
-        'player2_id': player2_id,
+        'player_left_id': player_left_id,
+        'player_right_id': player_right_id,
       }))
 
   async def opponent_success(self, event):
     await self.send(text_data=json.dumps({
       'game_id': event.get('game_id'),
-      'player1_id': event.get('player1_id'),
-      'player2_id': event.get('player2_id'),
+      'player_left_id': event.get('player_left_id'),
+      'player_right_id': event.get('player_right_id'),
     }))
 
   async def opponent_error(self, event):
@@ -90,11 +90,11 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
       'message': event.get('message')
     }))
 
-  def create_game(self, player1_id, player2_id):
+  def create_game(self, player_left_id, player_right_id):
     try:
-      game = Game(player1_id=player1_id, player2_id=player2_id)
+      game = Game(player_left_id=player_left_id, player_right_id=player_right_id)
       game.save()
-      return game.get_id()
+      return game.id
     except ValidationError as e:
       return None
     except Exception as e:
