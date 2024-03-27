@@ -22,9 +22,13 @@ class Match(models.Model):
     #     return f"{self.joueur1} vs {self.joueur2}"
 
 class Tournoi(models.Model):
+    CREATED = 0
+    IN_PROGRESS = 1
+    FINISHED = 2
+
     name = models.CharField(max_length=100)
     matchs = models.ManyToManyField(Match)
-    status = models.BooleanField(default=True)
+    status = models.BooleanField(default=CREATED)
     max_players = models.IntegerField(default=16, blank=True)
     start_datetime = models.DateTimeField(null=True)
 

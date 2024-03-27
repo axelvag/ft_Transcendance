@@ -95,6 +95,9 @@ class ViewTournament extends HTMLElement {
     </div>
     `;
 
+    this.tournamentName = document.getElementById('tournamentName');
+    this.tournamentSizeValue = document.getElementById('tournamentSizeValue');
+
     // Attache les gestionnaires d'événements
     this.querySelector('#createTournamentBtn').addEventListener('click', () => {
       this.querySelector('#formOverlay').style.display = 'block';
@@ -115,6 +118,39 @@ class ViewTournament extends HTMLElement {
     tournamentSizeRangeInput.addEventListener('input', function() {
       tournamentSizeValueDisplay.textContent = this.value;
     });
+
+    this.querySelector('#tournamentForm').addEventListener('submit', this.submitForm.bind(this));
+  }
+
+  async submitForm(event) {
+    event.preventDefault();
+
+    // Ajout : Récupération du CSRF Token
+    // const csrfToken = await getCsrfToken();
+
+    this.tournamentName = document.getElementById('tournamentName');
+    this.tournamentSizeValue = document.getElementById('tournamentSizeValue');
+
+    const formData = {
+      tournamentName: this.tournamentName.value,
+      tournamentSize: parseInt(this.tournamentSizeValue.textContent, 10), // Notez le changement ici pour utiliser textContent
+    };
+    console.log(formData);
+    const response = await fetch('http://127.0.0.1:8005/tournament/create_tournament/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 'X-CSRFToken': csrfToken,
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    })
+    const data = await response.json();
+    if (data.success) {
+      console.log(data);
+    } else {
+      console.log(data);
+    }
   }
 }
 
