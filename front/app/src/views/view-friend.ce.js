@@ -14,13 +14,7 @@ connectedCallback() {
   <h1 class="display-5 fw-bold mb-4 text-center mt-md-n5 mt-0">
   Friends
   </h1>
-  
-        <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3">
-        <!-- Les toasts notifications seront ajoutés ici dynamiquement -->
-        </div>
 
-        
-        
         <div class="container">
         <div class="row">
             <div class="col-md-3 ms-md-auto">
@@ -51,6 +45,14 @@ connectedCallback() {
                 </div>
         </div>
         
+        <!--Friend Requests-->
+        <div class="mt-4">
+          <h2>Friend Requests</h2>
+          <ul id="friend-requests" class="list-group">
+            <!-- Friend requests will be dynamically added here -->
+          </ul>
+        </div>
+
         <!--ADD FRIEND-->
         
         <div class="container">
@@ -118,7 +120,7 @@ connectedCallback() {
           </default-layout-main>
           `;
           
-    // initWebSocket();
+    this.loadFriendRequests();
     this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
     this.generalErrorFriend = document.getElementById('general-error-friend');
   }
@@ -163,6 +165,30 @@ connectedCallback() {
       this.generalErrorFriend.style.display = 'block';
     }
   }
+
+  async loadFriendRequests() {
+    try {
+      const response = await fetch(`http://127.0.0.1:8003/list_received_invitations/${user.id}/`);
+      const responseData = await response.json();
+  
+      if (responseData && responseData.invitations) {
+        const friendRequestsList = document.getElementById('friend-requests');
+        friendRequestsList.innerHTML = ''; // Clear previous content
+        
+        responseData.invitations.forEach(invitation => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('list-group-item');
+          listItem.textContent = `From: ${invitation.from_user}, Invitation ID: ${invitation.invitation_id}`;
+          friendRequestsList.appendChild(listItem);
+        });
+      } else {
+        console.error('Invalid response format:', responseData);
+      }
+    } catch (error) {
+      console.error('Error fetching friend requests:', error);
+    }
+  }
+  
 }
 
 customElements.define('view-friend', ViewFriend);
