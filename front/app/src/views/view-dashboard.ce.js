@@ -28,7 +28,7 @@ class ViewDash extends HTMLElement {
         <div class="col-4">
           <div class="row justify-content-end">
             <div class="col-md-6 d-flex flex-column align-items-center">
-                <img src="https://pbs.twimg.com/media/E3-FSn5XwAMwOYR.jpg" class="img-thumbnail rounded-circle" width="200" height="200" alt="character">
+                <img src="assets/img/avatar_careers.jpg" class="img-thumbnail rounded-circle" width="200" height="200" alt="character">
                 <h3 class="display-5 fw-bold btn-lg">
                   ${user.username}
                 </h3>
@@ -51,7 +51,7 @@ class ViewDash extends HTMLElement {
       <div class="d-flex justify-content-end mt-3">
         <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg ml-auto mt-5" style="--bs-btn-color: var(--bs-body-color); font-size: 2rem;" href="#" data-link="/rank">
           <span class="d-inline-block py-1">
-            <img src="https://static.vecteezy.com/system/resources/previews/028/754/694/non_2x/3d-purple-trophy-cup-winner-champion-icon-for-ui-ux-web-mobile-apps-social-media-ads-designs-png.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
+            <img src="assets/img/rank-icon.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
             RANK
           </span>
         </a>
