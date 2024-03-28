@@ -1,7 +1,9 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
+import { setLocalTournament } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
+import { redirectTo } from '../router';
 
 class ViewTournament extends HTMLElement {
   async connectedCallback() {
@@ -93,9 +95,21 @@ class ViewTournament extends HTMLElement {
       if (event.target.classList.contains('joinTournamentBtn')) {
           const tournamentId = event.target.id.replace('joinTournament-', '');
           console.log(`Rejoindre le tournoi avec l'ID : ${tournamentId}`);
-          // Ici, vous pouvez ajouter votre logique pour rejoindre le tournoi
-          // Par exemple, en faisant une requête POST à votre API
-      }
+          var url = `http://127.0.0.1:8005/tournament/get/${tournamentId}/`;
+
+          fetch(url)
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  setLocalTournament(data.data);
+                  console.log(data);
+                  redirectTo(`/game/tournament/waiting`);
+              } else {
+                  console.error('Tournoi non trouvé ou erreur de récupération.');
+              }
+          })
+          .catch(error => console.error('Erreur lors de la communication avec le serveur:', error));
+        }
     });
 
     this.loadTournois();
