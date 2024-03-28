@@ -180,4 +180,9 @@ export const icons = {
       <path fill="currentColor" d="M2 2v2h5v4H2v2h5c1.11 0 2-.89 2-2V7h5v10H9v-1c0-1.11-.89-2-2-2H2v2h5v4H2v2h5c1.11 0 2-.89 2-2v-1h5c1.11 0 2-.89 2-2v-4h6v-2h-6V7c0-1.11-.89-2-2-2H9V4c0-1.11-.89-2-2-2z"/>
     </svg>
   `,
+  42: `
+  <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 137.6 96.6">
+    <path d="M229 444h51v25h25v-46h-50l50-50h-25l-51 50zM316 398l25-25h-25zM341 398l-25 25v26h25v-26l26-25v-25h-26zM367 423l-26 26h26z" style="fill:currentColor" transform="translate(-229 -373)"/>
+  </svg>
+  `,
 };
