@@ -14,4 +14,5 @@ urlpatterns = [
     path('remove_friend/', views.remove_friend, name='remove_friend'),
     path('online_friends/<int:user_id>/', views.online_friends, name='online_friends'),
     path('offline_friends/<int:user_id>/', views.offline_friends, name='offline_friends'),
+    path('search_users/', views.search_users, name='search_users'), 
 ]

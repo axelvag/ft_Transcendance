@@ -6,180 +6,97 @@ import { user } from '@/auth.js';
 const BASE_URL = import.meta.env.BASE_URL;
 
 class ViewFriend extends HTMLElement {
-
-connectedCallback() {
-  this.innerHTML = `
-  <default-layout-sidebar></default-layout-sidebar>
-  <default-layout-main>
-  <h1 class="display-5 fw-bold mb-4 text-center mt-md-n5 mt-0">
-  Friends
-  </h1>
-
-        <div class="container">
-        <div class="row">
-            <div class="col-md-3 ms-md-auto">
-            <img src="assets/img/avatar-careers.jpg" class="img-thumbnail rounded-circle mx-auto d-block" width="200" height="200" alt="character">
-            </div>
-            <div class="col-md-6">
-            <h1 class="display-4 mb-3 mt-5 fw-bold">${user.username}</h1>
-            <h4 class="text-bicolor">${user.friends} Friends</h4>
-            </div>
-            </div>
-            </div>
-            
-            <!--Your friends-->
-            
-        <div class="accordion" id="accordionPanelsFriends">
-        <div class="accordion-item mt-4 mb-4">
-            <h2 class="accordion-header">
-            <button class="accordion-button collapsed bg-bicolor" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="friends"></ui-icon>
-                Your friends
-                </button>
-                </h2>
-                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
-                <div class="accordion-body">
-                <strong>No friend yet</strong>
-                </div>
-                </div>
-                </div>
-        </div>
-        
-        <!--Friend Requests-->
-        <div class="mt-4">
-          <h2>Friend Requests</h2>
-          <ul id="friend-requests" class="list-group">
-            <!-- Friend requests will be dynamically added here -->
-          </ul>
-        </div>
-
-        <!--ADD FRIEND-->
-        
-        <div class="container">
-          <div class="row justify-content-end">
-          <div class="col-md-6">
-              <form class="profile-form">
-                <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                      <span class="input-group-text">Add a friend</span>
-                      </div>
-                  <input type="text" id="friend-name" class="form-control" required>
-                </div>
-                </div>
-                <div id="success-notification-friend" class="alert alert-success mt-3" style="display: none;">
-                <strong>Success !</strong> Invitation successful !
-                </div>
-                <div id="general-error-friend" class="alert alert-danger mt-3" style="display: none;"></div>
-                <div class="form-actions ms-5 ps-4">
-                <button type="button" class="btn btn-outline-light cancel-button">Cancel</button>
-                <button type="submit" class="btn btn-outline-light save-button">Send Invite</button>
-                </div>
-                </form>
-                </div>
-                <div class="col-md-6">
-                <button type="button" class="btn btn-outline-light">Manage Friend List</button>
-                </div>
-                </div>
-        </div>
-
-        <!--Online-->
-        
-        <div class="row mt-4 no-wrap">
-          <div class="col-md-6 text-white">
-            <h2>
-              Online
-              <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="person"></ui-icon>
-              </h2>
-          </div>
-        </div>
-        
-        <div class="row">
-          <div class="col-md-6 mt-3 mb-3 ms-5 text-secondary">
-            Nobody
-          </div>
-        </div>
-        
-        <!--Offline-->
-        
-        <div class="row mt-4 no-wrap">
-          <div class="col-md-6 text-white">
-            <h2>
-              Offline
-              <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="person"></ui-icon>
-              </h2>
-              </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 mt-3 mb-3 ms-5 text-secondary">
-            Nobody
-          </div>
+  connectedCallback() {
+    this.innerHTML = `
+    <default-layout-sidebar></default-layout-sidebar>
+    <default-layout-main>
+      <h1 class="display-5 fw-bold mb-4 text-center mt-md-n5 mt-0">Friends</h1> 
+    
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" href="#myfriends" data-bs-toggle="tab">My friends</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#invitations" data-bs-toggle="tab">Invitations</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#addfriends" data-bs-toggle="tab">Add friends</a>
+        </li>
+      </ul>
+    
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div class="tab-pane container active" id="myfriends">
+          <!-- Friend Requests Section inside My Friends tab -->
+          
+          <!-- List of friends will be dynamically added here -->
           </div>
           
-          </default-layout-main>
-          `;
-          
+          <div class="tab-pane container fade" id="invitations">
+          <div class="mt-4">
+            <h2>Friend Requests</h2>
+            <ul id="friend-requests" class="list-group">
+              <!-- Friend requests will be dynamically added here -->
+            </ul>
+          </div>
+          <!-- Invitations will be dynamically added here -->
+        </div>
+        
+        <div class="tab-pane container fade" id="addfriends">
+          <form class="input-group mb-3 mt-3">
+            <input type="text" class="form-control" placeholder="Type a username" id="search-friend-name" required>
+            <button class="btn btn-outline-secondary" type="button" id="search">Search</button>
+          </form>
+          <div class="list-group" id="search-results">
+            <!-- Search results will be dynamically added here -->
+          </div>
+          <div id="error-messages"></div>
+        </div>
+      </div>
+    </default-layout-main>
+    `;
+
     this.loadFriendRequests();
-    this.querySelector('.profile-form').addEventListener('submit', this.handleFormSubmit.bind(this));
-    this.generalErrorFriend = document.getElementById('general-error-friend');
-  }
-
-  async handleFormSubmit(event) {
-    event.preventDefault();
-    
-    this.generalErrorFriend.style.display = 'none';
-    const successNotificationFriend = document.getElementById('success-notification-friend');
-    if (successNotificationFriend) successNotificationFriend.style.display = 'none';
-    
-    const friendName = this.querySelector('#friend-name').value;
-    console.log('friend-->', friendName);
-
-    try {
-      const response = await fetch('http://127.0.0.1:8003/send_invitation/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ username: friendName, user_id: user.id }),
-      });
-      const data = await response.json();
-      console.log('data:', data);
-
-      // Traiter la réponse du serveur
-      if (!data.status || data.status !== 'success') {
-        // Afficher une erreur spécifique si disponible, sinon un message générique
-        const errorMessage = data.message || 'An error occurred while sending the invitation.';
-        console.error('Error:', errorMessage);
-        this.generalErrorFriend.textContent = errorMessage;
-        this.generalErrorFriend.style.display = 'block';
-      } else {
-        // Afficher une notification de succès
-        console.log('Invitation sent successfully.');
-        if (successNotificationFriend) successNotificationFriend.style.display = 'block';
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      this.generalErrorFriend.textContent = 'An error occurred: ' + error.message;
-      this.generalErrorFriend.style.display = 'block';
-    }
+    this.querySelector('#search').addEventListener('click', this.searchFriends.bind(this));
   }
 
   async loadFriendRequests() {
     try {
       const response = await fetch(`http://127.0.0.1:8003/list_received_invitations/${user.id}/`);
       const responseData = await response.json();
-  
+
       if (responseData && responseData.invitations) {
         const friendRequestsList = document.getElementById('friend-requests');
-        friendRequestsList.innerHTML = ''; // Clear previous content
-        
-        responseData.invitations.forEach(invitation => {
-          const listItem = document.createElement('li');
-          listItem.classList.add('list-group-item');
-          listItem.textContent = `From: ${invitation.from_user}, Invitation ID: ${invitation.invitation_id}`;
-          friendRequestsList.appendChild(listItem);
+            friendRequestsList.innerHTML = '';
+
+            responseData.invitations.forEach(invitation => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+
+                const fromUserSpan = document.createElement('span');
+                fromUserSpan.textContent = `From: ${invitation.from_user}, Invitation ID: ${invitation.invitation_id}`;
+
+                const buttonGroup = document.createElement('div');
+                buttonGroup.classList.add('btn-group');
+
+                const acceptButton = document.createElement('button');
+                acceptButton.textContent = 'Accept';
+                acceptButton.classList.add('btn', 'btn-success', 'mx-1');
+                acceptButton.onclick = () => this.acceptFriendRequest(invitation.invitation_id);
+
+                const rejectButton = document.createElement('button');
+                rejectButton.textContent = 'Reject';
+                rejectButton.classList.add('btn', 'btn-danger', 'mx-1');
+                rejectButton.onclick = () => this.rejectFriendRequest(invitation.invitation_id);
+
+                buttonGroup.appendChild(acceptButton);
+                buttonGroup.appendChild(rejectButton);
+
+                listItem.appendChild(fromUserSpan);
+                listItem.appendChild(buttonGroup);
+
+                friendRequestsList.appendChild(listItem);
         });
       } else {
         console.error('Invalid response format:', responseData);
@@ -188,7 +105,131 @@ connectedCallback() {
       console.error('Error fetching friend requests:', error);
     }
   }
+
+  async acceptFriendRequest(invitationId){
+    console.log("accept", invitationId);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8003/accept_invitation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ invitation_id: invitationId }),
+      });
+      const data = await response.json();
+      console.log('data:', data);
+      
+      if (data.status === 'success') {
+        console.log("okkkk"); 
+      } else {
+        console.log("Nullll");
+      }
   
+    } catch (error) {
+      console.error('Error:', error);
+      console.log("Failed to send friend request: " + error.message);
+    }
+  }
+
+  async rejectFriendRequest(invitationId){
+    console.log("Reject", invitationId);
+  }
+
+  async searchFriends() {
+    const searchInputField = this.querySelector('#search-friend-name');
+    const searchInput = searchInputField.value.trim();
+    
+    if (searchInput === '') {
+      console.log("The field is empty");
+      const searchResultsList = this.querySelector('#search-results');
+      searchResultsList.innerHTML = '<li class="list-group-item">Please enter a search username.</li>';
+      return;
+    }
+  
+    const searchResultsList = this.querySelector('#search-results');
+    searchResultsList.innerHTML = '';
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8003/search_users/?query=${encodeURIComponent(searchInput)}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const searchResults = await response.json();
+      console.log(searchResults);
+  
+      if (searchResults.length === 0) {
+        const noResultsItem = document.createElement('li');
+        noResultsItem.classList.add('list-group-item');
+        noResultsItem.textContent = "No users found.";
+        searchResultsList.appendChild(noResultsItem);
+      } else {
+        searchResults.forEach(username => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('list-group-item');
+          listItem.style.display = 'flex';
+          listItem.style.justifyContent = 'space-between';
+          listItem.style.alignItems = 'center';
+          
+          const textSpan = document.createElement('span');
+          textSpan.textContent = username;
+          
+          const friendRequestButton = document.createElement('button');
+          friendRequestButton.textContent = 'Send Friend Request';
+          friendRequestButton.classList.add('btn', 'btn-primary');
+          // actionButton.textContent = user.invitation_sent ? 'Invitation Sent' : 'Send Friend Request';
+          // actionButton.classList.add('btn', user.invitation_sent ? 'btn-secondary' : 'btn-primary');
+
+          // Send friend
+          friendRequestButton.onclick = () => this.sendFriendRequest(username, friendRequestButton);
+          // if (!user.invitation_sent) {
+            // actionButton.onclick = () => this.sendFriendRequest(user.username, actionButton);
+          // }
+
+          listItem.appendChild(textSpan);
+          listItem.appendChild(friendRequestButton);
+          searchResultsList.appendChild(listItem);
+        });
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    }
+  }
+  
+  async sendFriendRequest(username, button) {
+    console.log("Sending friend request to", username);
+  
+    try {
+      const response = await fetch('http://127.0.0.1:8003/send_invitation/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username: username, user_id: user.id }),
+      });
+      const data = await response.json();
+      console.log('data:', data);
+      
+      if (data.status === 'success') {
+        button.textContent = 'Friend Request Sent';
+        button.classList.remove('btn-primary');
+        button.classList.add('btn-success');
+        button.disabled = true; 
+      } else {
+        const errorMessage = document.createElement('div');
+        errorMessage.classList.add('alert', 'alert-danger');
+        errorMessage.textContent = "Failed to send friend request: " + (data.message || "Unknown error");
+        document.querySelector('#error-messages').appendChild(errorMessage);
+      }
+  
+    } catch (error) {
+      console.error('Error:', error);
+      alert("Failed to send friend request: " + error.message);
+    }
+  }
 }
 
 customElements.define('view-friend', ViewFriend);

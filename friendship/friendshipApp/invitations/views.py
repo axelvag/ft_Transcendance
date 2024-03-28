@@ -9,6 +9,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 import json
 from django.db.models import F
+from django.db.models import Q
 import logging
 
 User = get_user_model()
@@ -62,6 +63,24 @@ def send_invitation(request):
             return JsonResponse({"status": "error", "message": "Cannot invite yourself."}, status=400)
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
+
+# gerer de pas s'affiche sois
+@require_http_methods(["GET"])
+def search_users(request):
+    search_query = request.GET.get('query', '')
+    
+    if search_query:
+        # Utilisez `__icontains` pour la recherche insensible à la casse
+        # et `distinct()` pour éviter les doublons.
+        user_list = User.objects.filter(
+            Q(username__icontains=search_query) | 
+            Q(first_name__icontains=search_query) | 
+            Q(last_name__icontains=search_query)
+        ).distinct().values_list('username', flat=True)[:10]
+        
+        return JsonResponse(list(user_list), safe=False, status=200)
+    else:
+        return JsonResponse({"status": "error", "message": "No search query provided."}, status=400)
 
 
 @csrf_exempt
