@@ -11,11 +11,12 @@ class Tournoi(models.Model):
     status = models.BooleanField(default=CREATED)
     max_players = models.IntegerField(default=16, blank=True)
     start_datetime = models.DateTimeField(null=True)
+    admin_id = models.BigIntegerField(default=0)
 
 class Joueur(models.Model):
     username = models.CharField(max_length=100)
     user_id = models.IntegerField()
-    tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='players')
+    tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='players', null=True)
 
 class Match(models.Model):
     player_1 = models.ForeignKey(Joueur, related_name='player_1', on_delete=models.CASCADE)

@@ -4,7 +4,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from datetime import timedelta
 import json
-from .models import Tournoi
+from .models import Joueur, Tournoi
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -17,10 +17,11 @@ def create_tournament(request):
         data = json.loads(request.body)
         name = data['tournamentName']
         max_players = data['tournamentSize']
+        admin_id = data['admin_id']
 
         start_datetime = timezone.now() + timedelta(minutes=10)
 
-        tournois = Tournoi(name=name, max_players=max_players, start_datetime=start_datetime)
+        tournois = Tournoi(name=name, max_players=max_players, start_datetime=start_datetime, admin_id=admin_id)
         tournois.save()
         
         return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournois.id}, status=201)
@@ -54,10 +55,11 @@ def tournament_detail(request, tournament_id):
                 'id': tournament.id,
                 'name': tournament.name,
                 'maxPlayer': tournament.max_players,
+                'admin_id': tournament.admin_id,
                 # Ajoutez d'autres champs selon votre modèle
             }
         }
-    except Tournament.DoesNotExist:
+    except Tournoi.DoesNotExist:
         # Si le tournoi n'est pas trouvé, renvoyez success: false avec un message d'erreur
         data = {
             'success': False,
@@ -66,3 +68,62 @@ def tournament_detail(request, tournament_id):
     
     # Renvoie les données en format JSON
     return JsonResponse(data)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def create_joueur(request):
+    # data = request.POST 
+    try:
+        data = json.loads(request.body.decode('utf8'))
+        print("Received data:", data)
+    except json.JSONDecodeError:
+        return JsonResponse(data={'errors': "Invalid JSON format"}, status=406)
+
+    username = data.get('username')
+    user_id = data.get('user_id')
+    tournament_id = data.get('tournament_id')
+
+    if not (username and user_id and tournament_id):
+        return JsonResponse({'error': 'Missing data'}, status=400)
+
+    try:
+        tournament = Tournoi.objects.get(pk=tournament_id)
+    except Tournoi.DoesNotExist:
+        return JsonResponse({'error': 'Tournoi not found'}, status=404)
+
+    joueur = Joueur(username=username, user_id=user_id, tournament=tournament)
+    joueur.save()
+
+    return JsonResponse({"success": True, 'message': 'Joueur created successfully', 'joueur_id': joueur.id})
+
+
+@csrf_exempt
+def view_joueur(request, tournament_id):
+    # Filtrez les tournois avec un status égal à 0
+    joueur = Joueur.objects.filter(tournament=tournament_id)
+
+    # Préparez les données pour la réponse
+    # Note : Adaptez les champs 'name', 'max_players', etc., selon votre modèle
+    data = list(joueur.values('user_id', 'username'))
+
+    # Retournez les données en JSON
+    return JsonResponse(data, safe=False)
+
+# @csrf_exempt
+# def joueur_in_tournament(request, user_id):
+#     # Filtrez les tournois avec un status égal à 0
+#     joueur = Joueur.objects.filter(user_id=user_id)
+#     if joueur is None:
+#         return JsonResponse({'error': 'Joueur not found'}, status=404)
+#     tournament_id = joueur.tournament.id
+#     return JsonResponse({"success": True, 'message': 'Joueur found', 'tournament_name': tournament_id})
+    
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def delete_joueur(request, user_id):
+    # Filtrez les tournois avec un status égal à 0
+    joueur = Joueur.objects.filter(user_id=user_id)
+    joueur.delete()
+
+    return JsonResponse({"success": True, 'message': 'Joueur delete successfully'})

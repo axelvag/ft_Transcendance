@@ -138,12 +138,14 @@ const router = new Router({
       path: '/game/tournament',
       title: 'Game tournament',
       template: '<view-game-tournament></view-game-tournament>',
+      beforeEnter: isLoggedInGuard,
     },
     {
       name: 'game-tournament-salon',
       path: '/game/tournament/waiting',
       title: 'Game tournament salon',
       template: '<view-game-tournament-salon></view-game-tournament-salon>',
+      beforeEnter: isLoggedInGuard,
     },
     {
       name: 'game-online-search-player',
