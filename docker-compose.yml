@@ -14,6 +14,8 @@ services:
     restart: on-failure
     profiles:
       - prod
+    volumes:
+      - shared_ssl:/etc/ssl
     env_file:
       - .env
 
@@ -45,6 +47,7 @@ services:
     ports:
       - "8001:8001"
     volumes:
+      - shared_ssl:/etc/ssl
       - ./authentification:/app
     networks:
       - back
@@ -62,6 +65,7 @@ services:
     ports:
       - "8002:8002"
     volumes:
+      - shared_ssl:/etc/ssl
       - ./profile/profileApp:/profileApp
     networks:
       - back
@@ -111,6 +115,7 @@ services:
     ports:
       - "8003:8003"
     volumes:
+      - shared_ssl:/etc/ssl
       - ./friendship/friendshipApp:/friendshipApp
     networks:
       - back
@@ -156,6 +161,7 @@ services:
 
 volumes:
   data_base_data:
+  shared_ssl:
 
 networks:
   front:
