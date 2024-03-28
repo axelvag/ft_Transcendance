@@ -44,7 +44,7 @@ const notify = data => {
   }
   lastToastIndex++;
   const toastId = `toast-${lastToastIndex}`;
-  const themeClasses = data.theme ? `text-bg-${data.theme} border-0` : '';
+  const themeClasses = data.theme ? `text-bg-${data.theme}` : 'toast-invert';
 
   let iconHtml = '';
   if (data.icon) {
@@ -78,14 +78,14 @@ const notify = data => {
   const toastHtml = `
     <div
       id="${toastId}"
-      class="toast align-items-center m-3 ${themeClasses}"
+      class="toast align-items-center m-3 ${themeClasses} border-0"
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
     >
       <div class="d-flex">
         ${iconHtml}
-        <div class="toast-body flex-shrink-1 flex-grow-1">
+        <div class="toast-body flex-shrink-1 flex-grow-1 text-truncate">
           ${data.message || 'No message'}
           ${actionsHtml}
         </div>
@@ -101,7 +101,7 @@ const notify = data => {
   const toastEl = document.getElementById(toastId);
   let toast = new Toast(toastEl, {
     autohide: data.hasOwnProperty('autohide') ? data.autohide : true,
-    delay: data.delay || 5000,
+    delay: data.delay || 3000,
   });
 
   // clear element and dispose on hidden
