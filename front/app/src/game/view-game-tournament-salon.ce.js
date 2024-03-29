@@ -1,6 +1,6 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
-import { getTournament, resetLocalTournament } from '@/tournament.js';
+import { getTournament, resetLocalTournament, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament } from '@/tournament.js';
 import { isAuthenticated } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
@@ -22,12 +22,20 @@ class ViewTournamentSalon extends HTMLElement {
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
 
-    // Ajout du bouton "Leave Tournament" avec un style rouge et un gestionnaire d'événements
+    let deleteTournamentButtonHTML = '';
+    if (this.#user.id === this.#tournament.admin_id) {
+        // Si l'utilisateur actuel est l'administrateur du tournoi, ajouter le HTML du bouton de suppression
+        deleteTournamentButtonHTML = `<button id="deleteTournamentBtn" class="btn btn-warning">Delete Tournament</button>`;
+    }
+
     this.innerHTML = `
       <div class="min-vh-100 halo-bicolor d-flex flex-column p-2">
         <div class="d-flex justify-content-between align-items-center mb-5">
           <h1 class="fw-bold text-center m-0">Waiting room for ${this.#tournament.name} Tournament</h1>
-          <button id="leaveTournamentBtn" class="btn btn-danger">Leave Tournament</button>
+          <div>
+            <button id="leaveTournamentBtn" class="btn btn-danger">Leave Tournament</button>
+            ${deleteTournamentButtonHTML}  <!-- Ajout du bouton de suppression si applicable -->
+          </div>
         </div>
         <div id="playersList" class="mt-4"></div>
       </div>
@@ -39,6 +47,18 @@ class ViewTournamentSalon extends HTMLElement {
       this.deletePlayer();
       redirectTo(this.#backUrl);
     });
+
+    const deleteBtn = this.querySelector('#deleteTournamentBtn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+            // Logique pour supprimer le tournoi
+            console.log('Deleting tournament...');
+            this.deleteTournament();
+            // Vous pouvez appeler une fonction pour supprimer le tournoi ici
+            // Assurez-vous de définir cette fonction et de gérer la suppression correctement
+        });
+    }
+
     this.addPlayer();
   }
 
@@ -50,16 +70,7 @@ class ViewTournamentSalon extends HTMLElement {
       tournament_id: this.#tournament.id,
     };
     console.log(formData);
-    const response = await fetch('http://127.0.0.1:8005/tournament/create_joueur/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    })
-    const data = await response.json();
+    const data = await fetchAddPlayer(formData);
     if (data.success) {
       console.log(data);
       this.viewPlayer();
@@ -70,18 +81,21 @@ class ViewTournamentSalon extends HTMLElement {
   }
   
   async deletePlayer() {
-    const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${this.#user.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-    })
-    const data = await response.json();
+    const data = await fetchDeletePlayerSalon();
     if (data.success) {
       console.log(data);
       this.viewPlayer();
+    } else {
+      console.log("error");
+    }
+  }
+  
+  async deleteTournament() {
+    const data = await fetchDeleteTournament();
+    if (data.success) {
+      console.log(data);
+      resetLocalTournament();
+      redirectTo(this.#backUrl);
     } else {
       console.log("error");
     }

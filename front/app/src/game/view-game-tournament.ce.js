@@ -1,7 +1,7 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
-import { setLocalTournament, fetchGetTournament } from '@/tournament.js';
+import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
 
@@ -100,22 +100,7 @@ class ViewTournament extends HTMLElement {
       if (event.target.classList.contains('joinTournamentBtn')) {
           const tournamentId = event.target.id.replace('joinTournament-', '');
           console.log(`Rejoindre le tournoi avec l'ID : ${tournamentId}`);
-        //   var url = `http://127.0.0.1:8005/tournament/get/${tournamentId}/`;
-
-        //   fetch(url)
-        //   .then(response => response.json())
-        //   .then(data => {
-        //       if (data.success) {
-        //           setLocalTournament(data.data);
-        //           console.log(data);
-        //           redirectTo(`/game/tournament/waiting`);
-        //       } else {
-        //           console.error('Tournoi non trouvé ou erreur de récupération.');
-        //       }
-        //   })
-        //   .catch(error => console.error('Erreur lors de la communication avec le serveur:', error));
-        // }
-        fetchGetTournament(tournamentId);
+          fetchGetTournament(tournamentId);
       }
     });
 
@@ -128,7 +113,6 @@ class ViewTournament extends HTMLElement {
   async submitForm(event) {
     event.preventDefault();
 
-    // Ajout : Récupération du CSRF Token
     // const csrfToken = await getCsrfToken();
 
     this.tournamentName = document.getElementById('tournamentName');
@@ -140,19 +124,12 @@ class ViewTournament extends HTMLElement {
       admin_id: this.#user.id,
     };
     console.log(formData);
-    const response = await fetch('http://127.0.0.1:8005/tournament/create_tournament/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    })
-    const data = await response.json();
+    const data = await fetchCreateTournament(formData);
     if (data.success) {
+      console.log(data);
       this.loadTournois();
       this.querySelector('#formOverlay').style.display = 'none';
+      fetchGetTournament(data.tournoi_id);
     } else {
       console.log(data);
     }
@@ -173,7 +150,7 @@ class ViewTournament extends HTMLElement {
         }
 
         const tournois = await response.json();
-
+        console.log(tournois);
         const listElement = this.querySelector('#tournoisList');
         listElement.innerHTML = '<h2>Join a Tournaments</h2><br>'; // Titre pour la section
 
@@ -200,20 +177,21 @@ class ViewTournament extends HTMLElement {
   }
 
   async deletePlayer() {
-    const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${this.#user.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-    })
-    const data = await response.json();
-    if (data.success) {
-      console.log(data);
-    } else {
-      console.log("error");
-    }
+    // const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${this.#user.id}`, {
+    //   method: 'DELETE',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     // 'X-CSRFToken': csrfToken,
+    //   },
+    //   credentials: 'include',
+    // })
+    // const data = await response.json();
+    // if (data.success) {
+    //   console.log(data);
+    // } else {
+    //   console.log("error");
+    // }
+    fetchDeletePlayer();
   }
 }
 

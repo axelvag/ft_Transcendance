@@ -127,3 +127,18 @@ def delete_joueur(request, user_id):
     joueur.delete()
 
     return JsonResponse({"success": True, 'message': 'Joueur delete successfully'})
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def delete_tournoi(request, tournoi_id):
+    try:
+        # Trouver le tournoi par son ID
+        tournoi = Tournoi.objects.get(pk=tournoi_id)
+        # Supprimer le tournoi. Tous les joueurs liés seront également supprimés grâce à on_delete=models.CASCADE
+        tournoi.delete()
+        return JsonResponse({'success': True, 'message': 'Tournoi and all associated players have been deleted.'})
+    except Tournoi.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Tournoi not found.'}, status=404)
+    except Exception as e:
+        # Pour capturer d'autres erreurs potentielles
+        return JsonResponse({'success': False, 'message': 'An error occurred: {}'.format(str(e))}, status=500)

@@ -1,4 +1,5 @@
 import { redirectTo } from '@/router.js';
+import { getProfile } from '@/auth.js';
 
 const tournament = {
   id: null,
@@ -49,4 +50,73 @@ const fetchGetTournament = async (tournamentId) => {
   }
 };
 
-export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament };
+const fetchCreateTournament = async (formData) => {
+  const response = await fetch('http://127.0.0.1:8005/tournament/create_tournament/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
+  })
+  return response.json();
+};
+
+const fetchDeletePlayer = async () => {
+  let user = getProfile();
+  const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${user.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+  })
+  const data = await response.json();
+  if (data.success) {
+    console.log(data);
+  } else {
+    console.log("error");
+  }
+};
+
+const fetchDeletePlayerSalon = async () => {
+  let user = getProfile();
+  const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${user.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+  })
+  return response.json();
+};
+
+const fetchDeleteTournament = async () => {
+  const response = await fetch(`http://127.0.0.1:8005/tournament/delete_tournment/${tournament.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+  })
+  return response.json();
+};
+
+const fetchAddPlayer = async (formData) => {
+  const response = await fetch('http://127.0.0.1:8005/tournament/create_joueur/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
+  })
+  return response.json();
+};
+
+export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament };
