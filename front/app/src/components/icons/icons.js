@@ -185,4 +185,9 @@ export const icons = {
     <path d="M229 444h51v25h25v-46h-50l50-50h-25l-51 50zM316 398l25-25h-25zM341 398l-25 25v26h25v-26l26-25v-25h-26zM367 423l-26 26h26z" style="fill:currentColor" transform="translate(-229 -373)"/>
   </svg>
   `,
+  info: `
+    <svg viewBox="0 0 24 24">
+      <path fill="currentColor" d="M11 9h2V7h-2m1 13c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m-1 15h2v-6h-2z"/>
+    </svg>
+  `,
 };

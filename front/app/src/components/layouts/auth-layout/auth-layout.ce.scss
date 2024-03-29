@@ -40,4 +40,39 @@
       border-radius: 1.5rem;
     }
   }
+
+  &.is-loading &-wrapper {
+    position: relative;
+
+    &-inner {
+      * {
+        pointer-events: none !important;
+      }
+      opacity: 0.25;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: 1000;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 100%;
+      border: 3px solid var(--bs-body-color);
+      border-right-color: transparent;
+      animation: 0.75s linear infinite loader-rotate;
+    }
+  }
+}
+
+@keyframes loader-rotate {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }

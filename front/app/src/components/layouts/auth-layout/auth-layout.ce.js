@@ -6,14 +6,28 @@ class AuthLayout extends HTMLElement {
     this.attachShadow({ mode: 'open' });
   }
   connectedCallback() {
+    const loadingClass = this.hasAttribute('loading') ? 'is-loading' : '';
+
     this.shadowRoot.innerHTML = `
     <style>${style}</style>
-    <div class="authLayout">
+    <div class="authLayout ${loadingClass}">
       <div class="authLayout-wrapper">
-        <slot></slot>
+        <div class="authLayout-wrapper-inner">
+          <slot></slot>
+        </div>
       </div>
     </div>
     `;
+  }
+
+  static get observedAttributes() {
+    return ['loading'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'loading') {
+      this.shadowRoot.querySelector('.authLayout').classList.toggle('is-loading', Boolean(newValue));
+    }
   }
 }
 
