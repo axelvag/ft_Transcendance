@@ -89,11 +89,12 @@ def accept_invitation(request):
 
     data = json.loads(request.body)
     invitation_id = data.get('invitation_id')
+    logging.critical(invitation_id)
 
     try:
         # recherche l'invitation non accepte
-        invitation = Invitation.objects.get(id=invitation_id, accepted=false)
-        invitation.accepted = true
+        invitation = Invitation.objects.get(id=invitation_id, accepted=False)
+        invitation.accepted = True
         invitation.save()
 
         # Création de la relation d'amitié dans les deux sens
@@ -112,7 +113,7 @@ def reject_invitation(request):
     invitation_id = data.get('invitation_id')
 
     try:
-        invitation = Invitation.objects.get(id=invitation_id, accepted=false)
+        invitation = Invitation.objects.get(id=invitation_id, accepted=False)
         invitation.delete()
 
         return JsonResponse({"status": "success", "message": "Invitation rejected."}, status=200)
@@ -191,8 +192,9 @@ def remove_friend(request):
 def online_friends(request, user_id):
     try:
         user = User.objects.get(id=user_id)
-        friends = user.friends.all()
-        online_friends = UserStatus.objects.filter(user__in=friends, is_online=True).values_list('user__username', flat=True)
+        # Récupérer les instances User des amis
+        friend_users = user.friends.all().values_list('friend', flat=True)
+        online_friends = UserStatus.objects.filter(user_id__in=friend_users, is_online=True).values_list('user__username', flat=True)
         
         return JsonResponse({"online_friends": list(online_friends)}, status=200)
     except User.DoesNotExist:
@@ -202,8 +204,9 @@ def online_friends(request, user_id):
 def offline_friends(request, user_id):
     try:
         user = User.objects.get(id=user_id)
-        friends = user.friends.all()
-        offline_friends = UserStatus.objects.filter(user__in=friends, is_online=False).values_list('user__username', flat=True)
+        # Récupérer les instances User des amis
+        friend_users = user.friends.all().values_list('friend', flat=True)
+        offline_friends = UserStatus.objects.filter(user_id__in=friend_users, is_online=False).values_list('user__username', flat=True)
         
         return JsonResponse({"offline_friends": list(offline_friends)}, status=200)
     except User.DoesNotExist:

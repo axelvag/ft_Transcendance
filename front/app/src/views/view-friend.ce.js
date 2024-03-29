@@ -27,11 +27,20 @@ class ViewFriend extends HTMLElement {
     
       <!-- Tab panes -->
       <div class="tab-content">
-        <div class="tab-pane container active" id="myfriends">
-          <!-- Friend Requests Section inside My Friends tab -->
-          
-          <!-- List of friends will be dynamically added here -->
-          </div>
+          <div class="tab-pane container active" id="myfriends">
+            <section>
+              <h2>Online</h2>
+              <ul id="online-friends" class="list-group">
+                <!-- Online friends will be dynamically added here -->
+              </ul>
+            </section>
+            <section>
+              <h2>Offline</h2>
+              <ul id="offline-friends" class="list-group">
+                <!-- Offline friends will be dynamically added here -->
+              </ul>
+            </section>
+        </div>
           
           <div class="tab-pane container fade" id="invitations">
           <div class="mt-4">
@@ -58,9 +67,12 @@ class ViewFriend extends HTMLElement {
     `;
 
     this.loadFriendRequests();
+    this.loadOnlineFriends();
+    this.loadOfflineFriends();
     this.querySelector('#search').addEventListener('click', this.searchFriends.bind(this));
   }
 
+  // list request friends
   async loadFriendRequests() {
     try {
       const response = await fetch(`http://127.0.0.1:8003/list_received_invitations/${user.id}/`);
@@ -72,6 +84,7 @@ class ViewFriend extends HTMLElement {
 
             responseData.invitations.forEach(invitation => {
                 const listItem = document.createElement('li');
+                listItem.id = `invitation-${invitation.invitation_id}`;
                 listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
                 const fromUserSpan = document.createElement('span');
@@ -106,22 +119,24 @@ class ViewFriend extends HTMLElement {
     }
   }
 
+  // btn accept
   async acceptFriendRequest(invitationId){
     console.log("accept", invitationId);
 
     try {
-      const response = await fetch('http://127.0.0.1:8003/accept_invitation', {
+      const response = await fetch('http://127.0.0.1:8003/accept_invitation/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ invitation_id: invitationId }),
+        body: JSON.stringify({invitation_id: invitationId }),
       });
       const data = await response.json();
       console.log('data:', data);
       
       if (data.status === 'success') {
+        document.querySelector(`#invitation-${invitationId}`).remove();
         console.log("okkkk"); 
       } else {
         console.log("Nullll");
@@ -133,10 +148,37 @@ class ViewFriend extends HTMLElement {
     }
   }
 
+  // btn reject
   async rejectFriendRequest(invitationId){
     console.log("Reject", invitationId);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8003/reject_invitation/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({invitation_id: invitationId }),
+      });
+      const data = await response.json();
+      console.log('data:', data);
+      
+      if (data.status === 'success') {
+        document.querySelector(`#invitation-${invitationId}`).remove();
+        console.log("okkkk bien delte"); 
+      } else {
+        console.log("Nullll");
+      }
+  
+    } catch (error) {
+      console.error('Error:', error);
+      console.log("Failed to send friend request: " + error.message);
+    }
+
   }
 
+  // Search user with username
   async searchFriends() {
     const searchInputField = this.querySelector('#search-friend-name');
     const searchInput = searchInputField.value.trim();
@@ -198,6 +240,7 @@ class ViewFriend extends HTMLElement {
     }
   }
   
+  //Send Invitation user
   async sendFriendRequest(username, button) {
     console.log("Sending friend request to", username);
   
@@ -230,6 +273,68 @@ class ViewFriend extends HTMLElement {
       alert("Failed to send friend request: " + error.message);
     }
   }
+
+  async loadOnlineFriends() {
+    try {
+      const response = await fetch(`http://127.0.0.1:8003/online_friends/${user.id}/`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const { online_friends } = await response.json();
+  
+      const onlineFriendsList = this.querySelector('#online-friends');
+      onlineFriendsList.innerHTML = '';
+  
+      if (online_friends.length > 0) {
+        online_friends.forEach(username => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('list-group-item');
+          listItem.textContent = `${username} (Online)`;
+          onlineFriendsList.appendChild(listItem);
+        });
+      } else {
+        const noOnlineFriends = document.createElement('li');
+        noOnlineFriends.classList.add('list-group-item');
+        noOnlineFriends.textContent = "No friends online.";
+        onlineFriendsList.appendChild(noOnlineFriends);
+      }
+    } catch (error) {
+      console.error('Error loading online friends:', error);
+    }
+  }
+  
+
+async loadOfflineFriends() {
+  try {
+    const response = await fetch(`http://127.0.0.1:8003/offline_friends/${user.id}/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const { offline_friends } = await response.json();
+    console.log("oeeee", offline_friends);
+
+    const offlineFriendsList = this.querySelector('#offline-friends');
+    offlineFriendsList.innerHTML = '';
+
+    if (offline_friends.length > 0) {
+      offline_friends.forEach(username => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item');
+        listItem.textContent = `${username} (Offline)`;
+        offlineFriendsList.appendChild(listItem);
+      });
+    } else {
+      const noOfflineFriends = document.createElement('li');
+      noOfflineFriends.classList.add('list-group-item');
+      noOfflineFriends.textContent = "No friends offline.";
+      offlineFriendsList.appendChild(noOfflineFriends);
+    }
+  } catch (error) {
+    console.error('Error loading offline friends:', error);
+  }
+}
+
+
 }
 
 customElements.define('view-friend', ViewFriend);

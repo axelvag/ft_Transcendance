@@ -1,9 +1,11 @@
 from django.urls import path
 from . import views
+from django.contrib import admin
+
 # from invitations import views
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('send_invitation/', views.send_invitation, name='send_invitation'),
     path('accept_invitation/', views.accept_invitation, name='accept_invitation'),
     path('reject_invitation/', views.reject_invitation, name='reject_invitation'),
