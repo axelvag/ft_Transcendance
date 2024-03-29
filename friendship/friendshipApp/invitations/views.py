@@ -1,4 +1,7 @@
-# # Create your views here.
+# Todo
+# [] check au de debut de send invitation si une amitie est deja creait entre les deux ou une invitation a deja etait envoyer pour ce couple && check si l'invitation a etait accepte
+# [] ne pas retourne son username dans search
+# [] check avant d'afficher les amis en ligne ou hors ligne si ils sont amis
 
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -19,10 +22,55 @@ from asgiref.sync import async_to_sync
 # Channel_layer ==> permet de communiquer avec les WS asynchromes
 #       send, receive
 
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def send_invitation(request):
+
+#     data = json.loads(request.body)
+#     user_id = data.get('user_id')
+#     username = data.get('username')
+
+#     try:
+#         to_user = User.objects.get(username=username)
+#         from_user = User.objects.get(id=user_id)
+#         if from_user != to_user:
+#             # Vérifier si une invitation n'a pas déjà été envoyée de cet expéditeur à ce destinataire
+#             if not Invitation.objects.filter(from_user=from_user, to_user=to_user).exists():
+#                 invitation = Invitation.objects.create(from_user=from_user, to_user=to_user) # creation d'une nouvelle invitation 
+#                 Notification.objects.create(
+#                     user=to_user,
+#                     message=f"You have a new invitation from {from_user.username}.",
+#                     invitation=invitation
+#                 )
+
+#                 logging.critical(invitation.id)
+
+#                 channel_layer = get_channel_layer()
+
+#                 group_name = f"user{to_user.id}"
+#                 logging.critical(f"Envoi au groupe: {group_name}")
+
+#                 # Envoyer une notification WebSocket au groupe de l'utilisateur destinataire
+#                 async_to_sync(channel_layer.group_send)(
+#                     group_name,
+#                     {
+#                         "type": "invitation_notification",
+#                         "message": f"You have a new invitation from {from_user.username}."
+#                     }
+#                 )
+
+#                 return JsonResponse({"status": "success", "message": "Invitation sent.", "invitation_id": invitation.id}, status=200)
+#             else:
+#                 return JsonResponse({"status": "error", "message": "Invitation already sent."}, status=409)
+#         else:
+#             return JsonResponse({"status": "error", "message": "Cannot invite yourself."}, status=400)
+#     except User.DoesNotExist:
+#         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
+
+# check aussi si l'invitation a etait accepter
 @csrf_exempt
 @require_http_methods(["POST"])
 def send_invitation(request):
-
     data = json.loads(request.body)
     user_id = data.get('user_id')
     username = data.get('username')
@@ -31,9 +79,26 @@ def send_invitation(request):
         to_user = User.objects.get(username=username)
         from_user = User.objects.get(id=user_id)
         if from_user != to_user:
-            # Vérifier si une invitation n'a pas déjà été envoyée de cet expéditeur à ce destinataire
-            if not Invitation.objects.filter(from_user=from_user, to_user=to_user).exists():
-                invitation = Invitation.objects.create(from_user=from_user, to_user=to_user) # creation d'une nouvelle invitation 
+            # Vérifier si une invitation n'a pas déjà été envoyée dans l'une ou l'autre direction
+            existing_invitation = Invitation.objects.filter(
+                (Q(from_user=from_user) & Q(to_user=to_user)) | 
+                (Q(from_user=to_user) & Q(to_user=from_user)),
+                accepted=False
+            ).first()
+
+            if existing_invitation:
+                if existing_invitation.from_user == to_user:
+                    # Une invitation existe déjà de la part du destinataire vers l'expéditeur
+                    return JsonResponse({
+                        "status": "info",
+                        "message": "You have already received a friendship request from this user. Please check your invitations."
+                    }, status=200)
+                else:
+                    # Une invitation a déjà été envoyée à cet utilisateur
+                    return JsonResponse({"status": "error", "message": "Invitation already sent."}, status=409)
+            else:
+                # Aucune invitation existante, procéder à la création d'une nouvelle invitation
+                invitation = Invitation.objects.create(from_user=from_user, to_user=to_user)
                 Notification.objects.create(
                     user=to_user,
                     message=f"You have a new invitation from {from_user.username}.",
@@ -43,7 +108,6 @@ def send_invitation(request):
                 logging.critical(invitation.id)
 
                 channel_layer = get_channel_layer()
-
                 group_name = f"user{to_user.id}"
                 logging.critical(f"Envoi au groupe: {group_name}")
 
@@ -57,8 +121,6 @@ def send_invitation(request):
                 )
 
                 return JsonResponse({"status": "success", "message": "Invitation sent.", "invitation_id": invitation.id}, status=200)
-            else:
-                return JsonResponse({"status": "error", "message": "Invitation already sent."}, status=409)
         else:
             return JsonResponse({"status": "error", "message": "Cannot invite yourself."}, status=400)
     except User.DoesNotExist:
@@ -81,7 +143,29 @@ def search_users(request):
         return JsonResponse(list(user_list), safe=False, status=200)
     else:
         return JsonResponse({"status": "error", "message": "No search query provided."}, status=400)
+# @require_http_methods(["GET"])
+# def search_users(request):
+#     search_query = request.GET.get('query', '')
+#     # Assurez-vous de convertir l'`user_id` en entier car les IDs dans Django sont des entiers par défaut
+#     user_id = request.GET.get('user_id', None)
 
+#     if search_query:
+#         query_filter = Q(username__icontains=search_query) | Q(first_name__icontains=search_query) | Q(last_name__icontains=search_query)
+
+#         if user_id:
+#             try:
+#                 # Convertir user_id en int avant de l'utiliser dans le filtre
+#                 user_id = int(user_id)
+#                 query_filter &= ~Q(id=user_id)
+#             except ValueError:
+#                 # Si la conversion échoue, retourner une erreur ou ignorer le filtre user_id
+#                 return JsonResponse({"status": "error", "message": "Invalid user ID provided."}, status=400)
+
+#         user_list = User.objects.filter(query_filter).distinct().values_list('username', flat=True)[:10]
+
+#         return JsonResponse(list(user_list), safe=False, status=200)
+#     else:
+#         return JsonResponse({"status": "error", "message": "No search query provided."}, status=400)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -191,10 +275,13 @@ def remove_friend(request):
 @require_http_methods(["GET"])
 def online_friends(request, user_id):
     try:
-        user = User.objects.get(id=user_id)
         # Récupérer les instances User des amis
-        friend_users = user.friends.all().values_list('friend', flat=True)
-        online_friends = UserStatus.objects.filter(user_id__in=friend_users, is_online=True).values_list('user__username', flat=True)
+        friendships = Friendship.objects.filter(user_id=user_id)
+        friend_ids = [friendship.friend.id for friendship in friendships]
+        
+        online_friends = UserStatus.objects.filter(
+            user_id__in=friend_ids, is_online=True
+        ).values_list('user__username', flat=True)
         
         return JsonResponse({"online_friends": list(online_friends)}, status=200)
     except User.DoesNotExist:
@@ -203,10 +290,13 @@ def online_friends(request, user_id):
 @require_http_methods(["GET"])
 def offline_friends(request, user_id):
     try:
-        user = User.objects.get(id=user_id)
         # Récupérer les instances User des amis
-        friend_users = user.friends.all().values_list('friend', flat=True)
-        offline_friends = UserStatus.objects.filter(user_id__in=friend_users, is_online=False).values_list('user__username', flat=True)
+        friendships = Friendship.objects.filter(user_id=user_id)
+        friend_ids = [friendship.friend.id for friendship in friendships]
+        
+        offline_friends = UserStatus.objects.filter(
+            user_id__in=friend_ids, is_online=False
+        ).values_list('user__username', flat=True)
         
         return JsonResponse({"offline_friends": list(offline_friends)}, status=200)
     except User.DoesNotExist:
