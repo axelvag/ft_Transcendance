@@ -1,5 +1,6 @@
 const BASE_URL = import.meta.env.BASE_URL;
 import { redirectTo } from '@/router.js';
+import { notify } from '@/notifications.js';
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
@@ -95,7 +96,6 @@ const isAuthenticated = async () => {
       if (data.success) {
         setLocalUser(data);
         const csrfToken = await getCsrfToken();
-        console.log('dwedededee', user.id);
         const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
           method: 'GET',
           headers: {
@@ -146,8 +146,19 @@ const logout = async () => {
         'X-CSRFToken': csrfToken,
       },
     });
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: 'You have been <b>logged out</b> successfully!',
+    });
   } catch (error) {
     console.error('Error:', error);
+    notify({
+      icon: 'error',
+      iconClass: 'text-danger',
+      message: 'Logout failed!',
+      autohide: false,
+    });
   }
 
   resetLocalUser();
@@ -354,12 +365,27 @@ const handleOAuthResponse = async () => {
         if (userProfileData.getProfile.success) {
           setLocalUser(userProfileData.getProfile);
           redirectTo('/dashboard');
+          notify({
+            icon: 'info',
+            iconClass: 'text-info',
+            message: 'You have been <b>logged in</b> successfully!',
+          });
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
+          notify({
+            icon: 'error',
+            iconClass: 'text-danger',
+            message: 'Failed to load user profile!',
+          });
         }
       }
     } catch (error) {
       console.error('Erreur:', error);
+      notify({
+        icon: 'error',
+        iconClass: 'text-danger',
+        message: 'login with 42 failed!',
+      });
     }
   }
 };

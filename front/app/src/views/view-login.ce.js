@@ -4,6 +4,7 @@ import { user } from '@/auth.js';
 import { getCsrfToken } from '@/auth.js';
 import { loginUser, setLocalUser } from '@/auth.js';
 import { getAuthorizationCode } from '@/auth.js';
+import { notify } from '@/notifications.js';
 
 const BASE_URL = import.meta.env.BASE_URL;
 
@@ -108,6 +109,7 @@ class ViewSignIn extends HTMLElement {
       password: password,
     };
 
+    this.querySelector('auth-layout').setAttribute('loading', true);
     const csrfToken = await getCsrfToken();
     try {
       const data = await loginUser(formData, csrfToken);
@@ -127,13 +129,24 @@ class ViewSignIn extends HTMLElement {
           console.error('Failed to load user profile:', userProfileData.message);
         }
         redirectTo('/dashboard');
+        notify({
+          icon: 'info',
+          iconClass: 'text-info',
+          message: `You habe been <b>logged in</b> successfully!</b>`,
+        });
       } else {
         if (data.message === 'User not active.') this.emailError.style.display = 'block';
         else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
       }
     } catch (error) {
       console.error('Login failed:', error);
+      notify({
+        icon: 'error',
+        iconClass: 'text-danger',
+        message: 'Login failed!',
+      });
     }
+    this.querySelector('auth-layout').removeAttribute('loading');
   }
 }
 

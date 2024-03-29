@@ -85,7 +85,7 @@ const notify = data => {
     >
       <div class="d-flex">
         ${iconHtml}
-        <div class="toast-body flex-shrink-1 flex-grow-1 text-truncate">
+        <div class="toast-body flex-shrink-1 flex-grow-1 min-width-0 overflow-hidden">
           ${data.message || 'No message'}
           ${actionsHtml}
         </div>
