@@ -4,17 +4,22 @@ import { redirectTo } from '@/router.js';
 const wsBaseUrl = 'ws://127.0.0.1:8009';
 
 class ViewGameOnlineMatchmaking extends HTMLElement {
+  #ws;
+
   constructor() {
     super();
     this.handleError = this.handleError.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
 
     const user = getProfile();
-    this.ws = new WebSocket(wsBaseUrl + `/search-opponent/${user.id}`);
-    this.ws.onerror = this.handleError;
-    this.ws.onmessage = this.handleMessage;
-    this.ws.onopen = () => console.log('WebSocket opened');
-    this.ws.onclose = () => console.log('WebSocket closed');
+    this.#ws = new WebSocket(wsBaseUrl + `/search-opponent/${user.id}`);
+    this.#ws.onerror = this.handleError;
+    this.#ws.onmessage = this.handleMessage;
+    this.#ws.onopen = () => console.log('WebSocket opened');
+    this.#ws.onclose = () => {
+      console.log('WebSocket closed');
+      this.#ws = null;
+    };
   }
   async connectedCallback() {
     this.innerHTML = `
@@ -41,9 +46,9 @@ class ViewGameOnlineMatchmaking extends HTMLElement {
   }
 
   disconnectedCallback() {
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
+    if (this.#ws) {
+      this.#ws.close();
+      this.#ws = null;
     }
   }
 
