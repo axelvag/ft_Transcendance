@@ -34,8 +34,27 @@ SECRET_KEY = 'django-insecure-9!)%2m*51ebj2*=$q2xu&-l2bl66gz9c)*f3v*-_dv1fvl_wjy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_ALL_METHODS = True
+
+CORS_ALLOWED_ORIGINS = ['https://*']
+
+CORS_ALLOW_CREDENTIALS = True
+
 ALLOWED_HOSTS = ['*']
 
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Application definition
 
@@ -47,11 +66,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pages',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -139,6 +159,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+APPEND_SLASH = False
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -150,28 +172,28 @@ EMAIL_HOST_PASSWORD = 'zotbqnassvkvftvk'
 
 # CORS_ORIGINS_ALLOWED_ALL = True
 
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ALLOWED_ORIGINS = [
 #     f"{URL}:5500",  # Remplacez par l'URL de votre frontend
 #     f"{URL}:8000",
 # ]
-CORS_ALLOWED_ORIGINS = ['https://*']
+# CORS_ALLOWED_ORIGINS = ['https://*']
 
-ALLOWED_HOSTS=['*']
+# ALLOWED_HOSTS=['*']
 
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
+# CORS_ALLOW_HEADERS = [
+#     'accept',
+#     'accept-encoding',
+#     'authorization',
+#     'content-type',
+#     'dnt',
+#     'origin',
+#     'user-agent',
+#     'x-csrftoken',
+#     'x-requested-with',
+# ]
 
 # PASSWORD_RESET_TIMEOUT = 1
 
