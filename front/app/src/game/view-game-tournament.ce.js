@@ -112,6 +112,8 @@ class ViewTournament extends HTMLElement {
       this.deletePlayer();
 
     this.querySelector('#tournamentForm').addEventListener('submit', this.submitForm.bind(this));
+
+    this.initWebSocket();
   }
 
   async submitForm(event) {
@@ -131,7 +133,7 @@ class ViewTournament extends HTMLElement {
     const data = await fetchCreateTournament(formData);
     if (data.success) {
       console.log(data);
-      this.loadTournois();
+      // this.loadTournois();
       this.querySelector('#formOverlay').style.display = 'none';
       fetchGetTournament(data.tournoi_id);
     } else {
@@ -181,21 +183,35 @@ class ViewTournament extends HTMLElement {
   }
 
   async deletePlayer() {
-    // const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${this.#user.id}`, {
-    //   method: 'DELETE',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     // 'X-CSRFToken': csrfToken,
-    //   },
-    //   credentials: 'include',
-    // })
-    // const data = await response.json();
-    // if (data.success) {
-    //   console.log(data);
-    // } else {
-    //   console.log("error");
-    // }
     fetchDeletePlayer();
+  }
+
+  initWebSocket() {
+    // Assurez-vous que l'URL correspond à votre serveur WebSocket.
+    this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
+
+    this.socket.onopen = () => {
+        console.log('WebSocket connection established');
+    };
+
+    this.socket.onmessage = (event) => {
+        // Logique pour gérer les messages entrants.
+        const data = JSON.parse(event.data);
+        console.log('Message received:', data);
+
+        if (data.action === 'reload_tournois') {
+            console.log("load tournoisssssssssssssssssss");
+            this.loadTournois();
+        }
+    };
+
+    this.socket.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
+
+    this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
   }
 }
 

@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -8,7 +10,10 @@ from .models import Joueur, Tournoi
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
+User = get_user_model()
 # @login_required
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -24,6 +29,15 @@ def create_tournament(request):
         tournois = Tournoi(name=name, max_players=max_players, start_datetime=start_datetime, admin_id=admin_id)
         tournois.save()
         
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
+            {
+                "type": "tournoi_cree",  # Type de message
+                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+            }
+        )
+        print("Message WebSocket envoyé avec succès depuis la vue.")
         return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournois.id}, status=201)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
