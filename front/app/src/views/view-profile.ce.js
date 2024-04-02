@@ -247,7 +247,7 @@ class ViewProfile extends HTMLElement {
         avatarFile: avatarPayload,
         // avatarFile: isDefaultAvatar ? user.avatarDefault : avatarFile,
       };
-      console.log("object newuser", newUser);
+      console.log('object newuser', newUser);
       try {
         this.querySelector('#profile-edit-loader').hidden = false;
         this.querySelector('#profile-edit').classList.add('opacity-25');
@@ -259,7 +259,7 @@ class ViewProfile extends HTMLElement {
           // if (response.message === "This user name is already taken.")
           {
             this.errorUsernameExisting = document.getElementById('error-username-existing');
-            this.errorUsernameExisting.textContent = "An error has occurred"; // categorie special d'erreur
+            this.errorUsernameExisting.textContent = 'An error has occurred'; // categorie special d'erreur
             this.errorUsernameExisting.style.display = 'block';
           }
           this.querySelector('#profile-edit-loader').hidden = true;

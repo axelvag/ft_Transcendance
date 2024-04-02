@@ -24,3 +24,42 @@
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
+
+.btn.btn-outline-bicolor {
+  border-color: transparent !important;
+
+  position: relative;
+  z-index: 1;
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    margin: calc(var(--bs-btn-border-width) * -1);
+    padding: var(--bs-btn-border-width);
+    background: linear-gradient(45deg, $primary, $secondary);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(45deg, $primary, $secondary);
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  &:hover {
+    color: #000;
+    &::after {
+      opacity: 1;
+    }
+  }
+}
