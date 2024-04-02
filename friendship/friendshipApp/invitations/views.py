@@ -1,7 +1,11 @@
 # Todo
-# [] check au de debut de send invitation si une amitie est deja creait entre les deux ou une invitation a deja etait envoyer pour ce couple && check si l'invitation a etait accepte
-# [] ne pas retourne son username dans search
+# [x] check au de debut de send invitation si une amitie est deja creait entre les deux ou une invitation a deja etait envoyer pour ce couple && check si l'invitation a etait accepte
+# [x] ne pas retourne son username dans search
 # [] check avant d'afficher les amis en ligne ou hors ligne si ils sont amis
+
+# [x] Dans search -> retourner que des amis qu'ils ne sont pas encore amies.
+# [] Bug quand on reject l'invitation, puis on re invite double , triple notification
+# [] Mettre un compteur des invitations dans l'onglet invitation 
 
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -14,6 +18,7 @@ import json
 from django.db.models import F
 from django.db.models import Q
 import logging
+import requests
 
 User = get_user_model()
 
@@ -22,52 +27,6 @@ from asgiref.sync import async_to_sync
 # Channel_layer ==> permet de communiquer avec les WS asynchromes
 #       send, receive
 
-# @csrf_exempt
-# @require_http_methods(["POST"])
-# def send_invitation(request):
-
-#     data = json.loads(request.body)
-#     user_id = data.get('user_id')
-#     username = data.get('username')
-
-#     try:
-#         to_user = User.objects.get(username=username)
-#         from_user = User.objects.get(id=user_id)
-#         if from_user != to_user:
-#             # Vérifier si une invitation n'a pas déjà été envoyée de cet expéditeur à ce destinataire
-#             if not Invitation.objects.filter(from_user=from_user, to_user=to_user).exists():
-#                 invitation = Invitation.objects.create(from_user=from_user, to_user=to_user) # creation d'une nouvelle invitation 
-#                 Notification.objects.create(
-#                     user=to_user,
-#                     message=f"You have a new invitation from {from_user.username}.",
-#                     invitation=invitation
-#                 )
-
-#                 logging.critical(invitation.id)
-
-#                 channel_layer = get_channel_layer()
-
-#                 group_name = f"user{to_user.id}"
-#                 logging.critical(f"Envoi au groupe: {group_name}")
-
-#                 # Envoyer une notification WebSocket au groupe de l'utilisateur destinataire
-#                 async_to_sync(channel_layer.group_send)(
-#                     group_name,
-#                     {
-#                         "type": "invitation_notification",
-#                         "message": f"You have a new invitation from {from_user.username}."
-#                     }
-#                 )
-
-#                 return JsonResponse({"status": "success", "message": "Invitation sent.", "invitation_id": invitation.id}, status=200)
-#             else:
-#                 return JsonResponse({"status": "error", "message": "Invitation already sent."}, status=409)
-#         else:
-#             return JsonResponse({"status": "error", "message": "Cannot invite yourself."}, status=400)
-#     except User.DoesNotExist:
-#         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
-
-# check aussi si l'invitation a etait accepter
 @csrf_exempt
 @require_http_methods(["POST"])
 def send_invitation(request):
@@ -79,94 +38,93 @@ def send_invitation(request):
         to_user = User.objects.get(username=username)
         from_user = User.objects.get(id=user_id)
         if from_user != to_user:
-            # Vérifier si une invitation n'a pas déjà été envoyée dans l'une ou l'autre direction
-            existing_invitation = Invitation.objects.filter(
+            # Vérifier si une invitation a été acceptée ou existe dans l'une ou l'autre direction
+            invitation_query = Invitation.objects.filter(
                 (Q(from_user=from_user) & Q(to_user=to_user)) | 
-                (Q(from_user=to_user) & Q(to_user=from_user)),
-                accepted=False
-            ).first()
+                (Q(from_user=to_user) & Q(to_user=from_user))
+            )
+            
+            if invitation_query.exists():
+                accepted_invitation = invitation_query.filter(accepted=True).exists()
+                pending_invitation = invitation_query.filter(accepted=False).exists()
 
-            if existing_invitation:
-                if existing_invitation.from_user == to_user:
-                    # Une invitation existe déjà de la part du destinataire vers l'expéditeur
+                if accepted_invitation:
+                    # Une invitation entre ces utilisateurs a déjà été acceptée
                     return JsonResponse({
-                        "status": "info",
-                        "message": "You have already received a friendship request from this user. Please check your invitations."
-                    }, status=200)
-                else:
-                    # Une invitation a déjà été envoyée à cet utilisateur
-                    return JsonResponse({"status": "error", "message": "Invitation already sent."}, status=409)
-            else:
-                # Aucune invitation existante, procéder à la création d'une nouvelle invitation
-                invitation = Invitation.objects.create(from_user=from_user, to_user=to_user)
-                Notification.objects.create(
-                    user=to_user,
-                    message=f"You have a new invitation from {from_user.username}.",
-                    invitation=invitation
-                )
+                        "status": "error",
+                        "message": "A friendship already exists or an invitation has already been accepted."
+                    }, status=409)
+                elif pending_invitation:
+                    # Une invitation en attente existe déjà entre ces utilisateurs
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "An invitation is already pending between these users."
+                    }, status=409)
+            
+            # Aucune invitation existante ou acceptée, procéder à la création d'une nouvelle invitation
+            invitation = Invitation.objects.create(from_user=from_user, to_user=to_user)
+            Notification.objects.create(
+                user=to_user,
+                message=f"You have a new invitation from {from_user.username}.",
+                invitation=invitation
+            )
 
-                logging.critical(invitation.id)
+            channel_layer = get_channel_layer()
+            group_name = f"user{to_user.id}"
 
-                channel_layer = get_channel_layer()
-                group_name = f"user{to_user.id}"
-                logging.critical(f"Envoi au groupe: {group_name}")
+            # Envoyer une notification WebSocket au groupe de l'utilisateur destinataire
+            async_to_sync(channel_layer.group_send)(
+                group_name,
+                {
+                    "type": "invitation_notification",
+                    "message": f"You have a new invitation from {from_user.username}."
+                }
+            )
 
-                # Envoyer une notification WebSocket au groupe de l'utilisateur destinataire
-                async_to_sync(channel_layer.group_send)(
-                    group_name,
-                    {
-                        "type": "invitation_notification",
-                        "message": f"You have a new invitation from {from_user.username}."
-                    }
-                )
-
-                return JsonResponse({"status": "success", "message": "Invitation sent.", "invitation_id": invitation.id}, status=200)
+            return JsonResponse({"status": "success", "message": "Invitation sent.", "invitation_id": invitation.id}, status=200)
         else:
             return JsonResponse({"status": "error", "message": "Cannot invite yourself."}, status=400)
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
-# gerer de pas s'affiche sois
 @require_http_methods(["GET"])
 def search_users(request):
     search_query = request.GET.get('query', '')
-    
-    if search_query:
-        # Utilisez `__icontains` pour la recherche insensible à la casse
-        # et `distinct()` pour éviter les doublons.
-        user_list = User.objects.filter(
-            Q(username__icontains=search_query) | 
-            Q(first_name__icontains=search_query) | 
-            Q(last_name__icontains=search_query)
-        ).distinct().values_list('username', flat=True)[:10]
-        
-        return JsonResponse(list(user_list), safe=False, status=200)
-    else:
-        return JsonResponse({"status": "error", "message": "No search query provided."}, status=400)
-# @require_http_methods(["GET"])
-# def search_users(request):
-#     search_query = request.GET.get('query', '')
-#     # Assurez-vous de convertir l'`user_id` en entier car les IDs dans Django sont des entiers par défaut
-#     user_id = request.GET.get('user_id', None)
+    user_id = request.GET.get('user_id', None)
 
-#     if search_query:
-#         query_filter = Q(username__icontains=search_query) | Q(first_name__icontains=search_query) | Q(last_name__icontains=search_query)
+    if not search_query or not user_id or user_id.lower() == 'null':
+        return JsonResponse({"status": "error", "message": "No search query or user ID provided."}, status=400)
 
-#         if user_id:
-#             try:
-#                 # Convertir user_id en int avant de l'utiliser dans le filtre
-#                 user_id = int(user_id)
-#                 query_filter &= ~Q(id=user_id)
-#             except ValueError:
-#                 # Si la conversion échoue, retourner une erreur ou ignorer le filtre user_id
-#                 return JsonResponse({"status": "error", "message": "Invalid user ID provided."}, status=400)
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return JsonResponse({"status": "error", "message": "Invalid user ID provided."}, status=400)
 
-#         user_list = User.objects.filter(query_filter).distinct().values_list('username', flat=True)[:10]
+    user_friends = Friendship.objects.filter(
+        Q(user_id=user_id) | Q(friend_id=user_id)
+    ).values_list('user_id', 'friend_id')
 
-#         return JsonResponse(list(user_list), safe=False, status=200)
-#     else:
-#         return JsonResponse({"status": "error", "message": "No search query provided."}, status=400)
+    friend_ids = {uid for pair in user_friends for uid in pair}
+    friend_ids.add(user_id)
 
+    users = User.objects.filter(
+        (Q(username__icontains=search_query) |
+         Q(first_name__icontains=search_query) |
+         Q(last_name__icontains=search_query)) &
+        ~Q(id__in=friend_ids)
+    ).distinct()[:10]
+
+    user_data = []
+    for user in users:
+        profile_info = get_profile_info(user.id)
+        user_data.append({
+            "username": user.username,
+            "email": user.email,  # Supposant que vous avez accès à l'email directement depuis l'objet user
+            "avatar_url": profile_info.get('avatar'),  # L'URL de l'avatar obtenue depuis l'API de profil
+        })
+
+    return JsonResponse(user_data, safe=False, status=200)
+       
 @csrf_exempt
 @require_http_methods(["POST"])
 def accept_invitation(request):
@@ -217,13 +175,22 @@ def get_list_friend(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
-# voir toutes les invitations d'amitié qu'il a reçues et qui sont en attente de réponse
 @require_http_methods(["GET"])
 def list_received_invitations(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         invitations = Invitation.objects.filter(to_user=user, accepted=False)
-        invitations_data = [{"from_user": invitation.from_user.username, "invitation_id": invitation.id} for invitation in invitations]
+        invitations_data = []
+
+        for invitation in invitations:
+            from_user = invitation.from_user
+            profile_info = get_profile_info(from_user.id)  # Récupère les informations du profil
+            invitations_data.append({
+                "from_user_username": from_user.username,
+                "from_user_email": profile_info.get('email'),  # Email depuis le profil
+                "from_user_avatar": profile_info.get('avatar'),  # Avatar URL depuis le profil
+                "invitation_id": invitation.id,
+            })
         
         return JsonResponse({"status": "success", "invitations": invitations_data}, safe=False, status=200)
     except User.DoesNotExist:
@@ -272,32 +239,86 @@ def remove_friend(request):
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User or friend does not exist."}, status=404)
 
+# @require_http_methods(["GET"])
+# def online_friends(request, user_id):
+#     try:
+#         # Récupérer les instances User des amis
+#         friendships = Friendship.objects.filter(user_id=user_id)
+#         friend_ids = [friendship.friend.id for friendship in friendships]
+        
+#         online_friends = UserStatus.objects.filter(
+#             user_id__in=friend_ids, is_online=True
+#         ).values_list('user__username', flat=True)
+        
+#         return JsonResponse({"online_friends": list(online_friends)}, status=200)
+#     except User.DoesNotExist:
+#         return JsonResponse({"error": "User not found"}, status=404)
+
+# @require_http_methods(["GET"])
+# def offline_friends(request, user_id):
+#     try:
+#         # Récupérer les instances User des amis
+#         friendships = Friendship.objects.filter(user_id=user_id)
+#         friend_ids = [friendship.friend.id for friendship in friendships]
+        
+#         offline_friends = UserStatus.objects.filter(
+#             user_id__in=friend_ids, is_online=False
+#         ).values_list('user__username', flat=True)
+        
+#         return JsonResponse({"offline_friends": list(offline_friends)}, status=200)
+#     except User.DoesNotExist:
+#         return JsonResponse({"error": "User not found"}, status=404)
+
 @require_http_methods(["GET"])
 def online_friends(request, user_id):
     try:
-        # Récupérer les instances User des amis
         friendships = Friendship.objects.filter(user_id=user_id)
         friend_ids = [friendship.friend.id for friendship in friendships]
         
-        online_friends = UserStatus.objects.filter(
-            user_id__in=friend_ids, is_online=True
-        ).values_list('user__username', flat=True)
+        online_friends_data = []
+        for friend_id in friend_ids:
+            if UserStatus.objects.filter(user_id=friend_id, is_online=True).exists():
+                user = User.objects.get(id=friend_id)
+                profile_info = get_profile_info(user.id)
+                online_friends_data.append({
+                    "username": user.username,
+                    "email": profile_info.get('email'),
+                    "avatar_url": profile_info.get('avatar'),
+                })
         
-        return JsonResponse({"online_friends": list(online_friends)}, status=200)
+        return JsonResponse({"online_friends": online_friends_data}, status=200)
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
 @require_http_methods(["GET"])
 def offline_friends(request, user_id):
     try:
-        # Récupérer les instances User des amis
         friendships = Friendship.objects.filter(user_id=user_id)
         friend_ids = [friendship.friend.id for friendship in friendships]
         
-        offline_friends = UserStatus.objects.filter(
-            user_id__in=friend_ids, is_online=False
-        ).values_list('user__username', flat=True)
+        offline_friends_data = []
+        for friend_id in friend_ids:
+            if UserStatus.objects.filter(user_id=friend_id, is_online=False).exists():
+                user = User.objects.get(id=friend_id)
+                profile_info = get_profile_info(user.id)
+                offline_friends_data.append({
+                    "username": user.username,
+                    "email": profile_info.get('email'),
+                    "avatar_url": profile_info.get('avatar'),
+                })
         
-        return JsonResponse({"offline_friends": list(offline_friends)}, status=200)
+        return JsonResponse({"offline_friends": offline_friends_data}, status=200)
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
+
+
+def get_profile_info(user_id):
+    profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    try:
+        response = requests.get(profile_service_url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {}
+    except requests.exceptions.RequestException:
+        return {}

@@ -77,40 +77,75 @@ class ViewFriend extends HTMLElement {
     try {
       const response = await fetch(`http://127.0.0.1:8003/list_received_invitations/${user.id}/`);
       const responseData = await response.json();
-
+  
+      const friendRequestsList = document.getElementById('friend-requests');
+      friendRequestsList.innerHTML = '';
+  
       if (responseData && responseData.invitations) {
-        const friendRequestsList = document.getElementById('friend-requests');
-            friendRequestsList.innerHTML = '';
-
-            responseData.invitations.forEach(invitation => {
-                const listItem = document.createElement('li');
-                listItem.id = `invitation-${invitation.invitation_id}`;
-                listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-
-                const fromUserSpan = document.createElement('span');
-                fromUserSpan.textContent = `From: ${invitation.from_user}, Invitation ID: ${invitation.invitation_id}`;
-
-                const buttonGroup = document.createElement('div');
-                buttonGroup.classList.add('btn-group');
-
-                const acceptButton = document.createElement('button');
-                acceptButton.textContent = 'Accept';
-                acceptButton.classList.add('btn', 'btn-success', 'mx-1');
-                acceptButton.onclick = () => this.acceptFriendRequest(invitation.invitation_id);
-
-                const rejectButton = document.createElement('button');
-                rejectButton.textContent = 'Reject';
-                rejectButton.classList.add('btn', 'btn-danger', 'mx-1');
-                rejectButton.onclick = () => this.rejectFriendRequest(invitation.invitation_id);
-
-                buttonGroup.appendChild(acceptButton);
-                buttonGroup.appendChild(rejectButton);
-
-                listItem.appendChild(fromUserSpan);
-                listItem.appendChild(buttonGroup);
-
-                friendRequestsList.appendChild(listItem);
-        });
+        if (responseData.invitations.length > 0) {
+          responseData.invitations.forEach(invitation => {
+            const listItem = document.createElement('li');
+            listItem.id = `invitation-${invitation.invitation_id}`;
+            listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+  
+            // Create a container for the avatar, username, and email
+            const userInfoDiv = document.createElement('div');
+            userInfoDiv.style.display = 'flex';
+            userInfoDiv.style.alignItems = 'center';
+  
+            // Add the avatar
+            const avatarImg = document.createElement('img');
+            if (!invitation.from_user_avatar)
+              avatarImg.src = 'assets/img/default-profile.jpg';
+            else
+              avatarImg.src = invitation.from_user_avatar;
+            avatarImg.alt = 'User Avatar';
+            avatarImg.style.width = '40px'; // Set the size as needed
+            avatarImg.style.height = '40px';
+            avatarImg.style.borderRadius = '50%'; // Make it round
+            avatarImg.style.marginRight = '50px';
+            userInfoDiv.appendChild(avatarImg);
+  
+            // Add the username
+            const usernameSpan = document.createElement('span');
+            usernameSpan.textContent = invitation.from_user_username;
+            usernameSpan.style.marginRight = '50px';
+            userInfoDiv.appendChild(usernameSpan);
+  
+            // Add the email
+            const emailSpan = document.createElement('span');
+            emailSpan.textContent = invitation.from_user_email;
+            userInfoDiv.appendChild(emailSpan);
+  
+            // Create the buttons for accept and reject
+            const buttonGroup = document.createElement('div');
+            buttonGroup.classList.add('btn-group');
+  
+            const acceptButton = document.createElement('button');
+            acceptButton.textContent = 'Accept';
+            acceptButton.classList.add('btn', 'btn-success', 'mx-1');
+            acceptButton.onclick = () => this.acceptFriendRequest(invitation.invitation_id);
+  
+            const rejectButton = document.createElement('button');
+            rejectButton.textContent = 'Reject';
+            rejectButton.classList.add('btn', 'btn-danger', 'mx-1');
+            rejectButton.onclick = () => this.rejectFriendRequest(invitation.invitation_id);
+  
+            buttonGroup.appendChild(acceptButton);
+            buttonGroup.appendChild(rejectButton);
+  
+            // Append everything to the list item
+            listItem.appendChild(userInfoDiv);
+            listItem.appendChild(buttonGroup);
+  
+            friendRequestsList.appendChild(listItem);
+          });
+        } else {
+          const noInvitationsItem = document.createElement('li');
+          noInvitationsItem.classList.add('list-group-item');
+          noInvitationsItem.textContent = "No friend requests.";
+          friendRequestsList.appendChild(noInvitationsItem);
+        }
       } else {
         console.error('Invalid response format:', responseData);
       }
@@ -118,6 +153,7 @@ class ViewFriend extends HTMLElement {
       console.error('Error fetching friend requests:', error);
     }
   }
+  
 
   // btn accept
   async acceptFriendRequest(invitationId){
@@ -178,7 +214,6 @@ class ViewFriend extends HTMLElement {
 
   }
 
-  // Search user with username
   async searchFriends() {
     const searchInputField = this.querySelector('#search-friend-name');
     const searchInput = searchInputField.value.trim();
@@ -194,13 +229,13 @@ class ViewFriend extends HTMLElement {
     searchResultsList.innerHTML = '';
     
     try {
-      const response = await fetch(`http://127.0.0.1:8003/search_users/?query=${encodeURIComponent(searchInput)}`);
+      const response = await fetch(`http://127.0.0.1:8003/search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
   
       const searchResults = await response.json();
-      console.log(searchResults);
+      console.log("searchResults", searchResults);
   
       if (searchResults.length === 0) {
         const noResultsItem = document.createElement('li');
@@ -208,29 +243,52 @@ class ViewFriend extends HTMLElement {
         noResultsItem.textContent = "No users found.";
         searchResultsList.appendChild(noResultsItem);
       } else {
-        searchResults.forEach(username => {
+        searchResults.forEach(user => {
           const listItem = document.createElement('li');
           listItem.classList.add('list-group-item');
           listItem.style.display = 'flex';
           listItem.style.justifyContent = 'space-between';
           listItem.style.alignItems = 'center';
           
-          const textSpan = document.createElement('span');
-          textSpan.textContent = username;
           
+          // Create a container for the avatar and username
+          const userInfoDiv = document.createElement('div');
+          userInfoDiv.style.display = 'flex';
+          userInfoDiv.style.alignItems = 'center';
+          
+          // Add the user's avatar
+          const avatarImg = document.createElement('img');
+          if (!user.avatar_url)
+            avatarImg.src = 'assets/img/default-profile.jpg';
+          else
+            avatarImg.src = user.avatar_url;
+          avatarImg.alt = 'User Avatar';
+          avatarImg.style.width = '40px'; // Set the size as needed
+          avatarImg.style.height = '40px';
+          avatarImg.style.borderRadius = '50%'; // Make it round
+          avatarImg.style.marginRight = '50px';
+          userInfoDiv.appendChild(avatarImg);
+  
+          // Add the user's username
+          const textSpan = document.createElement('span');
+          textSpan.textContent = user.username;
+          textSpan.style.marginRight = '50px';
+          userInfoDiv.appendChild(textSpan);
+          
+          // Add the user's email
+          const emailSpan = document.createElement('span');
+          emailSpan.textContent = user.email;
+          // emailSpan.style.marginRight = '150px';
+          userInfoDiv.appendChild(emailSpan);
+  
+          // Create the friend request button
           const friendRequestButton = document.createElement('button');
           friendRequestButton.textContent = 'Send Friend Request';
           friendRequestButton.classList.add('btn', 'btn-primary');
-          // actionButton.textContent = user.invitation_sent ? 'Invitation Sent' : 'Send Friend Request';
-          // actionButton.classList.add('btn', user.invitation_sent ? 'btn-secondary' : 'btn-primary');
-
-          // Send friend
-          friendRequestButton.onclick = () => this.sendFriendRequest(username, friendRequestButton);
-          // if (!user.invitation_sent) {
-            // actionButton.onclick = () => this.sendFriendRequest(user.username, actionButton);
-          // }
-
-          listItem.appendChild(textSpan);
+          friendRequestButton.onclick = () => this.sendFriendRequest(user.username, friendRequestButton);
+  
+          // Append everything to the listItem
+          listItem.appendChild(userInfoDiv);
           listItem.appendChild(friendRequestButton);
           searchResultsList.appendChild(listItem);
         });
@@ -239,6 +297,7 @@ class ViewFriend extends HTMLElement {
       console.error('Search error:', error);
     }
   }
+  
   
   //Send Invitation user
   async sendFriendRequest(username, button) {
@@ -274,35 +333,58 @@ class ViewFriend extends HTMLElement {
     }
   }
 
-  async loadOnlineFriends() {
-    try {
-      const response = await fetch(`http://127.0.0.1:8003/online_friends/${user.id}/`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const { online_friends } = await response.json();
-  
-      const onlineFriendsList = this.querySelector('#online-friends');
-      onlineFriendsList.innerHTML = '';
-  
-      if (online_friends.length > 0) {
-        online_friends.forEach(username => {
-          const listItem = document.createElement('li');
-          listItem.classList.add('list-group-item');
-          listItem.textContent = `${username} (Online)`;
-          onlineFriendsList.appendChild(listItem);
-        });
-      } else {
-        const noOnlineFriends = document.createElement('li');
-        noOnlineFriends.classList.add('list-group-item');
-        noOnlineFriends.textContent = "No friends online.";
-        onlineFriendsList.appendChild(noOnlineFriends);
-      }
-    } catch (error) {
-      console.error('Error loading online friends:', error);
+async loadOnlineFriends() {
+  try {
+    const response = await fetch(`http://127.0.0.1:8003/online_friends/${user.id}/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    const { online_friends } = await response.json();
+
+    const onlineFriendsList = this.querySelector('#online-friends');
+    onlineFriendsList.innerHTML = '';
+
+    if (online_friends.length > 0) {
+      online_friends.forEach(friend => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-start');
+
+        // Avatar
+        const avatarImg = document.createElement('img');
+        if (!friend.avatar_url)
+          avatarImg.src = 'assets/img/default-profile.jpg';
+        else
+          avatarImg.src = friend.avatar_url;
+        avatarImg.alt = 'User Avatar';
+        avatarImg.style.width = '40px';  // Or the size you prefer
+        avatarImg.style.height = '40px'; // Or the size you prefer
+        avatarImg.style.borderRadius = '50%';
+        avatarImg.style.marginRight = '50px';
+        listItem.appendChild(avatarImg);
+
+        // Username
+        const usernameSpan = document.createElement('span');
+        usernameSpan.textContent = friend.username;
+        usernameSpan.style.marginRight = '50px';
+        listItem.appendChild(usernameSpan);
+
+        // Email
+        const emailSpan = document.createElement('span');
+        emailSpan.textContent = friend.email;
+        listItem.appendChild(emailSpan);
+
+        onlineFriendsList.appendChild(listItem);
+      });
+    } else {
+      const noOnlineFriends = document.createElement('li');
+      noOnlineFriends.classList.add('list-group-item');
+      noOnlineFriends.textContent = "No friends online.";
+      onlineFriendsList.appendChild(noOnlineFriends);
+    }
+  } catch (error) {
+    console.error('Error loading online friends:', error);
   }
-  
+}
 
 async loadOfflineFriends() {
   try {
@@ -311,16 +393,39 @@ async loadOfflineFriends() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const { offline_friends } = await response.json();
-    console.log("oeeee", offline_friends);
 
     const offlineFriendsList = this.querySelector('#offline-friends');
     offlineFriendsList.innerHTML = '';
 
     if (offline_friends.length > 0) {
-      offline_friends.forEach(username => {
+      offline_friends.forEach(friend => {
         const listItem = document.createElement('li');
-        listItem.classList.add('list-group-item');
-        listItem.textContent = `${username} (Offline)`;
+        listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-start');
+
+        // Avatar
+        const avatarImg = document.createElement('img');
+        if (!friend.avatar_url)
+          avatarImg.src = 'assets/img/default-profile.jpg';
+        else
+          avatarImg.src = friend.avatar_url;
+        avatarImg.alt = 'User Avatar';
+        avatarImg.style.width = '40px';  // Or the size you prefer
+        avatarImg.style.height = '40px'; // Or the size you prefer
+        avatarImg.style.borderRadius = '50%';
+        avatarImg.style.marginRight = '50px';
+        listItem.appendChild(avatarImg);
+
+        // Username
+        const usernameSpan = document.createElement('span');
+        usernameSpan.textContent = friend.username;
+        usernameSpan.style.marginRight = '50px';
+        listItem.appendChild(usernameSpan);
+
+        // Email
+        const emailSpan = document.createElement('span');
+        emailSpan.textContent = friend.email;
+        listItem.appendChild(emailSpan);
+
         offlineFriendsList.appendChild(listItem);
       });
     } else {
@@ -333,6 +438,7 @@ async loadOfflineFriends() {
     console.error('Error loading offline friends:', error);
   }
 }
+
 
 
 }
