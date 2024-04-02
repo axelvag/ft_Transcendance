@@ -2,7 +2,9 @@ import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 // import { redirectTo } from '@/router.js';
 // import { user , getCsrfToken} from '@/auth.js';
-import { user } from '@/auth.js';
+import { user, getProfile } from '@/auth.js';
+
+const profile = getProfile();
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
@@ -28,7 +30,7 @@ class ViewDash extends HTMLElement {
         <div class="col-4">
           <div class="row justify-content-end">
             <div class="col-md-6 d-flex flex-column align-items-center">
-                <img src="assets/img/avatar_careers.jpg" class="img-thumbnail rounded-circle" width="200" height="200" alt="character">
+                <img src="${user.avatar}" class="img-thumbnail rounded-circle" alt="character" style="width: 128px; height: 128px; object-fit: cover;">
                 <h3 class="display-5 fw-bold btn-lg">
                   ${user.username}
                 </h3>
