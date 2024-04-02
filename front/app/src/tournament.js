@@ -75,6 +75,7 @@ const fetchDeletePlayer = async () => {
   })
   const data = await response.json();
   if (data.success) {
+    resetLocalTournament();
     console.log(data);
   } else {
     console.log("error");
@@ -119,4 +120,25 @@ const fetchAddPlayer = async (formData) => {
   return response.json();
 };
 
-export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament };
+const fetchTournamentInfo = async () => {
+  let user = getProfile();
+  const response = await fetch(`http://127.0.0.1:8005/tournament/tournoi_info/${user.id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+  })
+  const data = await response.json();
+  // console.log(data)
+  if (data.id) {
+    // resetLocalTournament();
+    setLocalTournament(data);
+    console.log(data);
+  } else {
+    console.log("player is not in a tournament");
+  }
+};
+
+export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo };

@@ -69,11 +69,9 @@ def tournament_detail(request, tournament_id):
     # Renvoie les données en format JSON
     return JsonResponse(data)
 
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def create_joueur(request):
-    # data = request.POST 
     try:
         data = json.loads(request.body.decode('utf8'))
         print("Received data:", data)
@@ -92,10 +90,18 @@ def create_joueur(request):
     except Tournoi.DoesNotExist:
         return JsonResponse({'error': 'Tournoi not found'}, status=404)
 
-    joueur = Joueur(username=username, user_id=user_id, tournament=tournament)
-    joueur.save()
+    # Utiliser get_or_create pour éviter de créer un doublon
+    joueur, created = Joueur.objects.get_or_create(
+        user_id=user_id, 
+        tournament_id=tournament_id, 
+        defaults={'username': username, 'tournament': tournament}
+    )
 
-    return JsonResponse({"success": True, 'message': 'Joueur created successfully', 'joueur_id': joueur.id})
+    if created:
+        return JsonResponse({"success": True, 'message': 'Joueur created successfully', 'joueur_id': joueur.id})
+    else:
+        return JsonResponse({"success": False, 'message': 'Joueur already exists', 'joueur_id': joueur.id})
+
 
 
 @csrf_exempt
@@ -110,15 +116,27 @@ def view_joueur(request, tournament_id):
     # Retournez les données en JSON
     return JsonResponse(data, safe=False)
 
-# @csrf_exempt
-# def joueur_in_tournament(request, user_id):
-#     # Filtrez les tournois avec un status égal à 0
-#     joueur = Joueur.objects.filter(user_id=user_id)
-#     if joueur is None:
-#         return JsonResponse({'error': 'Joueur not found'}, status=404)
-#     tournament_id = joueur.tournament.id
-#     return JsonResponse({"success": True, 'message': 'Joueur found', 'tournament_name': tournament_id})
-    
+@csrf_exempt
+@require_http_methods(["GET"])
+def tournoi_info(request, user_id):
+    try:
+        # Trouver le joueur et son tournoi associé
+        joueur = Joueur.objects.filter(user_id=user_id).select_related('tournament').first()
+        
+        if joueur:
+            tournoi = joueur.tournament
+            tournoi_info = {
+                "id": tournoi.id,
+                "name": tournoi.name,
+                "maxPlayer": tournoi.max_players,
+                "admin_id": tournoi.admin_id,
+            }
+            return JsonResponse(tournoi_info)
+        else:
+            return JsonResponse({'error': 'Joueur not found or not associated with a tournament'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 @csrf_exempt
 @require_http_methods(["DELETE"])
 def delete_joueur(request, user_id):

@@ -1,15 +1,17 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
-import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer } from '@/tournament.js';
+import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
 
 class ViewTournament extends HTMLElement {
   #user;
+  #tournament
   constructor() {
     super();
     this.#user = getProfile();
+    this.#tournament = getTournament();
   }
   async connectedCallback() {
     const isLoggedIn = await isAuthenticated();
@@ -105,7 +107,9 @@ class ViewTournament extends HTMLElement {
     });
 
     this.loadTournois();
-    this.deletePlayer();
+
+    if (this.#tournament.id !== null)
+      this.deletePlayer();
 
     this.querySelector('#tournamentForm').addEventListener('submit', this.submitForm.bind(this));
   }

@@ -1,5 +1,6 @@
 const BASE_URL = import.meta.env.BASE_URL;
 import { redirectTo } from '@/router.js';
+import { fetchTournamentInfo } from '@/tournament.js';
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
@@ -108,6 +109,7 @@ const isAuthenticated = async () => {
         if (userProfileData.getProfile.success) {
           console.log(userProfileData.getProfile.avatar42);
           setLocalUser(userProfileData.getProfile);
+          await fetchTournamentInfo();
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
