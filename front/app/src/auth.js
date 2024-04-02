@@ -1,6 +1,6 @@
 const BASE_URL = import.meta.env.BASE_URL;
 import { redirectTo } from '@/router.js';
-import { fetchTournamentInfo } from '@/tournament.js';
+import { fetchTournamentInfo, fetchDeletePlayer } from '@/tournament.js';
 const API_BASE_URL = 'http://127.0.0.1:8001';
 
 const user = {
@@ -151,7 +151,7 @@ const logout = async () => {
   } catch (error) {
     console.error('Error:', error);
   }
-
+  fetchDeletePlayer();
   resetLocalUser();
 };
 
