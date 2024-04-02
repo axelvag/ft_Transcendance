@@ -18,7 +18,7 @@ class ViewFriend extends HTMLElement {
           <a class="nav-link active" href="#myfriends" data-bs-toggle="tab">My friends</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#invitations" data-bs-toggle="tab">Invitations</a>
+          <a class="nav-link" href="#invitations" data-bs-toggle="tab">Invitations received</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#addfriends" data-bs-toggle="tab">Add friends</a>
@@ -41,8 +41,8 @@ class ViewFriend extends HTMLElement {
               </ul>
             </section>
         </div>
-          
-          <div class="tab-pane container fade" id="invitations">
+
+        <div class="tab-pane container fade" id="invitations">
           <div class="mt-4">
             <h2>Friend Requests</h2>
             <ul id="friend-requests" class="list-group">
@@ -173,7 +173,9 @@ class ViewFriend extends HTMLElement {
       
       if (data.status === 'success') {
         document.querySelector(`#invitation-${invitationId}`).remove();
-        console.log("okkkk"); 
+        console.log("okkkk");
+        this.loadOfflineFriends();
+        this.loadOnlineFriends();
       } else {
         console.log("Nullll");
       }
@@ -202,7 +204,9 @@ class ViewFriend extends HTMLElement {
       
       if (data.status === 'success') {
         document.querySelector(`#invitation-${invitationId}`).remove();
-        console.log("okkkk bien delte"); 
+        console.log("okkkk bien delte");
+        this.loadOfflineFriends();
+        this.loadOnlineFriends();
       } else {
         console.log("Nullll");
       }
@@ -347,7 +351,7 @@ async loadOnlineFriends() {
     if (online_friends.length > 0) {
       online_friends.forEach(friend => {
         const listItem = document.createElement('li');
-        listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-start');
+        listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-between');
 
         // Avatar
         const avatarImg = document.createElement('img');
@@ -372,6 +376,14 @@ async loadOnlineFriends() {
         const emailSpan = document.createElement('span');
         emailSpan.textContent = friend.email;
         listItem.appendChild(emailSpan);
+
+        // Delete friend button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('btn', 'btn-danger');
+        deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
+
+        listItem.appendChild(deleteButton);
 
         onlineFriendsList.appendChild(listItem);
       });
@@ -393,6 +405,7 @@ async loadOfflineFriends() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const { offline_friends } = await response.json();
+    console.log("test",offline_friends);
 
     const offlineFriendsList = this.querySelector('#offline-friends');
     offlineFriendsList.innerHTML = '';
@@ -400,7 +413,8 @@ async loadOfflineFriends() {
     if (offline_friends.length > 0) {
       offline_friends.forEach(friend => {
         const listItem = document.createElement('li');
-        listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-start');
+        // listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-start');
+        listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-between');
 
         // Avatar
         const avatarImg = document.createElement('img');
@@ -409,8 +423,8 @@ async loadOfflineFriends() {
         else
           avatarImg.src = friend.avatar_url;
         avatarImg.alt = 'User Avatar';
-        avatarImg.style.width = '40px';  // Or the size you prefer
-        avatarImg.style.height = '40px'; // Or the size you prefer
+        avatarImg.style.width = '40px';
+        avatarImg.style.height = '40px';
         avatarImg.style.borderRadius = '50%';
         avatarImg.style.marginRight = '50px';
         listItem.appendChild(avatarImg);
@@ -426,6 +440,13 @@ async loadOfflineFriends() {
         emailSpan.textContent = friend.email;
         listItem.appendChild(emailSpan);
 
+        // Delete friend button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('btn', 'btn-danger');
+        deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
+
+        listItem.appendChild(deleteButton);
         offlineFriendsList.appendChild(listItem);
       });
     } else {
@@ -439,7 +460,31 @@ async loadOfflineFriends() {
   }
 }
 
+// Function to confirm deletion and send delete request
+async confirmDeleteFriend(friendId) {
 
+  try {
+    const data = { friend_id: friendId, user_id: user.id};
+    
+    const response = await fetch('http://127.0.0.1:8003/remove_friend/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      console.log("Ami supprimé avec succès.");
+      this.loadOfflineFriends();
+      this.loadOnlineFriends();
+    } else {
+      throw new Error('Une erreur est survenue lors de la suppression de l\'ami.');
+    }
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'ami:", error);
+  }
+}
 
 }
 

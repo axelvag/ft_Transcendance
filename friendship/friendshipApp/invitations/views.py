@@ -100,6 +100,7 @@ def search_users(request):
     except ValueError:
         return JsonResponse({"status": "error", "message": "Invalid user ID provided."}, status=400)
 
+    # récupére tous les identifiants des amis de l'utilisateur
     user_friends = Friendship.objects.filter(
         Q(user_id=user_id) | Q(friend_id=user_id)
     ).values_list('user_id', 'friend_id')
@@ -111,7 +112,7 @@ def search_users(request):
         (Q(username__icontains=search_query) |
          Q(first_name__icontains=search_query) |
          Q(last_name__icontains=search_query)) &
-        ~Q(id__in=friend_ids)
+        ~Q(id__in=friend_ids) #exclure soit meme et si ils sont amies
     ).distinct()[:10]
 
     user_data = []
@@ -202,8 +203,18 @@ def list_sent_invitations(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         invitations = Invitation.objects.filter(from_user=user, accepted=False)
-        invitations_data = [{"to_user": invitation.to_user.username, "invitation_id": invitation.id} for invitation in invitations]
+        invitations_data = [] #[{"to_user": invitation.to_user.username, "invitation_id": invitation.id} for invitation in invitations]
         
+        for invitation in invitations:
+            from_user = invitation.from_user
+            profile_info = get_profile_info(from_user.id)  # Récupère les informations du profil
+            invitations_data.append({
+                "from_user_username": from_user.username,
+                "from_user_email": profile_info.get('email'),  # Email depuis le profil
+                "from_user_avatar": profile_info.get('avatar'),  # Avatar URL depuis le profil
+                "invitation_id": invitation.id,
+            })
+
         return JsonResponse({"status": "success", "invitations": invitations_data}, safe=False, status=200)
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
@@ -232,42 +243,20 @@ def remove_friend(request):
     try:
         user = User.objects.get(id=user_id)
         friend = User.objects.get(id=friend_id)
+
+        # suppressions des liens d'amitie
         Friendship.objects.filter(user=user, friend=friend).delete()
         Friendship.objects.filter(user=friend, friend=user).delete()
+
+        # Suppression des invitations acceptées ou en attente entre ces utilisateurs
+        Invitation.objects.filter(
+            (Q(from_user=user) & Q(to_user=friend)) |
+            (Q(from_user=friend) & Q(to_user=user))
+        ).delete()
         
         return JsonResponse({"status": "success", "message": "Friend removed."}, status=200)
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User or friend does not exist."}, status=404)
-
-# @require_http_methods(["GET"])
-# def online_friends(request, user_id):
-#     try:
-#         # Récupérer les instances User des amis
-#         friendships = Friendship.objects.filter(user_id=user_id)
-#         friend_ids = [friendship.friend.id for friendship in friendships]
-        
-#         online_friends = UserStatus.objects.filter(
-#             user_id__in=friend_ids, is_online=True
-#         ).values_list('user__username', flat=True)
-        
-#         return JsonResponse({"online_friends": list(online_friends)}, status=200)
-#     except User.DoesNotExist:
-#         return JsonResponse({"error": "User not found"}, status=404)
-
-# @require_http_methods(["GET"])
-# def offline_friends(request, user_id):
-#     try:
-#         # Récupérer les instances User des amis
-#         friendships = Friendship.objects.filter(user_id=user_id)
-#         friend_ids = [friendship.friend.id for friendship in friendships]
-        
-#         offline_friends = UserStatus.objects.filter(
-#             user_id__in=friend_ids, is_online=False
-#         ).values_list('user__username', flat=True)
-        
-#         return JsonResponse({"offline_friends": list(offline_friends)}, status=200)
-#     except User.DoesNotExist:
-#         return JsonResponse({"error": "User not found"}, status=404)
 
 @require_http_methods(["GET"])
 def online_friends(request, user_id):
@@ -281,6 +270,7 @@ def online_friends(request, user_id):
                 user = User.objects.get(id=friend_id)
                 profile_info = get_profile_info(user.id)
                 online_friends_data.append({
+                    "friend_id": user.id,
                     "username": user.username,
                     "email": profile_info.get('email'),
                     "avatar_url": profile_info.get('avatar'),
@@ -302,6 +292,7 @@ def offline_friends(request, user_id):
                 user = User.objects.get(id=friend_id)
                 profile_info = get_profile_info(user.id)
                 offline_friends_data.append({
+                    "friend_id": user.id,
                     "username": user.username,
                     "email": profile_info.get('email'),
                     "avatar_url": profile_info.get('avatar'),
