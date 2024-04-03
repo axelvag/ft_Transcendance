@@ -19,7 +19,7 @@ class ViewFriend extends HTMLElement {
         <div class="container">
           <div class="row">
             <div class="col-md-3 ms-md-auto">
-                <img src="assets/img/avatar-careers.jpg" class="img-thumbnail rounded-circle mx-auto d-block" width="200" height="200" alt="character">
+                <img src="${user.avatar}" class="img-thumbnail rounded-circle mx-auto d-block" alt="character"  style="width: 128px; height: 128px; object-fit: cover;">
             </div>
             <div class="col-md-6">
               <h1 class="display-4 mb-3 mt-5 fw-bold">${user.username}</h1>

@@ -25,7 +25,7 @@ const user = {
 };
 
 const setLocalAvatar = avatar => {
-  user.avatar = avatar || 'assets/img/default-profile.jpg';
+  user.avatar = avatar || '/assets/img/default-profile.jpg';
 };
 
 const setLocalUser = data => {
@@ -40,7 +40,7 @@ const setLocalUser = data => {
   user.id = data.id;
   user.email = data.email;
   user.username = data.username;
-  user.avatarDefault = 'assets/img/default-profile.jpg';
+  user.avatarDefault = '/assets/img/default-profile.jpg';
   user.avatarDefault42 = data.avatar42;
 
   //stat
@@ -95,17 +95,20 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
-        console.log("dwedededee",user.id);
-        const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+        const csrfToken = await getCsrfToken();
+        console.log('dwedededee', user.id);
+        const userProfileResponse = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
           method: 'GET',
-          mode: 'cors',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
-        if (userProfileData.success) {
-          console.log(userProfileData.avatar42);
-          setLocalUser(userProfileData);
+        if (userProfileData.getProfile.success) {
+          console.log(userProfileData.getProfile.avatar42);
+          setLocalUser(userProfileData.getProfile);
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
@@ -128,11 +131,10 @@ const getCsrfToken = async () => {
   });
   if (response.ok) {
     const data = await response.json();
-    console.log(data.csrfToken);
     return data.csrfToken;
   }
   throw new Error('Could not retrieve CSRF token');
-}
+};
 
 const logout = async () => {
   try {
@@ -154,7 +156,6 @@ const logout = async () => {
   resetLocalUser();
 };
 
-
 const getProfile = () => {
   return {
     id: user.id,
@@ -169,9 +170,6 @@ const getProfile = () => {
 };
 
 const saveUser = async newUser => {
-
-  console.log("object newUser saveUser", newUser);
-
   const formData = new FormData();
   formData.append('username', newUser.username);
   formData.append('email', newUser.email);
@@ -179,22 +177,19 @@ const saveUser = async newUser => {
   formData.append('lastname', newUser.lastname);
   formData.append('id', newUser.id);
 
-  if (newUser.avatarFile) { 
+  if (newUser.avatarFile) {
     formData.append('avatar', newUser.avatarFile);
   }
 
-  console.log("formData", formData);
-
-  // Pour afficher le contenu de formData
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}: ${value}`);
-  }
-
   try {
-    const response = await fetch('https://127.0.0.1:8002/update_user/', {
+    const csrfToken = await getCsrfToken();
+    const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
       method: 'POST',
       mode: 'cors',
       credentials: 'include',
+      headers: {
+        'X-CSRFToken': csrfToken,
+      },
       body: formData,
     });
 
@@ -203,33 +198,27 @@ const saveUser = async newUser => {
     }
 
     const data = await response.json();
-    console.log("Ladataaaaaa", data);
-
-    if (data.success){
+    if (data.update.success) {
       //MAJ object user
-      user.firstname = data.firstname;
-      user.lastname = data.lastname;
-      user.username = data.username;
+      user.firstname = data.update.firstname;
+      user.lastname = data.update.lastname;
+      user.username = data.update.username;
       user.email = user.email;
 
-      if (!data.avatar){
-        if(user.avatarDefault42 !== null && user.avatarDefault42 !== undefined)
-          user.avatar = user.avatarDefault42;
-        else
-          user.avatar = 'assets/img/default-profile.jpg';
-      }
-      else{
-        user.avatar = data.avatar;
+      if (!data.update.avatar) {
+        if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) user.avatar = user.avatarDefault42;
+        else user.avatar = '/assets/img/default-profile.jpg';
+      } else {
+        user.avatar = data.update.avatar;
       }
     }
 
-    return data;
+    return data.update;
   } catch (error) {
     console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
     return null;
   }
 };
-
 
 const loginUser = async (formData, csrfToken) => {
   const response = await fetch('https://127.0.0.1:8001/accounts/login/', {
@@ -242,7 +231,7 @@ const loginUser = async (formData, csrfToken) => {
     credentials: 'include',
     body: JSON.stringify(formData),
   });
-  return response.json(); // Retourne la promesse résolue avec les données JSON
+  return response.json();
 };
 
 const sendSignUpRequest = async (formData, csrfToken) => {
@@ -256,7 +245,7 @@ const sendSignUpRequest = async (formData, csrfToken) => {
     credentials: 'include',
     body: JSON.stringify(formData),
   });
-  return response.json(); // Retourne la promesse résolue avec les données JSON
+  return response.json();
 };
 
 const passwordReset = async (formData, csrfToken) => {
@@ -287,11 +276,30 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
   return response.json();
 };
 
+const deleteUser = async csrfToken => {
+  const url = `http://127.0.0.1:8001/accounts/delete_user/${user.username}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRFToken': csrfToken,
+    },
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    console.log('delete user and profil');
+    user.isAuthenticated = false;
+    resetLocalUser(data);
+  }
+};
+
 const handleOAuthResponse = async () => {
-  if (window.location.search.includes("code=")) {
+  if (window.location.search.includes('code=')) {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    console.log(code);
     try {
       const csrfToken = await getCsrfToken();
       const authResponse = await fetch('https://127.0.0.1:8001/accounts/oauth/callback/', {
@@ -302,11 +310,10 @@ const handleOAuthResponse = async () => {
         },
         mode: 'cors',
         credentials: 'include',
-        body: JSON.stringify({ code: code })
+        body: JSON.stringify({ code: code }),
       });
 
       const data = await authResponse.json();
-      console.log(data); // Traiter la réponse
       if (data.access_token) {
         user.id = data.id;
         user.email = data.email;
@@ -322,43 +329,39 @@ const handleOAuthResponse = async () => {
         formData.append('lastname', user.lastname);
         formData.append('id', user.id);
         formData.append('avatar', user.avatar);
-        if(data.register === true){
-          console.log("register trueeeeeeeeeeee");
+        if (data.register === true) {
           try {
-            for (let [key, value] of formData.entries()) {
-              console.log(`${key}: ${value}`);
-          }
-
-            const response = await fetch('https://127.0.0.1:8002/update_user/', {
+            const csrfToken = await getCsrfToken();
+            const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
               method: 'POST',
-              mode: 'cors',
+              headers: {
+                'X-CSRFToken': csrfToken,
+              },
               credentials: 'include',
               body: formData,
             });
-        
+
             if (!response.ok) {
               throw new Error('La requête a échoué avec le statut ' + response.status);
             }
-        
+
             const data = await response.json();
-            console.log(data);
-        
           } catch (error) {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
           }
         }
-        const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${data.id}/`, {
+        const userProfileResponse = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${data.id}/`, {
           method: 'GET',
-          mode: 'cors',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
           credentials: 'include',
         });
-        
+
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
-        if (userProfileData.success) {
-          console.log("yo");
-          console.log(userProfileData.avatar42);
-          setLocalUser(userProfileData);
+        if (userProfileData.getProfile.success) {
+          setLocalUser(userProfileData.getProfile);
           redirectTo('/dashboard');
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
@@ -373,6 +376,22 @@ const handleOAuthResponse = async () => {
 const getAuthorizationCode = () => {
   const url = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fauth42-callback&response_type=code`;
   window.location.href = url;
-}  
+};
 
-export { user, isAuthenticated, logout, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser, resetLocalUser};
+export {
+  user,
+  isAuthenticated,
+  logout,
+  deleteUser,
+  getProfile,
+  getCsrfToken,
+  loginUser,
+  sendSignUpRequest,
+  passwordReset,
+  sendEmailPasswordReset,
+  handleOAuthResponse,
+  getAuthorizationCode,
+  saveUser,
+  setLocalUser,
+  resetLocalUser,
+};
