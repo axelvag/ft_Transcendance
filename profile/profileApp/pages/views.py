@@ -56,7 +56,7 @@ def update_user(request):
     logging.critical(user_id)
 
     try:
-        auth_response = requests.post(auth_service_url, json=auth_data)
+        auth_response = requests.post(auth_service_url, json=auth_data, verify=False)
         if auth_response.status_code == 400:
             return JsonResponse({"success": False, "message": "This user name is already taken."})
         if auth_response.status_code != 200:
@@ -135,7 +135,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
     # Faites un appel au service d'authentification pour obtenir username et email
     auth_service_url = "https://authentification:8001/accounts/get_profile/"
     try:
-        auth_response = requests.get(f"{auth_service_url}{user_id}")
+        auth_response = requests.get(f"{auth_service_url}{user_id}", verify=False)
         if auth_response.status_code == 200:
             auth_data = auth_response.json()
             username = auth_data.get('username', '')
