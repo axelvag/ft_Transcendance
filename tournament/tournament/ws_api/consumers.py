@@ -24,3 +24,10 @@ class MyConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "action": "reload_tournois"
         }))
+        
+    async def add_Player(self, event):
+        # Appel de loadTournois() pour mettre à jour la liste des tournois
+        logging.critical("Consumeressssssssssssssssssss add player")
+        await self.send(text_data=json.dumps({
+            "action": "add_Player"
+        }))

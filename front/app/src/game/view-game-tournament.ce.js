@@ -1,7 +1,7 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
-import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament } from '@/tournament.js';
+import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament, initWebSocket } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
 

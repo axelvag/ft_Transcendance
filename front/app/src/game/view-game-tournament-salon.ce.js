@@ -59,6 +59,7 @@ class ViewTournamentSalon extends HTMLElement {
         });
     }
 
+    this.initWebSocket();
     this.addPlayer();
   }
 
@@ -144,6 +145,34 @@ class ViewTournamentSalon extends HTMLElement {
     } catch (error) {
         console.error('Could not load tournament:', error);
     }
+  }
+
+  initWebSocket() {
+    // Assurez-vous que l'URL correspond à votre serveur WebSocket.
+    this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
+
+    this.socket.onopen = () => {
+        console.log('WebSocket connection established');
+    };
+
+    this.socket.onmessage = (event) => {
+        // Logique pour gérer les messages entrants.
+        const data = JSON.parse(event.data);
+        console.log('Message received:', data);
+
+        if (data.action === 'add_Player') {
+            console.log("webSocket Add Playerrrrrrrrrrrrrr");
+            this.viewPlayer();
+        }
+    };
+
+    this.socket.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
+
+    this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
   }
 }
 

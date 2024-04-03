@@ -111,7 +111,31 @@ def create_joueur(request):
         tournament_id=tournament_id, 
         defaults={'username': username, 'tournament': tournament}
     )
-
+    # Modifier ici pour utiliser l'ID du tournoi dans le nom du groupe
+    # group_name = f"tournament_{tournament_id}"  # Nom unique pour le groupe WebSocket du tournoi
+    # channel_layer = get_channel_layer()
+    # async_to_sync(channel_layer.group_send)(
+    #     group_name,  # Utiliser l'ID du tournoi pour le groupe WebSocket
+    #     {
+    #         "type": "add_Player",  # Personnalisez ce type selon votre consommateur WebSocket
+    #         "message": {
+    #             "event": "add_Player",
+    #             "details": {
+    #                 "message": "Un nouveau joueur a rejoint le tournoi",
+    #                 "username": username,  # Inclure le nom d'utilisateur peut être utile
+    #                 "tournament_id": tournament_id
+    #             }
+    #         }
+    #     }
+    # )
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
+        {
+            "type": "add_Player",  # Type de message
+            "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+        }
+    )
     if created:
         return JsonResponse({"success": True, 'message': 'Joueur created successfully', 'joueur_id': joueur.id})
     else:
