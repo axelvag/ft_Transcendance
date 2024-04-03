@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+import logging
 
 User = get_user_model()
 # @login_required
@@ -37,7 +38,7 @@ def create_tournament(request):
                 "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
             }
         )
-        print("Message WebSocket envoyé avec succès depuis la vue.")
+        logging.critical("Message WebSocket envoyé avec succès depuis la vue.")
         return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournois.id}, status=201)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)

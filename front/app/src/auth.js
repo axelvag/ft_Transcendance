@@ -367,6 +367,11 @@ const handleOAuthResponse = async () => {
           console.error('Failed to load user profile:', userProfileData.message);
         }
       }
+      else{
+        console.error('Failed Auth42', data.error);
+        redirectTo('/');
+      }
+
     } catch (error) {
       console.error('Erreur:', error);
     }
