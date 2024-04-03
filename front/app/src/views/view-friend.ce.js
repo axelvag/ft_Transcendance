@@ -87,7 +87,14 @@ class ViewFriend extends HTMLElement {
 
   async loadSentInvitations() {
     try {
-      const response = await fetch(`http://127.0.0.1:8003/list_sent_invitations/${user.id}/`);
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_list_sent_invitations/${user.id}/`,{
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+      });
       const responseData = await response.json();
   
       const sentInvitationsList = document.getElementById('sent-invitations-list');
@@ -156,11 +163,13 @@ class ViewFriend extends HTMLElement {
   
   async cancelSentInvitation(invitationId) {
     try {
-      const response = await fetch(`http://127.0.0.1:8003/cancel_sent_invitation/`, {
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_cancel_sent_invitation/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
         },
+        credentials: 'include',
         body: JSON.stringify({ invitation_id: invitationId }),
       });
       const data = await response.json();
@@ -180,7 +189,14 @@ class ViewFriend extends HTMLElement {
   // list request friends
   async loadFriendRequests() {
     try {
-      const response = await fetch(`http://127.0.0.1:8003/list_received_invitations/${user.id}/`);
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_list_received_invitations/${user.id}/`,{
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+      });
       const responseData = await response.json();
   
       const friendRequestsList = document.getElementById('friend-requests');
@@ -265,10 +281,11 @@ class ViewFriend extends HTMLElement {
     console.log("accept", invitationId);
 
     try {
-      const response = await fetch('http://127.0.0.1:8003/accept_invitation/', {
+      const csrfToken = await getCsrfToken();
+      const response = await fetch('http://127.0.0.1:8001/accounts/proxy_accept_invitation/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({invitation_id: invitationId }),
@@ -281,6 +298,7 @@ class ViewFriend extends HTMLElement {
         console.log("okkkk");
         this.loadOfflineFriends();
         this.loadOnlineFriends();
+        this.loadFriendRequests();
       } else {
         console.log("Nullll");
       }
@@ -296,10 +314,11 @@ class ViewFriend extends HTMLElement {
     console.log("Reject", invitationId);
 
     try {
-      const response = await fetch('http://127.0.0.1:8003/reject_invitation/', {
+      const csrfToken = await getCsrfToken();
+      const response = await fetch('http://127.0.0.1:8001/accounts/proxy_reject_invitation/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({invitation_id: invitationId }),
@@ -312,6 +331,7 @@ class ViewFriend extends HTMLElement {
         console.log("okkkk bien delte");
         this.loadOfflineFriends();
         this.loadOnlineFriends();
+        this.loadFriendRequests();
       } else {
         console.log("Nullll");
       }
@@ -338,7 +358,14 @@ class ViewFriend extends HTMLElement {
     searchResultsList.innerHTML = '';
     
     try {
-      const response = await fetch(`http://127.0.0.1:8003/search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`);
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`,{
+        method: 'GET',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -446,7 +473,14 @@ class ViewFriend extends HTMLElement {
 
 async loadOnlineFriends() {
   try {
-    const response = await fetch(`http://127.0.0.1:8003/online_friends/${user.id}/`);
+    const csrfToken = await getCsrfToken();
+    const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_online_friends/${user.id}/`,{
+      method: 'GET',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -507,7 +541,14 @@ async loadOnlineFriends() {
 
 async loadOfflineFriends() {
   try {
-    const response = await fetch(`http://127.0.0.1:8003/offline_friends/${user.id}/`);
+    const csrfToken = await getCsrfToken();
+    const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_offline_friends/${user.id}/`,{
+      method: 'GET',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -571,13 +612,14 @@ async loadOfflineFriends() {
 async confirmDeleteFriend(friendId) {
 
   try {
+    const csrfToken = await getCsrfToken();
     const data = { friend_id: friendId, user_id: user.id};
-    
-    const response = await fetch('http://127.0.0.1:8003/remove_friend/', {
+    const response = await fetch('http://127.0.0.1:8001/accounts/proxy_remove_friend/', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
       },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
 

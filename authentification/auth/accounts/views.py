@@ -517,21 +517,202 @@ def proxy_send_invitation(request):
         }, status=500)
 
 
-# @login_required
-# @require_http_methods(["GET"])
-# def proxy_search_users(request):
-#     friendship_service_url = "http://friendship:8003/search_users/"
-
-#     payload = json.loads(request.body)
+# safe : cela permet de passer d'autres types de données (comme des listes) à JsonResponse
+@login_required
+@require_http_methods(["GET"])
+def proxy_search_users(request):
+    friendship_service_url = "http://friendship:8003/search_users/"
     
-#     try:
-#         # Envoie la requête POST au service de profils
-#         response = requests.post(friendship_service_url, json=payload)
+    # Extrait les paramètres de la requête GET
+    query = request.GET.get('query')
+    user_id = request.GET.get('user_id')
+    
+    # Construit l'URL avec les paramètres pour le service de profils
+    url = f"{friendship_service_url}?query={query}&user_id={user_id}"
+    
+    try:
+        # Envoie la requête GET au service de profils
+        response = requests.get(url)
         
-#         return JsonResponse(response.json(), status=response.status_code)
-#     except requests.exceptions.RequestException as e:
-#         # Log l'exception et renvoie une réponse d'erreur
-#         return JsonResponse({
-#             "status": "error",
-#             "message": "There was an error sending the invitation: " + str(e)
-#         }, status=500)
+        return JsonResponse(response.json(), status=response.status_code, safe=False)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def proxy_list_received_invitations(request, user_id):
+    friendship_service_url = "http://friendship:8003/list_received_invitations/{user_id}/"
+
+    payload = json.loads(request.body)
+
+    try:
+        # Envoie la requête POST au service de profils
+        response = requests.post(friendship_service_url, json=payload)
+        
+        return JsonResponse(response.json(), status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        # Log l'exception et renvoie une réponse d'erreur
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error sending the invitation: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def proxy_list_received_invitations(request, user_id):
+    # L'URL du service qui gère les invitations
+    friendship_service_url = "http://friendship:8003/list_received_invitations/"
+
+    url = f"{friendship_service_url}{user_id}/"
+
+    try:
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            return JsonResponse(response.json(), status=200, safe=False)
+        else:
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error fetching the invitations: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def proxy_list_sent_invitations(request, user_id):
+    friendship_service_url = "http://friendship:8003/list_sent_invitations/"
+
+    url = f"{friendship_service_url}{user_id}/"
+
+    try:
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            return JsonResponse(response.json(), status=200, safe=False)
+        else:
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error fetching the invitations: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def proxy_offline_friends(request, user_id):
+    friendship_service_url = "http://friendship:8003/offline_friends/"
+
+    url = f"{friendship_service_url}{user_id}/"
+
+    try:
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            return JsonResponse(response.json(), status=200, safe=False)
+        else:
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error fetching the invitations: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def proxy_online_friends(request, user_id):
+    friendship_service_url = "http://friendship:8003/online_friends/"
+
+    url = f"{friendship_service_url}{user_id}/"
+
+    try:
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            return JsonResponse(response.json(), status=200, safe=False)
+        else:
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error fetching the invitations: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def proxy_accept_invitation(request):
+    friendship_service_url = "http://friendship:8003/accept_invitation/"
+
+    payload = json.loads(request.body)
+    
+    try:
+        # Envoie la requête POST au service de profils
+        response = requests.post(friendship_service_url, json=payload)
+        
+        return JsonResponse(response.json(), status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        # Log l'exception et renvoie une réponse d'erreur
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error sending the invitation: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def proxy_reject_invitation(request):
+    friendship_service_url = "http://friendship:8003/reject_invitation/"
+
+    payload = json.loads(request.body)
+    
+    try:
+        # Envoie la requête POST au service de profils
+        response = requests.post(friendship_service_url, json=payload)
+        
+        return JsonResponse(response.json(), status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        # Log l'exception et renvoie une réponse d'erreur
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error sending the invitation: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def proxy_cancel_sent_invitation(request):
+    friendship_service_url = "http://friendship:8003/cancel_sent_invitation/"
+
+    payload = json.loads(request.body)
+    
+    try:
+        # Envoie la requête POST au service de profils
+        response = requests.post(friendship_service_url, json=payload)
+        
+        return JsonResponse(response.json(), status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        # Log l'exception et renvoie une réponse d'erreur
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error sending the invitation: " + str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def proxy_remove_friend(request):
+    friendship_service_url = "http://friendship:8003/remove_friend/"
+
+    payload = json.loads(request.body)
+    
+    try:
+        # Envoie la requête POST au service de profils
+        response = requests.post(friendship_service_url, json=payload)
+        
+        return JsonResponse(response.json(), status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        # Log l'exception et renvoie une réponse d'erreur
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error sending the invitation: " + str(e)
+        }, status=500)
