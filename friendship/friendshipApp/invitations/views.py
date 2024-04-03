@@ -206,10 +206,12 @@ def list_sent_invitations(request, user_id):
         invitations_data = [] #[{"to_user": invitation.to_user.username, "invitation_id": invitation.id} for invitation in invitations]
         
         for invitation in invitations:
-            from_user = invitation.from_user
-            profile_info = get_profile_info(from_user.id)  # Récupère les informations du profil
+            # from_user = invitation.from_user
+            # profile_info = get_profile_info(from_user.id)
+            to_user = invitation.to_user
+            profile_info = get_profile_info(to_user.id)
             invitations_data.append({
-                "from_user_username": from_user.username,
+                "from_user_username": to_user.username,
                 "from_user_email": profile_info.get('email'),  # Email depuis le profil
                 "from_user_avatar": profile_info.get('avatar'),  # Avatar URL depuis le profil
                 "invitation_id": invitation.id,

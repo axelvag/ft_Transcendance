@@ -23,6 +23,9 @@ class ViewFriend extends HTMLElement {
         <li class="nav-item">
           <a class="nav-link" href="#addfriends" data-bs-toggle="tab">Add friends</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#sentInvitations" data-bs-toggle="tab">Invitations Sent</a>
+        </li>
       </ul>
     
       <!-- Tab panes -->
@@ -51,6 +54,15 @@ class ViewFriend extends HTMLElement {
           </div>
           <!-- Invitations will be dynamically added here -->
         </div>
+
+        <div class="tab-pane container fade" id="sentInvitations">
+          <div class="mt-4">
+            <h2>Sent Invitations</h2>
+            <ul id="sent-invitations-list" class="list-group">
+              <!-- Les invitations envoyées seront dynamiquement ajoutées ici -->
+            </ul>
+          </div>
+        </div>
         
         <div class="tab-pane container fade" id="addfriends">
           <form class="input-group mb-3 mt-3">
@@ -66,11 +78,104 @@ class ViewFriend extends HTMLElement {
     </default-layout-main>
     `;
 
+    this.loadSentInvitations();
     this.loadFriendRequests();
     this.loadOnlineFriends();
     this.loadOfflineFriends();
     this.querySelector('#search').addEventListener('click', this.searchFriends.bind(this));
   }
+
+  async loadSentInvitations() {
+    try {
+      const response = await fetch(`http://127.0.0.1:8003/list_sent_invitations/${user.id}/`);
+      const responseData = await response.json();
+  
+      const sentInvitationsList = document.getElementById('sent-invitations-list');
+      sentInvitationsList.innerHTML = '';
+  
+      console.log("responseDataSend", responseData);
+
+      if (responseData && responseData.invitations) {
+        if (responseData.invitations.length > 0) {
+          responseData.invitations.forEach(invitation => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+  
+            // Créer un conteneur pour l'avatar, le nom d'utilisateur et l'email
+            const userInfoDiv = document.createElement('div');
+            userInfoDiv.style.display = 'flex';
+            userInfoDiv.style.alignItems = 'center';
+    
+            // Ajouter l'avatar
+            const avatarImg = document.createElement('img');
+            if (!invitation.from_user_avatar)
+              avatarImg.src = 'assets/img/default-profile.jpg';
+            else
+              avatarImg.src = invitation.from_user_avatar;
+            avatarImg.alt = 'User Avatar';
+            avatarImg.style.width = '40px';
+            avatarImg.style.height = '40px';
+            avatarImg.style.borderRadius = '50%';
+            avatarImg.style.marginRight = '50px';
+            userInfoDiv.appendChild(avatarImg);
+  
+            // Ajouter le nom d'utilisateur
+            const usernameSpan = document.createElement('span');
+            usernameSpan.textContent = invitation.from_user_username;
+            usernameSpan.style.marginRight = '50px';
+            userInfoDiv.appendChild(usernameSpan);
+  
+            // Ajouter l'email
+            const emailSpan = document.createElement('span');
+            emailSpan.textContent = invitation.from_user_email;
+            userInfoDiv.appendChild(emailSpan);
+  
+            // Juste après avoir ajouté l'email dans userInfoDiv
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.classList.add('btn', 'btn-warning'); // 'ms-auto' pour pousser le bouton à la droite dans un flex container
+            cancelButton.onclick = () => this.cancelSentInvitation(invitation.invitation_id); // Assurez-vous que c'est la bonne clé pour l'ID de l'invitation
+
+            listItem.appendChild(userInfoDiv);
+            listItem.appendChild(cancelButton);
+            sentInvitationsList.appendChild(listItem);
+          });
+        } else {
+          const noInvitationsItem = document.createElement('li');
+          noInvitationsItem.classList.add('list-group-item');
+          noInvitationsItem.textContent = "No sent invitations.";
+          sentInvitationsList.appendChild(noInvitationsItem);
+        }
+      } else {
+        console.error('Invalid response format:', responseData);
+      }
+    } catch (error) {
+      console.error('Error fetching sent invitations:', error);
+    }
+  }
+  
+  async cancelSentInvitation(invitationId) {
+    try {
+      const response = await fetch(`http://127.0.0.1:8003/cancel_sent_invitation/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ invitation_id: invitationId }),
+      });
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        console.log('Invitation cancelled successfully');
+        this.loadSentInvitations();
+      } else {
+        console.error('Failed to cancel the invitation:', data.message);
+      }
+    } catch (error) {
+      console.error('Error cancelling the invitation:', error);
+    }
+  }
+  
 
   // list request friends
   async loadFriendRequests() {
@@ -323,7 +428,8 @@ class ViewFriend extends HTMLElement {
         button.textContent = 'Friend Request Sent';
         button.classList.remove('btn-primary');
         button.classList.add('btn-success');
-        button.disabled = true; 
+        button.disabled = true;
+        this.loadSentInvitations();
       } else {
         const errorMessage = document.createElement('div');
         errorMessage.classList.add('alert', 'alert-danger');

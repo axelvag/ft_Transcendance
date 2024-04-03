@@ -19,6 +19,7 @@ class InvitationConsumer(AsyncWebsocketConsumer):
 
         # Récupérer et envoyer les notifications non livrées de manière asynchrone
         notifications = await self.get_undelivered_notifications()
+        # unread_invitations_count = await self.get_unread_invitations_count()
         for notification in notifications:
             await self.send(text_data=json.dumps({"message": notification.message}))
             await self.mark_notification_as_delivered(notification)
@@ -57,3 +58,6 @@ class InvitationConsumer(AsyncWebsocketConsumer):
             "message": event["message"]
         }))
 
+    # @database_sync_to_async
+    # def get_unread_invitations_count(self):
+    #     return Notification.objects.filter(user_id=self.user_id, delivered=False, read=False).count()
