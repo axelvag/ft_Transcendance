@@ -1,0 +1,11 @@
+.toast.toast-invert {
+  --bs-toast-color: var(--bs-body-bg);
+  --bs-toast-bg: var(--bs-body-color);
+
+  .btn-close {
+    filter: var(--bs-btn-close-white-filter);
+    html[data-bs-theme='dark'] & {
+      filter: none;
+    }
+  }
+}

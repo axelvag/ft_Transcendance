@@ -16,7 +16,7 @@ class ViewCareers extends HTMLElement {
 
         <div class="d-flex align-items-center">
           <div class="flex-shrink-0 flex-grow-0">
-            <img src="assets/img/avatar-careers.jpg" class="img-thumbnail rounded-circle" width="200" height="200" alt="character">
+            <img src="${user.avatar}" class="img-thumbnail rounded-circle" alt="character" style="width: 128px; height: 128px; object-fit: cover;">
           </div>
           <div class="flex-shrink-1 flex-grow-1 text-truncate">
             <h1 class="display-5 fw-bold mb-4 text-center text-lg irish-grover extra-large">
