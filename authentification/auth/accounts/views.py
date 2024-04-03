@@ -492,3 +492,46 @@ def delete_user_profile(request, user_id):
             return JsonResponse({"success": False, "message": "Failed to initiate profile deletion."}, status=response.status_code)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+
+###################################################################################################################################################
+# Friendship
+
+@login_required
+@require_http_methods(["POST"])
+def proxy_send_invitation(request):
+    friendship_service_url = "http://friendship:8003/send_invitation/"
+
+    payload = json.loads(request.body)
+    
+    try:
+        # Envoie la requête POST au service de profils
+        response = requests.post(friendship_service_url, json=payload)
+        
+        return JsonResponse(response.json(), status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        # Log l'exception et renvoie une réponse d'erreur
+        return JsonResponse({
+            "status": "error",
+            "message": "There was an error sending the invitation: " + str(e)
+        }, status=500)
+
+
+# @login_required
+# @require_http_methods(["GET"])
+# def proxy_search_users(request):
+#     friendship_service_url = "http://friendship:8003/search_users/"
+
+#     payload = json.loads(request.body)
+    
+#     try:
+#         # Envoie la requête POST au service de profils
+#         response = requests.post(friendship_service_url, json=payload)
+        
+#         return JsonResponse(response.json(), status=response.status_code)
+#     except requests.exceptions.RequestException as e:
+#         # Log l'exception et renvoie une réponse d'erreur
+#         return JsonResponse({
+#             "status": "error",
+#             "message": "There was an error sending the invitation: " + str(e)
+#         }, status=500)

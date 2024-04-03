@@ -1,6 +1,6 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { user } from '@/auth.js';
+import { user, getCsrfToken } from '@/auth.js';
 // import { initWebSocket } from '@/friends.js';
 
 const BASE_URL = import.meta.env.BASE_URL;
@@ -413,10 +413,11 @@ class ViewFriend extends HTMLElement {
     console.log("Sending friend request to", username);
   
     try {
-      const response = await fetch('http://127.0.0.1:8003/send_invitation/', {
+      const csrfToken = await getCsrfToken();
+      const response = await fetch('http://127.0.0.1:8001/accounts/proxy_send_invitation/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({ username: username, user_id: user.id }),

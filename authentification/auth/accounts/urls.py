@@ -26,4 +26,8 @@ urlpatterns = [
     path('update_user/', views.update_user, name='update_user'),
     path('delete_user_profile/<int:user_id>/', views.delete_user_profile, name='delete_user_profile'),
     path('get_user_profile/<int:user_id>/', views.get_user_profile, name='get_user_profile'),
+
+    #friendship
+    path('proxy_send_invitation/', views.proxy_send_invitation, name='proxy_send_invitation'),
+    # path('proxy_search_users/', views.proxy_search_users, name='proxy_search_users'),
 ]

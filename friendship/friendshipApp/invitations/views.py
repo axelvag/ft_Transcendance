@@ -166,15 +166,6 @@ def reject_invitation(request):
 # values_list est une methode QuerySet
 # double underscore __ permet de traverser les relations entre modèles pour accéder aux attributs du modèle lié.
 # flat retourne une liste aplatie ['ami1', 'ami2', 'ami3'], au lieu de [('ami1',), ('ami2',), ('ami3',)].
-@require_http_methods(["GET"])
-def get_list_friend(request, user_id):
-    try:
-        user = User.objects.get(id=user_id)
-        friends = user.friendships.values_list('friend__username', flat=True)
-        
-        return JsonResponse({"status": "success", "friends": list(friends)}, safe=False, status=200)
-    except User.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
 @require_http_methods(["GET"])
 def list_received_invitations(request, user_id):
