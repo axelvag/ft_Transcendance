@@ -78,11 +78,6 @@ const calculateNextAiPosition = (gameState, position, options = {}) => {
 
       targetY = Math.min(targetY, state.paddleMaxCenterY);
       targetY = Math.max(targetY, -state.paddleMaxCenterY);
-
-      if (position === 'left' && ballDir.x > 0) {
-        console.log('far left', targetY);
-      }
-
       return { targetY };
     }
   } catch (error) {

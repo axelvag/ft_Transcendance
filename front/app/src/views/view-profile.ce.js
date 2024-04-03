@@ -197,15 +197,10 @@ class ViewProfile extends HTMLElement {
     const defaultAvatarButton = this.querySelector('#defaultAvatar');
     defaultAvatarButton.addEventListener('click', () => {
       // Définissez ici l'URL de l'avatar par défaut
-      console.log("Default Avatar");
       let defaultAvatarUrl;
-      console.log(user.avatarDefault42);
-      console.log(user.avatarDefault);
       if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) {
-        console.log("passe1");
         defaultAvatarUrl = user.avatarDefault42;
       } else {
-        console.log("passe2");
         defaultAvatarUrl = user.avatarDefault;
       }
       const avatarImage = this.querySelector('#viewProfile-edit-avatarImg');
@@ -252,7 +247,7 @@ class ViewProfile extends HTMLElement {
         avatarFile: avatarPayload,
         // avatarFile: isDefaultAvatar ? user.avatarDefault : avatarFile,
       };
-      console.log("object newuser", newUser);
+      console.log('object newuser', newUser);
       try {
         this.querySelector('#profile-edit-loader').hidden = false;
         this.querySelector('#profile-edit').classList.add('opacity-25');
@@ -264,7 +259,7 @@ class ViewProfile extends HTMLElement {
           // if (response.message === "This user name is already taken.")
           {
             this.errorUsernameExisting = document.getElementById('error-username-existing');
-            this.errorUsernameExisting.textContent = "An error has occurred"; // categorie special d'erreur
+            this.errorUsernameExisting.textContent = 'An error has occurred'; // categorie special d'erreur
             this.errorUsernameExisting.style.display = 'block';
           }
           this.querySelector('#profile-edit-loader').hidden = true;

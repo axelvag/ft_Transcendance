@@ -82,6 +82,12 @@ class DefaultLayoutSidebar extends HTMLElement {
               </a>
             </li>
             <li class="nav-item my-1">
+              <a class="nav-link d-flex align-items-center" href="#" data-link="/game-history">
+                <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="carrers"></ui-icon> 
+                <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Game history</span>
+              </a>
+            </li>
+            <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center" href="#" data-link="/settings">
                 <ui-icon class="fs-5 me-2 flex-shrink-0 flex-grow-0" name="settings"></ui-icon>
                 <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Settings</span>
