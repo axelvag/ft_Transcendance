@@ -293,6 +293,7 @@ const deleteUser = async (csrfToken) => {
     console.log("delete user and profil");
     user.isAuthenticated = false;
     resetLocalUser(data);
+    localStorage.setItem('isLogged', 'false');
   }
 };
 

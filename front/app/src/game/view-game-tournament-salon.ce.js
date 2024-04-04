@@ -165,6 +165,9 @@ class ViewTournamentSalon extends HTMLElement {
             console.log("webSocket Add Playerrrrrrrrrrrrrr");
             this.viewPlayer();
         }
+        if (data.action === 'disconnect') {
+          socket.close();
+        }
     };
 
     this.socket.onclose = () => {

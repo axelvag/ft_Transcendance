@@ -111,14 +111,6 @@ def create_joueur(request):
         tournament_id=tournament_id, 
         defaults={'username': username, 'tournament': tournament}
     )
-    # channel_layer = get_channel_layer()
-    # async_to_sync(channel_layer.group_send)(
-    #     "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
-    #     {
-    #         "type": "add_Player",  # Type de message
-    #         "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
-    #     }
-    # )
     tournament_group_name = f"tournoi_{tournament_id}"
 
     # Envoi du message au groupe de canaux spécifique du tournoi
@@ -170,14 +162,58 @@ def tournoi_info(request, user_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+# @csrf_exempt
+# @require_http_methods(["DELETE"])
+# def delete_joueur(request, user_id):
+#     # Filtrez les tournois avec un status égal à 0
+#     joueur = Joueur.objects.filter(user_id=user_id)
+#     joueur.delete()
+#     tournament_group_name = f"tournoi_{tournament_id}"
+
+#     # Envoi du message au groupe de canaux spécifique du tournoi
+#     channel_layer = get_channel_layer()
+#     async_to_sync(channel_layer.group_send)(
+#         tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
+#         {
+#             "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
+#             "message": "Un nouveau joueur a été ajouté au tournoi"
+#         }
+#     )
+
+#     return JsonResponse({"success": True, 'message': 'Joueur delete successfully'})
+
 @csrf_exempt
 @require_http_methods(["DELETE"])
 def delete_joueur(request, user_id):
-    # Filtrez les tournois avec un status égal à 0
-    joueur = Joueur.objects.filter(user_id=user_id)
-    joueur.delete()
+    try:
+        # Trouver tous les joueurs correspondants à user_id, supposant qu'un user_id puisse avoir plusieurs entrées
+        joueurs = Joueur.objects.filter(user_id=user_id)
+        
+        for joueur in joueurs:
+            tournament_id = joueur.tournament_id  # Récupération de l'ID du tournoi avant la suppression
+            joueur.delete()
 
-    return JsonResponse({"success": True, 'message': 'Joueur delete successfully'})
+            # Construire le nom du groupe de canaux pour le tournoi spécifique
+            tournament_group_name = f"tournoi_{tournament_id}"
+
+            # Envoi du message au groupe de canaux spécifique du tournoi pour notifier la suppression du joueur
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                tournament_group_name,  # Utiliser le nom du groupe basé sur l'ID du tournoi
+                {
+                    "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
+                    "message": "Un joueur a été supprimé du tournoi"
+                }
+            )
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(tournament_group_name, {
+                'type': 'websocket.send',
+                'text': json.dumps({'action': 'disconnect'})
+            })
+        return JsonResponse({"success": True, 'message': 'Joueur(s) deleted successfully'})
+
+    except Joueur.DoesNotExist:
+        return JsonResponse({'error': 'Joueur not found'}, status=404)
 
 @csrf_exempt
 @require_http_methods(["DELETE"])
