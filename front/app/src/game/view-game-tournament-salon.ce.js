@@ -74,10 +74,10 @@ class ViewTournamentSalon extends HTMLElement {
     const data = await fetchAddPlayer(formData);
     if (data.success) {
       console.log(data);
-      this.viewPlayer();
+      // this.viewPlayer();
     } else {
       console.log("error");
-      this.viewPlayer();
+      // this.viewPlayer();
     }
   }
   
@@ -153,6 +153,7 @@ class ViewTournamentSalon extends HTMLElement {
 
     this.socket.onopen = () => {
         console.log('WebSocket connection established');
+        this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
     };
 
     this.socket.onmessage = (event) => {
