@@ -37,32 +37,44 @@ import json
 import logging
 
 class MyConsumer(AsyncWebsocketConsumer):
+    user_group_name = None  # Pour garder le nom du groupe de l'utilisateur
+
     async def connect(self):
         await self.accept()
 
         # S'abonner à un groupe général pour tous les utilisateurs
         await self.channel_layer.group_add("tournois", self.channel_name)
-
-        # L'abonnement à un groupe spécifique au tournoi sera géré via `receive`
         
+        # L'ID de l'utilisateur et l'abonnement au groupe spécifique de l'utilisateur seront gérés via `receive`
+
     async def disconnect(self, close_code):
         # Se désabonner du groupe général
         await self.channel_layer.group_discard("tournois", self.channel_name)
+        
+        # Se désabonner du groupe spécifique de l'utilisateur si présent
+        if self.user_group_name:
+            await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
         
         # Se désabonner du groupe spécifique au tournoi si présent
         if hasattr(self, 'tournoi_group_name'):
             await self.channel_layer.group_discard(self.tournoi_group_name, self.channel_name)
 
     async def receive(self, text_data):
-        logging.critical("tournament id connection")
+        logging.critical("Received data")
         text_data_json = json.loads(text_data)
         
+        # Traitement pour associer un utilisateur à un groupe spécifique
+        if 'user_id' in text_data_json:
+            user_id = text_data_json['user_id']
+            self.user_group_name = f"user_{user_id}"
+            await self.channel_layer.group_add(self.user_group_name, self.channel_name)
+            # Envoyer une confirmation ou un autre message au client si nécessaire
+            
         # Traitement pour s'abonner à un groupe spécifique au tournoi
         if 'tournoi_id' in text_data_json:
             tournoi_id = text_data_json['tournoi_id']
             self.tournoi_group_name = f"tournoi_{tournoi_id}"
             await self.channel_layer.group_add(self.tournoi_group_name, self.channel_name)
-            # Vous pouvez choisir de ne pas retourner ici si vous voulez traiter d'autres messages
             
         message = text_data_json.get('message')
         if message:
@@ -83,4 +95,10 @@ class MyConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "action": "add_Player"
         }))
+        
+    async def delete_tournament(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "delete_tournament"
+        }))
+
 

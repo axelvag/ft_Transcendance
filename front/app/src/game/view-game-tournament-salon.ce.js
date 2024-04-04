@@ -154,6 +154,7 @@ class ViewTournamentSalon extends HTMLElement {
     this.socket.onopen = () => {
         console.log('WebSocket connection established');
         this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
+        this.socket.send(JSON.stringify({user_id: this.#user.id}));
     };
 
     this.socket.onmessage = (event) => {
@@ -167,6 +168,12 @@ class ViewTournamentSalon extends HTMLElement {
         }
         if (data.action === 'disconnect') {
           socket.close();
+        }
+        if (data.action === 'delete_tournament') {
+          resetLocalTournament();
+          this.deletePlayer();
+          redirectTo(this.#backUrl);
+          this.socket.close();
         }
     };
 

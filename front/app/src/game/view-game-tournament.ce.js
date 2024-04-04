@@ -102,6 +102,9 @@ class ViewTournament extends HTMLElement {
       if (event.target.classList.contains('joinTournamentBtn')) {
           const tournamentId = event.target.id.replace('joinTournament-', '');
           console.log(`Rejoindre le tournoi avec l'ID : ${tournamentId}`);
+          if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.socket.close();
+          }
           fetchGetTournament(tournamentId);
       }
     });
@@ -114,6 +117,14 @@ class ViewTournament extends HTMLElement {
     this.querySelector('#tournamentForm').addEventListener('submit', this.submitForm.bind(this));
 
     this.initWebSocket();
+    this.querySelector('a[data-link]').addEventListener('click', (e) => {
+      e.preventDefault();
+    
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.socket.close();
+      }
+    
+    });
   }
 
   async submitForm(event) {
@@ -135,6 +146,9 @@ class ViewTournament extends HTMLElement {
       console.log(data);
       // this.loadTournois();
       this.querySelector('#formOverlay').style.display = 'none';
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.socket.close();
+      }
       fetchGetTournament(data.tournoi_id);
     } else {
       console.log(data);
@@ -167,7 +181,7 @@ class ViewTournament extends HTMLElement {
                 <div style="display: flex; flex-direction: column;">
                     <h3>${tournoi.name}</h3>
                     <div style="display: flex;">
-                        <p style="margin-right: 10px;">Max Players: ${tournoi.max_players}</p>
+                        <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
                         <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
                     </div>
                 </div>
