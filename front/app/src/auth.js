@@ -97,8 +97,12 @@ const isAuthenticated = async () => {
       if (data.success) {
         setLocalUser(data);
         console.log("dwedededee",user.id);
+        const csrfToken = await getCsrfToken();
         const userProfileResponse = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
           method: 'GET',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
