@@ -43,11 +43,11 @@ def update_user(request):
             return JsonResponse({"success": False, "message": "Invalid or missing JSON data."}, status=400)
 
     # Mise à jour des informations d'authentification via un service externe
-    auth_service_url = "http://authentification:8001/accounts/update_profile/"
+    auth_service_url = "https://authentification:8001/accounts/update_profile/"
     auth_data = {'id': user_id, 'username': username}#, 'email': email}
 
     try:
-        auth_response = requests.post(auth_service_url, json=auth_data)
+        auth_response = requests.post(auth_service_url, json=auth_data, verify=False)
         if auth_response.status_code == 400:
             return JsonResponse({"success": False, "message": "This user name is already taken."})
         if auth_response.status_code != 200:
@@ -90,7 +90,7 @@ def update_user(request):
         return JsonResponse({"success": False, "message": "Error updating or creating profile."})
 
     # Construction de l'URL de l'avatar
-    base_url = 'http://127.0.0.1:8001'
+    base_url = 'https://127.0.0.1:8001'
 
     avatar_url = base_url + profile.avatar.url if profile and profile.avatar else None
     if avatar is None:
@@ -127,9 +127,9 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         profile = None
 
     # Faites un appel au service d'authentification pour obtenir username et email
-    auth_service_url = "http://authentification:8001/accounts/get_profile/"
+    auth_service_url = "https://authentification:8001/accounts/get_profile/"
     try:
-        auth_response = requests.get(f"{auth_service_url}{user_id}")
+        auth_response = requests.get(f"{auth_service_url}{user_id}", verify=False)
         if auth_response.status_code == 200:
             auth_data = auth_response.json()
             username = auth_data.get('username', '')
@@ -141,7 +141,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         return JsonResponse({"success": False, "message": "Error calling authentication service."})
 
     # Construction de l'URL de l'avatar si disponible
-    base_url = 'http://127.0.0.1:8001'
+    base_url = 'https://127.0.0.1:8001'
 
     avatar_url = base_url + profile.avatar.url if profile and profile.avatar else None
     if profile is not None and avatar_url is None:

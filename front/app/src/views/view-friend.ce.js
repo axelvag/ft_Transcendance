@@ -127,7 +127,7 @@ class ViewFriend extends HTMLElement {
     const friendName = this.querySelector('#friend-name').value;
     console.log('friend-->', friendName);
 
-    fetch('http://127.0.0.1:8003/home/', {
+    fetch('https://127.0.0.1:8003/home/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
