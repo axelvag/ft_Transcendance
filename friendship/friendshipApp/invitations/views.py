@@ -69,6 +69,18 @@ def send_invitation(request):
                 invitation=invitation
             )
 
+            ############################################
+            notification = Notification.objects.create(
+                user=to_user,
+                message=f"You have a new invitation from {from_user.username}.",
+                invitation=invitation
+            )
+            # Récupérer l'ID de la notification créée
+            notification_id = notification.id
+            logging.critical(notification_id)
+            ############################################
+
+
             channel_layer = get_channel_layer()
             group_name = f"user{to_user.id}"
 
@@ -77,7 +89,8 @@ def send_invitation(request):
                 group_name,
                 {
                     "type": "invitation_notification",
-                    "message": f"You have a new invitation from {from_user.username}."
+                    "message": f"You have a new invitation from {from_user.username}.",
+                    "id": notification_id
                 }
             )
 

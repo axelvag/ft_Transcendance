@@ -4,6 +4,7 @@ import json
 from invitations.models import Notification, UserStatus
 from channels.db import database_sync_to_async
 from django.utils import timezone
+import logging
 
 class InvitationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -22,17 +23,26 @@ class InvitationConsumer(AsyncWebsocketConsumer):
         # unread_invitations_count = await self.get_unread_invitations_count()
         for notification in notifications:
             await self.send(text_data=json.dumps({"message": notification.message}))
-            await self.mark_notification_as_delivered(notification)
+            await self.mark_notification_as_delivered_by_id(notification.id)
 
     # return list, obliger pour pouvoir iterer sur un querySet
     @database_sync_to_async
     def get_undelivered_notifications(self):
         return list(Notification.objects.filter(user_id=self.user_id, delivered=False))
 
+    # @database_sync_to_async
+    # def mark_notification_as_delivered(self, notification):
+    #     notification.delivered = True
+    #     notification.save()
     @database_sync_to_async
-    def mark_notification_as_delivered(self, notification):
-        notification.delivered = True
-        notification.save()
+    def mark_notification_as_delivered_by_id(self, notification_id):
+        # Trouver la notification par son ID et la marquer comme livrée
+        try:
+            notification = Notification.objects.get(id=notification_id)
+            notification.delivered = True
+            notification.save()
+        except Notification.DoesNotExist:
+            pass  # Gérer l'exception si nécessaire
 
     @database_sync_to_async
     def update_user_status(self, is_online):
@@ -48,14 +58,21 @@ class InvitationConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def receive(self, text_data=None, bytes_data=None):
-        pass
-        # await self.send(text_data=json.dumps({"message": "Test response from server"}))
+        text_data_json = json.loads(text_data)
+        message_type = text_data_json['type']
+        
+        if message_type == 'notification_received':
+            notification_id = text_data_json['id']
+            logging.critical("Helloooooooooo")
+            await self.mark_notification_as_delivered_by_id(notification_id)
 
 
     async def invitation_notification(self, event):
-        print(f"Sending invitation notification: {event}")
+        # print(f"Sending invitation notification: {event}")
+        logging.critical(event)
         await self.send(text_data=json.dumps({
-            "message": event["message"]
+            "message": event["message"],
+            "id": event["id"]
         }))
 
     # @database_sync_to_async
