@@ -138,6 +138,11 @@ class ViewTournamentSalon extends HTMLElement {
         const nbPlayersWaiting = this.#tournament.maxPlayer - players.length;
         console.log(this.#tournament.maxPlayer);
         console.log(players.length);
+        if (nbPlayersWaiting === 0) {
+          // Si aucun joueur en attente, passer à view-game-tournament.ce.js
+          redirectTo(`/game/tournament/start`);
+          return; // Arrêter l'exécution de la fonction
+        }
         const waitingElement = document.createElement('div');
         waitingElement.innerHTML = `<h3>${nbPlayersWaiting} player(s) waiting</h3>`;
         listElement.appendChild(waitingElement);
