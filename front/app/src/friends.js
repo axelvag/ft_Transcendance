@@ -64,7 +64,9 @@ const initWebSocket = () => {
       // Vérifier si la notification a déjà été reçue
       if (!receivedNotifications.includes(data.id)) {
         console.log("onmessage", data);
-        notify(data.message); // Afficher la notification
+        if (data.message){
+          notify(data.message); // Afficher la notification
+        }
     
         // Ajouter l'ID de la notification aux notifications déjà reçues et mettre à jour le localStorage
         receivedNotifications.push(data.id);

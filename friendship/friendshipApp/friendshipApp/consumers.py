@@ -23,6 +23,7 @@ class InvitationConsumer(AsyncWebsocketConsumer):
         # unread_invitations_count = await self.get_unread_invitations_count()
         for notification in notifications:
             await self.send(text_data=json.dumps({"message": notification.message}))
+            # await self.mark_notification_as_delivered(notification)
             await self.mark_notification_as_delivered_by_id(notification.id)
 
     # return list, obliger pour pouvoir iterer sur un querySet
@@ -65,6 +66,7 @@ class InvitationConsumer(AsyncWebsocketConsumer):
             notification_id = text_data_json['id']
             logging.critical("Helloooooooooo")
             await self.mark_notification_as_delivered_by_id(notification_id)
+        # pass
 
 
     async def invitation_notification(self, event):

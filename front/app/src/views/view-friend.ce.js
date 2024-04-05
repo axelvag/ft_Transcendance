@@ -78,6 +78,8 @@ class ViewFriend extends HTMLElement {
     </default-layout-main>
     `;
 
+    this.initInvitationsWebSocket();
+
     this.loadSentInvitations();
     this.loadFriendRequests();
     this.loadOnlineFriends();
@@ -85,10 +87,38 @@ class ViewFriend extends HTMLElement {
     this.querySelector('#search').addEventListener('click', this.searchFriends.bind(this));
   }
 
+  initInvitationsWebSocket() {
+    const wsUrl = `ws://127.0.0.1:8003/ws/invitations/${user.id}/`;
+    const wsInstance = new WebSocket(wsUrl);
+
+    wsInstance.onopen = () => {
+      console.log("WebSocket pour les invitations est connecté.");
+    };
+
+    wsInstance.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("WebSocket message reçu:", data);
+
+      if (data.message) {
+        console.log("Yesss");
+        this.loadFriendRequests();
+        this.loadSentInvitations();
+      }
+    };
+
+    wsInstance.onerror = (event) => {
+      console.error("WebSocket error observed:", event);
+    };
+
+    wsInstance.onclose = (event) => {
+      console.log("WebSocket pour les invitations est fermé:", event.code, event.reason);
+    };
+  }
+
   async loadSentInvitations() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_list_sent_invitations/${user.id}/`,{
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_list_sent_invitations/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -96,10 +126,10 @@ class ViewFriend extends HTMLElement {
         credentials: 'include',
       });
       const responseData = await response.json();
-  
+
       const sentInvitationsList = document.getElementById('sent-invitations-list');
       sentInvitationsList.innerHTML = '';
-  
+
       console.log("responseDataSend", responseData);
 
       if (responseData && responseData.invitations) {
@@ -107,12 +137,12 @@ class ViewFriend extends HTMLElement {
           responseData.invitations.forEach(invitation => {
             const listItem = document.createElement('li');
             listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-  
+
             // Créer un conteneur pour l'avatar, le nom d'utilisateur et l'email
             const userInfoDiv = document.createElement('div');
             userInfoDiv.style.display = 'flex';
             userInfoDiv.style.alignItems = 'center';
-    
+
             // Ajouter l'avatar
             const avatarImg = document.createElement('img');
             if (!invitation.from_user_avatar)
@@ -125,18 +155,18 @@ class ViewFriend extends HTMLElement {
             avatarImg.style.borderRadius = '50%';
             avatarImg.style.marginRight = '50px';
             userInfoDiv.appendChild(avatarImg);
-  
+
             // Ajouter le nom d'utilisateur
             const usernameSpan = document.createElement('span');
             usernameSpan.textContent = invitation.from_user_username;
             usernameSpan.style.marginRight = '50px';
             userInfoDiv.appendChild(usernameSpan);
-  
+
             // Ajouter l'email
             const emailSpan = document.createElement('span');
             emailSpan.textContent = invitation.from_user_email;
             userInfoDiv.appendChild(emailSpan);
-  
+
             // Juste après avoir ajouté l'email dans userInfoDiv
             const cancelButton = document.createElement('button');
             cancelButton.textContent = 'Cancel';
@@ -160,7 +190,7 @@ class ViewFriend extends HTMLElement {
       console.error('Error fetching sent invitations:', error);
     }
   }
-  
+
   async cancelSentInvitation(invitationId) {
     try {
       const csrfToken = await getCsrfToken();
@@ -173,7 +203,7 @@ class ViewFriend extends HTMLElement {
         body: JSON.stringify({ invitation_id: invitationId }),
       });
       const data = await response.json();
-      
+
       if (data.status === 'success') {
         console.log('Invitation cancelled successfully');
         this.loadSentInvitations();
@@ -184,13 +214,13 @@ class ViewFriend extends HTMLElement {
       console.error('Error cancelling the invitation:', error);
     }
   }
-  
+
 
   // list request friends
   async loadFriendRequests() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_list_received_invitations/${user.id}/`,{
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_list_received_invitations/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -198,22 +228,22 @@ class ViewFriend extends HTMLElement {
         credentials: 'include',
       });
       const responseData = await response.json();
-  
+
       const friendRequestsList = document.getElementById('friend-requests');
       friendRequestsList.innerHTML = '';
-  
+
       if (responseData && responseData.invitations) {
         if (responseData.invitations.length > 0) {
           responseData.invitations.forEach(invitation => {
             const listItem = document.createElement('li');
             listItem.id = `invitation-${invitation.invitation_id}`;
             listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-  
+
             // Create a container for the avatar, username, and email
             const userInfoDiv = document.createElement('div');
             userInfoDiv.style.display = 'flex';
             userInfoDiv.style.alignItems = 'center';
-  
+
             // Add the avatar
             const avatarImg = document.createElement('img');
             if (!invitation.from_user_avatar)
@@ -226,39 +256,39 @@ class ViewFriend extends HTMLElement {
             avatarImg.style.borderRadius = '50%'; // Make it round
             avatarImg.style.marginRight = '50px';
             userInfoDiv.appendChild(avatarImg);
-  
+
             // Add the username
             const usernameSpan = document.createElement('span');
             usernameSpan.textContent = invitation.from_user_username;
             usernameSpan.style.marginRight = '50px';
             userInfoDiv.appendChild(usernameSpan);
-  
+
             // Add the email
             const emailSpan = document.createElement('span');
             emailSpan.textContent = invitation.from_user_email;
             userInfoDiv.appendChild(emailSpan);
-  
+
             // Create the buttons for accept and reject
             const buttonGroup = document.createElement('div');
             buttonGroup.classList.add('btn-group');
-  
+
             const acceptButton = document.createElement('button');
             acceptButton.textContent = 'Accept';
             acceptButton.classList.add('btn', 'btn-success', 'mx-1');
             acceptButton.onclick = () => this.acceptFriendRequest(invitation.invitation_id);
-  
+
             const rejectButton = document.createElement('button');
             rejectButton.textContent = 'Reject';
             rejectButton.classList.add('btn', 'btn-danger', 'mx-1');
             rejectButton.onclick = () => this.rejectFriendRequest(invitation.invitation_id);
-  
+
             buttonGroup.appendChild(acceptButton);
             buttonGroup.appendChild(rejectButton);
-  
+
             // Append everything to the list item
             listItem.appendChild(userInfoDiv);
             listItem.appendChild(buttonGroup);
-  
+
             friendRequestsList.appendChild(listItem);
           });
         } else {
@@ -274,10 +304,10 @@ class ViewFriend extends HTMLElement {
       console.error('Error fetching friend requests:', error);
     }
   }
-  
+
 
   // btn accept
-  async acceptFriendRequest(invitationId){
+  async acceptFriendRequest(invitationId) {
     console.log("accept", invitationId);
 
     try {
@@ -288,11 +318,11 @@ class ViewFriend extends HTMLElement {
           'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
-        body: JSON.stringify({invitation_id: invitationId }),
+        body: JSON.stringify({ invitation_id: invitationId }),
       });
       const data = await response.json();
       console.log('data:', data);
-      
+
       if (data.status === 'success') {
         document.querySelector(`#invitation-${invitationId}`).remove();
         console.log("okkkk");
@@ -302,7 +332,7 @@ class ViewFriend extends HTMLElement {
       } else {
         console.log("Nullll");
       }
-  
+
     } catch (error) {
       console.error('Error:', error);
       console.log("Failed to send friend request: " + error.message);
@@ -310,7 +340,7 @@ class ViewFriend extends HTMLElement {
   }
 
   // btn reject
-  async rejectFriendRequest(invitationId){
+  async rejectFriendRequest(invitationId) {
     console.log("Reject", invitationId);
 
     try {
@@ -321,11 +351,11 @@ class ViewFriend extends HTMLElement {
           'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
-        body: JSON.stringify({invitation_id: invitationId }),
+        body: JSON.stringify({ invitation_id: invitationId }),
       });
       const data = await response.json();
       console.log('data:', data);
-      
+
       if (data.status === 'success') {
         document.querySelector(`#invitation-${invitationId}`).remove();
         console.log("okkkk bien delte");
@@ -335,7 +365,7 @@ class ViewFriend extends HTMLElement {
       } else {
         console.log("Nullll");
       }
-  
+
     } catch (error) {
       console.error('Error:', error);
       console.log("Failed to send friend request: " + error.message);
@@ -346,20 +376,20 @@ class ViewFriend extends HTMLElement {
   async searchFriends() {
     const searchInputField = this.querySelector('#search-friend-name');
     const searchInput = searchInputField.value.trim();
-    
+
     if (searchInput === '') {
       console.log("The field is empty");
       const searchResultsList = this.querySelector('#search-results');
       searchResultsList.innerHTML = '<li class="list-group-item">Please enter a search username.</li>';
       return;
     }
-  
+
     const searchResultsList = this.querySelector('#search-results');
     searchResultsList.innerHTML = '';
-    
+
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`,{
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -369,10 +399,10 @@ class ViewFriend extends HTMLElement {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const searchResults = await response.json();
       console.log("searchResults", searchResults);
-  
+
       if (searchResults.length === 0) {
         const noResultsItem = document.createElement('li');
         noResultsItem.classList.add('list-group-item');
@@ -385,13 +415,13 @@ class ViewFriend extends HTMLElement {
           listItem.style.display = 'flex';
           listItem.style.justifyContent = 'space-between';
           listItem.style.alignItems = 'center';
-          
-          
+
+
           // Create a container for the avatar and username
           const userInfoDiv = document.createElement('div');
           userInfoDiv.style.display = 'flex';
           userInfoDiv.style.alignItems = 'center';
-          
+
           // Add the user's avatar
           const avatarImg = document.createElement('img');
           if (!user.avatar_url)
@@ -404,25 +434,25 @@ class ViewFriend extends HTMLElement {
           avatarImg.style.borderRadius = '50%'; // Make it round
           avatarImg.style.marginRight = '50px';
           userInfoDiv.appendChild(avatarImg);
-  
+
           // Add the user's username
           const textSpan = document.createElement('span');
           textSpan.textContent = user.username;
           textSpan.style.marginRight = '50px';
           userInfoDiv.appendChild(textSpan);
-          
+
           // Add the user's email
           const emailSpan = document.createElement('span');
           emailSpan.textContent = user.email;
           // emailSpan.style.marginRight = '150px';
           userInfoDiv.appendChild(emailSpan);
-  
+
           // Create the friend request button
           const friendRequestButton = document.createElement('button');
           friendRequestButton.textContent = 'Send Friend Request';
           friendRequestButton.classList.add('btn', 'btn-primary');
           friendRequestButton.onclick = () => this.sendFriendRequest(user.username, friendRequestButton);
-  
+
           // Append everything to the listItem
           listItem.appendChild(userInfoDiv);
           listItem.appendChild(friendRequestButton);
@@ -433,12 +463,12 @@ class ViewFriend extends HTMLElement {
       console.error('Search error:', error);
     }
   }
-  
-  
+
+
   //Send Invitation user
   async sendFriendRequest(username, button) {
     console.log("Sending friend request to", username);
-  
+
     try {
       const csrfToken = await getCsrfToken();
       const response = await fetch('http://127.0.0.1:8001/accounts/proxy_send_invitation/', {
@@ -451,7 +481,7 @@ class ViewFriend extends HTMLElement {
       });
       const data = await response.json();
       console.log('data:', data);
-      
+
       if (data.status === 'success') {
         button.textContent = 'Friend Request Sent';
         button.classList.remove('btn-primary');
@@ -464,176 +494,176 @@ class ViewFriend extends HTMLElement {
         errorMessage.textContent = "Failed to send friend request: " + (data.message || "Unknown error");
         document.querySelector('#error-messages').appendChild(errorMessage);
       }
-  
+
     } catch (error) {
       console.error('Error:', error);
       alert("Failed to send friend request: " + error.message);
     }
   }
 
-async loadOnlineFriends() {
-  try {
-    const csrfToken = await getCsrfToken();
-    const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_online_friends/${user.id}/`,{
-      method: 'GET',
+  async loadOnlineFriends() {
+    try {
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_online_friends/${user.id}/`, {
+        method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const { online_friends } = await response.json();
-
-    const onlineFriendsList = this.querySelector('#online-friends');
-    onlineFriendsList.innerHTML = '';
-
-    if (online_friends.length > 0) {
-      online_friends.forEach(friend => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-between');
-
-        // Avatar
-        const avatarImg = document.createElement('img');
-        if (!friend.avatar_url)
-          avatarImg.src = 'assets/img/default-profile.jpg';
-        else
-          avatarImg.src = friend.avatar_url;
-        avatarImg.alt = 'User Avatar';
-        avatarImg.style.width = '40px';  // Or the size you prefer
-        avatarImg.style.height = '40px'; // Or the size you prefer
-        avatarImg.style.borderRadius = '50%';
-        avatarImg.style.marginRight = '50px';
-        listItem.appendChild(avatarImg);
-
-        // Username
-        const usernameSpan = document.createElement('span');
-        usernameSpan.textContent = friend.username;
-        usernameSpan.style.marginRight = '50px';
-        listItem.appendChild(usernameSpan);
-
-        // Email
-        const emailSpan = document.createElement('span');
-        emailSpan.textContent = friend.email;
-        listItem.appendChild(emailSpan);
-
-        // Delete friend button
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.classList.add('btn', 'btn-danger');
-        deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
-
-        listItem.appendChild(deleteButton);
-
-        onlineFriendsList.appendChild(listItem);
       });
-    } else {
-      const noOnlineFriends = document.createElement('li');
-      noOnlineFriends.classList.add('list-group-item');
-      noOnlineFriends.textContent = "No friends online.";
-      onlineFriendsList.appendChild(noOnlineFriends);
-    }
-  } catch (error) {
-    console.error('Error loading online friends:', error);
-  }
-}
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const { online_friends } = await response.json();
 
-async loadOfflineFriends() {
-  try {
-    const csrfToken = await getCsrfToken();
-    const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_offline_friends/${user.id}/`,{
-      method: 'GET',
+      const onlineFriendsList = this.querySelector('#online-friends');
+      onlineFriendsList.innerHTML = '';
+
+      if (online_friends.length > 0) {
+        online_friends.forEach(friend => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-between');
+
+          // Avatar
+          const avatarImg = document.createElement('img');
+          if (!friend.avatar_url)
+            avatarImg.src = 'assets/img/default-profile.jpg';
+          else
+            avatarImg.src = friend.avatar_url;
+          avatarImg.alt = 'User Avatar';
+          avatarImg.style.width = '40px';  // Or the size you prefer
+          avatarImg.style.height = '40px'; // Or the size you prefer
+          avatarImg.style.borderRadius = '50%';
+          avatarImg.style.marginRight = '50px';
+          listItem.appendChild(avatarImg);
+
+          // Username
+          const usernameSpan = document.createElement('span');
+          usernameSpan.textContent = friend.username;
+          usernameSpan.style.marginRight = '50px';
+          listItem.appendChild(usernameSpan);
+
+          // Email
+          const emailSpan = document.createElement('span');
+          emailSpan.textContent = friend.email;
+          listItem.appendChild(emailSpan);
+
+          // Delete friend button
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Delete';
+          deleteButton.classList.add('btn', 'btn-danger');
+          deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
+
+          listItem.appendChild(deleteButton);
+
+          onlineFriendsList.appendChild(listItem);
+        });
+      } else {
+        const noOnlineFriends = document.createElement('li');
+        noOnlineFriends.classList.add('list-group-item');
+        noOnlineFriends.textContent = "No friends online.";
+        onlineFriendsList.appendChild(noOnlineFriends);
+      }
+    } catch (error) {
+      console.error('Error loading online friends:', error);
+    }
+  }
+
+  async loadOfflineFriends() {
+    try {
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_offline_friends/${user.id}/`, {
+        method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const { offline_friends } = await response.json();
-    console.log("test",offline_friends);
-
-    const offlineFriendsList = this.querySelector('#offline-friends');
-    offlineFriendsList.innerHTML = '';
-
-    if (offline_friends.length > 0) {
-      offline_friends.forEach(friend => {
-        const listItem = document.createElement('li');
-        // listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-start');
-        listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-between');
-
-        // Avatar
-        const avatarImg = document.createElement('img');
-        if (!friend.avatar_url)
-          avatarImg.src = 'assets/img/default-profile.jpg';
-        else
-          avatarImg.src = friend.avatar_url;
-        avatarImg.alt = 'User Avatar';
-        avatarImg.style.width = '40px';
-        avatarImg.style.height = '40px';
-        avatarImg.style.borderRadius = '50%';
-        avatarImg.style.marginRight = '50px';
-        listItem.appendChild(avatarImg);
-
-        // Username
-        const usernameSpan = document.createElement('span');
-        usernameSpan.textContent = friend.username;
-        usernameSpan.style.marginRight = '50px';
-        listItem.appendChild(usernameSpan);
-
-        // Email
-        const emailSpan = document.createElement('span');
-        emailSpan.textContent = friend.email;
-        listItem.appendChild(emailSpan);
-
-        // Delete friend button
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.classList.add('btn', 'btn-danger');
-        deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
-
-        listItem.appendChild(deleteButton);
-        offlineFriendsList.appendChild(listItem);
       });
-    } else {
-      const noOfflineFriends = document.createElement('li');
-      noOfflineFriends.classList.add('list-group-item');
-      noOfflineFriends.textContent = "No friends offline.";
-      offlineFriendsList.appendChild(noOfflineFriends);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const { offline_friends } = await response.json();
+      console.log("test", offline_friends);
+
+      const offlineFriendsList = this.querySelector('#offline-friends');
+      offlineFriendsList.innerHTML = '';
+
+      if (offline_friends.length > 0) {
+        offline_friends.forEach(friend => {
+          const listItem = document.createElement('li');
+          // listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-start');
+          listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-between');
+
+          // Avatar
+          const avatarImg = document.createElement('img');
+          if (!friend.avatar_url)
+            avatarImg.src = 'assets/img/default-profile.jpg';
+          else
+            avatarImg.src = friend.avatar_url;
+          avatarImg.alt = 'User Avatar';
+          avatarImg.style.width = '40px';
+          avatarImg.style.height = '40px';
+          avatarImg.style.borderRadius = '50%';
+          avatarImg.style.marginRight = '50px';
+          listItem.appendChild(avatarImg);
+
+          // Username
+          const usernameSpan = document.createElement('span');
+          usernameSpan.textContent = friend.username;
+          usernameSpan.style.marginRight = '50px';
+          listItem.appendChild(usernameSpan);
+
+          // Email
+          const emailSpan = document.createElement('span');
+          emailSpan.textContent = friend.email;
+          listItem.appendChild(emailSpan);
+
+          // Delete friend button
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Delete';
+          deleteButton.classList.add('btn', 'btn-danger');
+          deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
+
+          listItem.appendChild(deleteButton);
+          offlineFriendsList.appendChild(listItem);
+        });
+      } else {
+        const noOfflineFriends = document.createElement('li');
+        noOfflineFriends.classList.add('list-group-item');
+        noOfflineFriends.textContent = "No friends offline.";
+        offlineFriendsList.appendChild(noOfflineFriends);
+      }
+    } catch (error) {
+      console.error('Error loading offline friends:', error);
     }
-  } catch (error) {
-    console.error('Error loading offline friends:', error);
   }
-}
 
-// Function to confirm deletion and send delete request
-async confirmDeleteFriend(friendId) {
+  // Function to confirm deletion and send delete request
+  async confirmDeleteFriend(friendId) {
 
-  try {
-    const csrfToken = await getCsrfToken();
-    const data = { friend_id: friendId, user_id: user.id};
-    const response = await fetch('http://127.0.0.1:8001/accounts/proxy_remove_friend/', {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify(data),
-    });
+    try {
+      const csrfToken = await getCsrfToken();
+      const data = { friend_id: friendId, user_id: user.id };
+      const response = await fetch('http://127.0.0.1:8001/accounts/proxy_remove_friend/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
 
-    if (response.ok) {
-      console.log("Ami supprimé avec succès.");
-      this.loadOfflineFriends();
-      this.loadOnlineFriends();
-    } else {
-      throw new Error('Une erreur est survenue lors de la suppression de l\'ami.');
+      if (response.ok) {
+        console.log("Ami supprimé avec succès.");
+        this.loadOfflineFriends();
+        this.loadOnlineFriends();
+      } else {
+        throw new Error('Une erreur est survenue lors de la suppression de l\'ami.');
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'ami:", error);
     }
-  } catch (error) {
-    console.error("Erreur lors de la suppression de l'ami:", error);
   }
-}
 
 }
 
