@@ -175,6 +175,14 @@ class ViewTournamentSalon extends HTMLElement {
           redirectTo(this.#backUrl);
           this.socket.close();
         }
+        if (data.action === 'display_player') {
+          this.viewPlayer();
+        }
+        if (data.action === 'player_disconnected') {
+          resetLocalTournament();
+          this.deletePlayer();
+          this.socket.close();
+        }
     };
 
     this.socket.onclose = () => {
@@ -184,6 +192,11 @@ class ViewTournamentSalon extends HTMLElement {
     this.socket.onerror = (error) => {
         console.error('WebSocket error:', error);
     };
+
+    window.addEventListener('beforeunload', () => {
+      this.socket.close();
+    });
+
   }
 }
 
