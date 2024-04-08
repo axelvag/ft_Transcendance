@@ -98,6 +98,12 @@ class ViewFriend extends HTMLElement {
     wsInstance.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log("WebSocket message reçu:", data);
+      console.log("Message-->", data.message);
+
+      if (data.action === "accept_invitation") {
+        this.loadOnlineFriends();
+        this.loadOfflineFriends();
+      }
 
       if (data.message) {
         console.log("Yesss");
@@ -228,6 +234,7 @@ class ViewFriend extends HTMLElement {
         credentials: 'include',
       });
       const responseData = await response.json();
+      console.log("999999999999999999999999999", responseData);
 
       const friendRequestsList = document.getElementById('friend-requests');
       friendRequestsList.innerHTML = '';
@@ -275,7 +282,7 @@ class ViewFriend extends HTMLElement {
             const acceptButton = document.createElement('button');
             acceptButton.textContent = 'Accept';
             acceptButton.classList.add('btn', 'btn-success', 'mx-1');
-            acceptButton.onclick = () => this.acceptFriendRequest(invitation.invitation_id);
+            acceptButton.onclick = () => this.acceptFriendRequest(invitation.invitation_id, invitation.from_user_username);
 
             const rejectButton = document.createElement('button');
             rejectButton.textContent = 'Reject';
@@ -307,8 +314,9 @@ class ViewFriend extends HTMLElement {
 
 
   // btn accept
-  async acceptFriendRequest(invitationId) {
+  async acceptFriendRequest(invitationId, from_user_username) {
     console.log("accept", invitationId);
+    console.log("accept", from_user_username);
 
     try {
       const csrfToken = await getCsrfToken();
@@ -318,10 +326,9 @@ class ViewFriend extends HTMLElement {
           'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
-        body: JSON.stringify({ invitation_id: invitationId }),
+        body: JSON.stringify({ invitation_id: invitationId, username: from_user_username }),
       });
       const data = await response.json();
-      console.log('data:', data);
 
       if (data.status === 'success') {
         document.querySelector(`#invitation-${invitationId}`).remove();

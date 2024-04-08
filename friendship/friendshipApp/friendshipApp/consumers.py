@@ -31,10 +31,6 @@ class InvitationConsumer(AsyncWebsocketConsumer):
     def get_undelivered_notifications(self):
         return list(Notification.objects.filter(user_id=self.user_id, delivered=False))
 
-    # @database_sync_to_async
-    # def mark_notification_as_delivered(self, notification):
-    #     notification.delivered = True
-    #     notification.save()
     @database_sync_to_async
     def mark_notification_as_delivered_by_id(self, notification_id):
         # Trouver la notification par son ID et la marquer comme livrée
@@ -77,6 +73,7 @@ class InvitationConsumer(AsyncWebsocketConsumer):
             "id": event["id"]
         }))
 
-    # @database_sync_to_async
-    # def get_unread_invitations_count(self):
-    #     return Notification.objects.filter(user_id=self.user_id, delivered=False, read=False).count()
+    async def accept_invitation(self, event):
+        await self.send(text_data=json.dumps({
+            "action": event["message"]
+        }))

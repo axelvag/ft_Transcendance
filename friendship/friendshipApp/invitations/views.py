@@ -145,6 +145,9 @@ def accept_invitation(request):
 
     data = json.loads(request.body)
     invitation_id = data.get('invitation_id')
+    username = data.get('username')
+
+    to_user = User.objects.get(username=username)
     logging.critical(invitation_id)
 
     try:
@@ -156,6 +159,16 @@ def accept_invitation(request):
         # Création de la relation d'amitié dans les deux sens
         Friendship.objects.create(user=invitation.from_user, friend=invitation.to_user)
         Friendship.objects.create(user=invitation.to_user, friend=invitation.from_user)
+
+        channel_layer = get_channel_layer()
+        group_name = f"user{to_user.id}"
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                "type": "accept_invitation",
+                "message": "accept_invitation",
+            }
+        )
 
         return JsonResponse({"status": "success", "message": "Invitation accepted and friendship created."}, status=200)
     except Invitation.DoesNotExist:
