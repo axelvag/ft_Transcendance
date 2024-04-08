@@ -3,6 +3,9 @@ import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { getProfile, getCsrfToken } from '@/auth.js';
 import { redirectTo } from '@/router.js';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 class ViewGameHistory extends HTMLElement {
   #user;
   #games = [];
@@ -50,7 +53,7 @@ class ViewGameHistory extends HTMLElement {
 
   async fetchGames() {
     try {
-      this.#games = await fetch(`https://127.0.0.1:8009/games/history/${this.#user.id}`).then(res => res.json());
+      this.#games = await fetch(`${BASE_URL}:8009/games/history/${this.#user.id}`).then(res => res.json());
 
       // Fetch opponent profiles
       const opponents = {};
@@ -59,7 +62,7 @@ class ViewGameHistory extends HTMLElement {
       const csrfToken = await getCsrfToken();
       await Promise.all(
         opponentIds.map(async opponentId => {
-          const opponent = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${opponentId}`, {
+          const opponent = await fetch(API_BASE_URL + `/accounts/get_user_profile/${opponentId}`, {
             method: 'GET',
             headers: { 'X-CSRFToken': csrfToken },
             credentials: 'include',

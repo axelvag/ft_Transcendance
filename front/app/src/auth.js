@@ -1,7 +1,8 @@
-const BASE_URL = import.meta.env.BASE_URL;
 import { redirectTo } from '@/router.js';
 import { notify } from '@/notifications.js';
-const API_BASE_URL = 'https://127.0.0.1:8001';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL;
 
 const user = {
   isAuthenticated: undefined,
@@ -96,9 +97,9 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
-        console.log("dwedededee",user.id);
+        console.log('dwedededee', user.id);
         const csrfToken = await getCsrfToken();
-        const userProfileResponse = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(API_BASE_URL + `/accounts/get_user_profile/${user.id}/`, {
           method: 'GET',
           headers: {
             'X-CSRFToken': csrfToken,
@@ -125,7 +126,7 @@ const isAuthenticated = async () => {
 };
 
 const getCsrfToken = async () => {
-  const response = await fetch('https://127.0.0.1:8001/accounts/get-csrf-token/', {
+  const response = await fetch(API_BASE_URL + '/accounts/get-csrf-token/', {
     method: 'GET',
     mode: 'cors',
     credentials: 'include',
@@ -193,7 +194,7 @@ const saveUser = async newUser => {
     formData.append('avatar', newUser.avatarFile);
   }
 
-  console.log("formData", formData);
+  console.log('formData', formData);
 
   // Pour afficher le contenu de formData
   for (let [key, value] of formData.entries()) {
@@ -202,7 +203,7 @@ const saveUser = async newUser => {
 
   try {
     const csrfToken = await getCsrfToken();
-    const response = await fetch('https://127.0.0.1:8001/accounts/update_user/', {
+    const response = await fetch(API_BASE_URL + '/accounts/update_user/', {
       method: 'POST',
       mode: 'cors',
       credentials: 'include',
@@ -240,7 +241,7 @@ const saveUser = async newUser => {
 };
 
 const loginUser = async (formData, csrfToken) => {
-  const response = await fetch('https://127.0.0.1:8001/accounts/login/', {
+  const response = await fetch(API_BASE_URL + '/accounts/login/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -254,7 +255,7 @@ const loginUser = async (formData, csrfToken) => {
 };
 
 const sendSignUpRequest = async (formData, csrfToken) => {
-  const response = await fetch('https://127.0.0.1:8001/accounts/register/', {
+  const response = await fetch(API_BASE_URL + '/accounts/register/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -268,7 +269,7 @@ const sendSignUpRequest = async (formData, csrfToken) => {
 };
 
 const passwordReset = async (formData, csrfToken) => {
-  const response = await fetch('https://127.0.0.1:8001/accounts/password_reset/', {
+  const response = await fetch(API_BASE_URL + '/accounts/password_reset/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -296,7 +297,7 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
 };
 
 const deleteUser = async csrfToken => {
-  const url = `https://127.0.0.1:8001/accounts/delete_user/${user.username}`;
+  const url = API_BASE_URL + `/accounts/delete_user/${user.username}`;
   const response = await fetch(url, {
     method: 'DELETE',
     credentials: 'include',
@@ -321,7 +322,7 @@ const handleOAuthResponse = async () => {
     const code = urlParams.get('code');
     try {
       const csrfToken = await getCsrfToken();
-      const authResponse = await fetch('https://127.0.0.1:8001/accounts/oauth/callback/', {
+      const authResponse = await fetch(API_BASE_URL + '/accounts/oauth/callback/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -348,14 +349,14 @@ const handleOAuthResponse = async () => {
         formData.append('lastname', user.lastname);
         formData.append('id', user.id);
         formData.append('avatar', user.avatar);
-        if(data.register === true){
-          console.log("register trueeeeeeeeeeee");
+        if (data.register === true) {
+          console.log('register trueeeeeeeeeeee');
           try {
             for (let [key, value] of formData.entries()) {
               console.log(`${key}: ${value}`);
-          }
+            }
             const csrfToken = await getCsrfToken();
-            const response = await fetch('https://127.0.0.1:8001/accounts/update_user/', {
+            const response = await fetch(API_BASE_URL + '/accounts/update_user/', {
               method: 'POST',
               credentials: 'include',
               headers: {
@@ -374,12 +375,12 @@ const handleOAuthResponse = async () => {
           }
         }
         const csrfToken = await getCsrfToken();
-        const userProfileResponse = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${data.id}/`, {
+        const userProfileResponse = await fetch(API_BASE_URL + `/accounts/get_user_profile/${data.id}/`, {
           method: 'GET',
           credentials: 'include',
           headers: {
-                'X-CSRFToken': csrfToken,
-              },
+            'X-CSRFToken': csrfToken,
+          },
         });
 
         const userProfileData = await userProfileResponse.json();
@@ -413,7 +414,9 @@ const handleOAuthResponse = async () => {
 };
 
 const getAuthorizationCode = () => {
-  const url = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fauth42-callback&response_type=code`;
+  const oauthClientId = 'u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0';
+  const oauthRedirectUri = encodeURIComponent(APP_BASE_URL + '/auth42-callback');
+  const url = `https://api.intra.42.fr/oauth/authorize?client_id=${oauthClientId}&redirect_uri=${oauthRedirectUri}&response_type=code`;
   window.location.href = url;
 };
 

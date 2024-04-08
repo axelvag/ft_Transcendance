@@ -4,7 +4,7 @@ import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
 import { getCsrfToken, resetLocalUser, deleteUser } from '@/auth.js';
 
-const BASE_URL = import.meta.env.BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 class ViewSettings extends HTMLElement {
   connectedCallback() {
@@ -29,14 +29,14 @@ class ViewSettings extends HTMLElement {
   async suppUser() {
     try {
       const csrfToken = await getCsrfToken();
-      const deleteProfile = await fetch(`https://127.0.0.1:8001/accounts/delete_user_profile/${user.id}/`, {
+      const deleteProfile = await fetch(API_BASE_URL + `/accounts/delete_user_profile/${user.id}/`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
           'X-CSRFToken': csrfToken,
         },
       });
-      const deleteProfileData = await deleteProfile.json()
+      const deleteProfileData = await deleteProfile.json();
       if (deleteProfileData.success) {
         await deleteUser(csrfToken);
       } else {
@@ -48,6 +48,5 @@ class ViewSettings extends HTMLElement {
       console.error('Error:', error);
     }
   }
-  
 }
 customElements.define('view-settings', ViewSettings);
