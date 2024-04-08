@@ -209,11 +209,11 @@ class ViewTournamentSalon extends HTMLElement {
         if (data.action === 'display_player') {
           this.viewPlayer();
         }
-        // if (data.action === 'player_disconnected') {
-        //   resetLocalTournament();
-        //   this.deletePlayer();
-        //   this.socket.close();
-        // }
+        if (data.action === 'player_disconnected') {
+          resetLocalTournament();
+          this.deletePlayer();
+          this.socket.close();
+        }
     };
 
     this.socket.onclose = () => {
