@@ -38,6 +38,8 @@ class MyConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
         
         # Se désabonner du groupe spécifique au tournoi si présent
+        # if hasattr(self, 'tournoi_group_name'):
+        #     await self.channel_layer.group_discard(self.tournoi_group_name, self.channel_name)
         logging.critical("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         if hasattr(self, 'tournoi_group_name') and hasattr(self, 'user_group_name'):
             await remove_player(self.user_id, self.tournoi_id)

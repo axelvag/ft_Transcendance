@@ -1,7 +1,7 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
 import { getTournament, resetLocalTournament, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament } from '@/tournament.js';
-import { isAuthenticated } from '@/auth.js';
+import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
 
@@ -15,12 +15,15 @@ class ViewTournamentSalon extends HTMLElement {
     console.log("Waiting room");
     this.#user = getProfile();
     this.#tournament = getTournament();
+    
   }
-
+  
   async connectedCallback() {
     const isLoggedIn = await isAuthenticated();
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
+    if(this.#tournament.id === null)
+      redirectTo(this.#backUrl);
 
     let deleteTournamentButtonHTML = '';
     if (this.#user.id === this.#tournament.admin_id) {
@@ -76,12 +79,13 @@ class ViewTournamentSalon extends HTMLElement {
       console.log(data);
       // this.viewPlayer();
     } else {
-      console.log("error");
+      console.log(data);
       // this.viewPlayer();
     }
   }
   
   async deletePlayer() {
+    console.log("delete Playerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
     const data = await fetchDeletePlayerSalon();
     if (data.success) {
       console.log(data);
@@ -117,22 +121,48 @@ class ViewTournamentSalon extends HTMLElement {
         }
 
         const players = await response.json();
-
         const listElement = this.querySelector('#playersList');
         listElement.innerHTML = '<h2>Players in the Tournaments</h2><br>'; // Titre pour la section
 
-        players.forEach(player => {
+        for (const player of players) {
+            const csrfToken = await getCsrfToken();
+            const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${player.user_id}/`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                },
+                credentials: 'include',
+            });
+
+            if (!userProfileResponse.ok) {
+                throw new Error(`HTTP error! status: ${userProfileResponse.status}`);
+            }
+
+            const user = await userProfileResponse.json();
+            console.log(user);
+            let avatar = "/assets/img/default-profile.jpg";
+            if(user.getProfile.avatar42 !== null && user.getProfile.avatar42 !== undefined)
+              avatar = user.getProfile.avatar42;
+            if (user.getProfile.avatar !== null && user.getProfile.avatar !== undefined)
+              avatar = user.getProfile.avatar;
+            console.log(avatar);
             const playerElement = document.createElement('div');
             playerElement.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; flex-direction: column;">
-                        <h3>${player.username}</h3>
+                        <h3>${player.username}</h3> 
+                        <img
+                          src="${avatar}" 
+                          class="d-block object-fit-cover rounded-circle m-n1"
+                          width="28"
+                          height="28"
+                        />
                     </div>
                 </div>
                 <hr style="border-top: 1px solid #ccc; margin: 10px 0;">
             `;
             listElement.appendChild(playerElement);
-        });
+        }
 
         // Calculer le nombre de joueurs en attente
         const nbPlayersWaiting = this.#tournament.maxPlayer - players.length;
@@ -145,7 +175,8 @@ class ViewTournamentSalon extends HTMLElement {
     } catch (error) {
         console.error('Could not load tournament:', error);
     }
-  }
+}
+
 
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
@@ -178,11 +209,11 @@ class ViewTournamentSalon extends HTMLElement {
         if (data.action === 'display_player') {
           this.viewPlayer();
         }
-        if (data.action === 'player_disconnected') {
-          resetLocalTournament();
-          this.deletePlayer();
-          this.socket.close();
-        }
+        // if (data.action === 'player_disconnected') {
+        //   resetLocalTournament();
+        //   this.deletePlayer();
+        //   this.socket.close();
+        // }
     };
 
     this.socket.onclose = () => {

@@ -26,7 +26,7 @@ const user = {
 };
 
 const setLocalAvatar = avatar => {
-  user.avatar = avatar || 'assets/img/default-profile.jpg';
+  user.avatar = avatar || '/assets/img/default-profile.jpg';
 };
 
 const setLocalUser = data => {
@@ -41,7 +41,7 @@ const setLocalUser = data => {
   user.id = data.id;
   user.email = data.email;
   user.username = data.username;
-  user.avatarDefault = 'assets/img/default-profile.jpg';
+  user.avatarDefault = '/assets/img/default-profile.jpg';
   user.avatarDefault42 = data.avatar42;
 
   //stat
@@ -209,7 +209,7 @@ const saveUser = async newUser => {
         if(user.avatarDefault42 !== null && user.avatarDefault42 !== undefined)
           user.avatar = user.avatarDefault42;
         else
-          user.avatar = 'assets/img/default-profile.jpg';
+          user.avatar = '/assets/img/default-profile.jpg';
       }
       else{
         user.avatar = data.update.avatar;

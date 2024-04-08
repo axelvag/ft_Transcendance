@@ -137,6 +137,7 @@ const fetchTournamentInfo = async () => {
     setLocalTournament(data);
     console.log(data);
   } else {
+    console.log(data);
     console.log("player is not in a tournament");
   }
 };

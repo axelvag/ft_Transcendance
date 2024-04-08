@@ -165,7 +165,7 @@ def tournoi_info(request, user_id):
         # Trouver le joueur et son tournoi associé
         joueur = Joueur.objects.filter(user_id=user_id).select_related('tournament').first()
         
-        if joueur:
+        if joueur and joueur.tournament:  # Vérification ajoutée ici
             tournoi = joueur.tournament
             tournoi_info = {
                 "id": tournoi.id,
@@ -178,6 +178,7 @@ def tournoi_info(request, user_id):
             return JsonResponse({'error': 'Joueur not found or not associated with a tournament'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
 
 @csrf_exempt
 @require_http_methods(["DELETE"])
