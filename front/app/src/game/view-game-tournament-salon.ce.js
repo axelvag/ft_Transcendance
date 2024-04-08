@@ -140,6 +140,9 @@ class ViewTournamentSalon extends HTMLElement {
         console.log(players.length);
         if (nbPlayersWaiting === 0) {
           // Si aucun joueur en attente, passer à view-game-tournament.ce.js
+          // if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+          //   this.socket.close();
+          // }
           redirectTo(`/game/tournament/start`);
           return; // Arrêter l'exécution de la fonction
         }
