@@ -14,15 +14,15 @@ services:
     container_name: front
     ports:
       - "8000:8443"
+    volumes:
+      - shared_ssl:/etc/ssl
     networks:
       - front
+    env_file:
+      - .env
     restart: on-failure
     profiles:
       - prod
-    volumes:
-      - shared_ssl:/etc/ssl
-    env_file:
-      - .env
 
   # Front - dev (live server)
   front_dev:
@@ -35,10 +35,13 @@ services:
       - type: bind
         source: ./front/app
         target: /app
+      - shared_ssl:/etc/ssl
     ports:
       - "8000:8000"
     networks:
       - front
+    env_file:
+      - .env
     restart: on-failure
     profiles:
       - dev
