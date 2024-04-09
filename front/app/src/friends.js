@@ -5,8 +5,6 @@ let websocketInstance = null;
 
 const initWebSocket = () => {
 
-  console.log("user_id", user.id);
-
   if (!user.id) {
     console.error('WebSocket initialization failed: User ID is required.');
     return;
@@ -34,7 +32,6 @@ const initWebSocket = () => {
   
           // Vérifier si la notification a déjà été reçue
           if (!receivedNotifications.includes(dataIdStr)) {
-              console.log("onmessage", data);
               if (data.message) {
                   notify(data.message); // Afficher la notification
               }

@@ -73,7 +73,23 @@ class InvitationConsumer(AsyncWebsocketConsumer):
             "id": event["id"]
         }))
 
+    # WS action
     async def accept_invitation(self, event):
+        await self.send(text_data=json.dumps({
+            "action": event["message"]
+        }))
+
+    async def reject_invitation(self, event):
+        await self.send(text_data=json.dumps({
+            "action": event["message"]
+        }))
+
+    async def cancel_invitation(self, event):
+        await self.send(text_data=json.dumps({
+            "action": event["message"]
+        }))
+
+    async def remove_friend(self, event):
         await self.send(text_data=json.dumps({
             "action": event["message"]
         }))

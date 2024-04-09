@@ -145,10 +145,9 @@ def accept_invitation(request):
 
     data = json.loads(request.body)
     invitation_id = data.get('invitation_id')
-    username = data.get('username')
 
+    username = data.get('username')
     to_user = User.objects.get(username=username)
-    logging.critical(invitation_id)
 
     try:
         # recherche l'invitation non accepte
@@ -181,9 +180,22 @@ def reject_invitation(request):
     data = json.loads(request.body)
     invitation_id = data.get('invitation_id')
 
+    username = data.get('username')
+    to_user = User.objects.get(username=username)
+
     try:
         invitation = Invitation.objects.get(id=invitation_id, accepted=False)
         invitation.delete()
+
+        channel_layer = get_channel_layer()
+        group_name = f"user{to_user.id}"
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                "type": "reject_invitation",
+                "message": "reject_invitation",
+            }
+        )
 
         return JsonResponse({"status": "success", "message": "Invitation rejected."}, status=200)
     except Invitation.DoesNotExist:
@@ -244,9 +256,22 @@ def cancel_sent_invitation(request):
     data = json.loads(request.body)
     invitation_id = data.get('invitation_id')
 
+    username = data.get('username')
+    to_user = User.objects.get(username=username)
+
     try:
         invitation = Invitation.objects.get(id=invitation_id, accepted=False)
         invitation.delete()
+
+        channel_layer = get_channel_layer()
+        group_name = f"user{to_user.id}"
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                "type": "cancel_invitation",
+                "message": "cancel_invitation",
+            }
+        )
         
         return JsonResponse({"status": "success", "message": "Invitation cancelled."}, status=200)
     except Invitation.DoesNotExist:
@@ -273,6 +298,16 @@ def remove_friend(request):
             (Q(from_user=friend) & Q(to_user=user))
         ).delete()
         
+        channel_layer = get_channel_layer()
+        group_name = f"user{friend_id}"
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                "type": "remove_friend",
+                "message": "remove_friend",
+            }
+        )
+
         return JsonResponse({"status": "success", "message": "Friend removed."}, status=200)
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User or friend does not exist."}, status=404)

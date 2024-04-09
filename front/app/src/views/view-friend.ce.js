@@ -92,21 +92,28 @@ class ViewFriend extends HTMLElement {
     const wsInstance = new WebSocket(wsUrl);
 
     wsInstance.onopen = () => {
-      console.log("WebSocket pour les invitations est connecté.");
+      console.log("WebSocket for invitation connected");
     };
 
     wsInstance.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("WebSocket message reçu:", data);
-      console.log("Message-->", data.message);
 
-      if (data.action === "accept_invitation") {
+      if (data.action === "accept_invitation" || data.action === "reject_invitation") {
+        this.loadOnlineFriends();
+        this.loadOfflineFriends();
+        this.loadSentInvitations();
+        this.loadFriendRequests();
+      }
+      else if (data.action === "cancel_invitation"){
+        this.loadSentInvitations();
+        this.loadFriendRequests();
+      }
+      else if (data.action === "remove_friend"){
         this.loadOnlineFriends();
         this.loadOfflineFriends();
       }
 
       if (data.message) {
-        console.log("Yesss");
         this.loadFriendRequests();
         this.loadSentInvitations();
       }
@@ -117,10 +124,11 @@ class ViewFriend extends HTMLElement {
     };
 
     wsInstance.onclose = (event) => {
-      console.log("WebSocket pour les invitations est fermé:", event.code, event.reason);
+      console.log("WebSocket close:", event.code, event.reason);
     };
   }
 
+  // list send invitation 
   async loadSentInvitations() {
     try {
       const csrfToken = await getCsrfToken();
@@ -135,8 +143,6 @@ class ViewFriend extends HTMLElement {
 
       const sentInvitationsList = document.getElementById('sent-invitations-list');
       sentInvitationsList.innerHTML = '';
-
-      console.log("responseDataSend", responseData);
 
       if (responseData && responseData.invitations) {
         if (responseData.invitations.length > 0) {
@@ -177,7 +183,7 @@ class ViewFriend extends HTMLElement {
             const cancelButton = document.createElement('button');
             cancelButton.textContent = 'Cancel';
             cancelButton.classList.add('btn', 'btn-warning'); // 'ms-auto' pour pousser le bouton à la droite dans un flex container
-            cancelButton.onclick = () => this.cancelSentInvitation(invitation.invitation_id); // Assurez-vous que c'est la bonne clé pour l'ID de l'invitation
+            cancelButton.onclick = () => this.cancelSentInvitation(invitation.invitation_id, invitation.from_user_username); // Assurez-vous que c'est la bonne clé pour l'ID de l'invitation
 
             listItem.appendChild(userInfoDiv);
             listItem.appendChild(cancelButton);
@@ -197,7 +203,8 @@ class ViewFriend extends HTMLElement {
     }
   }
 
-  async cancelSentInvitation(invitationId) {
+  // cancel invitation send
+  async cancelSentInvitation(invitationId, from_user_username) {
     try {
       const csrfToken = await getCsrfToken();
       const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_cancel_sent_invitation/`, {
@@ -206,12 +213,11 @@ class ViewFriend extends HTMLElement {
           'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
-        body: JSON.stringify({ invitation_id: invitationId }),
+        body: JSON.stringify({ invitation_id: invitationId, username: from_user_username }),
       });
       const data = await response.json();
 
       if (data.status === 'success') {
-        console.log('Invitation cancelled successfully');
         this.loadSentInvitations();
       } else {
         console.error('Failed to cancel the invitation:', data.message);
@@ -234,7 +240,6 @@ class ViewFriend extends HTMLElement {
         credentials: 'include',
       });
       const responseData = await response.json();
-      console.log("999999999999999999999999999", responseData);
 
       const friendRequestsList = document.getElementById('friend-requests');
       friendRequestsList.innerHTML = '';
@@ -287,7 +292,7 @@ class ViewFriend extends HTMLElement {
             const rejectButton = document.createElement('button');
             rejectButton.textContent = 'Reject';
             rejectButton.classList.add('btn', 'btn-danger', 'mx-1');
-            rejectButton.onclick = () => this.rejectFriendRequest(invitation.invitation_id);
+            rejectButton.onclick = () => this.rejectFriendRequest(invitation.invitation_id, invitation.from_user_username);
 
             buttonGroup.appendChild(acceptButton);
             buttonGroup.appendChild(rejectButton);
@@ -315,8 +320,6 @@ class ViewFriend extends HTMLElement {
 
   // btn accept
   async acceptFriendRequest(invitationId, from_user_username) {
-    console.log("accept", invitationId);
-    console.log("accept", from_user_username);
 
     try {
       const csrfToken = await getCsrfToken();
@@ -332,12 +335,11 @@ class ViewFriend extends HTMLElement {
 
       if (data.status === 'success') {
         document.querySelector(`#invitation-${invitationId}`).remove();
-        console.log("okkkk");
         this.loadOfflineFriends();
         this.loadOnlineFriends();
         this.loadFriendRequests();
       } else {
-        console.log("Nullll");
+        console.log("False");
       }
 
     } catch (error) {
@@ -347,8 +349,7 @@ class ViewFriend extends HTMLElement {
   }
 
   // btn reject
-  async rejectFriendRequest(invitationId) {
-    console.log("Reject", invitationId);
+  async rejectFriendRequest(invitationId, from_user_username) {
 
     try {
       const csrfToken = await getCsrfToken();
@@ -358,19 +359,17 @@ class ViewFriend extends HTMLElement {
           'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
-        body: JSON.stringify({ invitation_id: invitationId }),
+        body: JSON.stringify({ invitation_id: invitationId, username: from_user_username }),
       });
       const data = await response.json();
-      console.log('data:', data);
 
       if (data.status === 'success') {
         document.querySelector(`#invitation-${invitationId}`).remove();
-        console.log("okkkk bien delte");
         this.loadOfflineFriends();
         this.loadOnlineFriends();
         this.loadFriendRequests();
       } else {
-        console.log("Nullll");
+        console.log("False");
       }
 
     } catch (error) {
@@ -381,11 +380,14 @@ class ViewFriend extends HTMLElement {
   }
 
   async searchFriends() {
+
+    const errorMessagesDiv = document.querySelector('#error-messages');
+    errorMessagesDiv.innerHTML = '';
+
     const searchInputField = this.querySelector('#search-friend-name');
     const searchInput = searchInputField.value.trim();
 
     if (searchInput === '') {
-      console.log("The field is empty");
       const searchResultsList = this.querySelector('#search-results');
       searchResultsList.innerHTML = '<li class="list-group-item">Please enter a search username.</li>';
       return;
@@ -408,7 +410,6 @@ class ViewFriend extends HTMLElement {
       }
 
       const searchResults = await response.json();
-      console.log("searchResults", searchResults);
 
       if (searchResults.length === 0) {
         const noResultsItem = document.createElement('li');
@@ -474,7 +475,9 @@ class ViewFriend extends HTMLElement {
 
   //Send Invitation user
   async sendFriendRequest(username, button) {
-    console.log("Sending friend request to", username);
+
+    const errorMessagesDiv = document.querySelector('#error-messages');
+    errorMessagesDiv.innerHTML = '';
 
     try {
       const csrfToken = await getCsrfToken();
@@ -487,7 +490,6 @@ class ViewFriend extends HTMLElement {
         body: JSON.stringify({ username: username, user_id: user.id }),
       });
       const data = await response.json();
-      console.log('data:', data);
 
       if (data.status === 'success') {
         button.textContent = 'Friend Request Sent';
@@ -590,7 +592,6 @@ class ViewFriend extends HTMLElement {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const { offline_friends } = await response.json();
-      console.log("test", offline_friends);
 
       const offlineFriendsList = this.querySelector('#offline-friends');
       offlineFriendsList.innerHTML = '';
@@ -661,7 +662,6 @@ class ViewFriend extends HTMLElement {
       });
 
       if (response.ok) {
-        console.log("Ami supprimé avec succès.");
         this.loadOfflineFriends();
         this.loadOnlineFriends();
       } else {
