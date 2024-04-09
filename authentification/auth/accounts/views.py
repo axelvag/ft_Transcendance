@@ -392,7 +392,7 @@ def oauth_callback(request):
             'code': code,
             'redirect_uri': settings.OAUTH_REDIRECT_URI,
         }
-        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data)
+        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data, verify=False)
         print(response.status_code)
         if response.status_code == 200:
             access_token = response.json().get('access_token')
@@ -400,6 +400,7 @@ def oauth_callback(request):
             profile_data = requests.get(
                 "https://api.intra.42.fr/v2/me",
                 headers={"Authorization": f"Bearer {access_token}"},
+                verify=False
             )
             print(profile_data)
             if profile_data.status_code == 200:
@@ -447,14 +448,14 @@ def oauth_callback(request):
 @login_required
 @require_http_methods(["POST"])
 def update_user(request):
-    update_url = "http://profile:8002/update_user/"
+    update_url = "https://profile:8002/update_user/"
     if request.FILES:
         files = {'avatar': request.FILES['avatar']} if 'avatar' in request.FILES else {}
         data = {key: value for key, value in request.POST.items()}
-        response = requests.post(update_url, files=files, data=data)
+        response = requests.post(update_url, files=files, data=data, verify=False)
     else:
         payload = request.POST
-        response = requests.post(update_url, json=payload)
+        response = requests.post(update_url, json=payload, verify=False)
     
     if response.status_code == 200:
         return JsonResponse({"status": "success", "update": response.json()})
@@ -469,9 +470,9 @@ def update_user(request):
 @login_required
 @require_http_methods(["GET"])
 def get_user_profile(request, user_id):
-    update_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    update_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:
-        response = requests.get(update_url)
+        response = requests.get(update_url, verify=False)
         if response.status_code == 200:
             return JsonResponse({"status": "success", "getProfile": response.json()})
         else:
@@ -482,9 +483,9 @@ def get_user_profile(request, user_id):
 @login_required
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
-    update_url = f"http://profile:8002/delete_user_profile/{user_id}/"
+    update_url = f"https://profile:8002/delete_user_profile/{user_id}/"
     try:
-        response = requests.delete(update_url)
+        response = requests.delete(update_url, verify=False)
 
         if response.status_code == 200:
             return JsonResponse({"success": True, "message": "Profile deletion initiated successfully."})
@@ -500,13 +501,13 @@ def delete_user_profile(request, user_id):
 @login_required
 @require_http_methods(["POST"])
 def proxy_send_invitation(request):
-    friendship_service_url = "http://friendship:8003/send_invitation/"
+    friendship_service_url = "https://friendship:8003/send_invitation/"
 
     payload = json.loads(request.body)
     
     try:
         # Envoie la requête POST au service de profils
-        response = requests.post(friendship_service_url, json=payload)
+        response = requests.post(friendship_service_url, json=payload, verify=False)
         
         return JsonResponse(response.json(), status=response.status_code)
     except requests.exceptions.RequestException as e:
@@ -521,7 +522,7 @@ def proxy_send_invitation(request):
 @login_required
 @require_http_methods(["GET"])
 def proxy_search_users(request):
-    friendship_service_url = "http://friendship:8003/search_users/"
+    friendship_service_url = "https://friendship:8003/search_users/"
     
     # Extrait les paramètres de la requête GET
     query = request.GET.get('query')
@@ -544,7 +545,7 @@ def proxy_search_users(request):
 @login_required
 @require_http_methods(["GET"])
 def proxy_list_received_invitations(request, user_id):
-    friendship_service_url = "http://friendship:8003/list_received_invitations/{user_id}/"
+    friendship_service_url = "https://friendship:8003/list_received_invitations/{user_id}/"
 
     payload = json.loads(request.body)
 
@@ -564,12 +565,12 @@ def proxy_list_received_invitations(request, user_id):
 @require_http_methods(["GET"])
 def proxy_list_received_invitations(request, user_id):
     # L'URL du service qui gère les invitations
-    friendship_service_url = "http://friendship:8003/list_received_invitations/"
+    friendship_service_url = "https://friendship:8003/list_received_invitations/"
 
     url = f"{friendship_service_url}{user_id}/"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         if response.status_code == 200:
             return JsonResponse(response.json(), status=200, safe=False)
@@ -584,12 +585,12 @@ def proxy_list_received_invitations(request, user_id):
 @login_required
 @require_http_methods(["GET"])
 def proxy_list_sent_invitations(request, user_id):
-    friendship_service_url = "http://friendship:8003/list_sent_invitations/"
+    friendship_service_url = "https://friendship:8003/list_sent_invitations/"
 
     url = f"{friendship_service_url}{user_id}/"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         if response.status_code == 200:
             return JsonResponse(response.json(), status=200, safe=False)
@@ -604,12 +605,12 @@ def proxy_list_sent_invitations(request, user_id):
 @login_required
 @require_http_methods(["GET"])
 def proxy_offline_friends(request, user_id):
-    friendship_service_url = "http://friendship:8003/offline_friends/"
+    friendship_service_url = "https://friendship:8003/offline_friends/"
 
     url = f"{friendship_service_url}{user_id}/"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         if response.status_code == 200:
             return JsonResponse(response.json(), status=200, safe=False)
@@ -624,12 +625,12 @@ def proxy_offline_friends(request, user_id):
 @login_required
 @require_http_methods(["GET"])
 def proxy_online_friends(request, user_id):
-    friendship_service_url = "http://friendship:8003/online_friends/"
+    friendship_service_url = "https://friendship:8003/online_friends/"
 
     url = f"{friendship_service_url}{user_id}/"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         if response.status_code == 200:
             return JsonResponse(response.json(), status=200, safe=False)
@@ -644,7 +645,7 @@ def proxy_online_friends(request, user_id):
 @login_required
 @require_http_methods(["POST"])
 def proxy_accept_invitation(request):
-    friendship_service_url = "http://friendship:8003/accept_invitation/"
+    friendship_service_url = "https://friendship:8003/accept_invitation/"
 
     payload = json.loads(request.body)
     
@@ -663,7 +664,7 @@ def proxy_accept_invitation(request):
 @login_required
 @require_http_methods(["POST"])
 def proxy_reject_invitation(request):
-    friendship_service_url = "http://friendship:8003/reject_invitation/"
+    friendship_service_url = "https://friendship:8003/reject_invitation/"
 
     payload = json.loads(request.body)
     
@@ -682,7 +683,7 @@ def proxy_reject_invitation(request):
 @login_required
 @require_http_methods(["POST"])
 def proxy_cancel_sent_invitation(request):
-    friendship_service_url = "http://friendship:8003/cancel_sent_invitation/"
+    friendship_service_url = "https://friendship:8003/cancel_sent_invitation/"
 
     payload = json.loads(request.body)
     
@@ -701,7 +702,7 @@ def proxy_cancel_sent_invitation(request):
 @login_required
 @require_http_methods(["POST"])
 def proxy_remove_friend(request):
-    friendship_service_url = "http://friendship:8003/remove_friend/"
+    friendship_service_url = "https://friendship:8003/remove_friend/"
 
     payload = json.loads(request.body)
     
