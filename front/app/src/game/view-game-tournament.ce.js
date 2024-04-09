@@ -141,6 +141,15 @@ class ViewTournament extends HTMLElement {
 
     // const csrfToken = await getCsrfToken();
 
+    if (this.#tournament.id !== null) {
+      const confirmLeave = confirm("Vous êtes déjà dans un tournoi. Si vous cree ce tournoi, vous serez déconnecté de l'autre. Voulez-vous continuer ?");
+      if (!confirmLeave) {
+          // Si l'utilisateur choisit de ne pas continuer, arrêtez l'exécution de la fonction ici
+          this.querySelector('#formOverlay').style.display = 'none';
+          return;
+      }
+      await fetchDeletePlayer();
+    }
     this.tournamentName = document.getElementById('tournamentName');
     this.tournamentSizeValue = document.getElementById('tournamentSizeValue');
 
