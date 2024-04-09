@@ -6,18 +6,18 @@ from apiTournament.models import Joueur
 from asgiref.sync import sync_to_async
 
 # Déplacez cette définition en dehors de la classe MyConsumer
-@sync_to_async
-def remove_player(user_id, tournoi_id):
-    joueur = Joueur.objects.filter(user_id=user_id, tournament__id=tournoi_id).first()
-    if joueur:
-        joueur.tournament = None
-        joueur.save()
+# @sync_to_async
+# def remove_player(user_id, tournoi_id):
+#     joueur = Joueur.objects.filter(user_id=user_id, tournament__id=tournoi_id).first()
+#     if joueur:
+#         joueur.tournament = None
+#         joueur.save()
 
 class MyConsumer(AsyncWebsocketConsumer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.user_id = None
-        self.tournoi_id = None
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.user_id = None
+    #     self.tournoi_id = None
     user_group_name = None  # Pour garder le nom du groupe de l'utilisateur
 
     async def connect(self):
@@ -38,18 +38,18 @@ class MyConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
         
         # Se désabonner du groupe spécifique au tournoi si présent
-        # if hasattr(self, 'tournoi_group_name'):
-        #     await self.channel_layer.group_discard(self.tournoi_group_name, self.channel_name)
-        if hasattr(self, 'tournoi_group_name') and hasattr(self, 'user_group_name'):
-            await remove_player(self.user_id, self.tournoi_id)
-            await self.channel_layer.group_send(
-                self.tournoi_group_name,
-                {
-                    'type': 'display_player',
-                    'message': 'Player has disconnected'
-                }
-            )
-            logging.critical("supppppppppppppppppppppppppppppppppppppppppppppppppppp")
+        if hasattr(self, 'tournoi_group_name'):
+            await self.channel_layer.group_discard(self.tournoi_group_name, self.channel_name)
+        # if hasattr(self, 'tournoi_group_name') and hasattr(self, 'user_group_name'):
+        #     await remove_player(self.user_id, self.tournoi_id)
+        #     await self.channel_layer.group_send(
+        #         self.tournoi_group_name,
+        #         {
+        #             'type': 'display_player',
+        #             'message': 'Player has disconnected'
+        #         }
+        #     )
+        #     logging.critical("supppppppppppppppppppppppppppppppppppppppppppppppppppp")
 
     async def receive(self, text_data):
         logging.critical("Received data")
@@ -57,7 +57,7 @@ class MyConsumer(AsyncWebsocketConsumer):
         
         # Traitement pour associer un utilisateur à un groupe spécifique
         if 'user_id' in text_data_json:
-            self.user_id = text_data_json['user_id']
+            # self.user_id = text_data_json['user_id']
             user_id = text_data_json['user_id']
             self.user_group_name = f"user_{user_id}"
             await self.channel_layer.group_add(self.user_group_name, self.channel_name)
@@ -65,14 +65,14 @@ class MyConsumer(AsyncWebsocketConsumer):
             
         # Traitement pour s'abonner à un groupe spécifique au tournoi
         if 'tournoi_id' in text_data_json:
-            self.tournoi_id = text_data_json['tournoi_id']
+            # self.tournoi_id = text_data_json['tournoi_id']
             tournoi_id = text_data_json['tournoi_id']
             self.tournoi_group_name = f"tournoi_{tournoi_id}"
             await self.channel_layer.group_add(self.tournoi_group_name, self.channel_name)
         
-        if 'user_id' in text_data_json and 'tournoi_id' in text_data_json:
-            self.user_id = text_data_json['user_id']
-            self.tournoi_id = text_data_json['tournoi_id']
+        # if 'user_id' in text_data_json and 'tournoi_id' in text_data_json:
+        #     self.user_id = text_data_json['user_id']
+        #     self.tournoi_id = text_data_json['tournoi_id']
             
         message = text_data_json.get('message')
         if message:

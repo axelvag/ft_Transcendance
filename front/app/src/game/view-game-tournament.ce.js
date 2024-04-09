@@ -12,6 +12,8 @@ class ViewTournament extends HTMLElement {
     super();
     this.#user = getProfile();
     this.#tournament = getTournament();
+    console.log("tounrmanet id de luser ");
+    console.log(this.#tournament.id);
   }
   async connectedCallback() {
     const isLoggedIn = await isAuthenticated();
@@ -102,17 +104,24 @@ class ViewTournament extends HTMLElement {
       if (event.target.classList.contains('joinTournamentBtn')) {
           const tournamentId = event.target.id.replace('joinTournament-', '');
           console.log(`Rejoindre le tournoi avec l'ID : ${tournamentId}`);
+          if (this.#tournament.id !== null && this.#tournament.id.toString() !== tournamentId) {
+              const confirmLeave = confirm("Vous êtes déjà dans un tournoi. Si vous rejoignez ce tournoi, vous serez déconnecté de l'autre. Voulez-vous continuer ?");
+              if (!confirmLeave) {
+                  // Si l'utilisateur choisit de ne pas continuer, arrêtez l'exécution de la fonction ici
+                  return;
+              }
+              await fetchDeletePlayer();
+
+          }
+  
           if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            this.socket.close();
+              this.socket.close();
           }
           fetchGetTournament(tournamentId);
       }
-    });
+  });
 
     this.loadTournois();
-
-    if (this.#tournament.id !== null)
-      this.deletePlayer();
 
     this.querySelector('#tournamentForm').addEventListener('submit', this.submitForm.bind(this));
 
@@ -170,34 +179,49 @@ class ViewTournament extends HTMLElement {
         }
 
         const tournois = await response.json();
-        console.log(tournois);
+        // console.log(tournois);
         const listElement = this.querySelector('#tournoisList');
         listElement.innerHTML = '<h2>Join a Tournaments</h2><br>'; // Titre pour la section
 
         tournois.forEach(tournoi => {
-            const tournoiElement = document.createElement('div');
-            tournoiElement.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; flex-direction: column;">
-                    <h3>${tournoi.name}</h3>
-                    <div style="display: flex;">
-                        <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
-                        <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
-                    </div>
-                </div>
-                <button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>
+          const tournoiElement = document.createElement('div');
+          let isInTournamentMessage = ''; // Initialiser le message comme une chaîne vide
+      
+          // Vérifier si l'utilisateur est dans le tournoi actuel
+          console.log("je suis dans ce tournoi");
+          console.log(this.#tournament.id);
+          console.log(tournoi.id);
+          if(this.#tournament.id === tournoi.id) {
+              // Si oui, définir le message avec le style en rouge
+              isInTournamentMessage = '<p style="color: red;">You are in this tournament</p>';
+          }
+      
+          // Incorporer le message conditionnel dans l'HTML de l'élément du tournoi
+          tournoiElement.innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; flex-direction: column;">
+                      <h3>${tournoi.name}</h3>
+                      ${isInTournamentMessage} <!-- Ajouter le message ici -->
+                      <div style="display: flex;">
+                          <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
+                          <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
+                      </div>
+                  </div>
+                  <button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>
               </div>
               <hr style="border-top: 1px solid #ccc; margin: 10px 0;">
-            `;
-            listElement.appendChild(tournoiElement);
-        });
+          `;
+      
+          listElement.appendChild(tournoiElement);
+      });
+      
     } catch (error) {
         console.error('Could not load tournament:', error);
     }
   }
 
   async deletePlayer() {
-    fetchDeletePlayer();
+    await fetchDeletePlayer();
   }
 
   initWebSocket() {
@@ -214,7 +238,7 @@ class ViewTournament extends HTMLElement {
         console.log('Message received:', data);
 
         if (data.action === 'reload_tournois') {
-            console.log("load tournoisssssssssssssssssss");
+            // console.log("load tournoisssssssssssssssssss");
             this.loadTournois();
         }
     };

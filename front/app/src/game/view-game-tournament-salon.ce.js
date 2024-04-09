@@ -15,7 +15,8 @@ class ViewTournamentSalon extends HTMLElement {
     console.log("Waiting room");
     this.#user = getProfile();
     this.#tournament = getTournament();
-    
+    console.log("tounrmanet id de luser ");
+    console.log(this.#tournament.id);
   }
   
   async connectedCallback() {
@@ -77,10 +78,9 @@ class ViewTournamentSalon extends HTMLElement {
     const data = await fetchAddPlayer(formData);
     if (data.success) {
       console.log(data);
-      // this.viewPlayer();
     } else {
+      this.viewPlayer();
       console.log(data);
-      // this.viewPlayer();
     }
   }
   
@@ -181,16 +181,6 @@ class ViewTournamentSalon extends HTMLElement {
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
     this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
-
-    // Envoyer un heartbeat toutes les 30 secondes
-    const heartbeatInterval = setInterval(() => {
-      socket.send(JSON.stringify({type: 'heartbeat'}));
-    }, 30000);
-
-    // S'assurer d'arrêter l'envoi des heartbeats si la connexion est fermée
-    socket.onclose = function() {
-      clearInterval(heartbeatInterval);
-    };
 
     this.socket.onopen = () => {
         console.log('WebSocket connection established');

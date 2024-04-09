@@ -120,26 +120,26 @@ def create_joueur(request):
         tournament_id=tournament_id, 
         defaults={'username': username, 'tournament': tournament}
     )
-    tournament_group_name = f"tournoi_{tournament_id}"
-
-    # Envoi du message au groupe de canaux spécifique du tournoi
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
-        {
-            "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-            "message": "Un nouveau joueur a été ajouté au tournoi"
-        }
-    )
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
-        {
-            "type": "tournoi_cree",  # Type de message
-            "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
-        }
-    )
     if created:
+        tournament_group_name = f"tournoi_{tournament_id}"
+
+        # Envoi du message au groupe de canaux spécifique du tournoi
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
+            {
+                "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
+                "message": "Un nouveau joueur a été ajouté au tournoi"
+            }
+        )
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
+            {
+                "type": "tournoi_cree",  # Type de message
+                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+            }
+        )
         return JsonResponse({"success": True, 'message': 'Joueur created successfully', 'joueur_id': joueur.id})
     else:
         return JsonResponse({"success": False, 'message': 'Joueur already exists', 'joueur_id': joueur.id})

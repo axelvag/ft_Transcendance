@@ -16,6 +16,7 @@ const setLocalTournament = data => {
 };
 
 const resetLocalTournament = () => {
+  console.log("reset tournamenttttttttttttttttttttttttt");
   tournament.id = null;
   tournament.name = null;
   tournament.maxPlayer = null;
