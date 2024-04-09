@@ -98,6 +98,7 @@ services:
     networks:
       - back
 
+  # Back - friendship
   friendship:
     build:
       context: ./friendship
@@ -114,19 +115,6 @@ services:
       - data_base
     env_file:
       - .env
-    restart: on-failure
-
-  statistic:
-    build:
-      context: ./statistic
-      dockerfile: Dockerfile
-    container_name: statistic
-    ports:
-      - "8004:8004"
-    networks:
-      - back
-    depends_on:
-      - data_base
     restart: on-failure
 
   # Back - game
