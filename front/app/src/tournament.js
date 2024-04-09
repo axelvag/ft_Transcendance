@@ -131,7 +131,7 @@ const fetchTournamentInfo = async () => {
     credentials: 'include',
   })
   const data = await response.json();
-  // console.log(data)
+  console.log(data)
   if (data.id) {
     // resetLocalTournament();
     setLocalTournament(data);
