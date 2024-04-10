@@ -491,3 +491,118 @@ def delete_user_profile(request, user_id):
             return JsonResponse({"success": False, "message": "Failed to initiate profile deletion."}, status=response.status_code)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+#tournament
+
+@login_required
+@require_http_methods(["POST"])
+def create_tournament(request):
+    update_url = "http://tournament:8005/tournament/create_tournament/"
+    try:
+        payload = request.POST.dict()
+        response = requests.post(update_url, json=payload)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": response.tournoi_id})
+        else:
+            return JsonResponse({"success": False, "message": "Tournoi created fail"}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def view(request):
+    update_url = "http://tournament:8005/tournament/view/"
+    try:
+        response = requests.get(update_url)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": ""})
+        else:
+            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def tournament_detail(request, tournament_id):
+    update_url = f"http://tournament:8005/tournament/{tournament_id}"
+    try:
+        response = requests.get(update_url)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": ""})
+        else:
+            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def create_joueur(request):
+    update_url = "http://tournament:8005/tournament/create_joueur/"
+    try:
+        response = requests.post(update_url)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": ""})
+        else:
+            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def view_joueur(request, tournament_id):
+    update_url = f"http://tournament:8005/tournament/{tournament_id}"
+    try:
+        response = requests.get(update_url)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": ""})
+        else:
+            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def tournoi_info(request, user_id):
+    update_url = f"http://tournament:8005/tournament/{user_id}"
+    try:
+        response = requests.get(update_url)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": ""})
+        else:
+            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["DELETE"])
+def delete_joueur(request, user_id):
+    update_url = f"http://tournament:8005/tournament/{user_id}"
+    try:
+        response = requests.delete(update_url)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": ""})
+        else:
+            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["DELETE"])
+def delete_tournoi(request, tournoi_id):
+    update_url = f"http://tournament:8005/tournament/{tournoi_id}"
+    try:
+        response = requests.delete(update_url)
+
+        if response.status_code == 200:
+            return JsonResponse({"success": True, "message": ""})
+        else:
+            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)

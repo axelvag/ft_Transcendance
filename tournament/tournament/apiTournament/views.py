@@ -18,7 +18,7 @@ from django.db.models import Count
 User = get_user_model()
 # @login_required
 @csrf_exempt
-@require_http_methods(["POST"])
+# @require_http_methods(["POST"])
 def create_tournament(request):
     try:
         data = json.loads(request.body)
@@ -40,7 +40,7 @@ def create_tournament(request):
             }
         )
         logging.critical("Message WebSocket envoyé avec succès depuis la vue.")
-        return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournois.id}, status=201)
+        return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournois.id}, status=200)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
 

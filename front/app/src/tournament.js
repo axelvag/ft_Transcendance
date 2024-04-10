@@ -1,5 +1,5 @@
 import { redirectTo } from '@/router.js';
-import { getProfile } from '@/auth.js';
+import { getProfile, getCsrfToken } from '@/auth.js';
 
 const tournament = {
   id: null,
@@ -52,11 +52,12 @@ const fetchGetTournament = async (tournamentId) => {
 };
 
 const fetchCreateTournament = async (formData) => {
-  const response = await fetch('http://127.0.0.1:8005/tournament/create_tournament/', {
+  let csrfToken = await getCsrfToken();
+  const response = await fetch('http://127.0.0.1:8001/accounts/create_tournament/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
+      'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
     body: JSON.stringify(formData),
