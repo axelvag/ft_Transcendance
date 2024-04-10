@@ -6,18 +6,36 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from .models import Game
 import json
+import requests
 
+def verify_sessionid(request):
+  session_id = request.COOKIES.get('sessionid', None)
+  update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
+  response = requests.get(update_url)
+  if response.status_code != 200:
+    raise Exception('Invalid sessionid')
+  return response.json()
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GameListView(View):
   
   def get(self, request):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, status=403)
+
     # List games
     games = Game.objects.all()
     games_data = [game.json() for game in games]
     return JsonResponse(games_data, safe=False, status=200)
 
   def post(self, request):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, status=403)
+
     # Create a new game
     try:
       data = json.loads(request.body)
@@ -36,6 +54,11 @@ class GameListView(View):
 class GameItemView(View):
   
   def get(self, request, game_id):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, status=403)
+
     # Get a specific game
     try:
       game = Game.objects.get(id=game_id)
@@ -46,6 +69,11 @@ class GameItemView(View):
       return JsonResponse({'error': 'Invalid request'}, status=400)
 
   def put(self, request, game_id):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, status=403)
+
     # Update a game
     try:
       data = json.loads(request.body)
@@ -70,6 +98,11 @@ class GameItemView(View):
       return JsonResponse({'error': 'Invalid request'}, status=400)
 
   def delete(self, request, game_id):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, status=403)
+
     # Delete a game
     try:
       game = Game.objects.get(id=game_id)
@@ -84,7 +117,15 @@ class GameItemView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class GamePlayerHistoryView(View):
   
-  def get(self, request, player_id):
+  def get(self, request):
+    
+    player_id = None
+    try:
+      response = verify_sessionid(request)
+      player_id = response['user_id']
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, status=403)
+
     # Get game history for a player
     games = Game.objects.filter(
       Q(player_left_id=player_id) | Q(player_right_id=player_id),
