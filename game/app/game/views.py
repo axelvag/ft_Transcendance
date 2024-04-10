@@ -5,12 +5,19 @@ from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 from .models import Game
 import json
+import requests
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GameListView(View):
   
   def get(self, request):
+    session_id = request.COOKIES.get('sessionid', None)
+    update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
+    response = requests.get(update_url)
+    print(response)
+    if response.status_code != 200:
+      raise ValidationError('wrong session ID')
     # List games
     games = Game.objects.all()
     games_data = [game.json() for game in games]

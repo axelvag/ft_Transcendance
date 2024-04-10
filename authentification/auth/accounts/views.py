@@ -30,6 +30,9 @@ import requests
 from django.middleware.csrf import CsrfViewMiddleware
 import os
 from dotenv import load_dotenv
+from django.http import JsonResponse
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
 
 # Déterminez le chemin absolu vers le fichier .env
 # dotenv_path = '../../.env'
@@ -608,13 +611,33 @@ def delete_tournoi(request, tournoi_id):
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
+@csrf_exempt
+def verif_sessionID(request, session_id):
+    # Récupérer le sessionID de l'en-tête de la requête
+    # session_id = request.headers.get('X-SessionID')
 
-def verif_sessionID(request, expected_value):
-    # Accéder au cookie 'sessionid'
-    session_id = request.COOKIES.get('sessionid', None)
-    
-    # Vérifier si le sessionid existe et correspond à la valeur attendue
-    if session_id and session_id == expected_value:
-        return True  # La vérification est réussie
-    else:
-        return False  # La vérification a échoué ou le cookie n'existe pas
+    if not session_id:
+        return JsonResponse({'error': 'SessionID manquant'}, status=400)
+
+    try:
+        # Vérifier si le sessionID existe
+        session = Session.objects.get(session_key=session_id)
+    except Session.DoesNotExist:
+        return JsonResponse({'error': 'SessionID invalide'}, status=404)
+
+    # Récupérer les données de session
+    session_data = session.get_decoded()
+    user_id = session_data.get('_auth_user_id')
+
+    if not user_id:
+        return JsonResponse({'error': 'Utilisateur non trouvé pour cette session'}, status=404)
+
+    # Récupérer l'utilisateur associé à cette session
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Utilisateur non trouvé'}, status=404)
+
+    # Réponse de succès avec le nom d'utilisateur
+    logging.critical(user.username)
+    return JsonResponse({'success': 'Session valide', 'username': user.username}, status=200)
