@@ -499,13 +499,13 @@ def delete_user_profile(request, user_id):
 def create_tournament(request):
     update_url = "http://tournament:8005/tournament/create_tournament/"
     try:
-        payload = request.POST.dict()
+        payload = json.loads(request.body)
         response = requests.post(update_url, json=payload)
-
+        logging.critical(response)
         if response.status_code == 200:
-            return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": response.tournoi_id})
+            return JsonResponse(response.json())
         else:
-            return JsonResponse({"success": False, "message": "Tournoi created fail"}, status=response.status_code)
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
@@ -517,23 +517,23 @@ def view(request):
         response = requests.get(update_url)
 
         if response.status_code == 200:
-            return JsonResponse({"success": True, "message": ""})
+            return JsonResponse(response.json(),  safe=False)
         else:
-            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
 @login_required
 @require_http_methods(["GET"])
 def tournament_detail(request, tournament_id):
-    update_url = f"http://tournament:8005/tournament/{tournament_id}"
+    update_url = f"http://tournament:8005/tournament/get/{tournament_id}"
     try:
         response = requests.get(update_url)
 
         if response.status_code == 200:
-            return JsonResponse({"success": True, "message": ""})
+            return JsonResponse(response.json(),  safe=False)
         else:
-            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
@@ -542,67 +542,79 @@ def tournament_detail(request, tournament_id):
 def create_joueur(request):
     update_url = "http://tournament:8005/tournament/create_joueur/"
     try:
-        response = requests.post(update_url)
+        payload = json.loads(request.body)
+        response = requests.post(update_url, json=payload)
 
         if response.status_code == 200:
-            return JsonResponse({"success": True, "message": ""})
+            return JsonResponse(response.json(),  safe=False)
         else:
-            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
 @login_required
 @require_http_methods(["GET"])
 def view_joueur(request, tournament_id):
-    update_url = f"http://tournament:8005/tournament/{tournament_id}"
+    update_url = f"http://tournament:8005/tournament/get_player/{tournament_id}"
     try:
         response = requests.get(update_url)
 
         if response.status_code == 200:
-            return JsonResponse({"success": True, "message": ""})
+            return JsonResponse(response.json(),  safe=False)
         else:
-            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
 @login_required
 @require_http_methods(["GET"])
 def tournoi_info(request, user_id):
-    update_url = f"http://tournament:8005/tournament/{user_id}"
+    update_url = f"http://tournament:8005/tournament/tournoi_info/{user_id}"
     try:
         response = requests.get(update_url)
 
         if response.status_code == 200:
-            return JsonResponse({"success": True, "message": ""})
+            return JsonResponse(response.json(),  safe=False)
         else:
-            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
 @login_required
 @require_http_methods(["DELETE"])
 def delete_joueur(request, user_id):
-    update_url = f"http://tournament:8005/tournament/{user_id}"
+    update_url = f"http://tournament:8005/tournament/delete_joueur/{user_id}"
     try:
         response = requests.delete(update_url)
 
         if response.status_code == 200:
-            return JsonResponse({"success": True, "message": ""})
+            return JsonResponse(response.json(),  safe=False)
         else:
-            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
 @login_required
 @require_http_methods(["DELETE"])
 def delete_tournoi(request, tournoi_id):
-    update_url = f"http://tournament:8005/tournament/{tournoi_id}"
+    update_url = f"http://tournament:8005/tournament/delete_tournment/{tournoi_id}"
     try:
         response = requests.delete(update_url)
 
         if response.status_code == 200:
-            return JsonResponse({"success": True, "message": ""})
+            return JsonResponse(response.json(),  safe=False)
         else:
-            return JsonResponse({"success": False, "message": ""}, status=response.status_code)
+            return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+
+def verif_sessionID(request, expected_value):
+    # Accéder au cookie 'sessionid'
+    session_id = request.COOKIES.get('sessionid', None)
+    
+    # Vérifier si le sessionid existe et correspond à la valeur attendue
+    if session_id and session_id == expected_value:
+        return True  # La vérification est réussie
+    else:
+        return False  # La vérification a échoué ou le cookie n'existe pas

@@ -16,9 +16,9 @@ import logging
 from django.db.models import Count
 
 User = get_user_model()
-# @login_required
+
 @csrf_exempt
-# @require_http_methods(["POST"])
+@require_http_methods(["POST"])
 def create_tournament(request):
     try:
         data = json.loads(request.body)
@@ -45,7 +45,7 @@ def create_tournament(request):
         return JsonResponse({"error": str(e)}, status=400)
 
 
-@csrf_exempt
+@require_http_methods(["GET"])
 def view(request):
     # Filtrez les tournois avec un status égal à 0 et annotez chaque tournoi avec le nombre de joueurs
     tournois = Tournoi.objects.filter(status=0).annotate(nombre_joueurs=Count('players'))
@@ -64,10 +64,10 @@ def view(request):
     ]
 
     # Retournez les données en JSON
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data, safe=False, status = 200)
 
 
-@csrf_exempt
+@require_http_methods(["GET"])
 def tournament_detail(request, tournament_id):
     try:
         # Essayez de récupérer le tournoi par son ID
@@ -146,7 +146,7 @@ def create_joueur(request):
 
 
 
-@csrf_exempt
+@require_http_methods(["GET"])
 def view_joueur(request, tournament_id):
     # Filtrez les tournois avec un status égal à 0
     joueur = Joueur.objects.filter(tournament=tournament_id)
@@ -158,7 +158,6 @@ def view_joueur(request, tournament_id):
     # Retournez les données en JSON
     return JsonResponse(data, safe=False)
 
-@csrf_exempt
 @require_http_methods(["GET"])
 def tournoi_info(request, user_id):
     try:

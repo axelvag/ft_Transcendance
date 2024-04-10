@@ -1,6 +1,6 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
-import { isAuthenticated } from '@/auth.js';
+import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament, initWebSocket } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
@@ -175,12 +175,15 @@ class ViewTournament extends HTMLElement {
 
   async loadTournois() {
     try {
-        const response = await fetch('http://127.0.0.1:8005/tournament/view/', { // Assurez-vous que l'URL correspond à votre endpoint API
+        // let csrfToken = await getCsrfToken();
+        const response = await fetch('http://127.0.0.1:8001/accounts/view/', { // Assurez-vous que l'URL correspond à votre endpoint API
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                // 'X-CSRFToken': csrfToken,
                 // 'Authorization': `Bearer ${token}`, // Si authentification est nécessaire
             },
+            credentials: 'include',
         });
 
         if (!response.ok) {
