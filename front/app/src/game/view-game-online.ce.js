@@ -1,6 +1,10 @@
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { getProfile, getCsrfToken } from '@/auth.js';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL;
+
 class ViewGameOnline extends HTMLElement {
   #game;
   #user;
@@ -56,7 +60,7 @@ class ViewGameOnline extends HTMLElement {
       };
     }
 
-    const profile = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${playerId}`, {
+    const profile = await fetch(API_BASE_URL + `/accounts/get_user_profile/${playerId}`, {
       method: 'GET',
       headers: { 'X-CSRFToken': await getCsrfToken() },
       credentials: 'include',
@@ -74,7 +78,7 @@ class ViewGameOnline extends HTMLElement {
 
   async displayMatchup() {
     try {
-      this.#game = await fetch(`https://127.0.0.1:8009/games/${this.getAttribute('game-id')}`).then(res => res.json());
+      this.#game = await fetch(`${BASE_URL}:8009/games/${this.getAttribute('game-id')}`).then(res => res.json());
       this.#playerLeft = await this.getPlayerProfile(this.#game.player_left_id);
       this.#playerRight = await this.getPlayerProfile(this.#game.player_right_id);
       console.log(this.#playerLeft, this.#playerRight);
@@ -165,7 +169,7 @@ class ViewGameOnline extends HTMLElement {
   }
 
   async joinGame() {
-    this.#ws = new WebSocket(`ws://127.0.0.1:8009/play/${this.#game.id}/${this.#user.id}`);
+    this.#ws = new WebSocket(`${WS_BASE_URL}:8009/play/${this.#game.id}/${this.#user.id}`);
     this.#ws.onmessage = this.handleMessage;
     this.#ws.onerror = this.displayGameNotFound;
     this.#ws.onopen = () => console.log('ws play opened');

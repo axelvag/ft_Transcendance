@@ -11,7 +11,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
 import os
+
+
+load_dotenv()
+BASE_URL = os.getenv('BASE_URL')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS
 # https://pypi.org/project/django-cors-headers/
 CORS_ALLOWED_ORIGINS = [
-  "https://127.0.0.1:8000"
+  BASE_URL + ":8000"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
