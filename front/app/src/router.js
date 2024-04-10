@@ -10,6 +10,7 @@ import '@/views/view-login.ce.js';
 import '@/game/view-game-set-mode.ce.js';
 import '@/game/view-game-offline.ce.js';
 import '@/game/view-game-online.ce.js';
+import '@/game/view-game-history.ce.js';
 import '@/game/view-game-tournament.ce.js';
 import '@/game/view-game-tournament-salon.ce.js';
 import '@/game/view-game-tournament-start.ce.js';
@@ -107,6 +108,13 @@ const router = new Router({
       path: '/careers',
       title: 'Careers',
       template: '<view-careers></view-careers>',
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'game-history',
+      path: '/game-history',
+      title: 'Game history',
+      template: '<view-game-history></view-game-history>',
       beforeEnter: isLoggedInGuard,
     },
     {
