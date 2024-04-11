@@ -30,6 +30,9 @@ import requests
 from django.middleware.csrf import CsrfViewMiddleware
 import os
 from dotenv import load_dotenv
+from django.http import JsonResponse
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
 
 # Déterminez le chemin absolu vers le fichier .env
 # dotenv_path = '../../.env'
