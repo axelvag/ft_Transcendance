@@ -147,7 +147,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'transcendence42lyon@gmail.com'
 EMAIL_HOST_PASSWORD = 'zotbqnassvkvftvk'
 
-
+CORS_ALLOWED_ORIGINS = ['https://*']
 CORS_ALLOWED_ORIGINS = [
     f"{URL}:5500",  # Remplacez par l'URL de votre frontend
     f"{URL}:8000",

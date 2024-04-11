@@ -90,7 +90,7 @@ def update_user(request):
         return JsonResponse({"success": False, "message": "Error updating or creating profile."})
 
     # Construction de l'URL de l'avatar
-    base_url = 'http://127.0.0.1:8001'
+    base_url = 'https://127.0.0.1:8001'
 
     avatar_url = base_url + profile.avatar.url if profile and profile.avatar else None
     if avatar is None:
@@ -141,7 +141,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         return JsonResponse({"success": False, "message": "Error calling authentication service."})
 
     # Construction de l'URL de l'avatar si disponible
-    base_url = 'http://127.0.0.1:8001'
+    base_url = 'https://127.0.0.1:8001'
 
     avatar_url = base_url + profile.avatar.url if profile and profile.avatar else None
     if profile is not None and avatar_url is None:

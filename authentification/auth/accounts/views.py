@@ -392,7 +392,7 @@ def oauth_callback(request):
             'code': code,
             'redirect_uri': settings.OAUTH_REDIRECT_URI,
         }
-        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data)
+        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data, verify=False)
         print(response.status_code)
         if response.status_code == 200:
             access_token = response.json().get('access_token')
@@ -476,14 +476,14 @@ def verif_sessionID(request, session_id):
 @login_required
 @require_http_methods(["POST"])
 def update_user(request):
-    update_url = "http://profile:8002/update_user/"
+    update_url = "https://profile:8002/update_user/"
     if request.FILES:
         files = {'avatar': request.FILES['avatar']} if 'avatar' in request.FILES else {}
         data = {key: value for key, value in request.POST.items()}
-        response = requests.post(update_url, files=files, data=data)
+        response = requests.post(update_url, files=files, data=data, verify=False)
     else:
         payload = request.POST
-        response = requests.post(update_url, json=payload)
+        response = requests.post(update_url, json=payload, verify=False)
     
     if response.status_code == 200:
         return JsonResponse({"status": "success", "update": response.json()})
@@ -498,9 +498,9 @@ def update_user(request):
 @login_required
 @require_http_methods(["GET"])
 def get_user_profile(request, user_id):
-    update_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    update_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:
-        response = requests.get(update_url)
+        response = requests.get(update_url, verify=False)
         if response.status_code == 200:
             return JsonResponse({"status": "success", "getProfile": response.json()})
         else:
@@ -511,9 +511,9 @@ def get_user_profile(request, user_id):
 @login_required
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
-    update_url = f"http://profile:8002/delete_user_profile/{user_id}/"
+    update_url = f"https://profile:8002/delete_user_profile/{user_id}/"
     try:
-        response = requests.delete(update_url)
+        response = requests.delete(update_url, verify=False)
 
         if response.status_code == 200:
             return JsonResponse({"success": True, "message": "Profile deletion initiated successfully."})
