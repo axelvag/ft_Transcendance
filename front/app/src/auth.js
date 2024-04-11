@@ -305,7 +305,7 @@ const handleOAuthResponse = async () => {
     const code = urlParams.get('code');
     try {
       const csrfToken = await getCsrfToken();
-      const authResponse = await fetch('http://127.0.0.1:8001/accounts/oauth/callback/', {
+      const authResponse = await fetch('https://127.0.0.1:8001/accounts/oauth/callback/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -334,7 +334,7 @@ const handleOAuthResponse = async () => {
         if (data.register === true) {
           try {
             const csrfToken = await getCsrfToken();
-            const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
+            const response = await fetch('https://127.0.0.1:8001/accounts/update_user/', {
               method: 'POST',
               headers: {
                 'X-CSRFToken': csrfToken,
@@ -352,7 +352,7 @@ const handleOAuthResponse = async () => {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
           }
         }
-        const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${data.id}/`, {
+        const userProfileResponse = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${data.id}/`, {
           method: 'GET',
           headers: {
             'X-CSRFToken': csrfToken,
