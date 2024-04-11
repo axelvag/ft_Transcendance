@@ -2,25 +2,41 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import logging
 from apiTournament.models import Joueur
-
+import requests
 from asgiref.sync import sync_to_async
 
-# Déplacez cette définition en dehors de la classe MyConsumer
-# @sync_to_async
-# def remove_player(user_id, tournoi_id):
-#     joueur = Joueur.objects.filter(user_id=user_id, tournament__id=tournoi_id).first()
-#     if joueur:
-#         joueur.tournament = None
-#         joueur.save()
-
 class MyConsumer(AsyncWebsocketConsumer):
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.user_id = None
-    #     self.tournoi_id = None
     user_group_name = None  # Pour garder le nom du groupe de l'utilisateur
 
     async def connect(self):
+
+        cookies = self.scope['headers']
+
+        # Les en-têtes (et donc les cookies) sont encodés en bytes, donc vous devez les décoder
+        cookies = dict(
+            (key.decode('ascii'), value.decode('ascii')) for key, value in cookies if key.decode('ascii') == 'cookie'
+        )
+
+        # Les cookies sont maintenant une chaîne de caractères, vous devez donc trouver le cookie 'sessionid'
+        cookies_str = cookies.get('cookie', '')
+        sessionid = None
+        for cookie in cookies_str.split(';'):
+            if 'sessionid' in cookie:
+                sessionid = cookie.split('=')[1].strip()
+                break
+
+        if sessionid:
+            print(f"Session ID trouvé : {sessionid}")
+            # Vous pouvez maintenant utiliser sessionid pour vos logiques de validation, etc.
+        else:
+            print("Session ID non trouvé")
+
+        update_url = f"http://authentification:8001/accounts/verif_sessionid/{sessionid}"
+        response = requests.get(update_url)
+        print(response)
+        if response.status_code != 200:
+            raise ValidationError('wrong session ID')
+
         await self.accept()
 
         # S'abonner à un groupe général pour tous les utilisateurs
@@ -40,16 +56,6 @@ class MyConsumer(AsyncWebsocketConsumer):
         # Se désabonner du groupe spécifique au tournoi si présent
         if hasattr(self, 'tournoi_group_name'):
             await self.channel_layer.group_discard(self.tournoi_group_name, self.channel_name)
-        # if hasattr(self, 'tournoi_group_name') and hasattr(self, 'user_group_name'):
-        #     await remove_player(self.user_id, self.tournoi_id)
-        #     await self.channel_layer.group_send(
-        #         self.tournoi_group_name,
-        #         {
-        #             'type': 'display_player',
-        #             'message': 'Player has disconnected'
-        #         }
-        #     )
-        #     logging.critical("supppppppppppppppppppppppppppppppppppppppppppppppppppp")
 
     async def receive(self, text_data):
         logging.critical("Received data")

@@ -14,10 +14,37 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import logging
 from django.db.models import Count
+import requests
 
 User = get_user_model()
 
+# def verif_sessionID(request):
+#     session_id = request.COOKIES.get('sessionid', None)
+#     update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
+#     response = requests.get(update_url)
+#     print(response)
+#     if response.status_code != 200:
+#         return JsonResponse({"success": False, "message": "sessionID Invalid"}, status=400)
+#     else
+#         return JsonResponse({"success": True, "message": "sessionID Valid"}, status=200)
+
 @csrf_exempt
+def verif_sessionID(view_func):
+    def wrapper(request, *args, **kwargs):
+        session_id = request.COOKIES.get('sessionid', None)
+        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
+        response = requests.get(update_url)
+        
+        if response.status_code != 200:
+            return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
+        
+        # Si la vérification est réussie, exécuter la vue originale
+        return view_func(request, *args, **kwargs)
+    
+    return wrapper
+
+@csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def create_tournament(request):
     try:
@@ -45,6 +72,7 @@ def create_tournament(request):
         return JsonResponse({"error": str(e)}, status=400)
 
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def view(request):
     # Filtrez les tournois avec un status égal à 0 et annotez chaque tournoi avec le nombre de joueurs
@@ -67,6 +95,7 @@ def view(request):
     return JsonResponse(data, safe=False, status = 200)
 
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def tournament_detail(request, tournament_id):
     try:
@@ -94,6 +123,7 @@ def tournament_detail(request, tournament_id):
     return JsonResponse(data)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def create_joueur(request):
     try:
@@ -145,7 +175,7 @@ def create_joueur(request):
         return JsonResponse({"success": False, 'message': 'Joueur already exists', 'joueur_id': joueur.id})
 
 
-
+@verif_sessionID
 @require_http_methods(["GET"])
 def view_joueur(request, tournament_id):
     # Filtrez les tournois avec un status égal à 0
@@ -158,6 +188,7 @@ def view_joueur(request, tournament_id):
     # Retournez les données en JSON
     return JsonResponse(data, safe=False)
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def tournoi_info(request, user_id):
     try:
@@ -180,6 +211,7 @@ def tournoi_info(request, user_id):
 
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["DELETE"])
 def delete_joueur(request, user_id):
     try:
@@ -222,6 +254,7 @@ def delete_joueur(request, user_id):
         return JsonResponse({'error': 'Joueur not found'}, status=404)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["DELETE"])
 def delete_tournoi(request, tournoi_id):
     try:

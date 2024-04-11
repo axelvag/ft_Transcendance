@@ -8,32 +8,32 @@ import requests
 class SearchOpponentConsumer(AsyncWebsocketConsumer):
   
   async def connect(self):
-    cookies = self.scope['headers']
+    # cookies = self.scope['headers']
 
-    # Les en-têtes (et donc les cookies) sont encodés en bytes, donc vous devez les décoder
-    cookies = dict(
-        (key.decode('ascii'), value.decode('ascii')) for key, value in cookies if key.decode('ascii') == 'cookie'
-    )
+    # # Les en-têtes (et donc les cookies) sont encodés en bytes, donc vous devez les décoder
+    # cookies = dict(
+    #     (key.decode('ascii'), value.decode('ascii')) for key, value in cookies if key.decode('ascii') == 'cookie'
+    # )
 
-    # Les cookies sont maintenant une chaîne de caractères, vous devez donc trouver le cookie 'sessionid'
-    cookies_str = cookies.get('cookie', '')
-    sessionid = None
-    for cookie in cookies_str.split(';'):
-        if 'sessionid' in cookie:
-            sessionid = cookie.split('=')[1].strip()
-            break
+    # # Les cookies sont maintenant une chaîne de caractères, vous devez donc trouver le cookie 'sessionid'
+    # cookies_str = cookies.get('cookie', '')
+    # sessionid = None
+    # for cookie in cookies_str.split(';'):
+    #     if 'sessionid' in cookie:
+    #         sessionid = cookie.split('=')[1].strip()
+    #         break
 
-    if sessionid:
-        print(f"Session ID trouvé : {sessionid}")
-        # Vous pouvez maintenant utiliser sessionid pour vos logiques de validation, etc.
-    else:
-        print("Session ID non trouvé")
+    # if sessionid:
+    #     print(f"Session ID trouvé : {sessionid}")
+    #     # Vous pouvez maintenant utiliser sessionid pour vos logiques de validation, etc.
+    # else:
+    #     print("Session ID non trouvé")
 
-    update_url = f"http://authentification:8001/accounts/verif_sessionid/{sessionid}"
-    response = requests.get(update_url)
-    print(response)
-    if response.status_code != 200:
-      raise ValidationError('wrong session ID')
+    # update_url = f"http://authentification:8001/accounts/verif_sessionid/{sessionid}"
+    # response = requests.get(update_url)
+    # print(response)
+    # if response.status_code != 200:
+    #   raise ValidationError('wrong session ID')
 
     self.user_id = self.scope['url_route']['kwargs']['user_id']
     

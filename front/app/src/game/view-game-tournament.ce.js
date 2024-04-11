@@ -176,7 +176,7 @@ class ViewTournament extends HTMLElement {
   async loadTournois() {
     try {
         // let csrfToken = await getCsrfToken();
-        const response = await fetch('http://127.0.0.1:8001/accounts/view/', { // Assurez-vous que l'URL correspond à votre endpoint API
+        const response = await fetch('http://127.0.0.1:8005/tournament/view/', { // Assurez-vous que l'URL correspond à votre endpoint API
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

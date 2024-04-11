@@ -108,7 +108,7 @@ class ViewTournamentSalon extends HTMLElement {
 
   async viewPlayer() {
     try {
-        const response = await fetch(`http://127.0.0.1:8001/accounts/get_player/${this.#tournament.id}/`, {
+        const response = await fetch(`http://127.0.0.1:8005/tournament/get_player/${this.#tournament.id}/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
