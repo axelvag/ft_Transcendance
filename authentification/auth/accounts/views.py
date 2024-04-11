@@ -441,6 +441,35 @@ def oauth_callback(request):
     else:
         return JsonResponse({'error': 'Code d\'autorisation manquant'}, status=400)
 
+@csrf_exempt
+def verif_sessionID(request, session_id):
+
+    if not session_id:
+        return JsonResponse({'error': 'SessionID manquant'}, status=400)
+
+    try:
+        # Vérifier si le sessionID existe
+        session = Session.objects.get(session_key=session_id)
+    except Session.DoesNotExist:
+        return JsonResponse({'error': 'SessionID invalide'}, status=404)
+
+    # Récupérer les données de session
+    session_data = session.get_decoded()
+    user_id = session_data.get('_auth_user_id')
+
+    if not user_id:
+        return JsonResponse({'error': 'Utilisateur non trouvé pour cette session'}, status=404)
+
+    # Récupérer l'utilisateur associé à cette session
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Utilisateur non trouvé'}, status=404)
+
+    # Réponse de succès avec le nom d'utilisateur
+    logging.critical(user.username)
+    return JsonResponse({'success': 'Session valide', 'username': user.username, 'user_id': user.id}, status=200)
+
 
 #Profile
 

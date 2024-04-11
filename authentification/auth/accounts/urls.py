@@ -20,6 +20,7 @@ urlpatterns = [
     path('update_profile/', views.update_profile, name='update_profile'),
     path('get_profile/<int:user_id>/', views.get_profile, name='get_profile'),
     path('oauth/callback/', views.oauth_callback, name='oauth_callback'),
+    path('verif_sessionid/<str:session_id>/', views.verif_sessionID, name='verif_sessionID'),
     # path('update_user/', views.update_user, name='update_user'),
 
     #profile
