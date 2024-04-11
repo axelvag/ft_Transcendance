@@ -8,12 +8,14 @@ services:
       dockerfile: Dockerfile
     container_name: front
     ports:
-      - "8000:80"
+      - "8000:8443"
     networks:
       - front
     restart: on-failure
     profiles:
       - prod
+    volumes:
+      - shared_ssl:/etc/ssl
     env_file:
       - .env
 
@@ -24,6 +26,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: front_dev
     volumes:
+      - shared_ssl:/etc/ssl
       - /app/node_modules
       - type: bind
         source: ./front/app
@@ -47,6 +50,7 @@ services:
     volumes:
       - ./authentification:/app
       - shared_media:/app/media
+      - shared_ssl:/etc/ssl
     networks:
       - back
     depends_on:
@@ -62,6 +66,7 @@ services:
     container_name: profile
     volumes:
       - shared_media:/app/media
+      - shared_ssl:/etc/ssl
       - ./profile/profileApp:/profileApp
     # ports:
     # - "8002:8002"
@@ -85,6 +90,7 @@ services:
       - "5432:5432"
     volumes:
       - data_base_data:/var/lib/postgresql/data
+      - shared_ssl:/etc/ssl
     restart: always
     networks:
       - back
@@ -99,6 +105,7 @@ services:
       - "8003:8003"
     volumes:
       - ./friendship/friendshipApp:/friendshipApp
+      - shared_ssl:/etc/ssl
     networks:
       - back
     depends_on:
@@ -117,6 +124,7 @@ services:
       - "8009:8009"
     volumes:
       - ./game/app:/app
+      - shared_ssl:/etc/ssl
     networks:
       - back
     depends_on:
@@ -128,6 +136,7 @@ services:
 volumes:
   data_base_data:
   shared_media:
+  shared_ssl:
 
 networks:
   front:

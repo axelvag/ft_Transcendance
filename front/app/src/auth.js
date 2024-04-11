@@ -1,7 +1,7 @@
 const BASE_URL = import.meta.env.BASE_URL;
 import { redirectTo } from '@/router.js';
 import { notify } from '@/notifications.js';
-const API_BASE_URL = 'http://127.0.0.1:8001';
+const API_BASE_URL = 'https://127.0.0.1:8001';
 
 const user = {
   isAuthenticated: undefined,
@@ -96,7 +96,7 @@ const isAuthenticated = async () => {
       if (data.success) {
         setLocalUser(data);
         const csrfToken = await getCsrfToken();
-        const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
           method: 'GET',
           headers: {
             'X-CSRFToken': csrfToken,
@@ -123,7 +123,7 @@ const isAuthenticated = async () => {
 };
 
 const getCsrfToken = async () => {
-  const response = await fetch('http://127.0.0.1:8001/accounts/get-csrf-token/', {
+  const response = await fetch('https://127.0.0.1:8001/accounts/get-csrf-token/', {
     method: 'GET',
     credentials: 'include',
   });
@@ -191,7 +191,7 @@ const saveUser = async newUser => {
 
   try {
     const csrfToken = await getCsrfToken();
-    const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
+    const response = await fetch('https://127.0.0.1:8001/accounts/update_user/', {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -228,7 +228,7 @@ const saveUser = async newUser => {
 };
 
 const loginUser = async (formData, csrfToken) => {
-  const response = await fetch('http://127.0.0.1:8001/accounts/login/', {
+  const response = await fetch('https://127.0.0.1:8001/accounts/login/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -241,7 +241,7 @@ const loginUser = async (formData, csrfToken) => {
 };
 
 const sendSignUpRequest = async (formData, csrfToken) => {
-  const response = await fetch('http://127.0.0.1:8001/accounts/register/', {
+  const response = await fetch('https://127.0.0.1:8001/accounts/register/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -254,7 +254,7 @@ const sendSignUpRequest = async (formData, csrfToken) => {
 };
 
 const passwordReset = async (formData, csrfToken) => {
-  const response = await fetch('http://127.0.0.1:8001/accounts/password_reset/', {
+  const response = await fetch('https://127.0.0.1:8001/accounts/password_reset/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -280,7 +280,7 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
 };
 
 const deleteUser = async csrfToken => {
-  const url = `http://127.0.0.1:8001/accounts/delete_user/${user.username}`;
+  const url = `https://127.0.0.1:8001/accounts/delete_user/${user.username}`;
   const response = await fetch(url, {
     method: 'DELETE',
     credentials: 'include',
