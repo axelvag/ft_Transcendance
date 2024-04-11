@@ -104,11 +104,11 @@ class ViewFriend extends HTMLElement {
         this.loadSentInvitations();
         this.loadFriendRequests();
       }
-      else if (data.action === "cancel_invitation"){
+      else if (data.action === "cancel_invitation") {
         this.loadSentInvitations();
         this.loadFriendRequests();
       }
-      else if (data.action === "remove_friend"){
+      else if (data.action === "remove_friend") {
         this.loadOnlineFriends();
         this.loadOfflineFriends();
       }

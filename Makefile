@@ -17,8 +17,12 @@ volumes:
 	# mkdir -p /var/lib/postgresql/data
 
 fclean:
+	@docker ps -a -q -f name=front | grep . > /dev/null; \
+    if [ $$? -eq 0 ]; then \
+        docker stop front > /dev/null 2>&1; \
+        docker rm front > /dev/null 2>&1; \
+    fi
 	docker compose -f docker-compose.yml down -v --rmi all --remove-orphans
-	# rm -rf /var/lib/postgresql/data
 
 rebuild:
 	docker compose -f docker-compose.yml --env-file .env build --no-cache
@@ -30,8 +34,8 @@ sh-%:
 	docker compose -f docker-compose.yml exec $* /bin/sh
 
 re: fclean
-	make rebuild
-	make all
+	@make --no-print-directory rebuild
+	@make --no-print-directory all
 
 sh-%:
 	docker compose -f docker-compose.yml exec $* /bin/sh
