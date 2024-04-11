@@ -10,7 +10,24 @@ import requests
 from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
+
 @csrf_exempt
+def verif_sessionID(view_func):
+    def wrapper(request, *args, **kwargs):
+        session_id = request.COOKIES.get('sessionid', None)
+        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
+        response = requests.get(update_url)
+        
+        if response.status_code != 200:
+            return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
+        
+        # Si la vérification est réussie, exécuter la vue originale
+        return view_func(request, *args, **kwargs)
+    
+    return wrapper
+
+@csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def update_user(request):
     if request.content_type.startswith('multipart/form-data'): # grace au formData envoyer
@@ -114,6 +131,7 @@ def update_user(request):
 
 # @login_required
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["GET"])  # Utilisez GET si vous récupérez simplement des informations, ajustez selon besoin
 def get_user_profile(request, user_id):  # Assurez-vous que user_id est correctement capturé depuis l'URL
     
@@ -161,6 +179,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
 
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
     logging.critical("delete user")

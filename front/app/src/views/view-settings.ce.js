@@ -32,9 +32,6 @@ class ViewSettings extends HTMLElement {
       const deleteProfile = await fetch(`http://127.0.0.1:8001/accounts/delete_user_profile/${user.id}/`, {
         method: 'DELETE',
         credentials: 'include',
-        headers: {
-          'X-CSRFToken': csrfToken,
-        },
       });
       const deleteProfileData = await deleteProfile.json()
       if (deleteProfileData.success) {

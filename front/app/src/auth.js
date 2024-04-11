@@ -95,19 +95,15 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
-        const csrfToken = await getCsrfToken();
-        const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
           method: 'GET',
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
-        console.log(userProfileData);
-        if (userProfileData.getProfile.success) {
-          console.log(userProfileData.getProfile.avatar42);
-          setLocalUser(userProfileData.getProfile);
+        console.log("jdiejdoejdoe", userProfileData);
+        if (userProfileData.success) {
+          console.log(userProfileData.avatar42);
+          setLocalUser(userProfileData);
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
@@ -190,13 +186,9 @@ const saveUser = async newUser => {
   }
 
   try {
-    const csrfToken = await getCsrfToken();
-    const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
+    const response = await fetch('http://127.0.0.1:8002/update_user/', {
       method: 'POST',
       credentials: 'include',
-      headers: {
-        'X-CSRFToken': csrfToken,
-      },
       body: formData,
     });
 
@@ -205,22 +197,22 @@ const saveUser = async newUser => {
     }
 
     const data = await response.json();
-    if (data.update.success) {
+    if (data.success) {
       //MAJ object user
-      user.firstname = data.update.firstname;
-      user.lastname = data.update.lastname;
-      user.username = data.update.username;
+      user.firstname = data.firstname;
+      user.lastname = data.lastname;
+      user.username = data.username;
       user.email = user.email;
 
-      if (!data.update.avatar) {
+      if (!data.avatar) {
         if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) user.avatar = user.avatarDefault42;
         else user.avatar = '/assets/img/default-profile.jpg';
       } else {
-        user.avatar = data.update.avatar;
+        user.avatar = data.avatar;
       }
     }
 
-    return data.update;
+    return data;
   } catch (error) {
     console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
     return null;
@@ -333,12 +325,8 @@ const handleOAuthResponse = async () => {
         formData.append('avatar', user.avatar);
         if (data.register === true) {
           try {
-            const csrfToken = await getCsrfToken();
-            const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
+            const response = await fetch('http://127.0.0.1:8002/update_user/', {
               method: 'POST',
-              headers: {
-                'X-CSRFToken': csrfToken,
-              },
               credentials: 'include',
               body: formData,
             });
@@ -352,18 +340,15 @@ const handleOAuthResponse = async () => {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
           }
         }
-        const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${data.id}/`, {
+        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${data.id}/`, {
           method: 'GET',
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
           credentials: 'include',
         });
 
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
-        if (userProfileData.getProfile.success) {
-          setLocalUser(userProfileData.getProfile);
+        if (userProfileData.success) {
+          setLocalUser(userProfileData);
           redirectTo('/dashboard');
           notify({
             icon: 'info',
