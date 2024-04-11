@@ -100,7 +100,6 @@ const isAuthenticated = async () => {
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
-        console.log("jdiejdoejdoe", userProfileData);
         if (userProfileData.success) {
           console.log(userProfileData.avatar42);
           setLocalUser(userProfileData);
