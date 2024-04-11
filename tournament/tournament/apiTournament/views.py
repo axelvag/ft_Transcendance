@@ -18,16 +18,6 @@ import requests
 
 User = get_user_model()
 
-# def verif_sessionID(request):
-#     session_id = request.COOKIES.get('sessionid', None)
-#     update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
-#     response = requests.get(update_url)
-#     print(response)
-#     if response.status_code != 200:
-#         return JsonResponse({"success": False, "message": "sessionID Invalid"}, status=400)
-#     else
-#         return JsonResponse({"success": True, "message": "sessionID Valid"}, status=200)
-
 @csrf_exempt
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
