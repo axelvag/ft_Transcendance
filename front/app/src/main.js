@@ -30,3 +30,7 @@ initNotifications();
 if (localStorage.getItem('isLogged') === null) {
   localStorage.setItem('isLogged', 'false');
 }
+
+// init WebSocket
+// import { initWebSocket } from '@/friends.js';
+// initWebSocket();

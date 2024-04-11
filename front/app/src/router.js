@@ -1,5 +1,6 @@
 import { isAuthenticated } from '@/auth.js';
 import Router from '@/utils/Router.js';
+import { initWebSocket } from '@/friends.js';
 
 import '@/views/view-not-found.ce.js';
 import '@/views/view-welcome.ce.js';
@@ -24,12 +25,14 @@ import '@/views/view-auth42-callback.ce.js';
 const isLoggedOutGuard = async () => {
   const isLoggedin = await isAuthenticated();
   if (isLoggedin) redirectTo('/dashboard');
+  initWebSocket();
   return !isLoggedin;
 };
 
 const isLoggedInGuard = async () => {
   const isLoggedin = await isAuthenticated();
   if (!isLoggedin) redirectTo('/login');
+  initWebSocket();
   return isLoggedin;
 };
 
