@@ -11,40 +11,57 @@ class ViewSigUp extends HTMLElement {
   }
   connectedCallback() {
     this.innerHTML = `
-        <auth-layout>
+      <auth-layout>
         <h1 class="fw-bold py-2 mb-4">
-        <span class="text-bicolor">Sign up</span>
+          <span class="text-bicolor">Sign up</span>
         </h1>
-        <form id="signup-form">
-        <div class="mb-4">
-          <label class="form-label" for="email">
-            Your email
-          </label>
-          <input
-            class="form-control form-control-lg"
-            type="email"
-            id="email"
-            name="email"
-            required
-            autocomplete="email"
-          />
-          <div id="email-error" class="invalid-feedback"></div>
-        </div>
-          <div class="mb-4">
-            <label class="form-label" for="username">
-              Choose your username
-              </label>
-            <input
-              class="form-control form-control-lg"
-              type="username"
-              id="username"
-              name="username"
-              required
-              autocomplete="username"
-            />
-            <div id="username-error" class="invalid-feedback"></div>
+        <div id="viewSignup-content">
+          <div id="OAuth42" class="d-grid">
+            <a
+              href="#"
+              id="OAuth-42"
+              class="btn btn-outline-bicolor border-2 btn-lg fw-bold"
+              style="--bs-btn-border-width: 2px;"
+            >
+              Sign Up with
+              <ui-icon class="ms-2" name="42"></ui-icon>
+            </a>
           </div>
-            
+          <div class="d-flex align-items-center my-3">
+            <hr class="flex-grow-1">
+            <span class="flex-shrink-0 px-3 pb-1 fw-semibold">or</span>
+            <hr class="flex-grow-1">
+          </div>
+          <form id="signup-form">
+            <div class="mb-4">
+              <label class="form-label" for="email">
+                Your email
+              </label>
+              <input
+                class="form-control form-control-lg"
+                type="email"
+                id="email"
+                name="email"
+                required
+                autocomplete="email"
+              />
+              <div id="email-error" class="invalid-feedback"></div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label" for="username">
+                Choose your username
+                </label>
+              <input
+                class="form-control form-control-lg"
+                type="username"
+                id="username"
+                name="username"
+                required
+                autocomplete="username"
+              />
+              <div id="username-error" class="invalid-feedback"></div>
+            </div>
+                
             <div class="mb-4">
               <label class="form-label" for="password1">Choose your password</label>
               <input
@@ -68,28 +85,31 @@ class ViewSigUp extends HTMLElement {
               />
               <div id="password-error" class="invalid-feedback"></div>
             </div>
-            <div id="OAuth42">
-              <a href="#" id="OAuth-42">
-              Se connecter avec 42
-              </a>
-            </div>
-            
             <div class="d-grid pt-3">
               <button type="submit" class="btn btn-primary btn-lg fw-bold">
-                Sign up
+                Sign Up
               </button>
-            
-              <div id="success-notification" class="alert alert-success mt-3" style="display: none;">
-                <strong>Success!</strong> Registration successful! Please check your email for further instructions.
-              </div>
-              <div id="general-error" class="alert alert-danger mt-3" style="display: none;"></div>
-              <div class="text-center pt-4">
-                <a href="#" data-link="/login" class="link fw-bold text-decoration-none">
-                  I already have an account
-                </a>
-              </div>
             </div>
-            </form>
+            <div id="general-error" class="alert alert-danger mt-3" style="display: none;"></div>
+            <div class="text-center pt-4">
+              <a href="#" data-link="/login" class="link fw-bold text-decoration-none">
+                I already have an account
+              </a>
+            </div>
+          </form>
+        </div>
+        
+        <div id="success-notification" style="display: none;">
+          <div class="alert alert-success mb-4">
+            <div class="mb-2"><strong>Registration successful!</strong></div>
+            <div>Please check your email for further instructions.</div>
+          </div>
+          <div class="d-grid">
+            <a href="#" data-link="/login" class="btn btn-primary btn-lg fw-bold">
+              Go to Login
+            </a>
+          </div>
+        </div>
       </auth-layout>
     `;
 
@@ -161,6 +181,9 @@ class ViewSigUp extends HTMLElement {
     let verif = this.passwordVerification();
     if (!verif) return;
 
+    // Show loader
+    this.querySelector('auth-layout').setAttribute('loading', true);
+
     // Ajout : Récupération du CSRF Token
     const csrfToken = await getCsrfToken();
 
@@ -177,7 +200,7 @@ class ViewSigUp extends HTMLElement {
     if (data.success) {
       const successNotification = document.getElementById('success-notification');
       if (successNotification) successNotification.style.display = 'block';
-      // redirectTo('/profil');
+      document.getElementById('viewSignup-content').style.display = 'none';
     } else {
       if (data.errors.email) {
         this.emailError.textContent = data.errors.email[0];
@@ -194,6 +217,9 @@ class ViewSigUp extends HTMLElement {
         this.generalError.style.display = 'block';
       }
     }
+
+    // Hide loader
+    this.querySelector('auth-layout').removeAttribute('loading');
   }
 
   resetError = () => {

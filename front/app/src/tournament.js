@@ -44,7 +44,7 @@ const fetchGetTournament = async (tournamentId) => {
   const data = await response.json();
   if (data.success) {
     setLocalTournament(data.data);
-    console.log(data);
+    // console.log(data);
     redirectTo(`/game/tournament/waiting`);
   } else {
       console.error('Tournoi non trouvé ou erreur de récupération.');
@@ -79,7 +79,7 @@ const fetchDeletePlayer = async () => {
   const data = await response.json();
   if (data.success) {
     resetLocalTournament();
-    console.log(data);
+    // console.log(data);
   } else {
     console.log("error");
   }
@@ -137,13 +137,13 @@ const fetchTournamentInfo = async () => {
     credentials: 'include',
   })
   const data = await response.json();
-  console.log(data)
+  // console.log(data)
   if (data.id) {
     // resetLocalTournament();
     setLocalTournament(data);
-    console.log(data);
+    // console.log(data);
   } else {
-    console.log(data);
+    // console.log(data);
     console.log("player is not in a tournament");
   }
 };

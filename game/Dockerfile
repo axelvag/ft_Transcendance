@@ -1,4 +1,4 @@
-FROM python:3.12.1-bookworm
+FROM python:3.12-bookworm
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1

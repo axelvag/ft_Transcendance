@@ -96,7 +96,6 @@ const isAuthenticated = async () => {
       if (data.success) {
         setLocalUser(data);
         const csrfToken = await getCsrfToken();
-        console.log("dwedededee",user.id);
         const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
           method: 'GET',
           headers: {
@@ -134,7 +133,7 @@ const getCsrfToken = async () => {
     return data.csrfToken;
   }
   throw new Error('Could not retrieve CSRF token');
-}
+};
 
 const logout = async () => {
   try {
@@ -148,13 +147,23 @@ const logout = async () => {
         'X-CSRFToken': csrfToken,
       },
     });
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: 'You have been <b>logged out</b> successfully!',
+    });
   } catch (error) {
     console.error('Error:', error);
+    notify({
+      icon: 'error',
+      iconClass: 'text-danger',
+      message: 'Logout failed!',
+      autohide: false,
+    });
   }
   fetchDeletePlayer();
   resetLocalUser();
 };
-
 
 const getProfile = () => {
   return {
@@ -170,7 +179,6 @@ const getProfile = () => {
 };
 
 const saveUser = async newUser => {
-
   const formData = new FormData();
   formData.append('username', newUser.username);
   formData.append('email', newUser.email);
@@ -178,7 +186,7 @@ const saveUser = async newUser => {
   formData.append('lastname', newUser.lastname);
   formData.append('id', newUser.id);
 
-  if (newUser.avatarFile) { 
+  if (newUser.avatarFile) {
     formData.append('avatar', newUser.avatarFile);
   }
 
@@ -198,7 +206,7 @@ const saveUser = async newUser => {
     }
 
     const data = await response.json();
-    if (data.update.success){
+    if (data.update.success) {
       //MAJ object user
       user.firstname = data.update.firstname;
       user.lastname = data.update.lastname;
@@ -209,7 +217,7 @@ const saveUser = async newUser => {
         if(user.avatarDefault42 !== null && user.avatarDefault42 !== undefined)
           user.avatar = user.avatarDefault42;
         else
-          user.avatar = '/assets/img/default-profile.jpg';
+          user.avatar = 'assets/img/default-profile.jpg';
       }
       else{
         user.avatar = data.update.avatar;
@@ -222,7 +230,6 @@ const saveUser = async newUser => {
     return null;
   }
 };
-
 
 const loginUser = async (formData, csrfToken) => {
   const response = await fetch('http://127.0.0.1:8001/accounts/login/', {
@@ -276,21 +283,21 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
   return response.json();
 };
 
-const deleteUser = async (csrfToken) => {
+const deleteUser = async csrfToken => {
   const url = `http://127.0.0.1:8001/accounts/delete_user/${user.username}`;
-    const response = await fetch(url, {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': csrfToken,
-      },
-    });
+  const response = await fetch(url, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRFToken': csrfToken,
+    },
+  });
 
-    const data = await response.json();
-    if (data.success) {
-    console.log("delete user and profil");
+  const data = await response.json();
+  if (data.success) {
+    console.log('delete user and profil');
     user.isAuthenticated = false;
     resetLocalUser(data);
     localStorage.setItem('isLogged', 'false');
@@ -298,7 +305,7 @@ const deleteUser = async (csrfToken) => {
 };
 
 const handleOAuthResponse = async () => {
-  if (window.location.search.includes("code=")) {
+  if (window.location.search.includes('code=')) {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     try {
@@ -310,7 +317,7 @@ const handleOAuthResponse = async () => {
           'X-CSRFToken': csrfToken,
         },
         credentials: 'include',
-        body: JSON.stringify({ code: code })
+        body: JSON.stringify({ code: code }),
       });
 
       const data = await authResponse.json();
@@ -329,7 +336,7 @@ const handleOAuthResponse = async () => {
         formData.append('lastname', user.lastname);
         formData.append('id', user.id);
         formData.append('avatar', user.avatar);
-        if(data.register === true){
+        if (data.register === true) {
           try {
             const csrfToken = await getCsrfToken();
             const response = await fetch('http://127.0.0.1:8001/accounts/update_user/', {
@@ -340,13 +347,12 @@ const handleOAuthResponse = async () => {
               credentials: 'include',
               body: formData,
             });
-        
+
             if (!response.ok) {
               throw new Error('La requête a échoué avec le statut ' + response.status);
             }
-        
+
             const data = await response.json();
-        
           } catch (error) {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
           }
@@ -358,14 +364,24 @@ const handleOAuthResponse = async () => {
           },
           credentials: 'include',
         });
-        
+
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
         if (userProfileData.getProfile.success) {
           setLocalUser(userProfileData.getProfile);
           redirectTo('/dashboard');
+          notify({
+            icon: 'info',
+            iconClass: 'text-info',
+            message: 'You have been <b>logged in</b> successfully!',
+          });
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
+          notify({
+            icon: 'error',
+            iconClass: 'text-danger',
+            message: 'Failed to load user profile!',
+          });
         }
       }
       else{
@@ -375,6 +391,11 @@ const handleOAuthResponse = async () => {
 
     } catch (error) {
       console.error('Erreur:', error);
+      notify({
+        icon: 'error',
+        iconClass: 'text-danger',
+        message: 'login with 42 failed!',
+      });
     }
   }
 };
@@ -382,6 +403,22 @@ const handleOAuthResponse = async () => {
 const getAuthorizationCode = () => {
   const url = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth42-callback&response_type=code`;
   window.location.href = url;
-}  
+};
 
-export { user, isAuthenticated, logout, deleteUser, getProfile, getCsrfToken, loginUser, sendSignUpRequest, passwordReset, sendEmailPasswordReset, handleOAuthResponse, getAuthorizationCode, saveUser, setLocalUser, resetLocalUser};
+export {
+  user,
+  isAuthenticated,
+  logout,
+  deleteUser,
+  getProfile,
+  getCsrfToken,
+  loginUser,
+  sendSignUpRequest,
+  passwordReset,
+  sendEmailPasswordReset,
+  handleOAuthResponse,
+  getAuthorizationCode,
+  saveUser,
+  setLocalUser,
+  resetLocalUser,
+};

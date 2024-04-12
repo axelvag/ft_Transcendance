@@ -20,9 +20,17 @@ import '@/router.js';
 // theme
 import { initTheme } from '@/theme.js';
 
-// init theme
+// notifications
+import { initNotifications } from '@/notifications.js';
+
+// init
 initTheme();
+initNotifications();
 
 if (localStorage.getItem('isLogged') === null) {
   localStorage.setItem('isLogged', 'false');
 }
+
+// init WebSocket
+// import { initWebSocket } from '@/friends.js';
+// initWebSocket();
