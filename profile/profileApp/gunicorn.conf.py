@@ -7,7 +7,7 @@ wsgi_app = 'profileApp.wsgi:application'
 bind = '0.0.0.0:8002'
 
 # Number of workers
-workers = 3
+workers = 4
 
 # chdir = 'profileApp/'
 

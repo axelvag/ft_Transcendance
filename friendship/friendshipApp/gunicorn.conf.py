@@ -7,7 +7,7 @@ wsgi_app = 'friendshipApp.wsgi:application'
 bind = '0.0.0.0:8003'
 
 # Number of workers
-workers = 3
+workers = 4
 
 # chdir = 'auth/'
 

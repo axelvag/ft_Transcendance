@@ -7,7 +7,7 @@ wsgi_app = 'auth.wsgi:application'
 bind = '0.0.0.0:8001'
 
 # Number of workers
-workers = 3
+workers = 4
 
 # chdir = 'auth/'
 
