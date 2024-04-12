@@ -132,7 +132,7 @@ class ViewFriend extends HTMLElement {
   async loadSentInvitations() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_list_sent_invitations/${user.id}/`, {
+      const response = await fetch(`https://127.0.0.1:8001/accounts/proxy_list_sent_invitations/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -232,7 +232,7 @@ class ViewFriend extends HTMLElement {
   async loadFriendRequests() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_list_received_invitations/${user.id}/`, {
+      const response = await fetch(`https://127.0.0.1:8001/accounts/proxy_list_received_invitations/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -513,7 +513,7 @@ class ViewFriend extends HTMLElement {
   async loadOnlineFriends() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_online_friends/${user.id}/`, {
+      const response = await fetch(`https://127.0.0.1:8001/accounts/proxy_online_friends/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -581,7 +581,7 @@ class ViewFriend extends HTMLElement {
   async loadOfflineFriends() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_offline_friends/${user.id}/`, {
+      const response = await fetch(`https://127.0.0.1:8001/accounts/proxy_offline_friends/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,

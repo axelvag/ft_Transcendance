@@ -597,12 +597,12 @@ def proxy_list_received_invitations(request, user_id):
 @require_http_methods(["GET"])
 def proxy_list_received_invitations(request, user_id):
     # L'URL du service qui gère les invitations
-    friendship_service_url = "http://friendship:8003/list_received_invitations/"
+    friendship_service_url = "https://friendship:8003/list_received_invitations/"
 
     url = f"{friendship_service_url}{user_id}/"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         if response.status_code == 200:
             return JsonResponse(response.json(), status=200, safe=False)
@@ -617,12 +617,12 @@ def proxy_list_received_invitations(request, user_id):
 @login_required
 @require_http_methods(["GET"])
 def proxy_list_sent_invitations(request, user_id):
-    friendship_service_url = "http://friendship:8003/list_sent_invitations/"
+    friendship_service_url = "https://friendship:8003/list_sent_invitations/"
 
     url = f"{friendship_service_url}{user_id}/"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         if response.status_code == 200:
             return JsonResponse(response.json(), status=200, safe=False)
@@ -637,12 +637,12 @@ def proxy_list_sent_invitations(request, user_id):
 @login_required
 @require_http_methods(["GET"])
 def proxy_offline_friends(request, user_id):
-    friendship_service_url = "http://friendship:8003/offline_friends/"
+    friendship_service_url = "https://friendship:8003/offline_friends/"
 
     url = f"{friendship_service_url}{user_id}/"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         if response.status_code == 200:
             return JsonResponse(response.json(), status=200, safe=False)
@@ -657,12 +657,12 @@ def proxy_offline_friends(request, user_id):
 @login_required
 @require_http_methods(["GET"])
 def proxy_online_friends(request, user_id):
-    friendship_service_url = "http://friendship:8003/online_friends/"
+    friendship_service_url = "https://friendship:8003/online_friends/"
 
     url = f"{friendship_service_url}{user_id}/"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         if response.status_code == 200:
             return JsonResponse(response.json(), status=200, safe=False)
