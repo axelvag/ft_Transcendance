@@ -21,22 +21,4 @@ urlpatterns = [
     path('get_profile/<int:user_id>/', views.get_profile, name='get_profile'),
     path('oauth/callback/', views.oauth_callback, name='oauth_callback'),
     path('verif_sessionid/<str:session_id>/', views.verif_sessionID, name='verif_sessionID'),
-    # path('update_user/', views.update_user, name='update_user'),
-
-    #profile
-    # path('update_user/', views.update_user, name='update_user'),
-    path('delete_user_profile/<int:user_id>/', views.delete_user_profile, name='delete_user_profile'),
-    # path('get_user_profile/<int:user_id>/', views.get_user_profile, name='get_user_profile'),
-
-    #friendship
-    path('proxy_send_invitation/', views.proxy_send_invitation, name='proxy_send_invitation'),
-    path('proxy_search_users/', views.proxy_search_users, name='proxy_search_users'),
-    path('proxy_list_received_invitations/<int:user_id>/', views.proxy_list_received_invitations, name='proxy_list_received_invitations'),
-    path('proxy_list_sent_invitations/<int:user_id>/', views.proxy_list_sent_invitations, name='proxy_list_sent_invitations'),
-    path('proxy_offline_friends/<int:user_id>/', views.proxy_offline_friends, name='proxy_offline_friends'),
-    path('proxy_online_friends/<int:user_id>/', views.proxy_online_friends, name='proxy_online_friends'),
-    path('proxy_accept_invitation/', views.proxy_accept_invitation, name='proxy_accept_invitation'),
-    path('proxy_reject_invitation/', views.proxy_reject_invitation, name='proxy_reject_invitation'),
-    path('proxy_cancel_sent_invitation/', views.proxy_cancel_sent_invitation, name='proxy_cancel_sent_invitation'),
-    path('proxy_remove_friend/', views.proxy_remove_friend, name='proxy_remove_friend'),
 ]
