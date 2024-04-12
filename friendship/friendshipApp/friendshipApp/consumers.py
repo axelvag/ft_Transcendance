@@ -5,9 +5,34 @@ from invitations.models import Notification, UserStatus
 from channels.db import database_sync_to_async
 from django.utils import timezone
 import logging
+import requests
 
 class InvitationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+
+        # Verif sessionId
+        cookies = self.scope['headers']
+        cookies = dict(
+            (key.decode('ascii'), value.decode('ascii')) for key, value in cookies if key.decode('ascii') == 'cookie'
+        )
+        cookies_str = cookies.get('cookie', '')
+        sessionid = None
+        for cookie in cookies_str.split(';'):
+            if 'sessionid' in cookie:
+                sessionid = cookie.split('=')[1].strip()
+                break
+
+        if sessionid:
+            print(f"Session ID trouvé : {sessionid}")
+        else:
+            print("Session ID non trouvé")
+
+        update_url = f"http://authentification:8001/accounts/verif_sessionid/{sessionid}"
+        response = requests.get(update_url)
+        print(response)
+        if response.status_code != 200:
+            raise ValidationError('wrong session ID')
+
         self.user_id = self.scope['url_route']['kwargs']['user_id']
         self.group_name = f"user{self.user_id}"
 

@@ -29,7 +29,7 @@ class ViewSettings extends HTMLElement {
   async suppUser() {
     try {
       const csrfToken = await getCsrfToken();
-      const deleteProfile = await fetch(`http://127.0.0.1:8001/accounts/delete_user_profile/${user.id}/`, {
+      const deleteProfile = await fetch(`http://127.0.0.1:8002/delete_user_profile/${user.id}/`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
