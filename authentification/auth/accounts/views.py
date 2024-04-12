@@ -400,6 +400,7 @@ def oauth_callback(request):
             profile_data = requests.get(
                 "https://api.intra.42.fr/v2/me",
                 headers={"Authorization": f"Bearer {access_token}"},
+                verify=False
             )
             print(profile_data)
             if profile_data.status_code == 200:

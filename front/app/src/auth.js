@@ -352,6 +352,7 @@ const handleOAuthResponse = async () => {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
           }
         }
+        const csrfToken = await getCsrfToken();
         const userProfileResponse = await fetch(`https://127.0.0.1:8001/accounts/get_user_profile/${data.id}/`, {
           method: 'GET',
           headers: {
