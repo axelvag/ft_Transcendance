@@ -57,8 +57,6 @@ class ViewGameOnline extends HTMLElement {
     }
 
     const profile = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${playerId}`, {
-      method: 'GET',
-      headers: { 'X-CSRFToken': await getCsrfToken() },
       credentials: 'include',
     })
       .then(res => res.json())
@@ -74,7 +72,9 @@ class ViewGameOnline extends HTMLElement {
 
   async displayMatchup() {
     try {
-      this.#game = await fetch(`http://127.0.0.1:8009/games/${this.getAttribute('game-id')}`).then(res => res.json());
+      this.#game = await fetch(`http://127.0.0.1:8009/games/${this.getAttribute('game-id')}`, {
+        credentials: 'include',
+      }).then(res => res.json());
       this.#playerLeft = await this.getPlayerProfile(this.#game.player_left_id);
       this.#playerRight = await this.getPlayerProfile(this.#game.player_right_id);
       console.log(this.#playerLeft, this.#playerRight);
