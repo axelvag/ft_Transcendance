@@ -127,7 +127,7 @@ class ViewTournamentSalon extends HTMLElement {
 
         for (const player of players) {
             const csrfToken = await getCsrfToken();
-            const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${player.user_id}/`, {
+            const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${player.user_id}/`, {
                 method: 'GET',
                 headers: {
                     'X-CSRFToken': csrfToken,
@@ -142,10 +142,10 @@ class ViewTournamentSalon extends HTMLElement {
             const user = await userProfileResponse.json();
             console.log(user);
             let avatar = "/assets/img/default-profile.jpg";
-            if(user.getProfile.avatar42 !== null && user.getProfile.avatar42 !== undefined)
-              avatar = user.getProfile.avatar42;
-            if (user.getProfile.avatar !== null && user.getProfile.avatar !== undefined)
-              avatar = user.getProfile.avatar;
+            if(user.avatar42 !== null && user.avatar42 !== undefined)
+              avatar = user.avatar42;
+            if (user.avatar !== null && user.avatar !== undefined)
+              avatar = user.avatar;
             console.log(avatar);
             const playerElement = document.createElement('div');
             playerElement.innerHTML = `

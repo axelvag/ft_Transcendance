@@ -56,7 +56,7 @@ class ViewGameOnline extends HTMLElement {
       };
     }
 
-    const profile = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${playerId}`, {
+    const profile = await fetch(`http://127.0.0.1:8002/get_user_profile/${playerId}`, {
       method: 'GET',
       headers: { 'X-CSRFToken': await getCsrfToken() },
       credentials: 'include',

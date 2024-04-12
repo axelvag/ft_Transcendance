@@ -475,40 +475,40 @@ def verif_sessionID(request, session_id):
 
 #Profile
 
-@login_required
-@require_http_methods(["POST"])
-def update_user(request):
-    update_url = "http://profile:8002/update_user/"
-    if request.FILES:
-        files = {'avatar': request.FILES['avatar']} if 'avatar' in request.FILES else {}
-        data = {key: value for key, value in request.POST.items()}
-        response = requests.post(update_url, files=files, data=data)
-    else:
-        payload = request.POST
-        response = requests.post(update_url, json=payload)
+# @login_required
+# @require_http_methods(["POST"])
+# def update_user(request):
+#     update_url = "http://profile:8002/update_user/"
+#     if request.FILES:
+#         files = {'avatar': request.FILES['avatar']} if 'avatar' in request.FILES else {}
+#         data = {key: value for key, value in request.POST.items()}
+#         response = requests.post(update_url, files=files, data=data)
+#     else:
+#         payload = request.POST
+#         response = requests.post(update_url, json=payload)
     
-    if response.status_code == 200:
-        return JsonResponse({"status": "success", "update": response.json()})
-    else:
-        return JsonResponse({
-            "status": "error",
-            "message": "Failed to update user profile.",
-            "response": response.text,
-            "status_code": response.status_code
-        }, status=500)
+#     if response.status_code == 200:
+#         return JsonResponse({"status": "success", "update": response.json()})
+#     else:
+#         return JsonResponse({
+#             "status": "error",
+#             "message": "Failed to update user profile.",
+#             "response": response.text,
+#             "status_code": response.status_code
+#         }, status=500)
 
-@login_required
-@require_http_methods(["GET"])
-def get_user_profile(request, user_id):
-    update_url = f"http://profile:8002/get_user_profile/{user_id}/"
-    try:
-        response = requests.get(update_url)
-        if response.status_code == 200:
-            return JsonResponse({"status": "success", "getProfile": response.json()})
-        else:
-            return JsonResponse({"success": False, "message": "Failed to get profile ."}, status=response.status_code)
-    except requests.exceptions.RequestException as e:
-        return JsonResponse({"success": False, "message": str(e)}, status=500)
+# @login_required
+# @require_http_methods(["GET"])
+# def get_user_profile(request, user_id):
+#     update_url = f"http://profile:8002/get_user_profile/{user_id}/"
+#     try:
+#         response = requests.get(update_url)
+#         if response.status_code == 200:
+#             return JsonResponse({"status": "success", "getProfile": response.json()})
+#         else:
+#             return JsonResponse({"success": False, "message": "Failed to get profile ."}, status=response.status_code)
+#     except requests.exceptions.RequestException as e:
+#         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
 @login_required
 @require_http_methods(["DELETE"])

@@ -63,8 +63,8 @@ services:
     volumes:
       - shared_media:/app/media
       - ./profile/profileApp:/profileApp
-    # ports:
-    # - "8002:8002"
+    ports:
+    - "8002:8002"
     networks:
       - back
     depends_on:
