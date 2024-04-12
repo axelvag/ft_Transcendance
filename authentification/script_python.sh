@@ -9,4 +9,5 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 
 # Lancer l'application Django
-python3 manage.py runserver 0.0.0.0:8001
+# python3 manage.py runserver 0.0.0.0:8001
+gunicorn -c /auth/gunicorn.conf.py
