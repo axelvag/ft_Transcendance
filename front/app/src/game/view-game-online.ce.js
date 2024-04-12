@@ -165,7 +165,7 @@ class ViewGameOnline extends HTMLElement {
   }
 
   async joinGame() {
-    this.#ws = new WebSocket(`ws://127.0.0.1:8009/play/${this.#game.id}/${this.#user.id}`);
+    this.#ws = new WebSocket(`ws://127.0.0.1:8009/play/${this.#game.id}`);
     this.#ws.onmessage = this.handleMessage;
     this.#ws.onerror = this.displayGameNotFound;
     this.#ws.onopen = () => console.log('ws play opened');

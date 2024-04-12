@@ -1,14 +1,48 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
+import requests
 from game.models import Game
 
 class PlayConsumer(AsyncWebsocketConsumer):
+  async def get_user_id(self):
+    cookies = self.scope['headers']
+
+    # Convert the headers to a dictionary
+    cookies = dict(
+      (key.decode('ascii'), value.decode('ascii')) for key, value in cookies if key.decode('ascii') == 'cookie'
+    )
+
+    # Find the sessionid cookie
+    cookies_str = cookies.get('cookie', '')
+    sessionid = None
+    for cookie in cookies_str.split(';'):
+      if 'sessionid' in cookie:
+        sessionid = cookie.split('=')[1].strip()
+        break
+
+    if not sessionid:
+      raise Exception('session ID not found')
+
+    response = requests.get(f"http://authentification:8001/accounts/verif_sessionid/{sessionid}")
+    if response.status_code != 200:
+      raise Exception('wrong session ID')
+    
+    user_id = response.json()['user_id']
+    if not user_id:
+      raise Exception('user not found')
+    
+    return str(user_id)
+  
   async def connect(self):
-    self.game_id = self.scope['url_route']['kwargs']['game_id']
-    self.user_id = self.scope['url_route']['kwargs']['user_id']
+    # Verify the session ID
+    self.user_id = await self.get_user_id()
+    if self.user_id is None:
+      await self.close()
+      return
 
     # check if game exists and is waiting for players
+    self.game_id = self.scope['url_route']['kwargs']['game_id']
     self.game = await database_sync_to_async(self.get_game)(self.game_id)
     if self.game is None or self.game.status != 'WAITING':
       await self.close()
