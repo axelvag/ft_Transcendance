@@ -513,7 +513,7 @@ class ViewFriend extends HTMLElement {
   async loadOnlineFriends() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_online_friends/${user.id}/`, {
+      const response = await fetch(`http://127.0.0.1:8003/online_friends/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
