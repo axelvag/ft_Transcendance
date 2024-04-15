@@ -12,8 +12,6 @@ class ViewTournament extends HTMLElement {
     super();
     this.#user = getProfile();
     this.#tournament = getTournament();
-    console.log("tounrmanet id de luser ");
-    console.log(this.#tournament.id);
   }
   async connectedCallback() {
     const isLoggedIn = await isAuthenticated();
@@ -103,7 +101,6 @@ class ViewTournament extends HTMLElement {
     this.querySelector('#tournoisList').addEventListener('click', async (event) => {
       if (event.target.classList.contains('joinTournamentBtn')) {
           const tournamentId = event.target.id.replace('joinTournament-', '');
-          console.log(`Rejoindre le tournoi avec l'ID : ${tournamentId}`);
           if (this.#tournament.id !== null && this.#tournament.id.toString() !== tournamentId) {
               const confirmLeave = confirm("Vous êtes déjà dans un tournoi. Si vous rejoignez ce tournoi, vous serez déconnecté de l'autre. Voulez-vous continuer ?");
               if (!confirmLeave) {
@@ -158,7 +155,6 @@ class ViewTournament extends HTMLElement {
       tournamentSize: parseInt(this.tournamentSizeValue.textContent, 10), // Notez le changement ici pour utiliser textContent
       admin_id: this.#user.id,
     };
-    console.log(formData);
     const data = await fetchCreateTournament(formData);
     if (data.success) {
       this.querySelector('#formOverlay').style.display = 'none';

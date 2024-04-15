@@ -16,7 +16,6 @@ const setLocalTournament = data => {
 };
 
 const resetLocalTournament = () => {
-  console.log("reset tournamenttttttttttttttttttttttttt");
   tournament.id = null;
   tournament.name = null;
   tournament.maxPlayer = null;
@@ -37,14 +36,12 @@ const fetchGetTournament = async (tournamentId) => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   });
   const data = await response.json();
   if (data.success) {
     setLocalTournament(data.data);
-    // console.log(data);
     redirectTo(`/game/tournament/waiting`);
   } else {
       console.error('Tournoi non trouvé ou erreur de récupération.');
@@ -52,12 +49,10 @@ const fetchGetTournament = async (tournamentId) => {
 };
 
 const fetchCreateTournament = async (formData) => {
-  let csrfToken = await getCsrfToken();
   const response = await fetch('http://127.0.0.1:8005/tournament/create_tournament/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
     body: JSON.stringify(formData),
@@ -67,19 +62,16 @@ const fetchCreateTournament = async (formData) => {
 
 const fetchDeletePlayer = async () => {
   let user = getProfile();
-  let csrfToken = await getCsrfToken();
   const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${user.id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   })
   const data = await response.json();
   if (data.success) {
     resetLocalTournament();
-    // console.log(data);
   } else {
     console.log("error");
   }
@@ -87,12 +79,10 @@ const fetchDeletePlayer = async () => {
 
 const fetchDeletePlayerSalon = async () => {
   let user = getProfile();
-  let csrfToken = await getCsrfToken();
   const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${user.id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   })
@@ -100,12 +90,10 @@ const fetchDeletePlayerSalon = async () => {
 };
 
 const fetchDeleteTournament = async () => {
-  let csrfToken = await getCsrfToken();
   const response = await fetch(`http://127.0.0.1:8005/tournament/delete_tournment/${tournament.id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   })
@@ -113,12 +101,10 @@ const fetchDeleteTournament = async () => {
 };
 
 const fetchAddPlayer = async (formData) => {
-  let csrfToken = await getCsrfToken();
   const response = await fetch('http://127.0.0.1:8005/tournament/create_joueur/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
     body: JSON.stringify(formData),
@@ -132,18 +118,13 @@ const fetchTournamentInfo = async () => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   })
   const data = await response.json();
-  // console.log(data)
   if (data.id) {
-    // resetLocalTournament();
     setLocalTournament(data);
-    // console.log(data);
   } else {
-    // console.log(data);
     console.log("player is not in a tournament");
   }
 };

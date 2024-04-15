@@ -12,11 +12,8 @@ class ViewTournamentSalon extends HTMLElement {
 
   constructor() {
     super();
-    console.log("Waiting room");
     this.#user = getProfile();
     this.#tournament = getTournament();
-    console.log("tounrmanet id de luser ");
-    console.log(this.#tournament.id);
   }
   
   async connectedCallback() {
@@ -55,7 +52,7 @@ class ViewTournamentSalon extends HTMLElement {
     const deleteBtn = this.querySelector('#deleteTournamentBtn');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
-            console.log('Deleting tournament...');
+
             this.deleteTournament();
         });
     }
@@ -77,30 +74,19 @@ class ViewTournamentSalon extends HTMLElement {
       username: this.#user.username,
       tournament_id: this.#tournament.id,
     };
-    console.log(formData);
     const data = await fetchAddPlayer(formData);
-    if (data.success) {
-      console.log(data);
-    } else {
+    if (data.success === false) {
       this.viewPlayer();
-      console.log(data);
     }
   }
   
   async deletePlayer() {
     const data = await fetchDeletePlayerSalon();
-    if (data.success) {
-      console.log(data);
-      this.viewPlayer();
-    } else {
-      console.log("error");
-    }
   }
   
   async deleteTournament() {
     const data = await fetchDeleteTournament();
     if (data.success) {
-      console.log(data);
       resetLocalTournament();
       redirectTo(this.#backUrl);
     } else {
@@ -141,13 +127,11 @@ class ViewTournamentSalon extends HTMLElement {
             }
 
             const user = await userProfileResponse.json();
-            console.log(user);
             let avatar = "/assets/img/default-profile.jpg";
             if(user.avatar42 !== null && user.avatar42 !== undefined)
               avatar = user.avatar42;
             if (user.avatar !== null && user.avatar !== undefined)
               avatar = user.avatar;
-            console.log(avatar);
             const playerElement = document.createElement('div');
             playerElement.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -168,8 +152,6 @@ class ViewTournamentSalon extends HTMLElement {
 
         // Calculer le nombre de joueurs en attente
         const nbPlayersWaiting = this.#tournament.maxPlayer - players.length;
-        console.log(this.#tournament.maxPlayer);
-        console.log(players.length);
         const waitingElement = document.createElement('div');
         waitingElement.innerHTML = `<h3>${nbPlayersWaiting} player(s) waiting</h3>`;
         listElement.appendChild(waitingElement);
@@ -193,10 +175,8 @@ class ViewTournamentSalon extends HTMLElement {
     this.socket.onmessage = (event) => {
         // Logique pour gérer les messages entrants.
         const data = JSON.parse(event.data);
-        console.log('Message received:', data);
 
         if (data.action === 'add_Player') {
-            console.log("webSocket Add Playerrrrrrrrrrrrrr");
             this.viewPlayer();
         }
         if (data.action === 'disconnect') {
