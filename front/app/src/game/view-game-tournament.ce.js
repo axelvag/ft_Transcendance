@@ -161,8 +161,6 @@ class ViewTournament extends HTMLElement {
     console.log(formData);
     const data = await fetchCreateTournament(formData);
     if (data.success) {
-      console.log(data);
-      // this.loadTournois();
       this.querySelector('#formOverlay').style.display = 'none';
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         this.socket.close();
@@ -175,13 +173,10 @@ class ViewTournament extends HTMLElement {
 
   async loadTournois() {
     try {
-        // let csrfToken = await getCsrfToken();
-        const response = await fetch('http://127.0.0.1:8005/tournament/view/', { // Assurez-vous que l'URL correspond à votre endpoint API
+        const response = await fetch('http://127.0.0.1:8005/tournament/view/', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                // 'X-CSRFToken': csrfToken,
-                // 'Authorization': `Bearer ${token}`, // Si authentification est nécessaire
             },
             credentials: 'include',
         });
@@ -197,12 +192,8 @@ class ViewTournament extends HTMLElement {
 
         tournois.forEach(tournoi => {
           const tournoiElement = document.createElement('div');
-          let isInTournamentMessage = ''; // Initialiser le message comme une chaîne vide
+          let isInTournamentMessage = '';
       
-          // Vérifier si l'utilisateur est dans le tournoi actuel
-          console.log("je suis dans ce tournoi");
-          console.log(this.#tournament.id);
-          console.log(tournoi.id);
           if(this.#tournament.id === tournoi.id) {
               // Si oui, définir le message avec le style en rouge
               isInTournamentMessage = '<p style="color: red;">You are in this tournament</p>';

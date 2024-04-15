@@ -3,10 +3,29 @@ import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
 import { logout, getProfile } from '@/auth.js';
+import { getTournament } from '@/tournament.js';
 
 class DefaultLayoutSidebar extends HTMLElement {
   connectedCallback() {
     const user = getProfile();
+    const tournament = getTournament();
+
+    let tournamentButtonHTML = '';
+    if (tournament && tournament.id) {
+      tournamentButtonHTML = `
+        <div class="d-grid mb-3">
+          <a
+            class="btn btn-outline-success border-2 fw-semibold rounded-0"
+            style="--bs-btn-color: var(--bs-body-color);"
+            href="#"
+            data-link="/game/tournament/waiting"
+          >
+            <span class="d-inline-block py-1">Join Tournament</span>
+          </a>
+        </div>
+      `;
+    }
+
     this.innerHTML = `
       <header
         class="navbar fixed-top z-2 z-lg-n1 bg-body-secondary py-0"
@@ -93,6 +112,7 @@ class DefaultLayoutSidebar extends HTMLElement {
                 <span class="ps-2 flex-shrink-1 flex-grow-1 text-truncate">Settings</span>
               </a>
             </li>
+            ${tournamentButtonHTML}
             <span class="my-auto"></span>
             <li class="nav-item my-1">
               <a class="nav-link d-flex align-items-center theme-toggle" href="#">

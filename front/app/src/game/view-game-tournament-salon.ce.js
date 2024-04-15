@@ -55,11 +55,8 @@ class ViewTournamentSalon extends HTMLElement {
     const deleteBtn = this.querySelector('#deleteTournamentBtn');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
-            // Logique pour supprimer le tournoi
             console.log('Deleting tournament...');
             this.deleteTournament();
-            // Vous pouvez appeler une fonction pour supprimer le tournoi ici
-            // Assurez-vous de définir cette fonction et de gérer la suppression correctement
         });
     }
 
@@ -91,7 +88,6 @@ class ViewTournamentSalon extends HTMLElement {
   }
   
   async deletePlayer() {
-    console.log("delete Playerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
     const data = await fetchDeletePlayerSalon();
     if (data.success) {
       console.log(data);
@@ -118,7 +114,6 @@ class ViewTournamentSalon extends HTMLElement {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                // 'Authorization': `Bearer ${token}`, // Si l'authentification est nécessaire
             },
             credentials: 'include',
         });
