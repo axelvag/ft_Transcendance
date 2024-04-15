@@ -278,3 +278,16 @@ def delete_tournoi(request, tournoi_id):
     except Exception as e:
         # Pour capturer d'autres erreurs potentielles
         return JsonResponse({'success': False, 'message': 'An error occurred: {}'.format(str(e))}, status=500)
+
+
+@csrf_exempt
+@verif_sessionID
+@require_http_methods(["POST"])
+def start_tournament(request, tournament_id):
+    try:
+        tournament = Tournoi.objects.get(pk=tournament_id)
+        tournament.status = Tournoi.IN_PROGRESS
+        tournament.save()
+        return JsonResponse({'message': 'Tournoi mis à jour avec succès en cours.'}, status=200)
+    except Tournoi.DoesNotExist:
+        return JsonResponse({'error': 'Tournoi non trouvé.'}, status=404)

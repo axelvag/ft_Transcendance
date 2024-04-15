@@ -3,7 +3,7 @@ import { getProfile } from '@/auth.js';
 import {
   getTournament,
   resetLocalTournament,
-  fetchDeletePlayerstart,
+  fetchDeletePlayerSalon,
   fetchAddPlayer,
   fetchDeleteTournament,
 } from '@/tournament.js';

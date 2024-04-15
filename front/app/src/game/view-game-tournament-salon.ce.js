@@ -159,6 +159,18 @@ class ViewTournamentSalon extends HTMLElement {
           // if (this.socket && this.socket.readyState === WebSocket.OPEN) {
           //   this.socket.close();
           // }
+          //status tournament in progress
+        //   const response = await fetch(`http://127.0.0.1:8005/tournament/start/${this.#tournament.id}/`, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     credentials: 'include',
+        // });
+
+        // if (!response.ok) {
+        //     throw new Error(`HTTP error! status: ${response.status}`);
+        // }
           redirectTo(`/game/tournament/start`);
           return; // Arrêter l'exécution de la fonction
         }
