@@ -67,6 +67,12 @@ class ViewTournamentSalon extends HTMLElement {
     this.addPlayer();
   }
 
+  disconnectedCallback() {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.close();
+    }
+  }
+
   async addPlayer() {
 
     const formData = {
