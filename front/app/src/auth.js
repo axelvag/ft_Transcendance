@@ -292,8 +292,10 @@ const deleteUser = async csrfToken => {
       'X-Requested-With': 'XMLHttpRequest',
       'X-CSRFToken': csrfToken,
     },
+    body: JSON.stringify({ user_id: user.id }),
   });
 
+  console.table(response);
   const data = await response.json();
   if (data.success) {
     console.log('delete user and profil');

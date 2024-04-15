@@ -406,3 +406,28 @@ def get_profile_info(user_id, cookies):
             return {}
     except requests.exceptions.RequestException:
         return {}
+
+@csrf_exempt
+# @verif_sessionID
+@require_http_methods(["POST"])
+def delete_user_data(request, user_id):
+
+    if not user_id:
+        return JsonResponse({"status": "error", "message": "User ID is required."}, status=400)
+
+    try:
+        user = User.objects.get(id=user_id)
+
+        # Suppression des friendships, invitations et notifications
+        Friendship.objects.filter(Q(user=user) | Q(friend=user)).delete()
+        Invitation.objects.filter(Q(from_user=user) | Q(to_user=user)).delete()
+        Notification.objects.filter(user=user).delete()
+        # hasattr, verifie dans si l'objet user possede un attribut status
+        if hasattr(user, 'status'):
+            user.status.delete()
+        
+        return JsonResponse({"status": "success", "message": "User data deleted successfully."}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "User not found."}, status=404)
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
