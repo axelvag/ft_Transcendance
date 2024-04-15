@@ -3,10 +3,38 @@ from channels.db import database_sync_to_async
 from django.core.exceptions import ValidationError
 import json
 from game.models import Game
+import requests
 
 class SearchOpponentConsumer(AsyncWebsocketConsumer):
   
   async def connect(self):
+    # cookies = self.scope['headers']
+
+    # # Les en-têtes (et donc les cookies) sont encodés en bytes, donc vous devez les décoder
+    # cookies = dict(
+    #     (key.decode('ascii'), value.decode('ascii')) for key, value in cookies if key.decode('ascii') == 'cookie'
+    # )
+
+    # # Les cookies sont maintenant une chaîne de caractères, vous devez donc trouver le cookie 'sessionid'
+    # cookies_str = cookies.get('cookie', '')
+    # sessionid = None
+    # for cookie in cookies_str.split(';'):
+    #     if 'sessionid' in cookie:
+    #         sessionid = cookie.split('=')[1].strip()
+    #         break
+
+    # if sessionid:
+    #     print(f"Session ID trouvé : {sessionid}")
+    #     # Vous pouvez maintenant utiliser sessionid pour vos logiques de validation, etc.
+    # else:
+    #     print("Session ID non trouvé")
+
+    # update_url = f"http://authentification:8001/accounts/verif_sessionid/{sessionid}"
+    # response = requests.get(update_url)
+    # print(response)
+    # if response.status_code != 200:
+    #   raise ValidationError('wrong session ID')
+
     self.user_id = self.scope['url_route']['kwargs']['user_id']
     
     if not self.user_id:
@@ -50,10 +78,10 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
     await self.channel_layer.group_discard("searching_players", event['channel_name'])
 
     # create a new game
-    player1_id = self.user_id
-    player2_id = event['user_id']
+    player_left_id = self.user_id
+    player_right_id = event['user_id']
 
-    game_id = await database_sync_to_async(self.create_game)(player1_id, player2_id)
+    game_id = await database_sync_to_async(self.create_game)(player_left_id, player_right_id)
     if game_id is None:
       await self.channel_layer.send(event['channel_name'], {
         'type': 'opponent.error',
@@ -68,20 +96,20 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
       await self.channel_layer.send(event['channel_name'], {
         'type': 'opponent.success',
         'game_id': game_id,
-        'player1_id': player1_id,
-        'player2_id': player2_id,
+        'player_left_id': player_left_id,
+        'player_right_id': player_right_id,
       })
       await self.send(text_data=json.dumps({
         'game_id': game_id,
-        'player1_id': player1_id,
-        'player2_id': player2_id,
+        'player_left_id': player_left_id,
+        'player_right_id': player_right_id,
       }))
 
   async def opponent_success(self, event):
     await self.send(text_data=json.dumps({
       'game_id': event.get('game_id'),
-      'player1_id': event.get('player1_id'),
-      'player2_id': event.get('player2_id'),
+      'player_left_id': event.get('player_left_id'),
+      'player_right_id': event.get('player_right_id'),
     }))
 
   async def opponent_error(self, event):
@@ -90,11 +118,11 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
       'message': event.get('message')
     }))
 
-  def create_game(self, player1_id, player2_id):
+  def create_game(self, player_left_id, player_right_id):
     try:
-      game = Game(player1_id=player1_id, player2_id=player2_id)
+      game = Game(player_left_id=player_left_id, player_right_id=player_right_id)
       game.save()
-      return game.get_id()
+      return game.id
     except ValidationError as e:
       return None
     except Exception as e:

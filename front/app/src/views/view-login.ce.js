@@ -4,6 +4,7 @@ import { user } from '@/auth.js';
 import { getCsrfToken } from '@/auth.js';
 import { loginUser, setLocalUser } from '@/auth.js';
 import { getAuthorizationCode } from '@/auth.js';
+import { notify } from '@/notifications.js';
 
 const BASE_URL = import.meta.env.BASE_URL;
 
@@ -14,6 +15,22 @@ class ViewSignIn extends HTMLElement {
         <h1 class="fw-bold py-2 mb-4">
           <span class="text-bicolor">Log In</span>
         </h1>
+        <div id="OAuth42" class="d-grid">
+          <a
+            href="#"
+            id="OAuth-42"
+            class="btn btn-outline-bicolor border-2 btn-lg fw-bold"
+            style="--bs-btn-border-width: 2px;"
+          >
+            Log In with
+            <ui-icon class="ms-2" name="42"></ui-icon>
+          </a>
+        </div>
+        <div class="d-flex align-items-center my-3">
+          <hr class="flex-grow-1">
+          <span class="flex-shrink-0 px-3 pb-1 fw-semibold">or</span>
+          <hr class="flex-grow-1">
+        </div>
         <form id="signin-form">
           <div class="mb-4">
             <label class="form-label" for="username">
@@ -48,11 +65,6 @@ class ViewSignIn extends HTMLElement {
             <div id="password-error" class="alert alert-danger mt-4" style="display: none;">Identifiants ou mot de passe incorrects.</div>
             <div id="email-error" class="alert alert-danger mt-4" style="display: none;">Verifier vos emails.</div>
           </div>
-          <div id="OAuth42">
-              <a href="#" id="OAuth-42">
-              Se connecter avec 42
-              </a>
-            </div>
           <div class="d-grid pt-3">
             <button type="submit" class="btn btn-primary btn-lg fw-bold">
               Log In
@@ -97,12 +109,13 @@ class ViewSignIn extends HTMLElement {
       password: password,
     };
 
+    this.querySelector('auth-layout').setAttribute('loading', true);
     const csrfToken = await getCsrfToken();
     try {
       const data = await loginUser(formData, csrfToken);
       if (data.success) {
         setLocalUser(data);
-        const userProfileResponse = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
           method: 'GET',
           headers: {
             'X-CSRFToken': csrfToken,
@@ -110,19 +123,30 @@ class ViewSignIn extends HTMLElement {
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
-        if (userProfileData.getProfile.success) {
-          setLocalUser(userProfileData.getProfile);
+        if (userProfileData.success) {
+          setLocalUser(userProfileData);
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
         redirectTo('/dashboard');
+        notify({
+          icon: 'info',
+          iconClass: 'text-info',
+          message: `You habe been <b>logged in</b> successfully!</b>`,
+        });
       } else {
         if (data.message === 'User not active.') this.emailError.style.display = 'block';
         else if (data.message === 'Invalid username or password.') this.passwordError.style.display = 'block';
       }
     } catch (error) {
       console.error('Login failed:', error);
+      notify({
+        icon: 'error',
+        iconClass: 'text-danger',
+        message: 'Login failed!',
+      });
     }
+    this.querySelector('auth-layout').removeAttribute('loading');
   }
 }
 

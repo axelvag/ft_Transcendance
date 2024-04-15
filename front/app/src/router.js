@@ -1,5 +1,6 @@
 import { isAuthenticated } from '@/auth.js';
 import Router from '@/utils/Router.js';
+import { initWebSocket } from '@/friends.js';
 
 import '@/views/view-not-found.ce.js';
 import '@/views/view-welcome.ce.js';
@@ -15,6 +16,7 @@ import '@/game/view-game-tournament.ce.js';
 import '@/game/view-game-tournament-salon.ce.js';
 import '@/game/view-game-tournament-start.ce.js';
 import '@/game/view-game-online-matchmaking.ce.js';
+import '@/game/view-game-history.ce.js';
 import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
@@ -27,12 +29,14 @@ import '@/views/view-auth42-callback.ce.js';
 const isLoggedOutGuard = async () => {
   const isLoggedin = await isAuthenticated();
   if (isLoggedin) redirectTo('/dashboard');
+  initWebSocket();
   return !isLoggedin;
 };
 
 const isLoggedInGuard = async () => {
   const isLoggedin = await isAuthenticated();
   if (!isLoggedin) redirectTo('/login');
+  initWebSocket();
   return isLoggedin;
 };
 

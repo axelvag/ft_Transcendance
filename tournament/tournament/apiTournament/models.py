@@ -19,6 +19,10 @@ class Joueur(models.Model):
     tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='players', null=True)
 
 class Match(models.Model):
+    NOT_PLAYED = 0
+    IN_PROGRESS = 1
+    FINISHED = 2
+    
     player_1 = models.ForeignKey(Joueur, related_name='player_1', on_delete=models.CASCADE)
     player_1_score = models.IntegerField(null=True)
     player_2 = models.ForeignKey(Joueur, related_name='player_2', on_delete=models.CASCADE)

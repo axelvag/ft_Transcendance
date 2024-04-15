@@ -1,9 +1,7 @@
-import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
-import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament, initWebSocket } from '@/tournament.js';
+import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
-import { redirectTo } from '../router';
 
 class ViewTournament extends HTMLElement {
   #user;
@@ -101,18 +99,24 @@ class ViewTournament extends HTMLElement {
     this.querySelector('#tournoisList').addEventListener('click', async (event) => {
       if (event.target.classList.contains('joinTournamentBtn')) {
           const tournamentId = event.target.id.replace('joinTournament-', '');
-          console.log(`Rejoindre le tournoi avec l'ID : ${tournamentId}`);
+          if (this.#tournament.id !== null && this.#tournament.id.toString() !== tournamentId) {
+              const confirmLeave = confirm("Vous êtes déjà dans un tournoi. Si vous rejoignez ce tournoi, vous serez déconnecté de l'autre. Voulez-vous continuer ?");
+              if (!confirmLeave) {
+                  // Si l'utilisateur choisit de ne pas continuer, arrêtez l'exécution de la fonction ici
+                  return;
+              }
+              await fetchDeletePlayer();
+
+          }
+  
           if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            this.socket.close();
+              this.socket.close();
           }
           fetchGetTournament(tournamentId);
       }
-    });
+  });
 
     this.loadTournois();
-
-    if (this.#tournament.id !== null)
-      this.deletePlayer();
 
     this.querySelector('#tournamentForm').addEventListener('submit', this.submitForm.bind(this));
 
@@ -127,11 +131,27 @@ class ViewTournament extends HTMLElement {
     });
   }
 
+
+  disconnectedCallback() {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.close();
+    }
+  }
+  
   async submitForm(event) {
     event.preventDefault();
 
     // const csrfToken = await getCsrfToken();
 
+    if (this.#tournament.id !== null) {
+      const confirmLeave = confirm("Vous êtes déjà dans un tournoi. Si vous cree ce tournoi, vous serez déconnecté de l'autre. Voulez-vous continuer ?");
+      if (!confirmLeave) {
+          // Si l'utilisateur choisit de ne pas continuer, arrêtez l'exécution de la fonction ici
+          this.querySelector('#formOverlay').style.display = 'none';
+          return;
+      }
+      await fetchDeletePlayer();
+    }
     this.tournamentName = document.getElementById('tournamentName');
     this.tournamentSizeValue = document.getElementById('tournamentSizeValue');
 
@@ -140,11 +160,8 @@ class ViewTournament extends HTMLElement {
       tournamentSize: parseInt(this.tournamentSizeValue.textContent, 10), // Notez le changement ici pour utiliser textContent
       admin_id: this.#user.id,
     };
-    console.log(formData);
     const data = await fetchCreateTournament(formData);
     if (data.success) {
-      console.log(data);
-      // this.loadTournois();
       this.querySelector('#formOverlay').style.display = 'none';
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         this.socket.close();
@@ -157,12 +174,12 @@ class ViewTournament extends HTMLElement {
 
   async loadTournois() {
     try {
-        const response = await fetch('http://127.0.0.1:8005/tournament/view/', { // Assurez-vous que l'URL correspond à votre endpoint API
+        const response = await fetch('http://127.0.0.1:8005/tournament/view/', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                // 'Authorization': `Bearer ${token}`, // Si authentification est nécessaire
             },
+            credentials: 'include',
         });
 
         if (!response.ok) {
@@ -170,34 +187,45 @@ class ViewTournament extends HTMLElement {
         }
 
         const tournois = await response.json();
-        console.log(tournois);
+        // console.log(tournois);
         const listElement = this.querySelector('#tournoisList');
         listElement.innerHTML = '<h2>Join a Tournaments</h2><br>'; // Titre pour la section
 
         tournois.forEach(tournoi => {
-            const tournoiElement = document.createElement('div');
-            tournoiElement.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; flex-direction: column;">
-                    <h3>${tournoi.name}</h3>
-                    <div style="display: flex;">
-                        <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
-                        <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
-                    </div>
-                </div>
-                <button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>
+          const tournoiElement = document.createElement('div');
+          let isInTournamentMessage = '';
+      
+          if(this.#tournament.id === tournoi.id) {
+              // Si oui, définir le message avec le style en rouge
+              isInTournamentMessage = '<p style="color: red;">You are in this tournament</p>';
+          }
+      
+          // Incorporer le message conditionnel dans l'HTML de l'élément du tournoi
+          tournoiElement.innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; flex-direction: column;">
+                      <h3>${tournoi.name}</h3>
+                      ${isInTournamentMessage} <!-- Ajouter le message ici -->
+                      <div style="display: flex;">
+                          <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
+                          <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
+                      </div>
+                  </div>
+                  <button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>
               </div>
               <hr style="border-top: 1px solid #ccc; margin: 10px 0;">
-            `;
-            listElement.appendChild(tournoiElement);
-        });
+          `;
+      
+          listElement.appendChild(tournoiElement);
+      });
+      
     } catch (error) {
         console.error('Could not load tournament:', error);
     }
   }
 
   async deletePlayer() {
-    fetchDeletePlayer();
+    await fetchDeletePlayer();
   }
 
   initWebSocket() {
@@ -211,10 +239,8 @@ class ViewTournament extends HTMLElement {
     this.socket.onmessage = (event) => {
         // Logique pour gérer les messages entrants.
         const data = JSON.parse(event.data);
-        console.log('Message received:', data);
 
         if (data.action === 'reload_tournois') {
-            console.log("load tournoisssssssssssssssssss");
             this.loadTournois();
         }
     };

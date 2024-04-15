@@ -30,6 +30,9 @@ import requests
 from django.middleware.csrf import CsrfViewMiddleware
 import os
 from dotenv import load_dotenv
+from django.http import JsonResponse
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
 
 # Déterminez le chemin absolu vers le fichier .env
 # dotenv_path = '../../.env'
@@ -440,54 +443,31 @@ def oauth_callback(request):
     else:
         return JsonResponse({'error': 'Code d\'autorisation manquant'}, status=400)
 
+@csrf_exempt
+def verif_sessionID(request, session_id):
 
-#Profile
+    if not session_id:
+        return JsonResponse({'error': 'SessionID manquant'}, status=400)
 
-@login_required
-@require_http_methods(["POST"])
-def update_user(request):
-    update_url = "http://profile:8002/update_user/"
-    if request.FILES:
-        files = {'avatar': request.FILES['avatar']} if 'avatar' in request.FILES else {}
-        data = {key: value for key, value in request.POST.items()}
-        response = requests.post(update_url, files=files, data=data)
-    else:
-        payload = request.POST
-        response = requests.post(update_url, json=payload)
-    
-    if response.status_code == 200:
-        return JsonResponse({"status": "success", "update": response.json()})
-    else:
-        return JsonResponse({
-            "status": "error",
-            "message": "Failed to update user profile.",
-            "response": response.text,
-            "status_code": response.status_code
-        }, status=500)
-
-@login_required
-@require_http_methods(["GET"])
-def get_user_profile(request, user_id):
-    update_url = f"http://profile:8002/get_user_profile/{user_id}/"
     try:
-        response = requests.get(update_url)
-        if response.status_code == 200:
-            return JsonResponse({"status": "success", "getProfile": response.json()})
-        else:
-            return JsonResponse({"success": False, "message": "Failed to get profile ."}, status=response.status_code)
-    except requests.exceptions.RequestException as e:
-        return JsonResponse({"success": False, "message": str(e)}, status=500)
+        # Vérifier si le sessionID existe
+        session = Session.objects.get(session_key=session_id)
+    except Session.DoesNotExist:
+        return JsonResponse({'error': 'SessionID invalide'}, status=404)
 
-@login_required
-@require_http_methods(["DELETE"])
-def delete_user_profile(request, user_id):
-    update_url = f"http://profile:8002/delete_user_profile/{user_id}/"
+    # Récupérer les données de session
+    session_data = session.get_decoded()
+    user_id = session_data.get('_auth_user_id')
+
+    if not user_id:
+        return JsonResponse({'error': 'Utilisateur non trouvé pour cette session'}, status=404)
+
+    # Récupérer l'utilisateur associé à cette session
     try:
-        response = requests.delete(update_url)
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Utilisateur non trouvé'}, status=404)
 
-        if response.status_code == 200:
-            return JsonResponse({"success": True, "message": "Profile deletion initiated successfully."})
-        else:
-            return JsonResponse({"success": False, "message": "Failed to initiate profile deletion."}, status=response.status_code)
-    except requests.exceptions.RequestException as e:
-        return JsonResponse({"success": False, "message": str(e)}, status=500)
+    # Réponse de succès avec le nom d'utilisateur
+    logging.critical(user.username)
+    return JsonResponse({'success': 'Session valide', 'username': user.username, 'user_id': user.id}, status=200)

@@ -21,6 +21,7 @@ class ViewTournamentstart extends HTMLElement {
     console.log('Start Tournament');
     this.#user = getProfile();
     this.#tournament = getTournament();
+    console.log(this.#tournament.id);
   }
 
   async connectedCallback() {
@@ -51,6 +52,10 @@ class ViewTournamentstart extends HTMLElement {
       this.deletePlayer();
       redirectTo(this.#backUrl);
     });
+  }
+
+  async deletePlayer() {
+    const data = await fetchDeletePlayerSalon();
   }
 
   generateTournamentTab() {
@@ -93,18 +98,18 @@ class ViewTournamentstart extends HTMLElement {
 
   // Les cases des bracket avec le username personnalise
   cardTournament(player, TabUser) {
-    const user = TabUser.find(item => item.getProfile.id === player.user_id);
+    const user = TabUser.find(item => item.id === player.user_id);
 
     console.log(user);
 
-    let avatarSrc = user.getProfile.avatar;
+    let avatarSrc = user.avatar;
 
-    if (user.getProfile.avatar == null) 
+    if (user.avatar == null) 
     {
-      if (user.getProfile.avatar42 == null)
+      if (user.avatar42 == null)
         avatarSrc = "https://oasys.ch/wp-content/uploads/2019/03/photo-avatar-profil.png";
       else
-        avatarSrc = user.getProfile.avatar42;
+        avatarSrc = user.avatar42;
     }
 
     // console.log(user.getProfile.avatar);
@@ -169,6 +174,7 @@ class ViewTournamentstart extends HTMLElement {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -182,7 +188,7 @@ class ViewTournamentstart extends HTMLElement {
       await Promise.all(
         players.map(async player => {
           const csrfToken = await getCsrfToken();
-          const responseUser = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${player.user_id}/`, {
+          const responseUser = await fetch(`http://127.0.0.1:8002/get_user_profile/${player.user_id}/`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

@@ -63,8 +63,8 @@ services:
     volumes:
       - shared_media:/app/media
       - ./profile/profileApp:/profileApp
-    # ports:
-      # - "8002:8002"
+    ports:
+    - "8002:8002"
     networks:
       - back
     depends_on:
@@ -89,6 +89,7 @@ services:
     networks:
       - back
 
+  # Back - friendship
   friendship:
     build:
       context: ./friendship
@@ -123,19 +124,6 @@ services:
       - .env
     restart: on-failure
 
-  statistic:
-    build:
-      context: ./statistic
-      dockerfile: Dockerfile
-    container_name: statistic
-    ports:
-      - "8004:8004"
-    networks:
-      - back
-    depends_on:
-      - data_base
-    restart: on-failure
-
   # Back - game
   game:
     build:
@@ -150,11 +138,8 @@ services:
       - back
     depends_on:
       - data_base
-    environment:
-      - POSTGRES_HOST=data_base
-      - POSTGRES_DB=transcendence
-      - POSTGRES_USER=postgresTranscendence
-      - POSTGRES_PASSWORD=postgresTranscendence123
+    env_file:
+      - .env
     restart: on-failure
 
 volumes:

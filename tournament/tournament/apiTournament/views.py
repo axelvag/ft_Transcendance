@@ -14,10 +14,27 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import logging
 from django.db.models import Count
+import requests
 
 User = get_user_model()
-# @login_required
+
 @csrf_exempt
+def verif_sessionID(view_func):
+    def wrapper(request, *args, **kwargs):
+        session_id = request.COOKIES.get('sessionid', None)
+        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
+        response = requests.get(update_url)
+        
+        if response.status_code != 200:
+            return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
+        
+        # Si la vérification est réussie, exécuter la vue originale
+        return view_func(request, *args, **kwargs)
+    
+    return wrapper
+
+@csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def create_tournament(request):
     try:
@@ -40,12 +57,13 @@ def create_tournament(request):
             }
         )
         logging.critical("Message WebSocket envoyé avec succès depuis la vue.")
-        return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournois.id}, status=201)
+        return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournois.id}, status=200)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
 
 
-@csrf_exempt
+@verif_sessionID
+@require_http_methods(["GET"])
 def view(request):
     # Filtrez les tournois avec un status égal à 0 et annotez chaque tournoi avec le nombre de joueurs
     tournois = Tournoi.objects.filter(status=0).annotate(nombre_joueurs=Count('players'))
@@ -64,10 +82,11 @@ def view(request):
     ]
 
     # Retournez les données en JSON
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data, safe=False, status = 200)
 
 
-@csrf_exempt
+@verif_sessionID
+@require_http_methods(["GET"])
 def tournament_detail(request, tournament_id):
     try:
         # Essayez de récupérer le tournoi par son ID
@@ -94,6 +113,7 @@ def tournament_detail(request, tournament_id):
     return JsonResponse(data)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def create_joueur(request):
     try:
@@ -120,33 +140,33 @@ def create_joueur(request):
         tournament_id=tournament_id, 
         defaults={'username': username, 'tournament': tournament}
     )
-    tournament_group_name = f"tournoi_{tournament_id}"
-
-    # Envoi du message au groupe de canaux spécifique du tournoi
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
-        {
-            "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-            "message": "Un nouveau joueur a été ajouté au tournoi"
-        }
-    )
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
-        {
-            "type": "tournoi_cree",  # Type de message
-            "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
-        }
-    )
     if created:
+        tournament_group_name = f"tournoi_{tournament_id}"
+
+        # Envoi du message au groupe de canaux spécifique du tournoi
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
+            {
+                "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
+                "message": "Un nouveau joueur a été ajouté au tournoi"
+            }
+        )
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
+            {
+                "type": "tournoi_cree",  # Type de message
+                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+            }
+        )
         return JsonResponse({"success": True, 'message': 'Joueur created successfully', 'joueur_id': joueur.id})
     else:
         return JsonResponse({"success": False, 'message': 'Joueur already exists', 'joueur_id': joueur.id})
 
 
-
-@csrf_exempt
+@verif_sessionID
+@require_http_methods(["GET"])
 def view_joueur(request, tournament_id):
     # Filtrez les tournois avec un status égal à 0
     joueur = Joueur.objects.filter(tournament=tournament_id)
@@ -158,14 +178,14 @@ def view_joueur(request, tournament_id):
     # Retournez les données en JSON
     return JsonResponse(data, safe=False)
 
-@csrf_exempt
+@verif_sessionID
 @require_http_methods(["GET"])
 def tournoi_info(request, user_id):
     try:
         # Trouver le joueur et son tournoi associé
         joueur = Joueur.objects.filter(user_id=user_id).select_related('tournament').first()
         
-        if joueur:
+        if joueur and joueur.tournament:  # Vérification ajoutée ici
             tournoi = joueur.tournament
             tournoi_info = {
                 "id": tournoi.id,
@@ -179,7 +199,9 @@ def tournoi_info(request, user_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["DELETE"])
 def delete_joueur(request, user_id):
     try:
@@ -222,6 +244,7 @@ def delete_joueur(request, user_id):
         return JsonResponse({'error': 'Joueur not found'}, status=404)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["DELETE"])
 def delete_tournoi(request, tournoi_id):
     try:

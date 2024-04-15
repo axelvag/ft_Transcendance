@@ -5,7 +5,10 @@ class ViewGameSetMode extends HTMLElement {
   async connectedCallback() {
     const isLoggedIn = await isAuthenticated();
     const backUrl = isLoggedIn ? '/dashboard' : '/';
-
+    const games = await fetch('http://127.0.0.1:8009/games', {
+      credentials: 'include',
+    })
+    console.log('games', games);
     const isNotAuthenticatedAlert = `
       <div class="alert alert-warning text-center mb-4" role="alert">
         <div class="d-flex gap-2 align-items-center">

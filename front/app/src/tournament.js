@@ -1,5 +1,6 @@
 import { redirectTo } from '@/router.js';
-import { getProfile } from '@/auth.js';
+import { getProfile, getCsrfToken } from '@/auth.js';
+import { notify } from '@/notifications.js';
 
 const tournament = {
   id: null,
@@ -36,17 +37,46 @@ const fetchGetTournament = async (tournamentId) => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   });
   const data = await response.json();
   if (data.success) {
     setLocalTournament(data.data);
-    console.log(data);
     redirectTo(`/game/tournament/waiting`);
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: `The tournament was successfully joined</b>`,
+    });
   } else {
       console.error('Tournoi non trouvé ou erreur de récupération.');
+  }
+};
+
+const TournamentExist = async (tournamentId) => {
+  const response = await fetch(`http://127.0.0.1:8005/tournament/get/${tournamentId}/`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  const data = await response.json();
+  if (data.success) {
+    redirectTo(`/game/tournament/waiting`);
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: `The tournament was successfully joined</b>`,
+    });
+  } else {
+    redirectTo(`/game/tournament`);
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: `The tournament has been deleted !</b>`,
+    });
   }
 };
 
@@ -55,7 +85,6 @@ const fetchCreateTournament = async (formData) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
     body: JSON.stringify(formData),
@@ -69,14 +98,12 @@ const fetchDeletePlayer = async () => {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   })
   const data = await response.json();
   if (data.success) {
     resetLocalTournament();
-    console.log(data);
   } else {
     console.log("error");
   }
@@ -88,7 +115,6 @@ const fetchDeletePlayerSalon = async () => {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   })
@@ -100,7 +126,6 @@ const fetchDeleteTournament = async () => {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   })
@@ -112,7 +137,6 @@ const fetchAddPlayer = async (formData) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
     body: JSON.stringify(formData),
@@ -126,48 +150,15 @@ const fetchTournamentInfo = async () => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': csrfToken,
     },
     credentials: 'include',
   })
   const data = await response.json();
-  // console.log(data)
   if (data.id) {
-    // resetLocalTournament();
     setLocalTournament(data);
-    console.log(data);
   } else {
     console.log("player is not in a tournament");
   }
 };
 
-
-const initWebSocket = async () => {
-  // Assurez-vous que l'URL correspond à votre serveur WebSocket.
-  this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
-
-  this.socket.onopen = () => {
-      console.log('WebSocket connection established');
-  };
-
-  this.socket.onmessage = (event) => {
-      // Logique pour gérer les messages entrants.
-      const data = JSON.parse(event.data);
-      console.log('Message received:', data);
-
-      if (data.action === 'reload_tournois') {
-          console.log("load tournoisssssssssssssssssss");
-          this.loadTournois();
-      }
-  };
-
-  this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
-  };
-
-  this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-  };
-}
-
-export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, initWebSocket };
+export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist };

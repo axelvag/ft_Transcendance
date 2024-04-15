@@ -1,45 +1,42 @@
-# from channels.generic.websocket import AsyncWebsocketConsumer
-# import json
-# import logging
-
-# class MyConsumer(AsyncWebsocketConsumer):
-#     async def connect(self):
-#         await self.accept()
-#         await self.channel_layer.group_add("tournois", self.channel_name)
-
-#     async def disconnect(self, close_code):
-#         await self.channel_layer.group_discard("tournois", self.channel_name)
-
-#     async def receive(self, text_data):
-#         text_data_json = json.loads(text_data)
-#         message = text_data_json['message']
-
-#         await self.send(text_data=json.dumps({
-#             'message': message
-#         }))
-
-#     async def tournoi_cree(self, event):
-#         # Appel de loadTournois() pour mettre à jour la liste des tournois
-#         logging.critical("Consumeressssssssssssssssssss")
-#         await self.send(text_data=json.dumps({
-#             "action": "reload_tournois"
-#         }))
-        
-#     async def add_Player(self, event):
-#         # Appel de loadTournois() pour mettre à jour la liste des tournois
-#         logging.critical("Consumeressssssssssssssssssss add player")
-#         await self.send(text_data=json.dumps({
-#             "action": "add_Player"
-#         }))
-
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import logging
+from apiTournament.models import Joueur
+import requests
+from asgiref.sync import sync_to_async
 
 class MyConsumer(AsyncWebsocketConsumer):
     user_group_name = None  # Pour garder le nom du groupe de l'utilisateur
 
     async def connect(self):
+
+        cookies = self.scope['headers']
+
+        # Les en-têtes (et donc les cookies) sont encodés en bytes, donc vous devez les décoder
+        cookies = dict(
+            (key.decode('ascii'), value.decode('ascii')) for key, value in cookies if key.decode('ascii') == 'cookie'
+        )
+
+        # Les cookies sont maintenant une chaîne de caractères, vous devez donc trouver le cookie 'sessionid'
+        cookies_str = cookies.get('cookie', '')
+        sessionid = None
+        for cookie in cookies_str.split(';'):
+            if 'sessionid' in cookie:
+                sessionid = cookie.split('=')[1].strip()
+                break
+
+        if sessionid:
+            print(f"Session ID trouvé : {sessionid}")
+            # Vous pouvez maintenant utiliser sessionid pour vos logiques de validation, etc.
+        else:
+            print("Session ID non trouvé")
+
+        update_url = f"http://authentification:8001/accounts/verif_sessionid/{sessionid}"
+        response = requests.get(update_url)
+        print(response)
+        if response.status_code != 200:
+            raise ValidationError('wrong session ID')
+
         await self.accept()
 
         # S'abonner à un groupe général pour tous les utilisateurs
@@ -48,6 +45,7 @@ class MyConsumer(AsyncWebsocketConsumer):
         # L'ID de l'utilisateur et l'abonnement au groupe spécifique de l'utilisateur seront gérés via `receive`
 
     async def disconnect(self, close_code):
+        logging.critical(f"WebSocket disconnected: {close_code}")
         # Se désabonner du groupe général
         await self.channel_layer.group_discard("tournois", self.channel_name)
         
@@ -65,6 +63,7 @@ class MyConsumer(AsyncWebsocketConsumer):
         
         # Traitement pour associer un utilisateur à un groupe spécifique
         if 'user_id' in text_data_json:
+            # self.user_id = text_data_json['user_id']
             user_id = text_data_json['user_id']
             self.user_group_name = f"user_{user_id}"
             await self.channel_layer.group_add(self.user_group_name, self.channel_name)
@@ -72,9 +71,14 @@ class MyConsumer(AsyncWebsocketConsumer):
             
         # Traitement pour s'abonner à un groupe spécifique au tournoi
         if 'tournoi_id' in text_data_json:
+            # self.tournoi_id = text_data_json['tournoi_id']
             tournoi_id = text_data_json['tournoi_id']
             self.tournoi_group_name = f"tournoi_{tournoi_id}"
             await self.channel_layer.group_add(self.tournoi_group_name, self.channel_name)
+        
+        # if 'user_id' in text_data_json and 'tournoi_id' in text_data_json:
+        #     self.user_id = text_data_json['user_id']
+        #     self.tournoi_id = text_data_json['tournoi_id']
             
         message = text_data_json.get('message')
         if message:
@@ -100,5 +104,13 @@ class MyConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "action": "delete_tournament"
         }))
-
-
+        
+    async def player_disconnected(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "player_disconnected"
+        }))
+        
+    async def display_player(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "display_player"
+        }))
