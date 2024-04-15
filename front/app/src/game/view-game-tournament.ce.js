@@ -1,9 +1,7 @@
-import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
-import { isAuthenticated, getCsrfToken } from '@/auth.js';
-import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament, initWebSocket } from '@/tournament.js';
+import { isAuthenticated } from '@/auth.js';
+import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
-import { redirectTo } from '../router';
 
 class ViewTournament extends HTMLElement {
   #user;
@@ -133,6 +131,13 @@ class ViewTournament extends HTMLElement {
     });
   }
 
+
+  disconnectedCallback() {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.close();
+    }
+  }
+  
   async submitForm(event) {
     event.preventDefault();
 
@@ -234,10 +239,8 @@ class ViewTournament extends HTMLElement {
     this.socket.onmessage = (event) => {
         // Logique pour gérer les messages entrants.
         const data = JSON.parse(event.data);
-        console.log('Message received:', data);
 
         if (data.action === 'reload_tournois') {
-            // console.log("load tournoisssssssssssssssssss");
             this.loadTournois();
         }
     };

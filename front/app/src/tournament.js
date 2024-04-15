@@ -129,33 +129,4 @@ const fetchTournamentInfo = async () => {
   }
 };
 
-
-const initWebSocket = async () => {
-  // Assurez-vous que l'URL correspond à votre serveur WebSocket.
-  this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
-
-  this.socket.onopen = () => {
-      console.log('WebSocket connection established');
-  };
-
-  this.socket.onmessage = (event) => {
-      // Logique pour gérer les messages entrants.
-      const data = JSON.parse(event.data);
-      console.log('Message received:', data);
-
-      if (data.action === 'reload_tournois') {
-          console.log("load tournoisssssssssssssssssss");
-          this.loadTournois();
-      }
-  };
-
-  this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
-  };
-
-  this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-  };
-}
-
-export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, initWebSocket };
+export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo };
