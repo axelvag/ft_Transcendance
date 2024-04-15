@@ -1,5 +1,6 @@
 import { redirectTo } from '@/router.js';
 import { getProfile, getCsrfToken } from '@/auth.js';
+import { notify } from '@/notifications.js';
 
 const tournament = {
   id: null,
@@ -43,8 +44,39 @@ const fetchGetTournament = async (tournamentId) => {
   if (data.success) {
     setLocalTournament(data.data);
     redirectTo(`/game/tournament/waiting`);
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: `The tournament was successfully joined</b>`,
+    });
   } else {
       console.error('Tournoi non trouvé ou erreur de récupération.');
+  }
+};
+
+const TournamentExist = async (tournamentId) => {
+  const response = await fetch(`http://127.0.0.1:8005/tournament/get/${tournamentId}/`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  const data = await response.json();
+  if (data.success) {
+    redirectTo(`/game/tournament/waiting`);
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: `The tournament was successfully joined</b>`,
+    });
+  } else {
+    redirectTo(`/game/tournament`);
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: `The tournament has been deleted !</b>`,
+    });
   }
 };
 
@@ -129,4 +161,4 @@ const fetchTournamentInfo = async () => {
   }
 };
 
-export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo };
+export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist };

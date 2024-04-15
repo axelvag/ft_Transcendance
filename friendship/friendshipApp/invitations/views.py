@@ -19,15 +19,28 @@ from django.db.models import F
 from django.db.models import Q
 import logging
 import requests
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 User = get_user_model()
 
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-# Channel_layer ==> permet de communiquer avec les WS asynchromes
-#       send, receive
+@csrf_exempt
+def verif_sessionID(view_func):
+    def wrapper(request, *args, **kwargs):
+        session_id = request.COOKIES.get('sessionid', None)
+        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
+        response = requests.get(update_url)
+        
+        if response.status_code != 200:
+            return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
+        
+        # Si la vérification est réussie, exécuter la vue originale
+        return view_func(request, *args, **kwargs)
+    
+    return wrapper
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def send_invitation(request):
     data = json.loads(request.body)
@@ -100,10 +113,12 @@ def send_invitation(request):
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def search_users(request):
     search_query = request.GET.get('query', '')
     user_id = request.GET.get('user_id', None)
+    cookies = request.COOKIES.get('sessionid', None)
 
     if not search_query or not user_id or user_id.lower() == 'null':
         return JsonResponse({"status": "error", "message": "No search query or user ID provided."}, status=400)
@@ -130,7 +145,7 @@ def search_users(request):
 
     user_data = []
     for user in users:
-        profile_info = get_profile_info(user.id)
+        profile_info = get_profile_info(user.id, cookies)
         user_data.append({
             "username": user.username,
             "email": user.email,  # Supposant que vous avez accès à l'email directement depuis l'objet user
@@ -140,6 +155,7 @@ def search_users(request):
     return JsonResponse(user_data, safe=False, status=200)
        
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def accept_invitation(request):
 
@@ -174,6 +190,7 @@ def accept_invitation(request):
         return JsonResponse({"status": "error", "message": "Invitation does not exist or has already been accepted."}, status=404)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def reject_invitation(request):
 
@@ -205,16 +222,18 @@ def reject_invitation(request):
 # double underscore __ permet de traverser les relations entre modèles pour accéder aux attributs du modèle lié.
 # flat retourne une liste aplatie ['ami1', 'ami2', 'ami3'], au lieu de [('ami1',), ('ami2',), ('ami3',)].
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def list_received_invitations(request, user_id):
     try:
+        cookies = request.COOKIES.get('sessionid', None)
         user = User.objects.get(id=user_id)
         invitations = Invitation.objects.filter(to_user=user, accepted=False)
         invitations_data = []
 
         for invitation in invitations:
             from_user = invitation.from_user
-            profile_info = get_profile_info(from_user.id)  # Récupère les informations du profil
+            profile_info = get_profile_info(from_user.id, cookies)  # Récupère les informations du profil
             invitations_data.append({
                 "from_user_username": from_user.username,
                 "from_user_email": profile_info.get('email'),  # Email depuis le profil
@@ -227,9 +246,11 @@ def list_received_invitations(request, user_id):
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
 # affiche toutes les invitations envoyées par l'utilisateur qui n'ont pas encore été acceptées.
+@verif_sessionID
 @require_http_methods(["GET"])
 def list_sent_invitations(request, user_id):
     try:
+        cookies = request.COOKIES.get('sessionid', None)
         logging.critical("sent invitation zeubiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         user = User.objects.get(id=user_id)
         invitations = Invitation.objects.filter(from_user=user, accepted=False)
@@ -239,7 +260,7 @@ def list_sent_invitations(request, user_id):
             # from_user = invitation.from_user
             # profile_info = get_profile_info(from_user.id)
             to_user = invitation.to_user
-            profile_info = get_profile_info(to_user.id)
+            profile_info = get_profile_info(to_user.id, cookies)
             invitations_data.append({
                 "from_user_username": to_user.username,
                 "from_user_email": profile_info.get('email'),  # Email depuis le profil
@@ -252,6 +273,7 @@ def list_sent_invitations(request, user_id):
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def cancel_sent_invitation(request):
     data = json.loads(request.body)
@@ -279,6 +301,7 @@ def cancel_sent_invitation(request):
         return JsonResponse({"status": "error", "message": "Invitation does not exist or has already been accepted."}, status=404)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def remove_friend(request):
     data = json.loads(request.body)
@@ -313,6 +336,7 @@ def remove_friend(request):
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User or friend does not exist."}, status=404)
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def online_friends(request, user_id):
     try:
@@ -324,7 +348,7 @@ def online_friends(request, user_id):
         for friend_id in friend_ids:
             if UserStatus.objects.filter(user_id=friend_id, is_online=True).exists():
                 user = User.objects.get(id=friend_id)
-                profile_info = get_profile_info_cookie(user.id, cookies)
+                profile_info = get_profile_info(user.id, cookies)
                 online_friends_data.append({
                     "friend_id": user.id,
                     "username": user.username,
@@ -336,9 +360,11 @@ def online_friends(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def offline_friends(request, user_id):
     try:
+        cookies = request.COOKIES.get('sessionid', None)
         friendships = Friendship.objects.filter(user_id=user_id)
         friend_ids = [friendship.friend.id for friendship in friendships]
         
@@ -346,7 +372,7 @@ def offline_friends(request, user_id):
         for friend_id in friend_ids:
             if UserStatus.objects.filter(user_id=friend_id, is_online=False).exists():
                 user = User.objects.get(id=friend_id)
-                profile_info = get_profile_info(user.id)
+                profile_info = get_profile_info(user.id, cookies)
                 offline_friends_data.append({
                     "friend_id": user.id,
                     "username": user.username,
@@ -359,10 +385,21 @@ def offline_friends(request, user_id):
         return JsonResponse({"error": "User not found"}, status=404)
 
 
-def get_profile_info(user_id):
+# def get_profile_info(user_id):
+#     profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
+#     try:
+#         response = requests.get(profile_service_url)
+#         if response.status_code == 200:
+#             return response.json()
+#         else:
+#             return {}
+#     except requests.exceptions.RequestException:
+#         return {}
+        
+def get_profile_info(user_id, cookies):
     profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
     try:
-        response = requests.get(profile_service_url)
+        response = requests.get(profile_service_url, cookies={'sessionid': cookies})
         if response.status_code == 200:
             return response.json()
         else:

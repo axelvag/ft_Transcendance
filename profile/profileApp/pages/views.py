@@ -179,6 +179,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
 
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
     logging.critical("delete user")

@@ -3,7 +3,7 @@ import logoSvg from '@/assets/img/logo.svg?raw';
 import { toggleTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
 import { logout, getProfile } from '@/auth.js';
-import { getTournament } from '@/tournament.js';
+import { getTournament , TournamentExist} from '@/tournament.js';
 
 class DefaultLayoutSidebar extends HTMLElement {
   connectedCallback() {
@@ -18,7 +18,7 @@ class DefaultLayoutSidebar extends HTMLElement {
             class="btn btn-outline-success border-2 fw-semibold rounded-0"
             style="--bs-btn-color: var(--bs-body-color);"
             href="#"
-            data-link="/game/tournament/waiting"
+            id="joinTournamentButton"
           >
             <span class="d-inline-block py-1">Join Tournament</span>
           </a>
@@ -146,6 +146,12 @@ class DefaultLayoutSidebar extends HTMLElement {
         </div>
       </div>
     `;
+
+    this.querySelector('#joinTournamentButton')?.addEventListener('click', () => {
+      if (tournament && tournament.id) {
+        TournamentExist(tournament.id);
+      }
+    });
 
     this.querySelector('.theme-toggle')?.addEventListener('click', e => {
       e.preventDefault();
