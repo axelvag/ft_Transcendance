@@ -525,6 +525,8 @@ class ViewFriend extends HTMLElement {
       }
       const { online_friends } = await response.json();
 
+      console.table("online_friends", online_friends);
+  
       const onlineFriendsList = this.querySelector('#online-friends');
       onlineFriendsList.innerHTML = '';
 
@@ -556,6 +558,20 @@ class ViewFriend extends HTMLElement {
           const emailSpan = document.createElement('span');
           emailSpan.textContent = friend.email;
           listItem.appendChild(emailSpan);
+
+          // InGame Status
+          if (friend.in_game === true){
+            const inGameSpan = document.createElement('span');
+            inGameSpan.textContent = "In game";
+            inGameSpan.style.color = 'green';
+            listItem.appendChild(inGameSpan);
+          }
+          else{
+            const inGameSpan = document.createElement('span');
+            inGameSpan.textContent = "not in the game";
+            inGameSpan.style.color = 'red';
+            listItem.appendChild(inGameSpan);
+          }
 
           // Delete friend button
           const deleteButton = document.createElement('button');

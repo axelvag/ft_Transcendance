@@ -117,3 +117,20 @@ class GamePlayerHistoryView(View):
         'ended_at': game_data.get('ended_at', None),
       })
     return JsonResponse(computed_games, safe=False, status=200)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserGameStatusView(View):
+    def get(self, request, user_id):
+        # Find any game where the user is currently playing
+        current_game = Game.objects.filter(
+            (Q(player_left_id=user_id) | Q(player_right_id=user_id)) & Q(status='RUNNING')
+        ).first()
+
+        if current_game:
+            # User is currently in a game
+            return JsonResponse({
+                'in_game': True
+            }, status=200)
+        else:
+            # User is not in any current game
+            return JsonResponse({'in_game': False}, status=200)

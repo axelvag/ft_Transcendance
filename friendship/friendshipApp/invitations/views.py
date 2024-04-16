@@ -339,6 +339,8 @@ def remove_friend(request):
 @verif_sessionID
 @require_http_methods(["GET"])
 def online_friends(request, user_id):
+
+
     try:
         cookies = request.COOKIES.get('sessionid', None)
         friendships = Friendship.objects.filter(user_id=user_id)
@@ -349,11 +351,19 @@ def online_friends(request, user_id):
             if UserStatus.objects.filter(user_id=friend_id, is_online=True).exists():
                 user = User.objects.get(id=friend_id)
                 profile_info = get_profile_info(user.id, cookies)
+
+                game_service_url = f"http://game:8009/games/{friend_id}/game-status"
+                response = requests.get(game_service_url)
+                in_game = False
+                if response.status_code == 200 and response.json().get('in_game'):
+                    in_game = True
+
                 online_friends_data.append({
                     "friend_id": user.id,
                     "username": user.username,
                     "email": profile_info.get('email'),
                     "avatar_url": profile_info.get('avatar'),
+                    "in_game": in_game,
                 })
         
         return JsonResponse({"online_friends": online_friends_data}, status=200)
