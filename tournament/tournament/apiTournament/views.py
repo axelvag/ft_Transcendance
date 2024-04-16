@@ -6,7 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from datetime import timedelta
 import json
-from .models import Joueur, Tournoi
+from .models import Joueur, Tournoi, Match
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -15,6 +15,7 @@ from channels.layers import get_channel_layer
 import logging
 from django.db.models import Count
 import requests
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -280,14 +281,111 @@ def delete_tournoi(request, tournoi_id):
         return JsonResponse({'success': False, 'message': 'An error occurred: {}'.format(str(e))}, status=500)
 
 
+# @csrf_exempt
+# @verif_sessionID
+# @require_http_methods(["POST"])
+# def start_tournament(request, tournament_id):
+#     try:
+#         tournament = Tournoi.objects.get(pk=tournament_id)
+#         tournament.status = Tournoi.IN_PROGRESS
+#         tournament.save()
+#         return JsonResponse({'message': 'Tournoi mis à jour avec succès en cours.'}, status=200)
+#     except Tournoi.DoesNotExist:
+#         return JsonResponse({'error': 'Tournoi non trouvé.'}, status=404)
+
+
+# import random
+
 @csrf_exempt
 @verif_sessionID
 @require_http_methods(["POST"])
-def start_tournament(request, tournament_id):
+def create_matches(request, tournament_id):
+    # Vérifier si le tournoi est dans un état approprié pour créer des matchs
+    tournament = Tournoi.objects.filter(id=tournament_id, status=Tournoi.CREATED).first()
+    if not tournament:
+        return JsonResponse({"error": "Le tournoi n'est pas dans un état valide pour créer des matchs."}, status=400)
+
+    # Récupérer tous les joueurs du tournoi
+    players = list(Joueur.objects.filter(tournament=tournament_id))
+    if len(players) % 2 != 0:
+        return JsonResponse({"error": "Nombre impair de joueurs, impossible de créer des matchs pairs."}, status=400)
+
+    # Mélanger la liste des joueurs pour randomiser les appariements
+    # random.shuffle(players)
+
+    # Créer les matchs en associant les joueurs deux à deux
+    matches_created = []
+    for i in range(0, len(players), 2):
+        match = Match.objects.create(
+            player_1=players[i],
+            player_2=players[i+1],
+            tournament=tournament,  # Associer le match au tournoi spécifique
+            status=Match.NOT_PLAYED  # Initialiser le statut du match à 'Non joué'
+        )
+        matches_created.append(match)
+
+    # Mettre à jour le statut du tournoi pour indiquer que les matchs sont en cours
+    tournament.status = Tournoi.IN_PROGRESS
+    tournament.save()
+
+    return JsonResponse({'success': True, "message": f"Les matchs ont été créés avec succès. Nombre de matchs créés: {len(matches_created)}."}, status=201)
+
+@verif_sessionID
+@require_http_methods(["GET"])
+def get_matches(request, tournament_id):
     try:
-        tournament = Tournoi.objects.get(pk=tournament_id)
-        tournament.status = Tournoi.IN_PROGRESS
-        tournament.save()
-        return JsonResponse({'message': 'Tournoi mis à jour avec succès en cours.'}, status=200)
+        # Récupérez tous les matchs du tournoi spécifié
+        matches = Match.objects.filter(tournament_id=tournament_id)
+        
+        # Transformez les matchs en données JSON
+        matches_data = [
+            {
+                "match_id": match.id,
+                "player_1_id": match.player_1.user_id,
+                "player_1_username": match.player_1.username,
+                "player_2_id": match.player_2.user_id,
+                "player_2_username": match.player_2.username,
+                "status": match.status,
+                "player_1_ready": match.player_1.status_ready,
+                "player_2_ready": match.player_2.status_ready,
+            }
+            for match in matches
+        ]
+
+        # Renvoyez les données JSON avec 'success' et les données des matchs
+        return JsonResponse({'success': True, 'matches': matches_data}, safe=False)
+
     except Tournoi.DoesNotExist:
-        return JsonResponse({'error': 'Tournoi non trouvé.'}, status=404)
+        # Gérez le cas où le tournoi n'existe pas
+        return JsonResponse({'error': "Tournoi non trouvé."}, status=404)
+
+
+@csrf_exempt
+@verif_sessionID
+@require_http_methods(["POST"])
+def set_player_ready(request, player_id):
+    try:
+        player = Joueur.objects.get(user_id=player_id)
+        player.status_ready = Joueur.READY
+        player.save()
+
+        # Récupérez le match correspondant au joueur qui vient de se mettre en 'prêt'
+        match = Match.objects.filter(Q(player_1=player) | Q(player_2=player)).first()
+        if not match:
+            return JsonResponse({"success": False, "error": "Match correspondant non trouvé."}, status=404)
+
+        # Vérifiez si l'autre joueur est également prêt
+        if match.player_1.status_ready == Joueur.READY and match.player_2.status_ready == Joueur.READY:
+            # Mettez à jour l'état du match si nécessaire
+            match.status = Match.IN_PROGRESS
+            match.save()
+
+            # Vous pouvez ici ajouter la logique supplémentaire pour "lancer" le match, par exemple,
+            # en envoyant des notifications aux joueurs, en initialisant des ressources de jeu, etc.
+
+            return JsonResponse({"success": True, "match_started": True})
+
+        return JsonResponse({"success": True, "match_started": False})
+
+    except Joueur.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Joueur non trouvé."}, status=404)
