@@ -1,7 +1,7 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user, getCsrfToken } from '@/auth.js';
-// import { initWebSocket } from '@/friends.js';
+import { showModal } from '@/modal.js';
 
 const BASE_URL = import.meta.env.BASE_URL;
 
@@ -182,8 +182,11 @@ class ViewFriend extends HTMLElement {
             // Juste après avoir ajouté l'email dans userInfoDiv
             const cancelButton = document.createElement('button');
             cancelButton.textContent = 'Cancel';
-            cancelButton.classList.add('btn', 'btn-warning'); // 'ms-auto' pour pousser le bouton à la droite dans un flex container
-            cancelButton.onclick = () => this.cancelSentInvitation(invitation.invitation_id, invitation.from_user_username); // Assurez-vous que c'est la bonne clé pour l'ID de l'invitation
+            cancelButton.classList.add('btn', 'btn-warning');
+            cancelButton.onclick = () => showModal('Confirm Invitation Deletion', 'Are you sure you want to delete your invitation ? This action cannot be undone.', {
+              okCallback: () => this.cancelSentInvitation(invitation.invitation_id, invitation.from_user_username),
+              cancelCallback: () => console.log('Deletion cancelled.')
+            });
 
             listItem.appendChild(userInfoDiv);
             listItem.appendChild(cancelButton);
@@ -561,7 +564,10 @@ class ViewFriend extends HTMLElement {
           const deleteButton = document.createElement('button');
           deleteButton.textContent = 'Delete';
           deleteButton.classList.add('btn', 'btn-danger');
-          deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
+          deleteButton.onclick = () => showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
+            okCallback: () => this.confirmDeleteFriend(friend.friend_id),
+            cancelCallback: () => console.log('Deletion cancelled.')
+          });
 
           listItem.appendChild(deleteButton);
 
@@ -630,7 +636,10 @@ class ViewFriend extends HTMLElement {
           const deleteButton = document.createElement('button');
           deleteButton.textContent = 'Delete';
           deleteButton.classList.add('btn', 'btn-danger');
-          deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
+          deleteButton.onclick = () => showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
+            okCallback: () => this.confirmDeleteFriend(),
+            cancelCallback: () => console.log('Deletion cancelled.')
+          });
 
           listItem.appendChild(deleteButton);
           offlineFriendsList.appendChild(listItem);

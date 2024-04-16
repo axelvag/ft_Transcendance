@@ -47,7 +47,7 @@ const initModal = () => {
   isModalInitialized = true;
 };
 
-const showModal = (title, message) => {
+const showModal = (title, message, options = {}) => {
   if (!isModalInitialized) {
     initModal();
   }
@@ -56,7 +56,23 @@ const showModal = (title, message) => {
   document.getElementById('notificationModalLabel').textContent = title;
   modalElement.querySelector('.modal-body').textContent = message;
   const modalInstance = Modal.getInstance(modalElement) || new Modal(modalElement);
+
+  // Handle callbacks if provided
+  if (options.okCallback) {
+    document.getElementById('modalOkButton').onclick = () => {
+      options.okCallback();
+      modalInstance.hide();
+    };
+  } else {
+    document.getElementById('modalOkButton').onclick = () => modalInstance.hide();
+  }
+
+  if (options.cancelCallback) {
+    document.querySelector('.btn-secondary[data-bs-dismiss="modal"]').onclick = options.cancelCallback;
+  }
+
   modalInstance.show();
 };
+
 
 export { showModal, initModal };
