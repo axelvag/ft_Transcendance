@@ -7,6 +7,7 @@ import {
   fetchAddPlayer,
   fetchDeleteTournament,
   fetchCreateMatchs,
+  fetchGetMatchs,
 } from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
@@ -54,7 +55,9 @@ class ViewTournamentstart extends HTMLElement {
       redirectTo(this.#backUrl);
     });
 
-    this.createMatchs();
+    await this.createMatchs();
+
+    this.displayNextRounds();
   }
 
   async createMatchs() {
@@ -62,8 +65,9 @@ class ViewTournamentstart extends HTMLElement {
     if (data.success) {
       console.log("Matchs created");
       const matches = await fetchGetMatchs();
+      console.log(matches);
       if (matches.success)
-        this.displayMatches(matches);
+        this.displayMatches(matches.matches);
       else 
         console.log("error : get matchs failled !");
     } else {
@@ -74,38 +78,79 @@ class ViewTournamentstart extends HTMLElement {
   displayMatches(matches) {
     const tournamentTabElement = this.querySelector('#tournamentTabFront');
     tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
-  
-    // Créer et afficher les matchs
+
+    // Filtrer et afficher seulement les matchs impliquant l'utilisateur connecté
     matches.forEach((match) => {
       const matchElement = document.createElement('div');
       matchElement.classList.add('match');
-      
-      matchElement.innerHTML = `
-        <div class="match-info">
-          <span class="player">${match.player_1_username}</span>
-          <button id="ready-player1-${match.match_id}" class="ready-button">Prêt</button>
-          vs
-          <span class="player">${match.player_2_username}</span>
-          <button id="ready-player2-${match.match_id}" class="ready-button">Prêt</button>
-        </div>
-      `;
-  
-      // Attacher un gestionnaire d'événements pour chaque bouton "Prêt"
-      const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
-      player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
-  
-      const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
-      player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
-  
-      // Ajouter l'élément de match à la div de tournoi
-      tournamentTabElement.appendChild(matchElement);
+
+      let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
+      let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
+        if (this.#user.id === match.player_1_id || this.#user.id === match.player_2_id) {
+            const isPlayer1 = this.#user.id === match.player_1_id;
+            const isPlayer2 = this.#user.id === match.player_2_id;
+            const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
+            const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Prêt') : '';
+            let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
+            let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
+
+            matchElement.innerHTML = `
+              <div class="match-info>
+                <div class="player-info d-flex align-items-center">
+                  <img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
+                  <span class="player">${match.player_1_username}</span>
+                  ${isPlayer1 ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : readyIconPlayer1}
+                </div>
+                <div class="vs">vs</div>
+                <div class="player-info d-flex align-items-center">
+                  <img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
+                  <span class="player">${match.player_2_username}</span>
+                  ${isPlayer2 ? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : readyIconPlayer2}
+                </div>
+                <br>
+                <br>
+              </div>
+              `;
+        }
+        else{
+          matchElement.innerHTML = `
+          <div class="match-info">
+            <div class="player-info d-flex align-items-center">
+              <img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
+              <span class="player">${match.player_1_username}</span>
+            </div>
+            <div class="vs">vs</div>
+            <div class="player-info d-flex align-items-center">
+              <img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
+              <span class="player">${match.player_2_username}</span>
+            </div>
+            <br>
+            <br>
+          </div>
+        `;
+        }
+            // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
+            if (this.#user.id === match.player_1_id) {
+                const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
+                player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
+            }
+            if (this.#user.id === match.player_2_id) {
+                const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
+                player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
+            }
+
+            // Ajouter l'élément de match à la div de tournoi
+            tournamentTabElement.appendChild(matchElement);
     });
-  }
+}
+
+
+
   
   handleReadyButtonClick(playerId) {
     console.log(`Player ${playerId} is ready!`);
     // Ici, vous pourriez également appeler une fonction qui va envoyer cette information au backend
-    fetch(`http://127.0.0.1:8005/tournament/ready/${playerId}`, {
+    fetch(`http://127.0.0.1:8005/tournament/ready/${playerId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -122,6 +167,7 @@ class ViewTournamentstart extends HTMLElement {
       if (data.success) {
         // Mettre à jour l'UI pour refléter le changement d'état
         console.log(`Player ${playerId} is now marked as ready in the backend.`);
+        this.displayUpdate();
         if(data.match_started)
           console.log("matche commenceeeeee !!!!");
       } else {
@@ -136,6 +182,56 @@ class ViewTournamentstart extends HTMLElement {
   async deletePlayer() {
     const data = await fetchDeletePlayerSalon();
   }
+  
+  async displayUpdate() {
+    const matches = await fetchGetMatchs();
+      console.log(matches);
+      if (matches.success)
+        this.displayMatches(matches.matches);
+      else 
+        console.log("error : get matchs failled !");
+  }
+  
+  async displayRounds() {
+    const response = await fetch(`http://127.0.0.1:8005/tournament/get_next_rounds/${this.#tournament.id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+  }
+
+  async displayNextRounds() {
+    const tournamentTabElement = document.querySelector('#tournamentTabFront');
+    // tournamentTabElement.innerHTML = ''; // Effacer les tours précédents
+    
+    try {
+      // Récupérer les tours restants depuis le backend
+      const data = await this.displayRounds();
+      const rounds = data.rounds;
+
+      // Afficher chaque tour avec un état d'attente
+      rounds.forEach((round, index) => {
+          const roundElement = document.createElement('div');
+          roundElement.classList.add('round');
+          roundElement.innerHTML = `
+              <h3>Round ${round.round}</h3>
+              <div class="matches">
+                  ${index === rounds.length - 1 && round.matches.length === 0 ? "En attente d'un champion" : round.matches.map(match => `
+                      <div class="match">
+                          <span class="player">${match.player_1_username}</span> vs <span class="player">${match.player_2_username}</span>
+                      </div>
+                  `).join('')}
+              </div>
+          `;
+          tournamentTabElement.appendChild(roundElement);
+      });
+  } catch (error) {
+      console.error('Error fetching or displaying next rounds:', error);
+  }
+}
 
   // generateTournamentTab() {
   //   let message = ''; // Variable pour stocker le message à afficher
