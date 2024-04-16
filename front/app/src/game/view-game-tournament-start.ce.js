@@ -56,18 +56,17 @@ class ViewTournamentstart extends HTMLElement {
     });
 
     await this.createMatchs();
-
-    this.displayNextRounds();
   }
 
   async createMatchs() {
     const data = await fetchCreateMatchs();
+    console.log(data);
     if (data.success) {
       console.log("Matchs created");
       const matches = await fetchGetMatchs();
       console.log(matches);
       if (matches.success)
-        this.displayMatches(matches.matches);
+        this.displayMatches(matches.matches_by_tour);
       else 
         console.log("error : get matchs failled !");
     } else {
@@ -75,75 +74,204 @@ class ViewTournamentstart extends HTMLElement {
     }
   }
 
-  displayMatches(matches) {
-    const tournamentTabElement = this.querySelector('#tournamentTabFront');
-    tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
+//   displayMatches(matches) {
+//     const tournamentTabElement = this.querySelector('#tournamentTabFront');
+//     tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
 
-    // Filtrer et afficher seulement les matchs impliquant l'utilisateur connecté
-    matches.forEach((match) => {
-      const matchElement = document.createElement('div');
-      matchElement.classList.add('match');
+//     // Filtrer et afficher seulement les matchs impliquant l'utilisateur connecté
+//     matches.forEach((match) => {
+//       const matchElement = document.createElement('div');
+//       matchElement.classList.add('match');
 
-      let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
-      let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
-        if (this.#user.id === match.player_1_id || this.#user.id === match.player_2_id) {
-            const isPlayer1 = this.#user.id === match.player_1_id;
-            const isPlayer2 = this.#user.id === match.player_2_id;
-            const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
-            const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Prêt') : '';
-            let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
-            let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
+//       let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
+//       let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
+//         if (this.#user.id === match.player_1_id || this.#user.id === match.player_2_id) {
+//             const isPlayer1 = this.#user.id === match.player_1_id;
+//             const isPlayer2 = this.#user.id === match.player_2_id;
+//             const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
+//             const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Prêt') : '';
+//             let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
+//             let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
 
+//             matchElement.innerHTML = `
+//               <div class="match-info>
+//                 <div class="player-info d-flex align-items-center">
+//                   <img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
+//                   <span class="player">${match.player_1_username}</span>
+//                   ${isPlayer1 ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : readyIconPlayer1}
+//                 </div>
+//                 <div class="vs">vs</div>
+//                 <div class="player-info d-flex align-items-center">
+//                   <img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
+//                   <span class="player">${match.player_2_username}</span>
+//                   ${isPlayer2 ? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : readyIconPlayer2}
+//                 </div>
+//                 <br>
+//                 <br>
+//               </div>
+//               `;
+//         }
+//         else{
+//           matchElement.innerHTML = `
+//           <div class="match-info">
+//             <div class="player-info d-flex align-items-center">
+//               <img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
+//               <span class="player">${match.player_1_username}</span>
+//             </div>
+//             <div class="vs">vs</div>
+//             <div class="player-info d-flex align-items-center">
+//               <img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
+//               <span class="player">${match.player_2_username}</span>
+//             </div>
+//             <br>
+//             <br>
+//           </div>
+//         `;
+//         }
+//             // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
+//             if (this.#user.id === match.player_1_id) {
+//                 const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
+//                 player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
+//             }
+//             if (this.#user.id === match.player_2_id) {
+//                 const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
+//                 player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
+//             }
+
+//             // Ajouter l'élément de match à la div de tournoi
+//             tournamentTabElement.appendChild(matchElement);
+//     });
+// }
+
+displayMatches(matchesByTour) {
+  const tournamentTabElement = this.querySelector('#tournamentTabFront');
+  tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
+  tournamentTabElement.style.display = 'flex'; // Aligner les conteneurs de tours horizontalement
+  tournamentTabElement.style.flexDirection = 'row'; // Aligner les éléments en ligne
+  tournamentTabElement.style.overflowX = 'auto'; // Défilement horizontal si nécessaire
+
+  const totalTours = matchesByTour.length; // Nombre total de tours
+
+  matchesByTour.forEach((matches, tourIndex) => {
+      const tourElement = document.createElement('div');
+      tourElement.classList.add('tour');
+      tourElement.style.display = 'flex';
+      tourElement.style.flexDirection = 'column'; // Alignement vertical des matchs dans le tour
+      tourElement.style.marginRight = '150px'; // Espacement entre les tours
+
+      let tourTitle;
+      if (tourIndex === totalTours - 1) {
+          tourTitle = "Finale";
+      } else if (tourIndex === totalTours - 2) {
+          tourTitle = "Demi-finale";
+      } else {
+          tourTitle = `Tour ${tourIndex + 1}`;
+      }
+
+      const titleElement = document.createElement('h3');
+      titleElement.textContent = tourTitle;
+      tourElement.appendChild(titleElement);
+
+      matches.forEach((match) => {
+          const matchElement = document.createElement('div');
+          matchElement.classList.add('match');
+
+          let player1Name = match.player_1_username || "Waiting for a winner";
+          let player2Name = match.player_2_username || "Waiting for a winner";
+          let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
+          let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
+
+          // Gérer l'affichage lorsque les joueurs ne sont pas encore déterminés
+          if (player1Name === "Waiting for a winner") {
+              avatarImg1 = ""; // Ne pas afficher d'avatar
+          }
+          if (player2Name === "Waiting for a winner") {
+              avatarImg2 = ""; // Ne pas afficher d'avatar
+          }
+
+          if (this.#user.id === match.player_1_id || this.#user.id === match.player_2_id) {
+              const isPlayer1 = this.#user.id === match.player_1_id;
+              const isPlayer2 = this.#user.id === match.player_2_id;
+              const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
+              const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Prêt') : '';
+              let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
+              let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
+
+              matchElement.innerHTML = `
+                <div class="match-info">
+                  <div class="player-info d-flex align-items-center">
+                    ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
+                    <span class="player">${player1Name}</span>
+                    ${isPlayer1 ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : readyIconPlayer1}
+                  </div>
+                  <div class="vs">vs</div>
+                  <div class="player-info d-flex align-items-center">
+                    ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
+                    <span class="player">${player2Name}</span>
+                    ${isPlayer2 ? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : readyIconPlayer2}
+                  </div>
+                  <br><br>
+                </div>
+                `;
+          } else {
             matchElement.innerHTML = `
-              <div class="match-info>
-                <div class="player-info d-flex align-items-center">
-                  <img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
-                  <span class="player">${match.player_1_username}</span>
-                  ${isPlayer1 ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : readyIconPlayer1}
-                </div>
-                <div class="vs">vs</div>
-                <div class="player-info d-flex align-items-center">
-                  <img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
-                  <span class="player">${match.player_2_username}</span>
-                  ${isPlayer2 ? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : readyIconPlayer2}
-                </div>
-                <br>
-                <br>
+            <div class="match-info">
+              <div class="player-info d-flex align-items-center">
+                ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
+                <span class="player">${player1Name}</span>
               </div>
-              `;
-        }
-        else{
-          matchElement.innerHTML = `
-          <div class="match-info">
-            <div class="player-info d-flex align-items-center">
-              <img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
-              <span class="player">${match.player_1_username}</span>
+              <div class="vs">vs</div>
+              <div class="player-info d-flex align-items-center">
+                ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
+                <span class="player">${player2Name}</span>
+              </div>
+              <br><br>
             </div>
-            <div class="vs">vs</div>
-            <div class="player-info d-flex align-items-center">
-              <img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
-              <span class="player">${match.player_2_username}</span>
-            </div>
-            <br>
-            <br>
-          </div>
-        `;
+            `;
+          }
+          // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
+       if (this.#user.id === match.player_1_id) {
+            const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
+            player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
         }
-            // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
-            if (this.#user.id === match.player_1_id) {
-                const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
-                player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
-            }
-            if (this.#user.id === match.player_2_id) {
-                const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
-                player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
-            }
+        if (this.#user.id === match.player_2_id) {
+            const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
+            player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
+        }
+          tourElement.appendChild(matchElement);
+      });
+      if (tourIndex === totalTours - 1) {
+        const finaleHeader = document.createElement('div');
+        finaleHeader.style.display = 'flex';
+        finaleHeader.style.alignItems = 'center'; // Centrer les éléments verticalement
+        finaleHeader.appendChild(titleElement);
 
-            // Ajouter l'élément de match à la div de tournoi
-            tournamentTabElement.appendChild(matchElement);
-    });
+        const winnerContainer = document.createElement('div');
+        winnerContainer.style.display = 'flex';
+        winnerContainer.style.flexDirection = 'column'; // Empiler le titre "Winner" et le message verticalement
+        winnerContainer.style.marginLeft = '150px'; // Pousser le conteneur à droite
+
+        const winnerTitleElement = document.createElement('h3');
+        winnerTitleElement.textContent = 'Winner';
+        winnerContainer.appendChild(winnerTitleElement);
+
+        const winnerMessageElement = document.createElement('div');
+        let winnerMessage = "Waiting for result";
+        const lastMatch = matches[matches.length - 1];
+        if (lastMatch && lastMatch.winner) {
+            winnerMessage = lastMatch.winner.username;
+        }
+        winnerMessageElement.innerHTML = `<h5>Winner: ${winnerMessage}</h5>`;
+        winnerContainer.appendChild(winnerMessageElement);
+
+        finaleHeader.appendChild(winnerContainer);
+        tourElement.insertBefore(finaleHeader, tourElement.firstChild);
+      }
+      
+
+      tournamentTabElement.appendChild(tourElement);
+  });
 }
-
 
 
   
@@ -187,7 +315,7 @@ class ViewTournamentstart extends HTMLElement {
     const matches = await fetchGetMatchs();
       console.log(matches);
       if (matches.success)
-        this.displayMatches(matches.matches);
+        this.displayMatches(matches.matches_by_tour);
       else 
         console.log("error : get matchs failled !");
   }
@@ -202,36 +330,6 @@ class ViewTournamentstart extends HTMLElement {
   })
   return response.json();
   }
-
-  async displayNextRounds() {
-    const tournamentTabElement = document.querySelector('#tournamentTabFront');
-    // tournamentTabElement.innerHTML = ''; // Effacer les tours précédents
-    
-    try {
-      // Récupérer les tours restants depuis le backend
-      const data = await this.displayRounds();
-      const rounds = data.rounds;
-
-      // Afficher chaque tour avec un état d'attente
-      rounds.forEach((round, index) => {
-          const roundElement = document.createElement('div');
-          roundElement.classList.add('round');
-          roundElement.innerHTML = `
-              <h3>Round ${round.round}</h3>
-              <div class="matches">
-                  ${index === rounds.length - 1 && round.matches.length === 0 ? "En attente d'un champion" : round.matches.map(match => `
-                      <div class="match">
-                          <span class="player">${match.player_1_username}</span> vs <span class="player">${match.player_2_username}</span>
-                      </div>
-                  `).join('')}
-              </div>
-          `;
-          tournamentTabElement.appendChild(roundElement);
-      });
-  } catch (error) {
-      console.error('Error fetching or displaying next rounds:', error);
-  }
-}
 
   // generateTournamentTab() {
   //   let message = ''; // Variable pour stocker le message à afficher

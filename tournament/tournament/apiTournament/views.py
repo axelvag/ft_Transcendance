@@ -16,6 +16,7 @@ import logging
 from django.db.models import Count
 import requests
 from django.db.models import Q
+from collections import defaultdict
 
 User = get_user_model()
 
@@ -294,7 +295,7 @@ def delete_tournoi(request, tournoi_id):
 #         return JsonResponse({'error': 'Tournoi non trouvé.'}, status=404)
 
 
-# import random
+import random
 
 @csrf_exempt
 @verif_sessionID
@@ -304,7 +305,8 @@ def create_matches(request, tournament_id):
     tournament = Tournoi.objects.get(id=tournament_id)
     if Match.objects.filter(tournament=tournament).exists():
         return JsonResponse({'success': True, "message": "Matches already created for this tournament"}, status=200)
-    tournament = None
+    
+    # Vérifier si le tournoi est prêt pour la création de matchs
     tournament = Tournoi.objects.filter(id=tournament_id, status=Tournoi.CREATED).first()
     if not tournament:
         return JsonResponse({"error": "Le tournoi n'est pas dans un état valide pour créer des matchs."}, status=400)
@@ -315,57 +317,110 @@ def create_matches(request, tournament_id):
         return JsonResponse({"error": "Nombre impair de joueurs, impossible de créer des matchs pairs."}, status=400)
 
     # Mélanger la liste des joueurs pour randomiser les appariements
-    # random.shuffle(players)
+    random.shuffle(players)
 
-    # Créer les matchs en associant les joueurs deux à deux
+    # Créer les matchs pour le premier tour
     matches_created = []
+    number_of_matches = len(players) // 2
     for i in range(0, len(players), 2):
         match = Match.objects.create(
             player_1=players[i],
             player_2=players[i+1],
-            tournament=tournament,  # Associer le match au tournoi spécifique
-            status=Match.NOT_PLAYED  # Initialiser le statut du match à 'Non joué'
+            tournament=tournament,
+            tour=1,  # Premier tour
+            status=Match.NOT_PLAYED
         )
         matches_created.append(match)
+
+    # Créer des matchs pour les tours suivants avec les joueurs à null
+    current_tour = 2
+    while number_of_matches > 1:
+        for _ in range(number_of_matches // 2):
+            match = Match.objects.create(
+                tournament=tournament,
+                tour=current_tour,
+                status=Match.NOT_PLAYED
+            )
+            matches_created.append(match)
+        number_of_matches //= 2
+        current_tour += 1
 
     # Mettre à jour le statut du tournoi pour indiquer que les matchs sont en cours
     tournament.status = Tournoi.IN_PROGRESS
     tournament.save()
 
-    return JsonResponse({'success': True, "message": f"Les matchs ont été créés avec succès. Nombre de matchs créés: {len(matches_created)}."}, status=201)
+    return JsonResponse({'success': True, "message": f"Les matchs ont été créés avec succès pour tous les tours. Nombre de matchs créés: {len(matches_created)}."}, status=201)
+
+# @verif_sessionID
+# @require_http_methods(["GET"])
+# def get_matches(request, tournament_id):
+#     try:
+#         cookies = request.COOKIES.get('sessionid', None)
+#         matches = Match.objects.filter(tournament_id=tournament_id)
+
+#         matches_data = []
+#         for match in matches:
+#             # Obtenir les informations de profil pour chaque joueur
+#             profile_info1 = get_profile_info_cookie(match.player_1.user_id, cookies)
+#             profile_info2 = get_profile_info_cookie(match.player_2.user_id, cookies)
+
+#             # Ajouter les informations du match à la liste
+#             matches_data.append({
+#                 "match_id": match.id,
+#                 "player_1_id": match.player_1.user_id,
+#                 "player_1_username": match.player_1.username,
+#                 "player_1_avatar": profile_info1.get('avatar'),
+#                 "player_2_id": match.player_2.user_id,
+#                 "player_2_username": match.player_2.username,
+#                 "player_2_avatar": profile_info2.get('avatar'),
+#                 "status": match.status,
+#                 "player_1_ready": match.player_1.status_ready,
+#                 "player_2_ready": match.player_2.status_ready,
+#             })
+
+#         # Renvoyez les données JSON avec 'success' et les données des matchs
+#         return JsonResponse({'success': True, 'matches': matches_data}, safe=False)
+
+#     except Tournoi.DoesNotExist:
+#         # Gérez le cas où le tournoi n'existe pas
+#         return JsonResponse({'error': "Tournoi non trouvé."}, status=404)
 
 @verif_sessionID
 @require_http_methods(["GET"])
 def get_matches(request, tournament_id):
     try:
-        cookies = request.COOKIES.get('sessionid', None)
-        matches = Match.objects.filter(tournament_id=tournament_id)
+        # Vérifier l'existence du tournoi
+        tournament = Tournoi.objects.get(id=tournament_id)
+        matches = Match.objects.filter(tournament=tournament).order_by('tour', 'id')
 
-        matches_data = []
+        # Préparer les données des matchs groupées par tour
+        tours_data = defaultdict(list)
         for match in matches:
-            # Obtenir les informations de profil pour chaque joueur
-            profile_info1 = get_profile_info_cookie(match.player_1.user_id, cookies)
-            profile_info2 = get_profile_info_cookie(match.player_2.user_id, cookies)
+            profile_info1 = get_profile_info_cookie(match.player_1.user_id, request.COOKIES.get('sessionid')) if match.player_1 else {}
+            profile_info2 = get_profile_info_cookie(match.player_2.user_id, request.COOKIES.get('sessionid')) if match.player_2 else {}
 
-            # Ajouter les informations du match à la liste
-            matches_data.append({
+            match_data = {
                 "match_id": match.id,
-                "player_1_id": match.player_1.user_id,
-                "player_1_username": match.player_1.username,
+                "player_1_id": match.player_1.user_id if match.player_1 else None,
+                "player_1_username": match.player_1.username if match.player_1 else None,
                 "player_1_avatar": profile_info1.get('avatar'),
-                "player_2_id": match.player_2.user_id,
-                "player_2_username": match.player_2.username,
+                "player_2_id": match.player_2.user_id if match.player_2 else None,
+                "player_2_username": match.player_2.username if match.player_2 else None,
                 "player_2_avatar": profile_info2.get('avatar'),
                 "status": match.status,
-                "player_1_ready": match.player_1.status_ready,
-                "player_2_ready": match.player_2.status_ready,
-            })
+                "player_1_ready": match.player_1.status_ready if match.player_1 else False,
+                "player_2_ready": match.player_2.status_ready if match.player_2 else False,
+                "winner": match.winner,
+            }
+            tours_data[match.tour].append(match_data)
 
-        # Renvoyez les données JSON avec 'success' et les données des matchs
-        return JsonResponse({'success': True, 'matches': matches_data}, safe=False)
+        # Convertir le dictionnaire en liste de listes pour respecter le format souhaité
+        sorted_tours = sorted(tours_data.items())
+        matches_by_tour = [tour_matches for _, tour_matches in sorted_tours]
+
+        return JsonResponse({'success': True, 'matches_by_tour': matches_by_tour}, safe=False)
 
     except Tournoi.DoesNotExist:
-        # Gérez le cas où le tournoi n'existe pas
         return JsonResponse({'error': "Tournoi non trouvé."}, status=404)
 
 
