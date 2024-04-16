@@ -273,8 +273,6 @@ displayMatches(matchesByTour) {
   });
 }
 
-
-  
   handleReadyButtonClick(playerId) {
     console.log(`Player ${playerId} is ready!`);
     // Ici, vous pourriez également appeler une fonction qui va envoyer cette information au backend
