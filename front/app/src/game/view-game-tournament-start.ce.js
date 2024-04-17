@@ -8,6 +8,8 @@ import {
   fetchDeleteTournament,
   fetchCreateMatchs,
   fetchGetMatchs,
+  fetchInfoMatch,
+  fetchWinnerMatch,
 } from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
@@ -56,6 +58,7 @@ class ViewTournamentstart extends HTMLElement {
     });
 
     await this.createMatchs();
+    await this.infoMatch();
   }
 
   async createMatchs() {
@@ -73,75 +76,6 @@ class ViewTournamentstart extends HTMLElement {
       console.log("error : create matchs failled !");
     }
   }
-
-//   displayMatches(matches) {
-//     const tournamentTabElement = this.querySelector('#tournamentTabFront');
-//     tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
-
-//     // Filtrer et afficher seulement les matchs impliquant l'utilisateur connecté
-//     matches.forEach((match) => {
-//       const matchElement = document.createElement('div');
-//       matchElement.classList.add('match');
-
-//       let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
-//       let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
-//         if (this.#user.id === match.player_1_id || this.#user.id === match.player_2_id) {
-//             const isPlayer1 = this.#user.id === match.player_1_id;
-//             const isPlayer2 = this.#user.id === match.player_2_id;
-//             const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
-//             const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Prêt') : '';
-//             let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
-//             let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
-
-//             matchElement.innerHTML = `
-//               <div class="match-info>
-//                 <div class="player-info d-flex align-items-center">
-//                   <img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
-//                   <span class="player">${match.player_1_username}</span>
-//                   ${isPlayer1 ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : readyIconPlayer1}
-//                 </div>
-//                 <div class="vs">vs</div>
-//                 <div class="player-info d-flex align-items-center">
-//                   <img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
-//                   <span class="player">${match.player_2_username}</span>
-//                   ${isPlayer2 ? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : readyIconPlayer2}
-//                 </div>
-//                 <br>
-//                 <br>
-//               </div>
-//               `;
-//         }
-//         else{
-//           matchElement.innerHTML = `
-//           <div class="match-info">
-//             <div class="player-info d-flex align-items-center">
-//               <img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
-//               <span class="player">${match.player_1_username}</span>
-//             </div>
-//             <div class="vs">vs</div>
-//             <div class="player-info d-flex align-items-center">
-//               <img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />
-//               <span class="player">${match.player_2_username}</span>
-//             </div>
-//             <br>
-//             <br>
-//           </div>
-//         `;
-//         }
-//             // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
-//             if (this.#user.id === match.player_1_id) {
-//                 const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
-//                 player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
-//             }
-//             if (this.#user.id === match.player_2_id) {
-//                 const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
-//                 player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
-//             }
-
-//             // Ajouter l'élément de match à la div de tournoi
-//             tournamentTabElement.appendChild(matchElement);
-//     });
-// }
 
 displayMatches(matchesByTour) {
   const tournamentTabElement = this.querySelector('#tournamentTabFront');
@@ -273,37 +207,46 @@ displayMatches(matchesByTour) {
   });
 }
 
-  handleReadyButtonClick(playerId) {
+  async handleReadyButtonClick(playerId) {
     console.log(`Player ${playerId} is ready!`);
-    // Ici, vous pourriez également appeler une fonction qui va envoyer cette information au backend
-    fetch(`http://127.0.0.1:8005/tournament/ready/${playerId}/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.success) {
-        // Mettre à jour l'UI pour refléter le changement d'état
-        console.log(`Player ${playerId} is now marked as ready in the backend.`);
-        this.displayUpdate();
-        if(data.match_started)
-          console.log("matche commenceeeeee !!!!");
-      } else {
-        console.error('Could not mark the player as ready in the backend.', data.error);
-      }
-    })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation: ' + error.message);
-    });
+
+    try {
+        const response = await fetch(`http://127.0.0.1:8005/tournament/ready/${playerId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            console.log(`Player ${playerId} is now marked as ready in the backend.`);
+            this.displayUpdate();
+
+            if (data.match_started) {
+                console.log("Match started!!!");
+                const winner = await this.fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+                console.log(winner);
+
+                if (winner.success) {
+                    this.displayUpdate();
+                } else {
+                    console.log("Error: winner failed!");
+                }
+            }
+        } else {
+            console.error('Could not mark the player as ready in the backend.', data.error);
+        }
+    } catch (error) {
+        console.error('There was a problem with the fetch operation: ' + error.message);
+    }
   }
+
   
   async deletePlayer() {
     const data = await fetchDeletePlayerSalon();
@@ -318,15 +261,8 @@ displayMatches(matchesByTour) {
         console.log("error : get matchs failled !");
   }
   
-  async displayRounds() {
-    const response = await fetch(`http://127.0.0.1:8005/tournament/get_next_rounds/${this.#tournament.id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
+  async infoMatch() {
+    await fetchInfoMatch();
   }
 
   // generateTournamentTab() {
