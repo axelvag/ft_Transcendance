@@ -415,7 +415,7 @@ def get_matches(request, tournament_id):
                 "status": match.status,
                 "player_1_ready": match.player_1.status_ready if match.player_1 else False,
                 "player_2_ready": match.player_2.status_ready if match.player_2 else False,
-                "winner": match.winner,
+                "winner_id": match.winner.username if match.winner else None,
             }
             tours_data[match.tour].append(match_data)
 
@@ -432,7 +432,7 @@ def get_matches(request, tournament_id):
 @csrf_exempt
 @verif_sessionID
 @require_http_methods(["POST"])
-def set_player_ready(request, player_id):
+def set_player_ready(request, player_id, match_id):
     try:
         player = Joueur.objects.get(user_id=player_id)
 
@@ -444,7 +444,7 @@ def set_player_ready(request, player_id):
         player.save()
 
         # Récupérez le match correspondant au joueur
-        match = Match.objects.filter(Q(player_1=player) | Q(player_2=player)).first()
+        match = Match.objects.get(id=match_id)
         if not match:
             return JsonResponse({"success": False, "error": "Match correspondant non trouvé."}, status=404)
 
@@ -540,14 +540,16 @@ def get_latest_match_for_user(request, user_id):
 @verif_sessionID
 @require_http_methods(["POST"])
 def update_winner_and_prepare_next_match(request, match_id, winner_id):
-    with transaction.atomic():
+    # with transaction.atomic():
         # Trouver le match actuel et mettre à jour le vainqueur
         try:
-            match = Match.objects.select_for_update().get(id=match_id)
-            winner = Joueur.objects.get(id=winner_id)
+            match = Match.objects.get(id=match_id)
+            winner = Joueur.objects.get(user_id=winner_id)
+            winner.status_ready = 0
             match.winner = winner
             match.status = Match.FINISHED
             match.save()
+            winner.save()
         except (Match.DoesNotExist, Joueur.DoesNotExist):
             return JsonResponse({'error': "Match ou Joueur non trouvé."}, status=404)
         

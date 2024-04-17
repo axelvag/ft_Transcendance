@@ -10,6 +10,7 @@ import {
   fetchGetMatchs,
   fetchInfoMatch,
   fetchWinnerMatch,
+  getMatch,
 } from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
@@ -18,6 +19,7 @@ import { redirectTo } from '@/router.js';
 class ViewTournamentstart extends HTMLElement {
   #user;
   #tournament;
+  #match
   #backUrl = '/'; // Définissez ici l'URL de redirection par défaut
 
   constructor() {
@@ -58,13 +60,13 @@ class ViewTournamentstart extends HTMLElement {
     });
 
     await this.createMatchs();
-    await this.infoMatch();
   }
-
+  
   async createMatchs() {
     const data = await fetchCreateMatchs();
     console.log(data);
     if (data.success) {
+      await this.infoMatch();
       console.log("Matchs created");
       const matches = await fetchGetMatchs();
       console.log(matches);
@@ -78,6 +80,7 @@ class ViewTournamentstart extends HTMLElement {
   }
 
 displayMatches(matchesByTour) {
+  this.#match = getMatch();
   const tournamentTabElement = this.querySelector('#tournamentTabFront');
   tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
   tournamentTabElement.style.display = 'flex'; // Aligner les conteneurs de tours horizontalement
@@ -85,7 +88,7 @@ displayMatches(matchesByTour) {
   tournamentTabElement.style.overflowX = 'auto'; // Défilement horizontal si nécessaire
 
   const totalTours = matchesByTour.length; // Nombre total de tours
-
+  
   matchesByTour.forEach((matches, tourIndex) => {
       const tourElement = document.createElement('div');
       tourElement.classList.add('tour');
@@ -98,32 +101,35 @@ displayMatches(matchesByTour) {
           tourTitle = "Finale";
       } else if (tourIndex === totalTours - 2) {
           tourTitle = "Demi-finale";
-      } else {
+        } else {
           tourTitle = `Tour ${tourIndex + 1}`;
-      }
-
-      const titleElement = document.createElement('h3');
-      titleElement.textContent = tourTitle;
-      tourElement.appendChild(titleElement);
-
-      matches.forEach((match) => {
+        }
+        
+        const titleElement = document.createElement('h3');
+        titleElement.textContent = tourTitle;
+        tourElement.appendChild(titleElement);
+        
+        matches.forEach((match) => {
           const matchElement = document.createElement('div');
           matchElement.classList.add('match');
-
+          
           let player1Name = match.player_1_username || "Waiting for a winner";
           let player2Name = match.player_2_username || "Waiting for a winner";
           let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
           let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
-
+          
           // Gérer l'affichage lorsque les joueurs ne sont pas encore déterminés
           if (player1Name === "Waiting for a winner") {
-              avatarImg1 = ""; // Ne pas afficher d'avatar
+            avatarImg1 = ""; // Ne pas afficher d'avatar
           }
           if (player2Name === "Waiting for a winner") {
-              avatarImg2 = ""; // Ne pas afficher d'avatar
+            avatarImg2 = ""; // Ne pas afficher d'avatar
           }
-
-          if (this.#user.id === match.player_1_id || this.#user.id === match.player_2_id) {
+          
+          console.log(this.#match.id);
+          console.log(match.match_id);
+          if(this.#match.id === match.match_id && match.status != 2) {
+            console.log("passe ici");
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
               const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
@@ -164,11 +170,11 @@ displayMatches(matchesByTour) {
             `;
           }
           // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
-       if (this.#user.id === match.player_1_id) {
+       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2) {
             const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
             player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
         }
-        if (this.#user.id === match.player_2_id) {
+        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2) {
             const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
             player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
         }
@@ -192,8 +198,9 @@ displayMatches(matchesByTour) {
         const winnerMessageElement = document.createElement('div');
         let winnerMessage = "Waiting for result";
         const lastMatch = matches[matches.length - 1];
-        if (lastMatch && lastMatch.winner) {
-            winnerMessage = lastMatch.winner.username;
+        console.log("yooooooooooooooooooooooooooo",matches[matches.length - 1]);
+        if (lastMatch && lastMatch.winner_id) {
+            winnerMessage = lastMatch.winner_id;
         }
         winnerMessageElement.innerHTML = `<h5>Winner: ${winnerMessage}</h5>`;
         winnerContainer.appendChild(winnerMessageElement);
@@ -211,7 +218,7 @@ displayMatches(matchesByTour) {
     console.log(`Player ${playerId} is ready!`);
 
     try {
-        const response = await fetch(`http://127.0.0.1:8005/tournament/ready/${playerId}/`, {
+        const response = await fetch(`http://127.0.0.1:8005/tournament/ready/${playerId}/${this.#match.id}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -224,17 +231,18 @@ displayMatches(matchesByTour) {
         }
 
         const data = await response.json();
+        console.log(data);
         if (data.success) {
             console.log(`Player ${playerId} is now marked as ready in the backend.`);
-            this.displayUpdate();
+            await this.displayUpdate();
 
             if (data.match_started) {
                 console.log("Match started!!!");
-                const winner = await this.fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+                const winner = await fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
                 console.log(winner);
 
                 if (winner.success) {
-                    this.displayUpdate();
+                    await this.displayUpdate();
                 } else {
                     console.log("Error: winner failed!");
                 }
