@@ -303,58 +303,57 @@ import random
 @verif_sessionID
 @require_http_methods(["POST"])
 def create_matches(request, tournament_id):
-    with transaction.atomic():  # S'assurer que les opérations suivantes sont atomiques
-        # S'assurer que la même instance de tournoi n'est pas traitée simultanément par une autre requête
+    with transaction.atomic():
         tournament = Tournoi.objects.select_for_update().get(id=tournament_id)
         
         if Match.objects.filter(tournament=tournament).exists():
             return JsonResponse({'success': True, "message": "Matches already created for this tournament"}, status=200)
     
-        tournament = None
-        # Vérifier si le tournoi est prêt pour la création de matchs
         tournament = Tournoi.objects.filter(id=tournament_id, status=Tournoi.CREATED).first()
         if not tournament:
             return JsonResponse({"error": "Le tournoi n'est pas dans un état valide pour créer des matchs."}, status=400)
 
-        # Récupérer tous les joueurs du tournoi
         players = list(Joueur.objects.filter(tournament=tournament_id))
         if len(players) % 2 != 0:
             return JsonResponse({"error": "Nombre impair de joueurs, impossible de créer des matchs pairs."}, status=400)
 
-        # Mélanger la liste des joueurs pour randomiser les appariements
         random.shuffle(players)
-
-        # Créer les matchs pour le premier tour
         matches_created = []
+        
         number_of_matches = len(players) // 2
+        match_id = 1  # Réinitialiser match_id à 1 pour le premier tour
         for i in range(0, len(players), 2):
             match = Match.objects.create(
                 player_1=players[i],
                 player_2=players[i+1],
                 tournament=tournament,
-                tour=1,  # Premier tour
-                status=Match.NOT_PLAYED
+                tour=1,
+                status=Match.NOT_PLAYED,
+                match_id=match_id
             )
             matches_created.append(match)
+            match_id += 1
 
-        # Créer des matchs pour les tours suivants avec les joueurs à null
         current_tour = 2
         while number_of_matches > 1:
+            match_id = 1  # Réinitialiser match_id à 1 pour chaque nouveau tour
             for _ in range(number_of_matches // 2):
                 match = Match.objects.create(
                     tournament=tournament,
                     tour=current_tour,
-                    status=Match.NOT_PLAYED
+                    status=Match.NOT_PLAYED,
+                    match_id=match_id
                 )
                 matches_created.append(match)
+                match_id += 1  # Incrémenter match_id pour le prochain match
             number_of_matches //= 2
             current_tour += 1
 
-        # Mettre à jour le statut du tournoi pour indiquer que les matchs sont en cours
         tournament.status = Tournoi.IN_PROGRESS
         tournament.save()
 
         return JsonResponse({'success': True, "message": f"Les matchs ont été créés avec succès pour tous les tours. Nombre de matchs créés: {len(matches_created)}."}, status=201)
+
 
 # @verif_sessionID
 # @require_http_methods(["GET"])
@@ -540,41 +539,51 @@ def get_latest_match_for_user(request, user_id):
 @verif_sessionID
 @require_http_methods(["POST"])
 def update_winner_and_prepare_next_match(request, match_id, winner_id):
-    # with transaction.atomic():
-        # Trouver le match actuel et mettre à jour le vainqueur
-        try:
-            match = Match.objects.get(id=match_id)
-            winner = Joueur.objects.get(user_id=winner_id)
-            winner.status_ready = 0
-            match.winner = winner
-            match.status = Match.FINISHED
-            match.save()
-            winner.save()
-        except (Match.DoesNotExist, Joueur.DoesNotExist):
-            return JsonResponse({'error': "Match ou Joueur non trouvé."}, status=404)
-        
-        # Déterminer le prochain match
-        next_tour = match.tour + 1
-        try:
-            tournament = match.tournament
-            # Trouver le prochain match en cours pour le tournoi actuel et le tour suivant
-            next_match = Match.objects.filter(tournament=tournament, tour=next_tour, player_1=None).first()
-            if not next_match:
-                next_match = Match.objects.filter(tournament=tournament, tour=next_tour, player_2=None).first()
-            
-            # Mise à jour du prochain match avec le vainqueur
-            if next_match:
-                if next_match.player_1 is None:
-                    next_match.player_1 = winner
-                else:
-                    next_match.player_2 = winner
-                next_match.save()
-        except Match.DoesNotExist:
-            # Si aucun match n'est trouvé pour le tour suivant, cela peut signifier que le tournoi est terminé
-            return JsonResponse({'message': "Aucun match suivant à mettre à jour. Le tournoi pourrait être terminé."}, status=200)
-            
-        # Retourner une réponse de succès
-        return JsonResponse({
-            'success': True,
-            'message': "Le vainqueur a été mis à jour et le match suivant a été préparé."
-        }, status=200)
+    try:
+        match = Match.objects.get(id=match_id)
+        winner = Joueur.objects.get(user_id=winner_id)
+        winner.status_ready = 0
+        match.winner = winner
+        match.status = Match.FINISHED
+        match.save()
+        winner.save()
+    except ObjectDoesNotExist:
+        return JsonResponse({'error': "Match ou Joueur non trouvé."}, status=404)
+
+    next_tour = match.tour + 1
+    tournament = match.tournament
+
+    try:
+        # Logique pour déterminer l'indice pour le prochain match (cette partie doit être révisée selon le besoin exact)
+        n_float = float(match.match_id / 2)
+        modulo_result = n_float % 1
+        if modulo_result == 0.5:
+            n_float += 0.5
+        match_index = int(n_float)
+        logging.critical(match_index)
+
+        match_next_tour = Match.objects.filter(tour=next_tour).order_by('id').first()
+        if match_next_tour is None:
+            return JsonResponse({'success': True, 'message': "Finale."}, status=200)
+        # Trouver le prochain match basé sur l'index calculé si nécessaire
+        # Cette logique doit être ajustée selon la structure exacte et la logique de votre application
+        next_match = Match.objects.filter(tournament=tournament, tour=next_tour).order_by('match_id')[match_index - 1]
+
+        if next_match:
+            # if next_match.player_1 is None:
+            if match.match_id % 2 == 1:
+                next_match.player_1 = winner
+            elif match.match_id % 2 == 0:
+                next_match.player_2 = winner
+            next_match.save()
+        else:
+            return JsonResponse({'message': "Aucun match disponible pour la mise à jour."}, status=404)
+    except IndexError:
+        return JsonResponse({'error': "Index hors de portée."}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({
+        'success': True,
+        'message': "Le vainqueur a été mis à jour et le match suivant a été préparé."
+    }, status=200)
