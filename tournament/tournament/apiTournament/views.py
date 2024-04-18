@@ -139,12 +139,20 @@ def create_joueur(request):
         return JsonResponse({'error': 'Tournoi not found'}, status=404)
 
     # Utiliser get_or_create pour éviter de créer un doublon
+    # joueur, created = Joueur.objects.get_or_create(
+    #     user_id=user_id, 
+    #     tournament_id=tournament_id, 
+    #     defaults={'username': username, 'tournament': tournament}
+    # )
+
     joueur, created = Joueur.objects.get_or_create(
-        user_id=user_id, 
-        tournament_id=tournament_id, 
-        defaults={'username': username, 'tournament': tournament}
+        user_id=user_id,
+        defaults={'username': username}
     )
+
     if created:
+        joueur.tournament = tournament
+        joueur.save()
         tournament_group_name = f"tournoi_{tournament_id}"
 
         # Envoi du message au groupe de canaux spécifique du tournoi
@@ -165,8 +173,32 @@ def create_joueur(request):
             }
         )
         return JsonResponse({"success": True, 'message': 'Joueur created successfully', 'joueur_id': joueur.id})
-    else:
-        return JsonResponse({"success": False, 'message': 'Joueur already exists', 'joueur_id': joueur.id})
+    
+    if joueur.tournament is None:
+        joueur.tournament = tournament
+        joueur.save()
+        tournament_group_name = f"tournoi_{tournament_id}"
+
+        # Envoi du message au groupe de canaux spécifique du tournoi
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
+            {
+                "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
+                "message": "Un nouveau joueur a été ajouté au tournoi"
+            }
+        )
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
+            {
+                "type": "tournoi_cree",  # Type de message
+                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+            }
+        )
+        return JsonResponse({'success': True, 'message': 'Joueur updated with new tournament successfully', 'joueur_id': joueur.id})
+
+    return JsonResponse({"success": False, 'message': 'Joueur already exists', 'joueur_id': joueur.id})
 
 
 @verif_sessionID
@@ -554,7 +586,7 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id):
 
 @csrf_exempt  # Exempter de CSRF pour simplifier l'exemple
 @verif_sessionID
-@require_http_methods(["DELETE"])  # S'assurer que la requête est de type POST
+@require_http_methods(["POST"])  # S'assurer que la requête est de type POST
 def delete_player_and_tournament_if_empty(request, player_id):
     try:
         # Trouver le joueur spécifié par ID
@@ -562,7 +594,10 @@ def delete_player_and_tournament_if_empty(request, player_id):
         tournament = player.tournament  # Récupérer le tournoi associé au joueur
 
         # Supprimer le joueur
-        player.delete()
+        player.tournament = None
+        player.status_ready = Joueur.NOT_READY
+        player.save()
+        # player.delete()
 
         # Vérifier si d'autres joueurs sont encore inscrits dans le tournoi
         if not tournament.players.exists():  # 'players' doit être le related_name dans le modèle ForeignKey

@@ -12,7 +12,6 @@ import {
   fetchWinnerMatch,
   getMatch,
   fetchTournamentInfo,
-  removePlayerFromTournament,
   fetchDeletePlayerAndTournament,
 } from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
@@ -57,20 +56,14 @@ class ViewTournamentstart extends HTMLElement {
 
     // Ajout d'un écouteur d'événements pour le bouton de sortie
     this.querySelector('#leaveTournamentBtn').addEventListener('click', () => {
-      // this.fetchTournamentInfo();
-      // console.log("iciiiiiiiiiiiiiiiiiiiii",this.#tournament.status);
-      // if(this.#tournament.status != 2){
-        // resetLocalTournament();
         this.deletePlayer();
-      // }
-      // else{
-        // resetLocalTournament();
-        // this.removePlayerFromTournament();
-      // }
     });
 
     this.initWebSocket();
-    await this.createMatchs();
+    if(this.#tournament.status != 2)
+      await this.createMatchs();
+    else
+      this.displayUpdate();
   }
 
   disconnectedCallback() {
@@ -170,7 +163,31 @@ displayMatches(matchesByTour) {
                   <br><br>
                 </div>
                 `;
-          } else {
+          } 
+          else if (match.status === 2) {
+            console.log("match status === 22222222222222222222");
+            console.log(match.winner_id);
+            console.log(player1Name);
+            // Apply green text color if the player is the winner
+            const player1Style = match.winner_id === player1Name ? 'color:green;' : 'color:red;';
+            const player2Style = match.winner_id === player2Name ? 'color:green;' : 'color:red;';
+
+            matchElement.innerHTML = `
+                <div class="match-info">
+                    <div class="player-info d-flex align-items-center">
+                        ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
+                        <span class="player" style="${player1Style}">${player1Name}</span>
+                    </div>
+                    <div class="vs">vs</div>
+                    <div class="player-info d-flex align-items-center">
+                        ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
+                        <span class="player" style="${player2Style}">${player2Name}</span>
+                    </div>
+                    <br><br>
+                </div>
+            `;
+          }
+          else {
             matchElement.innerHTML = `
             <div class="match-info">
               <div class="player-info d-flex align-items-center">
