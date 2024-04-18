@@ -16,7 +16,7 @@ urlpatterns = [
     path('create_matches/<int:tournament_id>/', views.create_matches, name='create_matches'),
     path('get_matches/<int:tournament_id>/', views.get_matches, name='get_matches'),
     path('ready/<int:player_id>/<int:match_id>/', views.set_player_ready, name='set_player_ready'),
-    path('get_next_rounds/<int:tournament_id>/', views.get_next_rounds, name='get_next_rounds'),
     path('get_latest_match_for_user/<int:user_id>/', views.get_latest_match_for_user, name='get_latest_match_for_user'),
     path('update_winner/<int:match_id>/<int:winner_id>/', views.update_winner_and_prepare_next_match, name='update_winner_and_prepare_next_match'),
+    path('delete_player/<int:player_id>/', views.delete_player_and_tournament_if_empty, name='delete_player'),
 ]

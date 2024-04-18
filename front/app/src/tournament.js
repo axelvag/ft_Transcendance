@@ -7,6 +7,7 @@ const tournament = {
   name: null,
   maxPlayer: null,
   admin_id: null,
+  status: null,
 };
 
 const setLocalTournament = data => {
@@ -14,6 +15,7 @@ const setLocalTournament = data => {
   tournament.name = data.name || '';
   tournament.maxPlayer = data.maxPlayer || '';
   tournament.admin_id = data.admin_id || '';
+  tournament.status = data.status || '';
 };
 
 const resetLocalTournament = () => {
@@ -21,6 +23,7 @@ const resetLocalTournament = () => {
   tournament.name = null;
   tournament.maxPlayer = null;
   tournament.admin_id = null;
+  tournament.status = null;
 };
 
 const getTournament = () => {
@@ -29,6 +32,7 @@ const getTournament = () => {
     name: tournament.name,
     maxPlayer: tournament.maxPlayer,
     admin_id: tournament.admin_id,
+    status: tournament.status,
   };
 };
 
@@ -176,6 +180,7 @@ const fetchTournamentInfo = async () => {
     credentials: 'include',
   })
   const data = await response.json();
+  console.log("tournoi infooooooooooo", data);
   if (data.id) {
     setLocalTournament(data);
   } else {
@@ -235,5 +240,22 @@ const fetchWinnerMatch = async () => {
 };
 
 
+const fetchDeletePlayerAndTournament = async () => {
+  let user = getProfile();
+  const response = await fetch(`http://127.0.0.1:8005/tournament/delete_player/${user.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  const data = await response.json();
+  console.log(data);
+  if (data.success) {
+    resetLocalTournament();
+  } else {
+    console.log("error");
+  }
+};
 
-export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch };
+export { tournament, fetchDeletePlayerAndTournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch };

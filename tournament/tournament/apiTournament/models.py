@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 
 # Create your models here.
 class Tournoi(models.Model):
@@ -8,7 +9,7 @@ class Tournoi(models.Model):
 
     name = models.CharField(max_length=100)
     # matchs = models.ManyToManyField(Match)
-    status = models.BooleanField(default=CREATED)
+    status = models.IntegerField(default=CREATED)
     max_players = models.IntegerField(default=16, blank=True)
     start_datetime = models.DateTimeField(null=True)
     admin_id = models.BigIntegerField(default=0)

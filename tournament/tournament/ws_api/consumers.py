@@ -114,3 +114,13 @@ class MyConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "action": "display_player"
         }))
+        
+    async def player_ready(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "player_ready"
+        }))
+    
+    async def winner(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "winner"
+        }))

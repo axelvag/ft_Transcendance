@@ -11,6 +11,9 @@ import {
   fetchInfoMatch,
   fetchWinnerMatch,
   getMatch,
+  fetchTournamentInfo,
+  removePlayerFromTournament,
+  fetchDeletePlayerAndTournament,
 } from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
@@ -54,12 +57,26 @@ class ViewTournamentstart extends HTMLElement {
 
     // Ajout d'un écouteur d'événements pour le bouton de sortie
     this.querySelector('#leaveTournamentBtn').addEventListener('click', () => {
-      resetLocalTournament();
-      this.deletePlayer();
-      redirectTo(this.#backUrl);
+      // this.fetchTournamentInfo();
+      // console.log("iciiiiiiiiiiiiiiiiiiiii",this.#tournament.status);
+      // if(this.#tournament.status != 2){
+        // resetLocalTournament();
+        this.deletePlayer();
+      // }
+      // else{
+        // resetLocalTournament();
+        // this.removePlayerFromTournament();
+      // }
     });
 
+    this.initWebSocket();
     await this.createMatchs();
+  }
+
+  disconnectedCallback() {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.close();
+    }
   }
   
   async createMatchs() {
@@ -257,7 +274,18 @@ displayMatches(matchesByTour) {
 
   
   async deletePlayer() {
-    const data = await fetchDeletePlayerSalon();
+    await fetchDeletePlayerAndTournament();
+    redirectTo(this.#backUrl);
+  }
+  
+  async fetchTournamentInfo() {
+    await fetchTournamentInfo();
+    this.#tournament = getTournament();
+    console.log(this.#tournament);
+  }
+  
+  async removePlayerFromTournament() {
+    await removePlayerFromTournament();
   }
   
   async displayUpdate() {
@@ -273,6 +301,43 @@ displayMatches(matchesByTour) {
     await fetchInfoMatch();
   }
 
+
+  initWebSocket() {
+    // Assurez-vous que l'URL correspond à votre serveur WebSocket.
+    this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
+
+    this.socket.onopen = () => {
+        console.log('WebSocket connection established start tournament');
+        // this.socket.send(JSON.stringify({user_id: this.#user.id}));
+        this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
+    };
+
+    this.socket.onmessage = (event) => {
+        // Logique pour gérer les messages entrants.
+        const data = JSON.parse(event.data);
+
+        if (data.action === 'player_ready') {
+            this.displayUpdate();
+        }
+        if (data.action === 'winner') {
+          this.infoMatch();
+          this.displayUpdate();
+        }
+    };
+
+    this.socket.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
+
+    this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+
+    window.addEventListener('beforeunload', () => {
+      this.socket.close();
+    });
+
+  }
   // generateTournamentTab() {
   //   let message = ''; // Variable pour stocker le message à afficher
 
