@@ -60,11 +60,10 @@ class ViewGameHistory extends HTMLElement {
       opponentIds = [...new Set(opponentIds)];
       await Promise.all(
         opponentIds.map(async opponentId => {
-          const opponent = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${opponentId}`, {
+          const opponent = await fetch(`http://127.0.0.1:8002/get_user_profile/${opponentId}`, {
             credentials: 'include',
           })
             .then(res => res.json())
-            .then(res => res.getProfile);
           opponents[opponentId] = opponent;
         })
       );
@@ -95,7 +94,7 @@ class ViewGameHistory extends HTMLElement {
             <img
               src="${game.opponent?.avatar || '/assets/img/default-profile.jpg'}"
               alt="avatar"
-              class="fs-3 rounded-circle me-2"
+              class="fs-3 rounded-circle me-2 object-fit-cover"
               style="width: 1em; height: 1em;"
             />
             <small>${game.opponent?.username}</small>

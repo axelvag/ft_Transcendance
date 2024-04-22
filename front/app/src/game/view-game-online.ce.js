@@ -1,5 +1,5 @@
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { getProfile, getCsrfToken } from '@/auth.js';
+import { getProfile } from '@/auth.js';
 
 class ViewGameOnline extends HTMLElement {
   #game;
@@ -56,11 +56,10 @@ class ViewGameOnline extends HTMLElement {
       };
     }
 
-    const profile = await fetch(`http://127.0.0.1:8001/accounts/get_user_profile/${playerId}`, {
+    const profile = await fetch(`http://127.0.0.1:8002/get_user_profile/${playerId}`, {
       credentials: 'include',
     })
       .then(res => res.json())
-      .then(res => res.getProfile);
     console.log('profile', profile.getProfile);
     return {
       id: playerId,
