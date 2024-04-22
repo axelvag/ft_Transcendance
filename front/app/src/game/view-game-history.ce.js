@@ -1,6 +1,6 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { getProfile, getCsrfToken } from '@/auth.js';
+import { getProfile } from '@/auth.js';
 import { redirectTo } from '@/router.js';
 
 class ViewGameHistory extends HTMLElement {
@@ -50,22 +50,20 @@ class ViewGameHistory extends HTMLElement {
 
   async fetchGames() {
     try {
-      this.#games = await fetch(`http://127.0.0.1:8009/games/history/${this.#user.id}`).then(res => res.json());
+      this.#games = await fetch('http://127.0.0.1:8009/game-history', {
+        credentials: 'include',
+      }).then(res => res.json());
 
       // Fetch opponent profiles
       const opponents = {};
       let opponentIds = this.#games.map(game => game.opponent_id);
       opponentIds = [...new Set(opponentIds)];
-      const csrfToken = await getCsrfToken();
       await Promise.all(
         opponentIds.map(async opponentId => {
           const opponent = await fetch(`http://127.0.0.1:8002/get_user_profile/${opponentId}`, {
-            method: 'GET',
-            headers: { 'X-CSRFToken': csrfToken },
             credentials: 'include',
           })
             .then(res => res.json())
-            .then(res => res.getProfile);
           opponents[opponentId] = opponent;
         })
       );
@@ -75,6 +73,14 @@ class ViewGameHistory extends HTMLElement {
       }));
     } catch (error) {
       console.error(error);
+      if (!this.#bodyEl) return;
+      this.#bodyEl.innerHTML = `
+        <p class="text-danger fw-bold">An error occured!</p>
+        <p>
+          <button class="btn btn-danger" data-link="/game-history">Retry</button>
+        </p>
+      `;
+      return;
     }
 
     if (!this.#bodyEl) return;
@@ -88,16 +94,15 @@ class ViewGameHistory extends HTMLElement {
             <img
               src="${game.opponent?.avatar || '/assets/img/default-profile.jpg'}"
               alt="avatar"
-              class="fs-3 rounded-circle me-2"
+              class="fs-3 rounded-circle me-2 object-fit-cover"
               style="width: 1em; height: 1em;"
             />
             <small>${game.opponent?.username}</small>
           </td>
-          <td class="bg-transparent align-middle">${
-            game.is_victory
-              ? '<span class="badge text-bg-success">VICTORY</span>'
-              : '<span class="badge text-bg-danger">DEFEAT</span>'
-          }</td>
+          <td class="bg-transparent align-middle">${game.is_victory
+          ? '<span class="badge text-bg-success">VICTORY</span>'
+          : '<span class="badge text-bg-danger">DEFEAT</span>'
+        }</td>
           <td class="bg-transparent align-middle">
             ${game.player_forfeit ? 'Forfeit' : game.player_score}
             -
