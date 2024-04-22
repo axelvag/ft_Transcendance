@@ -539,7 +539,7 @@ def proxy_send_invitation(request):
     
     try:
         # Envoie la requête POST au service de profils
-        response = requests.post(friendship_service_url, json=payload)
+        response = requests.post(friendship_service_url, json=payload, verify=False)
         
         return JsonResponse(response.json(), status=response.status_code)
     except requests.exceptions.RequestException as e:
@@ -683,7 +683,7 @@ def proxy_accept_invitation(request):
     
     try:
         # Envoie la requête POST au service de profils
-        response = requests.post(friendship_service_url, json=payload)
+        response = requests.post(friendship_service_url, json=payload, verify=False)
         
         return JsonResponse(response.json(), status=response.status_code)
     except requests.exceptions.RequestException as e:
@@ -702,7 +702,7 @@ def proxy_reject_invitation(request):
     
     try:
         # Envoie la requête POST au service de profils
-        response = requests.post(friendship_service_url, json=payload)
+        response = requests.post(friendship_service_url, json=payload, verify=False)
         
         return JsonResponse(response.json(), status=response.status_code)
     except requests.exceptions.RequestException as e:
@@ -721,7 +721,7 @@ def proxy_cancel_sent_invitation(request):
     
     try:
         # Envoie la requête POST au service de profils
-        response = requests.post(friendship_service_url, json=payload)
+        response = requests.post(friendship_service_url, json=payload, verify=False)
         
         return JsonResponse(response.json(), status=response.status_code)
     except requests.exceptions.RequestException as e:
@@ -740,7 +740,7 @@ def proxy_remove_friend(request):
     
     try:
         # Envoie la requête POST au service de profils
-        response = requests.post(friendship_service_url, json=payload)
+        response = requests.post(friendship_service_url, json=payload, verify=False)
         
         return JsonResponse(response.json(), status=response.status_code)
     except requests.exceptions.RequestException as e:
