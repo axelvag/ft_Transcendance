@@ -533,7 +533,7 @@ def delete_user_profile(request, user_id):
 @login_required
 @require_http_methods(["POST"])
 def proxy_send_invitation(request):
-    friendship_service_url = "http://friendship:8003/send_invitation/"
+    friendship_service_url = "https://friendship:8003/send_invitation/"
 
     payload = json.loads(request.body)
     
@@ -554,7 +554,7 @@ def proxy_send_invitation(request):
 @login_required
 @require_http_methods(["GET"])
 def proxy_search_users(request):
-    friendship_service_url = "http://friendship:8003/search_users/"
+    friendship_service_url = "https://friendship:8003/search_users/"
     
     # Extrait les paramètres de la requête GET
     query = request.GET.get('query')
@@ -565,7 +565,7 @@ def proxy_search_users(request):
     
     try:
         # Envoie la requête GET au service de profils
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         
         return JsonResponse(response.json(), status=response.status_code, safe=False)
     except requests.exceptions.RequestException as e:
@@ -577,7 +577,7 @@ def proxy_search_users(request):
 @login_required
 @require_http_methods(["GET"])
 def proxy_list_received_invitations(request, user_id):
-    friendship_service_url = "http://friendship:8003/list_received_invitations/{user_id}/"
+    friendship_service_url = "https://friendship:8003/list_received_invitations/{user_id}/"
 
     payload = json.loads(request.body)
 
@@ -677,7 +677,7 @@ def proxy_online_friends(request, user_id):
 @login_required
 @require_http_methods(["POST"])
 def proxy_accept_invitation(request):
-    friendship_service_url = "http://friendship:8003/accept_invitation/"
+    friendship_service_url = "https://friendship:8003/accept_invitation/"
 
     payload = json.loads(request.body)
     
@@ -696,7 +696,7 @@ def proxy_accept_invitation(request):
 @login_required
 @require_http_methods(["POST"])
 def proxy_reject_invitation(request):
-    friendship_service_url = "http://friendship:8003/reject_invitation/"
+    friendship_service_url = "https://friendship:8003/reject_invitation/"
 
     payload = json.loads(request.body)
     
@@ -715,7 +715,7 @@ def proxy_reject_invitation(request):
 @login_required
 @require_http_methods(["POST"])
 def proxy_cancel_sent_invitation(request):
-    friendship_service_url = "http://friendship:8003/cancel_sent_invitation/"
+    friendship_service_url = "https://friendship:8003/cancel_sent_invitation/"
 
     payload = json.loads(request.body)
     
@@ -734,7 +734,7 @@ def proxy_cancel_sent_invitation(request):
 @login_required
 @require_http_methods(["POST"])
 def proxy_remove_friend(request):
-    friendship_service_url = "http://friendship:8003/remove_friend/"
+    friendship_service_url = "https://friendship:8003/remove_friend/"
 
     payload = json.loads(request.body)
     

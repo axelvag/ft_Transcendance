@@ -129,6 +129,7 @@ services:
     ports:
       - "8009:8009"
     volumes:
+      - shared_ssl:/etc/ssl
       - ./game/app:/app
     networks:
       - back

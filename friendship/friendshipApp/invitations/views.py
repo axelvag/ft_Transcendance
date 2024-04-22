@@ -358,7 +358,7 @@ def offline_friends(request, user_id):
 
 
 def get_profile_info(user_id):
-    profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:
         response = requests.get(profile_service_url)
         if response.status_code == 200:

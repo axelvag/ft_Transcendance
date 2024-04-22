@@ -88,7 +88,7 @@ class ViewFriend extends HTMLElement {
   }
 
   initInvitationsWebSocket() {
-    const wsUrl = `ws://127.0.0.1:8003/ws/invitations/${user.id}/`;
+    const wsUrl = `wss://127.0.0.1:8003/ws/invitations/${user.id}/`;
     const wsInstance = new WebSocket(wsUrl);
 
     wsInstance.onopen = () => {
@@ -398,7 +398,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8001/accounts/proxy_search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`, {
+      const response = await fetch(`https://127.0.0.1:8001/accounts/proxy_search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -481,7 +481,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch('http://127.0.0.1:8001/accounts/proxy_send_invitation/', {
+      const response = await fetch('https://127.0.0.1:8001/accounts/proxy_send_invitation/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
