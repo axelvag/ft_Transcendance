@@ -62,7 +62,7 @@ class ViewGameHistory extends HTMLElement {
       const csrfToken = await getCsrfToken();
       await Promise.all(
         opponentIds.map(async opponentId => {
-          const opponent = await fetch(API_BASE_URL + `/accounts/get_user_profile/${opponentId}`, {
+          const opponent = await fetch(`https://127.0.0.1:8002/get_user_profile/${opponentId}`, {
             method: 'GET',
             headers: { 'X-CSRFToken': csrfToken },
             credentials: 'include',

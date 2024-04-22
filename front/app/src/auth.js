@@ -99,7 +99,7 @@ const isAuthenticated = async () => {
         setLocalUser(data);
         console.log('dwedededee', user.id);
         const csrfToken = await getCsrfToken();
-        const userProfileResponse = await fetch(API_BASE_URL + `/accounts/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${user.id}/`, {
           method: 'GET',
           headers: {
             'X-CSRFToken': csrfToken,
@@ -108,9 +108,9 @@ const isAuthenticated = async () => {
         });
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
-        if (userProfileData.getProfile.success) {
-          console.log(userProfileData.getProfile.avatar42);
-          setLocalUser(userProfileData.getProfile);
+        if (userProfileData.success) {
+          console.log(userProfileData.avatar42);
+          setLocalUser(userProfileData);
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
@@ -203,7 +203,7 @@ const saveUser = async newUser => {
 
   try {
     const csrfToken = await getCsrfToken();
-    const response = await fetch(API_BASE_URL + '/accounts/update_user/', {
+    const response = await fetch('https://127.0.0.1:8002/update_user/', {
       method: 'POST',
       mode: 'cors',
       credentials: 'include',
@@ -218,22 +218,25 @@ const saveUser = async newUser => {
     }
 
     const data = await response.json();
-    if (data.update.success) {
+    if (data.success) {
       //MAJ object user
-      user.firstname = data.update.firstname;
-      user.lastname = data.update.lastname;
-      user.username = data.update.username;
+      user.firstname = data.firstname;
+      user.lastname = data.lastname;
+      user.username = data.username;
       user.email = user.email;
 
-      if (!data.update.avatar) {
-        if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) user.avatar = user.avatarDefault42;
-        else user.avatar = '/assets/img/default-profile.jpg';
-      } else {
-        user.avatar = data.update.avatar;
+      if (!data.avatar) {
+        if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined)
+          user.avatar = user.avatarDefault42;
+        else
+          user.avatar = 'assets/img/default-profile.jpg';
+      }
+      else {
+        user.avatar = data.avatar;
       }
     }
 
-    return data.update;
+    return data;
   } catch (error) {
     console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
     return null;
@@ -356,7 +359,7 @@ const handleOAuthResponse = async () => {
               console.log(`${key}: ${value}`);
             }
             const csrfToken = await getCsrfToken();
-            const response = await fetch(API_BASE_URL + '/accounts/update_user/', {
+            const response = await fetch('https://127.0.0.1:8002/update_user/', {
               method: 'POST',
               credentials: 'include',
               headers: {
@@ -375,7 +378,7 @@ const handleOAuthResponse = async () => {
           }
         }
         const csrfToken = await getCsrfToken();
-        const userProfileResponse = await fetch(API_BASE_URL + `/accounts/get_user_profile/${data.id}/`, {
+        const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${data.id}/`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -385,8 +388,8 @@ const handleOAuthResponse = async () => {
 
         const userProfileData = await userProfileResponse.json();
         console.log(userProfileData);
-        if (userProfileData.getProfile.success) {
-          setLocalUser(userProfileData.getProfile);
+        if (userProfileData.success) {
+          setLocalUser(userProfileData);
           redirectTo('/dashboard');
           notify({
             icon: 'info',
