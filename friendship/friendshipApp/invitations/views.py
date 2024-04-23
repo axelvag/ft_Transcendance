@@ -40,6 +40,7 @@ def verif_sessionID(view_func):
     return wrapper
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def send_invitation(request):
     data = json.loads(request.body)
@@ -112,6 +113,7 @@ def send_invitation(request):
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def search_users(request):
     search_query = request.GET.get('query', '')
@@ -152,6 +154,7 @@ def search_users(request):
     return JsonResponse(user_data, safe=False, status=200)
        
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def accept_invitation(request):
 
@@ -186,6 +189,7 @@ def accept_invitation(request):
         return JsonResponse({"status": "error", "message": "Invitation does not exist or has already been accepted."}, status=404)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def reject_invitation(request):
 
@@ -217,6 +221,7 @@ def reject_invitation(request):
 # double underscore __ permet de traverser les relations entre modèles pour accéder aux attributs du modèle lié.
 # flat retourne une liste aplatie ['ami1', 'ami2', 'ami3'], au lieu de [('ami1',), ('ami2',), ('ami3',)].
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def list_received_invitations(request, user_id):
     try:
@@ -239,6 +244,7 @@ def list_received_invitations(request, user_id):
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
 # affiche toutes les invitations envoyées par l'utilisateur qui n'ont pas encore été acceptées.
+@verif_sessionID
 @require_http_methods(["GET"])
 def list_sent_invitations(request, user_id):
     try:
@@ -263,6 +269,7 @@ def list_sent_invitations(request, user_id):
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def cancel_sent_invitation(request):
     data = json.loads(request.body)
@@ -290,6 +297,7 @@ def cancel_sent_invitation(request):
         return JsonResponse({"status": "error", "message": "Invitation does not exist or has already been accepted."}, status=404)
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["POST"])
 def remove_friend(request):
     data = json.loads(request.body)
@@ -324,6 +332,7 @@ def remove_friend(request):
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User or friend does not exist."}, status=404)
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def online_friends(request, user_id):
     try:
@@ -346,6 +355,7 @@ def online_friends(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
+@verif_sessionID
 @require_http_methods(["GET"])
 def offline_friends(request, user_id):
     try:
