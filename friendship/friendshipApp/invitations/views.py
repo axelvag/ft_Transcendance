@@ -118,6 +118,7 @@ def send_invitation(request):
 def search_users(request):
     search_query = request.GET.get('query', '')
     user_id = request.GET.get('user_id', None)
+    cookies = request.COOKIES.get('sessionid', None)
 
     if not search_query or not user_id or user_id.lower() == 'null':
         return JsonResponse({"status": "error", "message": "No search query or user ID provided."}, status=400)
@@ -144,7 +145,7 @@ def search_users(request):
 
     user_data = []
     for user in users:
-        profile_info = get_profile_info(user.id)
+        profile_info = get_profile_info(user.id, cookies)
         user_data.append({
             "username": user.username,
             "email": user.email,  # Supposant que vous avez accès à l'email directement depuis l'objet user
@@ -225,13 +226,14 @@ def reject_invitation(request):
 @require_http_methods(["GET"])
 def list_received_invitations(request, user_id):
     try:
+        cookies = request.COOKIES.get('sessionid', None)
         user = User.objects.get(id=user_id)
         invitations = Invitation.objects.filter(to_user=user, accepted=False)
         invitations_data = []
 
         for invitation in invitations:
             from_user = invitation.from_user
-            profile_info = get_profile_info(from_user.id)  # Récupère les informations du profil
+            profile_info = get_profile_info(from_user.id, cookies)  # Récupère les informations du profil
             invitations_data.append({
                 "from_user_username": from_user.username,
                 "from_user_email": profile_info.get('email'),  # Email depuis le profil
@@ -248,6 +250,8 @@ def list_received_invitations(request, user_id):
 @require_http_methods(["GET"])
 def list_sent_invitations(request, user_id):
     try:
+        cookies = request.COOKIES.get('sessionid', None)
+        logging.critical("sent invitation zeubiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         user = User.objects.get(id=user_id)
         invitations = Invitation.objects.filter(from_user=user, accepted=False)
         invitations_data = [] #[{"to_user": invitation.to_user.username, "invitation_id": invitation.id} for invitation in invitations]
@@ -256,7 +260,7 @@ def list_sent_invitations(request, user_id):
             # from_user = invitation.from_user
             # profile_info = get_profile_info(from_user.id)
             to_user = invitation.to_user
-            profile_info = get_profile_info(to_user.id)
+            profile_info = get_profile_info(to_user.id, cookies)
             invitations_data.append({
                 "from_user_username": to_user.username,
                 "from_user_email": profile_info.get('email'),  # Email depuis le profil
@@ -336,6 +340,7 @@ def remove_friend(request):
 @require_http_methods(["GET"])
 def online_friends(request, user_id):
     try:
+        cookies = request.COOKIES.get('sessionid', None)
         friendships = Friendship.objects.filter(user_id=user_id)
         friend_ids = [friendship.friend.id for friendship in friendships]
         
@@ -343,7 +348,7 @@ def online_friends(request, user_id):
         for friend_id in friend_ids:
             if UserStatus.objects.filter(user_id=friend_id, is_online=True).exists():
                 user = User.objects.get(id=friend_id)
-                profile_info = get_profile_info(user.id)
+                profile_info = get_profile_info(user.id, cookies)
                 online_friends_data.append({
                     "friend_id": user.id,
                     "username": user.username,
@@ -359,6 +364,7 @@ def online_friends(request, user_id):
 @require_http_methods(["GET"])
 def offline_friends(request, user_id):
     try:
+        cookies = request.COOKIES.get('sessionid', None)
         friendships = Friendship.objects.filter(user_id=user_id)
         friend_ids = [friendship.friend.id for friendship in friendships]
         
@@ -366,7 +372,7 @@ def offline_friends(request, user_id):
         for friend_id in friend_ids:
             if UserStatus.objects.filter(user_id=friend_id, is_online=False).exists():
                 user = User.objects.get(id=friend_id)
-                profile_info = get_profile_info(user.id)
+                profile_info = get_profile_info(user.id, cookies)
                 offline_friends_data.append({
                     "friend_id": user.id,
                     "username": user.username,
@@ -378,24 +384,24 @@ def offline_friends(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
-def get_profile_info(user_id):
-    profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
-    try:
-        response = requests.get(profile_service_url)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return {}
-    except requests.exceptions.RequestException:
-        return {}
-
-# def get_profile_info(user_id, cookies):
-#     profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
+# def get_profile_info(user_id):
+#     profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
 #     try:
-#         response = requests.get(profile_service_url, cookies={'sessionid': cookies})
+#         response = requests.get(profile_service_url)
 #         if response.status_code == 200:
 #             return response.json()
 #         else:
 #             return {}
 #     except requests.exceptions.RequestException:
 #         return {}
+
+def get_profile_info(user_id, cookies):
+    profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
+    try:
+        response = requests.get(profile_service_url, cookies={'sessionid': cookies})
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {}
+    except requests.exceptions.RequestException:
+        return {}
