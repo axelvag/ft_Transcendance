@@ -583,7 +583,7 @@ def proxy_list_received_invitations(request, user_id):
 
     try:
         # Envoie la requête POST au service de profils
-        response = requests.post(friendship_service_url, json=payload)
+        response = requests.post(friendship_service_url, json=payload, verify=False)
         
         return JsonResponse(response.json(), status=response.status_code)
     except requests.exceptions.RequestException as e:

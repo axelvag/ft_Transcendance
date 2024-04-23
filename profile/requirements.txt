@@ -9,3 +9,4 @@ requests
 Pillow
 python-dotenv==0.19.1
 gunicorn==21.2.0
+daphne==4.0.0
