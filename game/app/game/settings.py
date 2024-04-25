@@ -38,16 +38,16 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
   'daphne',
-  'channels',
   'django.contrib.admin',
   'django.contrib.auth',
   'django.contrib.contenttypes',
   'django.contrib.sessions',
   'django.contrib.messages',
   'django.contrib.staticfiles',
-  'corsheaders',
+  'ws_api',
   'game',
-  'ws_api'
+  'corsheaders',
+  'channels',
 ]
 
 MIDDLEWARE = [
