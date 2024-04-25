@@ -1,4 +1,3 @@
-import { getProfile } from '@/auth.js';
 import { redirectTo } from '@/router.js';
 
 const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL;
@@ -11,8 +10,7 @@ class ViewGameOnlineMatchmaking extends HTMLElement {
     this.handleError = this.handleError.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
 
-    const user = getProfile();
-    this.#ws = new WebSocket(`${WS_BASE_URL}:8009/search-opponent/${user.id}`);
+    this.#ws = new WebSocket(`${WS_BASE_URL}:8009/search-opponent`);
     this.#ws.onerror = this.handleError;
     this.#ws.onmessage = this.handleMessage;
     this.#ws.onopen = () => console.log('WebSocket opened');

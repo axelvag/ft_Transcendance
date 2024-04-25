@@ -61,12 +61,9 @@ class ViewGameOnline extends HTMLElement {
     }
 
     const profile = await fetch(`https://127.0.0.1:8002/get_user_profile/${playerId}`, {
-      method: 'GET',
-      headers: { 'X-CSRFToken': await getCsrfToken() },
       credentials: 'include',
     })
       .then(res => res.json())
-      .then(res => res.getProfile);
     console.log('profile', profile.getProfile);
     return {
       id: playerId,
@@ -78,7 +75,9 @@ class ViewGameOnline extends HTMLElement {
 
   async displayMatchup() {
     try {
-      this.#game = await fetch(`${BASE_URL}:8009/games/${this.getAttribute('game-id')}`).then(res => res.json());
+      this.#game = await fetch(`${BASE_URL}:8009/games/${this.getAttribute('game-id')}`, {
+        credentials: 'include',
+      }).then(res => res.json());
       this.#playerLeft = await this.getPlayerProfile(this.#game.player_left_id);
       this.#playerRight = await this.getPlayerProfile(this.#game.player_right_id);
       console.log(this.#playerLeft, this.#playerRight);
@@ -169,7 +168,7 @@ class ViewGameOnline extends HTMLElement {
   }
 
   async joinGame() {
-    this.#ws = new WebSocket(`${WS_BASE_URL}:8009/play/${this.#game.id}/${this.#user.id}`);
+    this.#ws = new WebSocket(`${WS_BASE_URL}:8009/play/${this.#game.id}`);
     this.#ws.onmessage = this.handleMessage;
     this.#ws.onerror = this.displayGameNotFound;
     this.#ws.onopen = () => console.log('ws play opened');
