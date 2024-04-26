@@ -6,7 +6,14 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from .models import Game
 import json
+import requests
 
+def verify_sessionid(request):
+  session_id = request.COOKIES.get('sessionid', None)
+  if not session_id:
+        raise Exception('Session ID not found')
+  response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{session_id}", verify=False)
+  return response.json()['user_id']
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GameListView(View):
@@ -84,7 +91,13 @@ class GameItemView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class GamePlayerHistoryView(View):
   
-  def get(self, request, player_id):
+  def get(self, request):
+
+    player_id = None
+    try:
+      player_id = verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
     # Get game history for a player
     games = Game.objects.filter(
       Q(player_left_id=player_id) | Q(player_right_id=player_id),

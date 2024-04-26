@@ -53,7 +53,7 @@ class ViewGameHistory extends HTMLElement {
 
   async fetchGames() {
     try {
-      this.#games = await fetch(`${BASE_URL}:8009/games/history/${this.#user.id}`, {
+      this.#games = await fetch(`${BASE_URL}:8009/game-history`, {
         credentials: 'include',
       }).then(res => res.json());
 

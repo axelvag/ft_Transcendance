@@ -1,10 +1,12 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 import json
 import requests
 from game.models import Game
 
+# @method_decorator(csrf_exempt, name='dispatch')
 class SearchOpponentConsumer(AsyncWebsocketConsumer):
 
   async def get_user_id(self):
