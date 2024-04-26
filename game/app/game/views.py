@@ -115,7 +115,7 @@ class GameItemView(View):
 class GamePlayerHistoryView(View):
   
   def get(self, request):
-
+    
     player_id = None
     try:
       player_id = verify_sessionid(request)
