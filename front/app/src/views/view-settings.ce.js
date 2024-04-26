@@ -3,8 +3,7 @@ import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
 import { getCsrfToken, resetLocalUser, deleteUser } from '@/auth.js';
-
-const BASE_URL = import.meta.env.BASE_URL;
+import { BASE_URL } from '@/constants.js';
 
 class ViewSettings extends HTMLElement {
   connectedCallback() {
@@ -29,7 +28,7 @@ class ViewSettings extends HTMLElement {
   async suppUser() {
     try {
       const csrfToken = await getCsrfToken();
-      const deleteProfile = await fetch(`http://127.0.0.1:8002/delete_user_profile/${user.id}/`, {
+      const deleteProfile = await fetch(`${BASE_URL}:8002/delete_user_profile/${user.id}/`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -48,6 +47,6 @@ class ViewSettings extends HTMLElement {
       console.error('Error:', error);
     }
   }
-  
+
 }
 customElements.define('view-settings', ViewSettings);

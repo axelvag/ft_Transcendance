@@ -1,6 +1,7 @@
 import { redirectTo } from '@/router.js';
+import { WS_BASE_URL } from '@/constants.js';
 
-const wsBaseUrl = 'ws://127.0.0.1:8009';
+const wsBaseUrl = WS_BASE_URL + ':8009';
 
 class ViewGameOnlineMatchmaking extends HTMLElement {
   #ws;
