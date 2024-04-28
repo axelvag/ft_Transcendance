@@ -42,6 +42,20 @@ services:
     profiles:
       - dev
 
+  # Back - data_base
+  data_base:
+    build:
+      context: ./data_base
+      dockerfile: Dockerfile
+    container_name: data_base
+    env_file:
+      - .env
+    volumes:
+      - data_base_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - back
+
   # Back - authentification
   authentification:
     build:
@@ -79,20 +93,6 @@ services:
     env_file:
       - .env
     restart: on-failure
-
-  # Back - data base
-  data_base:
-    build:
-      context: ./data_base
-      dockerfile: Dockerfile
-    container_name: data_base
-    env_file:
-      - .env
-    volumes:
-      - data_base_data:/var/lib/postgresql/data
-    restart: always
-    networks:
-      - back
 
   # Back - friendship
   friendship:
