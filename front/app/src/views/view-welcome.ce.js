@@ -97,11 +97,11 @@ class ViewWelcome extends HTMLElement {
           </p>
         </div>
         <div class="my-auto"></div>
-        <div>
-
         <div class="d-flex justify-content-center">
           <game-demo class="w-100" style="max-width: 50rem;"></game-demo>
         </div>
+        <div class="my-auto"></div>
+        <div class="my-auto"></div>
       </section>
       
     `;
