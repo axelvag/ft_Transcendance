@@ -1,8 +1,6 @@
 import { redirectTo } from '@/router.js';
 import { notify } from '@/notifications.js';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL;
+import { BASE_URL, OAUTH_AUTHORIZE_URL } from '@/constants.js';
 
 const user = {
   isAuthenticated: undefined,
@@ -89,7 +87,7 @@ const isAuthenticated = async () => {
   try {
     if (user.isAuthenticated === undefined) {
       resetLocalUser();
-      const response = await fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
+      const response = await fetch(`${BASE_URL}:8001/accounts/is_user_logged_in/`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'include',
@@ -97,13 +95,7 @@ const isAuthenticated = async () => {
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
-        console.log('dwedededee', user.id);
-        const csrfToken = await getCsrfToken();
-        const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${user.id}/`, {
-          method: 'GET',
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
+        const userProfileResponse = await fetch(`${BASE_URL}:8002/get_user_profile/${user.id}/`, {
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
@@ -126,7 +118,7 @@ const isAuthenticated = async () => {
 };
 
 const getCsrfToken = async () => {
-  const response = await fetch(API_BASE_URL + '/accounts/get-csrf-token/', {
+  const response = await fetch(BASE_URL + ':8001/accounts/get-csrf-token/', {
     method: 'GET',
     mode: 'cors',
     credentials: 'include',
@@ -141,7 +133,7 @@ const getCsrfToken = async () => {
 const logout = async () => {
   try {
     const csrfToken = await getCsrfToken();
-    await fetch(`${API_BASE_URL}/accounts/logout/`, {
+    await fetch(`${BASE_URL}:8001/accounts/logout/`, {
       method: 'POST',
       mode: 'cors',
       credentials: 'include',
@@ -194,16 +186,9 @@ const saveUser = async newUser => {
     formData.append('avatar', newUser.avatarFile);
   }
 
-  console.log('formData', formData);
-
-  // Pour afficher le contenu de formData
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}: ${value}`);
-  }
-
   try {
     const csrfToken = await getCsrfToken();
-    const response = await fetch('https://127.0.0.1:8002/update_user/', {
+    const response = await fetch(BASE_URL + ':8002/update_user/', {
       method: 'POST',
       mode: 'cors',
       credentials: 'include',
@@ -244,7 +229,7 @@ const saveUser = async newUser => {
 };
 
 const loginUser = async (formData, csrfToken) => {
-  const response = await fetch(API_BASE_URL + '/accounts/login/', {
+  const response = await fetch(BASE_URL + ':8001/accounts/login/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -258,7 +243,7 @@ const loginUser = async (formData, csrfToken) => {
 };
 
 const sendSignUpRequest = async (formData, csrfToken) => {
-  const response = await fetch(API_BASE_URL + '/accounts/register/', {
+  const response = await fetch(BASE_URL + ':8001/accounts/register/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -272,7 +257,7 @@ const sendSignUpRequest = async (formData, csrfToken) => {
 };
 
 const passwordReset = async (formData, csrfToken) => {
-  const response = await fetch(API_BASE_URL + '/accounts/password_reset/', {
+  const response = await fetch(BASE_URL + ':8001/accounts/password_reset/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -300,7 +285,7 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
 };
 
 const deleteUser = async csrfToken => {
-  const url = API_BASE_URL + `/accounts/delete_user/${user.username}`;
+  const url = `${BASE_URL}:8001/accounts/delete_user/${user.username}`;
   const response = await fetch(url, {
     method: 'DELETE',
     credentials: 'include',
@@ -325,7 +310,7 @@ const handleOAuthResponse = async () => {
     const code = urlParams.get('code');
     try {
       const csrfToken = await getCsrfToken();
-      const authResponse = await fetch(API_BASE_URL + '/accounts/oauth/callback/', {
+      const authResponse = await fetch(BASE_URL + ':8001/accounts/oauth/callback/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -353,13 +338,12 @@ const handleOAuthResponse = async () => {
         formData.append('id', user.id);
         formData.append('avatar', user.avatar);
         if (data.register === true) {
-          console.log('register trueeeeeeeeeeee');
           try {
             for (let [key, value] of formData.entries()) {
               console.log(`${key}: ${value}`);
             }
             const csrfToken = await getCsrfToken();
-            const response = await fetch('https://127.0.0.1:8002/update_user/', {
+            const response = await fetch(BASE_URL + ':8002/update_user/', {
               method: 'POST',
               credentials: 'include',
               headers: {
@@ -377,8 +361,7 @@ const handleOAuthResponse = async () => {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
           }
         }
-        const csrfToken = await getCsrfToken();
-        const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${data.id}/`, {
+        const userProfileResponse = await fetch(`${BASE_URL}:8002/get_user_profile/${data.id}/`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -417,10 +400,7 @@ const handleOAuthResponse = async () => {
 };
 
 const getAuthorizationCode = () => {
-  const oauthClientId = 'u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0';
-  const oauthRedirectUri = encodeURIComponent(APP_BASE_URL + '/auth42-callback');
-  const url = `https://api.intra.42.fr/oauth/authorize?client_id=${oauthClientId}&redirect_uri=${oauthRedirectUri}&response_type=code`;
-  window.location.href = url;
+  window.location.href = OAUTH_AUTHORIZE_URL;
 };
 
 export {
