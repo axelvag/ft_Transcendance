@@ -10,7 +10,7 @@ import requests
 
 def verify_sessionid(request):
   session_id = request.COOKIES.get('sessionid', None)
-  response = requests.get(f"http://authentification:8001/accounts/verif_sessionid/{session_id}")
+  response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{session_id}", verify=False)
   return response.json()['user_id']
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -121,7 +121,7 @@ class GamePlayerHistoryView(View):
       player_id = verify_sessionid(request)
     except Exception as e:
       return JsonResponse({'error': str(e)}, safe=False, status=403)
-
+    
     # Get game history for a player
     games = Game.objects.filter(
       Q(player_left_id=player_id) | Q(player_right_id=player_id),

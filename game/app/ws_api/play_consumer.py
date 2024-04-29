@@ -4,6 +4,7 @@ import json
 import requests
 from game.models import Game
 
+# @method_decorator(csrf_exempt, name='dispatch')
 class PlayConsumer(AsyncWebsocketConsumer):
   async def get_user_id(self):
     cookies = self.scope['headers']
@@ -24,7 +25,7 @@ class PlayConsumer(AsyncWebsocketConsumer):
     if not sessionid:
       raise Exception('session ID not found')
 
-    response = requests.get(f"http://authentification:8001/accounts/verif_sessionid/{sessionid}")
+    response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{sessionid}", verify=False)
     if response.status_code != 200:
       raise Exception('wrong session ID')
     

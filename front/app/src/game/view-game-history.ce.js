@@ -51,7 +51,7 @@ class ViewGameHistory extends HTMLElement {
 
   async fetchGames() {
     try {
-      this.#games = await fetch(BASE_URL + ':8009/game-history', {
+      this.#games = await fetch(`${BASE_URL}:8009/game-history`, {
         credentials: 'include',
       }).then(res => res.json());
 
@@ -61,7 +61,7 @@ class ViewGameHistory extends HTMLElement {
       opponentIds = [...new Set(opponentIds)];
       await Promise.all(
         opponentIds.map(async opponentId => {
-          const opponent = await fetch(`${BASE_URL}:8002/get_user_profile/${opponentId}`, {
+          const opponent = await fetch(`${BASE_URL}:8002/get_user_profile/${opponentId}/`, {
             credentials: 'include',
           })
             .then(res => res.json())

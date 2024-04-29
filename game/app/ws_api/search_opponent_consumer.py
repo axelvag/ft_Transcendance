@@ -1,10 +1,12 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 import json
 import requests
 from game.models import Game
 
+# @method_decorator(csrf_exempt, name='dispatch')
 class SearchOpponentConsumer(AsyncWebsocketConsumer):
 
   async def get_user_id(self):
@@ -26,7 +28,7 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
     if not sessionid:
       raise Exception('session ID not found')
 
-    response = requests.get(f"http://authentification:8001/accounts/verif_sessionid/{sessionid}")
+    response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{sessionid}", verify=False)
     if response.status_code != 200:
       raise Exception('wrong session ID')
     

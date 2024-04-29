@@ -93,17 +93,6 @@ class ViewNewPass extends HTMLElement {
       confirm_password: password2,
     };
 
-    console.log(JSON.stringify(formData));
-    // const response = await fetch(url, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'X-CSRFToken': csrfToken,
-    //   },
-    //   credentials: 'include',
-    //   body: JSON.stringify(formData),
-    // });
-
     const data = await sendEmailPasswordReset(formData, csrfToken, url);
     console.log(data);
     if (data.success) {

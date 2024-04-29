@@ -2,7 +2,7 @@ import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
-import { getCsrfToken, resetLocalUser, deleteUser } from '@/auth.js';
+import { getCsrfToken, deleteUser } from '@/auth.js';
 import { BASE_URL } from '@/constants.js';
 
 class ViewSettings extends HTMLElement {
@@ -35,7 +35,7 @@ class ViewSettings extends HTMLElement {
           'X-CSRFToken': csrfToken,
         },
       });
-      const deleteProfileData = await deleteProfile.json()
+      const deleteProfileData = await deleteProfile.json();
       if (deleteProfileData.success) {
         await deleteUser(csrfToken);
       } else {
@@ -47,6 +47,5 @@ class ViewSettings extends HTMLElement {
       console.error('Error:', error);
     }
   }
-
 }
 customElements.define('view-settings', ViewSettings);

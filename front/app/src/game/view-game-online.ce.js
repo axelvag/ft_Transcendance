@@ -57,11 +57,11 @@ class ViewGameOnline extends HTMLElement {
       };
     }
 
-    const profile = await fetch(`${BASE_URL}:8002/get_user_profile/${playerId}`, {
+    const profile = await fetch(`${BASE_URL}:8002/get_user_profile/${playerId}/`, {
       credentials: 'include',
     })
       .then(res => res.json())
-    console.log('profile', profile.getProfile);
+
     return {
       id: playerId,
       name: profile.username,

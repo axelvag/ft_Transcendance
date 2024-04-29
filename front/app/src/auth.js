@@ -2,8 +2,6 @@ import { redirectTo } from '@/router.js';
 import { notify } from '@/notifications.js';
 import { BASE_URL, OAUTH_AUTHORIZE_URL } from '@/constants.js';
 
-const API_BASE_URL = BASE_URL + ':8001';
-
 const user = {
   isAuthenticated: undefined,
   id: null,
@@ -89,19 +87,15 @@ const isAuthenticated = async () => {
   try {
     if (user.isAuthenticated === undefined) {
       resetLocalUser();
-      const response = await fetch(`${API_BASE_URL}/accounts/is_user_logged_in/`, {
+      const response = await fetch(`${BASE_URL}:8001/accounts/is_user_logged_in/`, {
         method: 'GET',
+        mode: 'cors',
         credentials: 'include',
       });
       const data = await response.json();
       if (data.success) {
         setLocalUser(data);
-        const csrfToken = await getCsrfToken();
         const userProfileResponse = await fetch(`${BASE_URL}:8002/get_user_profile/${user.id}/`, {
-          method: 'GET',
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
@@ -126,6 +120,7 @@ const isAuthenticated = async () => {
 const getCsrfToken = async () => {
   const response = await fetch(BASE_URL + ':8001/accounts/get-csrf-token/', {
     method: 'GET',
+    mode: 'cors',
     credentials: 'include',
   });
   if (response.ok) {
@@ -138,8 +133,9 @@ const getCsrfToken = async () => {
 const logout = async () => {
   try {
     const csrfToken = await getCsrfToken();
-    await fetch(`${API_BASE_URL}/accounts/logout/`, {
+    await fetch(`${BASE_URL}:8001/accounts/logout/`, {
       method: 'POST',
+      mode: 'cors',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
@@ -194,6 +190,7 @@ const saveUser = async newUser => {
     const csrfToken = await getCsrfToken();
     const response = await fetch(BASE_URL + ':8002/update_user/', {
       method: 'POST',
+      mode: 'cors',
       credentials: 'include',
       headers: {
         'X-CSRFToken': csrfToken,
@@ -238,6 +235,7 @@ const loginUser = async (formData, csrfToken) => {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken,
     },
+    mode: 'cors',
     credentials: 'include',
     body: JSON.stringify(formData),
   });
@@ -251,6 +249,7 @@ const sendSignUpRequest = async (formData, csrfToken) => {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken,
     },
+    mode: 'cors',
     credentials: 'include',
     body: JSON.stringify(formData),
   });
@@ -264,6 +263,7 @@ const passwordReset = async (formData, csrfToken) => {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken,
     },
+    mode: 'cors',
     credentials: 'include',
     body: JSON.stringify(formData),
   });
@@ -277,6 +277,7 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken,
     },
+    mode: 'cors',
     credentials: 'include',
     body: JSON.stringify(formData),
   });
@@ -315,6 +316,7 @@ const handleOAuthResponse = async () => {
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken,
         },
+        mode: 'cors',
         credentials: 'include',
         body: JSON.stringify({ code: code }),
       });
@@ -337,13 +339,16 @@ const handleOAuthResponse = async () => {
         formData.append('avatar', user.avatar);
         if (data.register === true) {
           try {
+            for (let [key, value] of formData.entries()) {
+              console.log(`${key}: ${value}`);
+            }
             const csrfToken = await getCsrfToken();
             const response = await fetch(BASE_URL + ':8002/update_user/', {
               method: 'POST',
+              credentials: 'include',
               headers: {
                 'X-CSRFToken': csrfToken,
               },
-              credentials: 'include',
               body: formData,
             });
 
@@ -358,10 +363,10 @@ const handleOAuthResponse = async () => {
         }
         const userProfileResponse = await fetch(`${BASE_URL}:8002/get_user_profile/${data.id}/`, {
           method: 'GET',
+          credentials: 'include',
           headers: {
             'X-CSRFToken': csrfToken,
           },
-          credentials: 'include',
         });
 
         const userProfileData = await userProfileResponse.json();
