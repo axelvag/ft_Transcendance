@@ -11,7 +11,7 @@ const initWebSocket = () => {
   }
 
   if (websocketInstance === null || websocketInstance.readyState === WebSocket.CLOSED) {
-    websocketInstance = new WebSocket(`ws://127.0.0.1:8003/ws/invitations/${user.id}/`);
+    websocketInstance = new WebSocket(`wss://127.0.0.1:8003/ws/invitations/${user.id}/`);
 
     websocketInstance.onopen = function (event) {
       console.log('WebSocket connection established:', event);

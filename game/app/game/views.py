@@ -6,46 +6,71 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from .models import Game
 import json
+import requests
 
+def verify_sessionid(request):
+  session_id = request.COOKIES.get('sessionid', None)
+  response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{session_id}", verify=False)
+  return response.json()['user_id']
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GameListView(View):
   
   def get(self, request):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
+
     # List games
     games = Game.objects.all()
     games_data = [game.json() for game in games]
     return JsonResponse(games_data, safe=False, status=200)
 
   def post(self, request):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
+
     # Create a new game
     try:
       data = json.loads(request.body)
       game = Game(player_left_id=data.get('player_left_id'), player_right_id=data.get('player_right_id'))
       game.save()
-      return JsonResponse(game.json(), status=201)
+      return JsonResponse(game.json(), safe=False, status=201)
     except json.JSONDecodeError:
-      return JsonResponse({'error': 'Invalid JSON'}, status=400)
+      return JsonResponse({'error': 'Invalid JSON'}, safe=False, status=400)
     except ValidationError as e:
       errors = {field: message for field, message in e.message_dict.items()}
-      return JsonResponse({'error': errors}, status=400)
+      return JsonResponse({'error': errors}, safe=False, status=400)
     except Exception as e:
-      return JsonResponse({'error': str(e)}, status=500)
+      return JsonResponse({'error': str(e)}, safe=False, status=500)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GameItemView(View):
   
   def get(self, request, game_id):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
+
     # Get a specific game
     try:
       game = Game.objects.get(id=game_id)
       return JsonResponse(game.json())
     except Game.DoesNotExist:
-      return JsonResponse({'error': 'Game does not exist'}, status=404)
+      return JsonResponse({'error': 'Game does not exist'}, safe=False, status=404)
     except Exception as e:
-      return JsonResponse({'error': 'Invalid request'}, status=400)
+      return JsonResponse({'error': 'Invalid request'}, safe=False, status=400)
 
   def put(self, request, game_id):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
+
     # Update a game
     try:
       data = json.loads(request.body)
@@ -53,38 +78,50 @@ class GameItemView(View):
 
       # Data validation
       if data.get('player_left_id') and data.get('player_left_id') == game.player_right_id:
-        return JsonResponse({'error': 'player_left_id and player_right_id cannot be the same'}, status=400)
+        return JsonResponse({'error': 'player_left_id and player_right_id cannot be the same'}, safe=False, status=400)
       if data.get('player_right_id') and data.get('player_right_id') == game.player_left_id:
-        return JsonResponse({'error': 'player_left_id and player_right_id cannot be the same'}, status=400)
+        return JsonResponse({'error': 'player_left_id and player_right_id cannot be the same'}, safe=False, status=400)
       # todo check if player_left_id  and player_right_id exist
 
       game.player_left_id = data.get('player_left_id', game.player_left_id)
       game.player_right_id = data.get('player_right_id', game.player_right_id)
       game.save()
-      return JsonResponse(game.json(), status=200)
+      return JsonResponse(game.json(), safe=False, status=200)
     except json.JSONDecodeError:
-      return JsonResponse({'error': 'Invalid JSON'}, status=400)
+      return JsonResponse({'error': 'Invalid JSON'}, safe=False, status=400)
     except Game.DoesNotExist:
-      return JsonResponse({'error': 'Game does not exist'}, status=404)
+      return JsonResponse({'error': 'Game does not exist'}, safe=False, status=404)
     except Exception as e:
-      return JsonResponse({'error': 'Invalid request'}, status=400)
+      return JsonResponse({'error': 'Invalid request'}, safe=False, status=400)
 
   def delete(self, request, game_id):
+    try:
+      verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
+
     # Delete a game
     try:
       game = Game.objects.get(id=game_id)
       game.delete()
-      return JsonResponse({'message': 'Game deleted successfully'}, status=204)
+      return JsonResponse({'message': 'Game deleted successfully'}, safe=False, status=204)
     except Game.DoesNotExist:
-      return JsonResponse({'error': 'Game does not exist'}, status=404)
+      return JsonResponse({'error': 'Game does not exist'}, safe=False, status=404)
     except Exception as e:
-      return JsonResponse({'error': 'Invalid request'}, status=400)
+      return JsonResponse({'error': 'Invalid request'}, safe=False, status=400)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GamePlayerHistoryView(View):
   
-  def get(self, request, player_id):
+  def get(self, request):
+    
+    player_id = None
+    try:
+      player_id = verify_sessionid(request)
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
+    
     # Get game history for a player
     games = Game.objects.filter(
       Q(player_left_id=player_id) | Q(player_right_id=player_id),
@@ -133,4 +170,4 @@ class UserGameStatusView(View):
             }, status=200)
         else:
             # User is not in any current game
-            return JsonResponse({'in_game': False}, status=200)
+            return JsonResponse({'in_game': False}, status=204)

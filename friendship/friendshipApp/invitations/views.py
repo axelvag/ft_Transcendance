@@ -28,15 +28,15 @@ User = get_user_model()
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
-        response = requests.get(update_url)
-        
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
+        response = requests.get(update_url, verify=False)
+
         if response.status_code != 200:
             return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
-        
+
         # Si la vérification est réussie, exécuter la vue originale
         return view_func(request, *args, **kwargs)
-    
+
     return wrapper
 
 @csrf_exempt
@@ -251,7 +251,6 @@ def list_received_invitations(request, user_id):
 def list_sent_invitations(request, user_id):
     try:
         cookies = request.COOKIES.get('sessionid', None)
-        logging.critical("sent invitation zeubiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         user = User.objects.get(id=user_id)
         invitations = Invitation.objects.filter(from_user=user, accepted=False)
         invitations_data = [] #[{"to_user": invitation.to_user.username, "invitation_id": invitation.id} for invitation in invitations]
@@ -346,16 +345,20 @@ def online_friends(request, user_id):
         friendships = Friendship.objects.filter(user_id=user_id)
         friend_ids = [friendship.friend.id for friendship in friendships]
         
+        logging.critical("333333333333333333333333333333333333333333333333333333333")
         online_friends_data = []
         for friend_id in friend_ids:
             if UserStatus.objects.filter(user_id=friend_id, is_online=True).exists():
                 user = User.objects.get(id=friend_id)
                 profile_info = get_profile_info(user.id, cookies)
 
-                game_service_url = f"http://game:8009/games/{friend_id}/game-status"
-                response = requests.get(game_service_url)
+                logging.critical("22222222222222222222222222222222222222222222222222222222")
+                game_service_url = f"https://game:8009/games/{friend_id}/game-status"
+                response = requests.get(game_service_url, verify=False)
                 in_game = False
-                if response.status_code == 200 and response.json().get('in_game'):
+                logging.critical("11111111111111111111111111111111111111111111111111111")
+                if response.status_code == 200: #and response.json().get('in_game'):
+                    logging.critical("Iciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
                     in_game = True
 
                 online_friends_data.append({
@@ -394,7 +397,6 @@ def offline_friends(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
-
 # def get_profile_info(user_id):
 #     profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
 #     try:
@@ -405,9 +407,9 @@ def offline_friends(request, user_id):
 #             return {}
 #     except requests.exceptions.RequestException:
 #         return {}
-        
+
 def get_profile_info(user_id, cookies):
-    profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:
         response = requests.get(profile_service_url, cookies={'sessionid': cookies})
         if response.status_code == 200:

@@ -88,7 +88,7 @@ class ViewFriend extends HTMLElement {
   }
 
   initInvitationsWebSocket() {
-    const wsUrl = `ws://127.0.0.1:8003/ws/invitations/${user.id}/`;
+    const wsUrl = `wss://127.0.0.1:8003/ws/invitations/${user.id}/`;
     const wsInstance = new WebSocket(wsUrl);
 
     wsInstance.onopen = () => {
@@ -132,7 +132,7 @@ class ViewFriend extends HTMLElement {
   async loadSentInvitations() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/list_sent_invitations/${user.id}/`, {
+      const response = await fetch(`https://127.0.0.1:8003/list_sent_invitations/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -207,7 +207,7 @@ class ViewFriend extends HTMLElement {
   async cancelSentInvitation(invitationId, from_user_username) {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/cancel_sent_invitation/`, {
+      const response = await fetch(`https://127.0.0.1:8003/cancel_sent_invitation/`, {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -232,7 +232,7 @@ class ViewFriend extends HTMLElement {
   async loadFriendRequests() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/list_received_invitations/${user.id}/`, {
+      const response = await fetch(`https://127.0.0.1:8003/list_received_invitations/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -323,7 +323,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch('http://127.0.0.1:8003/accept_invitation/', {
+      const response = await fetch('https://127.0.0.1:8003/accept_invitation/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -353,7 +353,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch('http://127.0.0.1:8003/reject_invitation/', {
+      const response = await fetch('https://127.0.0.1:8003/reject_invitation/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -398,7 +398,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`, {
+      const response = await fetch(`https://127.0.0.1:8003/search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -481,7 +481,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch('http://127.0.0.1:8003/send_invitation/', {
+      const response = await fetch('https://127.0.0.1:8003/send_invitation/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -513,7 +513,7 @@ class ViewFriend extends HTMLElement {
   async loadOnlineFriends() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/online_friends/${user.id}/`, {
+      const response = await fetch(`https://127.0.0.1:8003/online_friends/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -597,7 +597,7 @@ class ViewFriend extends HTMLElement {
   async loadOfflineFriends() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/offline_friends/${user.id}/`, {
+      const response = await fetch(`https://127.0.0.1:8003/offline_friends/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -668,7 +668,7 @@ class ViewFriend extends HTMLElement {
     try {
       const csrfToken = await getCsrfToken();
       const data = { friend_id: friendId, user_id: user.id };
-      const response = await fetch('http://127.0.0.1:8003/remove_friend/', {
+      const response = await fetch('https://127.0.0.1:8003/remove_friend/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
