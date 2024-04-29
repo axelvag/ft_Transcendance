@@ -63,7 +63,7 @@ class ViewGameHistory extends HTMLElement {
       opponentIds = [...new Set(opponentIds)];
       await Promise.all(
         opponentIds.map(async opponentId => {
-          const opponent = await fetch(`https://127.0.0.1:8002/get_user_profile/${opponentId}`, {
+          const opponent = await fetch(`https://127.0.0.1:8002/get_user_profile/${opponentId}/`, {
             credentials: 'include',
           })
             .then(res => res.json())
