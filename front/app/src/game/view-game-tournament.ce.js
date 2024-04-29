@@ -57,7 +57,7 @@ class ViewTournament extends HTMLElement {
                 Tournament Size
                 </label>
                 <br>
-                  <input type="range" id="tournamentSizeRange" name="tournamentSize" min="4" max="16" value="8" step="4" />
+                  <input type="range" id="tournamentSizeRange" name="tournamentSize" min="4" max="8" value="8" step="4" />
                   <span id="tournamentSizeValue">8</span>
                 <div id="tournamentSize-error" class="invalid-feedback"></div>
               </div>
