@@ -148,19 +148,20 @@ EMAIL_HOST_USER = 'transcendence42lyon@gmail.com'
 EMAIL_HOST_PASSWORD = 'zotbqnassvkvftvk'
 
 
-CORS_ALLOWED_ORIGINS = [
-    f"{URL}:5500",  # Remplacez par l'URL de votre frontend
-    f"{URL}:8000",
-    f"{URL}:8002",
-]
-
-# print(URL)
 
 # CORS_ORIGINS_ALLOWED_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = ['https://*']
+
+# CORS_ALLOWED_ORIGINS = [
+#     f"{URL}:5500",  # Remplacez par l'URL de votre frontend
+#     f"{URL}:8000",
+#     f"{URL}:8443",
+#     f"{URL}:8002",
+# ]
 
 ALLOWED_HOSTS=['*']
 

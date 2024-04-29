@@ -22,7 +22,7 @@ User = get_user_model()
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
         response = requests.get(update_url)
         
         if response.status_code != 200:

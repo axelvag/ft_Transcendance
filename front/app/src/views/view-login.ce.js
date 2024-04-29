@@ -6,7 +6,7 @@ import { loginUser, setLocalUser } from '@/auth.js';
 import { getAuthorizationCode } from '@/auth.js';
 import { notify } from '@/notifications.js';
 
-const BASE_URL = import.meta.env.BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
@@ -115,7 +115,7 @@ class ViewSignIn extends HTMLElement {
       const data = await loginUser(formData, csrfToken);
       if (data.success) {
         setLocalUser(data);
-        const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${user.id}/`, {
+        const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${user.id}/`, {
           method: 'GET',
           headers: {
             'X-CSRFToken': csrfToken,

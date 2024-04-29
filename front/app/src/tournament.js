@@ -33,7 +33,7 @@ const getTournament = () => {
 };
 
 const fetchGetTournament = async (tournamentId) => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/get/${tournamentId}/`, {
+  const response = await fetch(`https://127.0.0.1:8005/tournament/get/${tournamentId}/`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ const fetchGetTournament = async (tournamentId) => {
 };
 
 const TournamentExist = async (tournamentId) => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/get/${tournamentId}/`, {
+  const response = await fetch(`https://127.0.0.1:8005/tournament/get/${tournamentId}/`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const TournamentExist = async (tournamentId) => {
 };
 
 const fetchCreateTournament = async (formData) => {
-  const response = await fetch('http://127.0.0.1:8005/tournament/create_tournament/', {
+  const response = await fetch('https://127.0.0.1:8005/tournament/create_tournament/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ const fetchCreateTournament = async (formData) => {
 
 const fetchDeletePlayer = async () => {
   let user = getProfile();
-  const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${user.id}`, {
+  const response = await fetch(`https://127.0.0.1:8005/tournament/delete_joueur/${user.id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ const fetchDeletePlayer = async () => {
 
 const fetchDeletePlayerSalon = async () => {
   let user = getProfile();
-  const response = await fetch(`http://127.0.0.1:8005/tournament/delete_joueur/${user.id}`, {
+  const response = await fetch(`https://127.0.0.1:8005/tournament/delete_joueur/${user.id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ const fetchDeletePlayerSalon = async () => {
 };
 
 const fetchDeleteTournament = async () => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/delete_tournment/${tournament.id}`, {
+  const response = await fetch(`https://127.0.0.1:8005/tournament/delete_tournment/${tournament.id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ const fetchDeleteTournament = async () => {
 };
 
 const fetchAddPlayer = async (formData) => {
-  const response = await fetch('http://127.0.0.1:8005/tournament/create_joueur/', {
+  const response = await fetch('https://127.0.0.1:8005/tournament/create_joueur/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ const fetchAddPlayer = async (formData) => {
 
 const fetchTournamentInfo = async () => {
   let user = getProfile();
-  const response = await fetch(`http://127.0.0.1:8005/tournament/tournoi_info/${user.id}`, {
+  const response = await fetch(`https://127.0.0.1:8005/tournament/tournoi_info/${user.id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

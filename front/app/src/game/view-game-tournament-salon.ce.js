@@ -96,7 +96,7 @@ class ViewTournamentSalon extends HTMLElement {
 
   async viewPlayer() {
     try {
-        const response = await fetch(`http://127.0.0.1:8005/tournament/get_player/${this.#tournament.id}/`, {
+        const response = await fetch(`https://127.0.0.1:8005/tournament/get_player/${this.#tournament.id}/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ class ViewTournamentSalon extends HTMLElement {
 
         for (const player of players) {
             const csrfToken = await getCsrfToken();
-            const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${player.user_id}/`, {
+            const userProfileResponse = await fetch(`https://127.0.0.1:8002/get_user_profile/${player.user_id}/`, {
                 method: 'GET',
                 headers: {
                     'X-CSRFToken': csrfToken,
@@ -164,7 +164,7 @@ class ViewTournamentSalon extends HTMLElement {
 
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
-    this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
+    this.socket = new WebSocket('wss://127.0.0.1:8005/tournament/websocket/');
 
     this.socket.onopen = () => {
         console.log('WebSocket connection established');

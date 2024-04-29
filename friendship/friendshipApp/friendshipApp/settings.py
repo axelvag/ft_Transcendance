@@ -33,10 +33,12 @@ DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 # Settings error Cros
-CORS_ALLOWED_ORIGINS = [
-    f"{URL}:5500",  # Remplacez par l'URL de votre frontend
-    f"{URL}:8000",
-]
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = [
+#     f"{URL}:5500",  # Remplacez par l'URL de votre frontend
+#     f"{URL}:8000",
+# ]
+CORS_ALLOWED_ORIGINS = ['https://*']
 
 # CORS_ORIGINS_ALLOWED_ALL = True
 

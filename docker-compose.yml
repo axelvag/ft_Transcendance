@@ -1,21 +1,26 @@
-version: "3.8"
-
 services:
   # Front - prod (build)
   front:
     build:
       context: ./front
       dockerfile: Dockerfile
+      args:
+        VITE_BASE_URL: $VITE_BASE_URL
+        VITE_APP_BASE_URL: $VITE_APP_BASE_URL
+        VITE_API_BASE_URL: $VITE_API_BASE_URL
+        VITE_WS_BASE_URL: $VITE_WS_BASE_URL
     container_name: front
     ports:
-      - "8000:80"
+      - "8000:8443"
+    volumes:
+      - shared_ssl:/etc/ssl
     networks:
       - front
+    env_file:
+      - .env
     restart: on-failure
     profiles:
       - prod
-    env_file:
-      - .env
 
   # Front - dev (live server)
   front_dev:
@@ -28,10 +33,13 @@ services:
       - type: bind
         source: ./front/app
         target: /app
+      - shared_ssl:/etc/ssl
     ports:
       - "8000:8000"
     networks:
       - front
+    env_file:
+      - .env
     restart: on-failure
     profiles:
       - dev
@@ -45,6 +53,7 @@ services:
     ports:
       - "8001:8001"
     volumes:
+      - shared_ssl:/etc/ssl
       - ./authentification:/app
       - shared_media:/app/media
     networks:
@@ -61,10 +70,11 @@ services:
       dockerfile: Dockerfile
     container_name: profile
     volumes:
+      - shared_ssl:/etc/ssl
       - shared_media:/app/media
       - ./profile/profileApp:/profileApp
     ports:
-    - "8002:8002"
+      - "8002:8002"
     networks:
       - back
     depends_on:
@@ -98,6 +108,7 @@ services:
     ports:
       - "8003:8003"
     volumes:
+      - shared_ssl:/etc/ssl
       - ./friendship/friendshipApp:/friendshipApp
     networks:
       - back
@@ -115,6 +126,7 @@ services:
     ports:
       - "8005:8005"
     volumes:
+      - shared_ssl:/etc/ssl
       - ./tournament/tournament:/tournament
     networks:
       - back
@@ -133,6 +145,7 @@ services:
     ports:
       - "8009:8009"
     volumes:
+      - shared_ssl:/etc/ssl
       - ./game/app:/app
     networks:
       - back
@@ -144,6 +157,7 @@ services:
 
 volumes:
   data_base_data:
+  shared_ssl:
   shared_media:
 
 networks:

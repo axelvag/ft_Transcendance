@@ -31,7 +31,7 @@ class MyConsumer(AsyncWebsocketConsumer):
         else:
             print("Session ID non trouvé")
 
-        update_url = f"http://authentification:8001/accounts/verif_sessionid/{sessionid}"
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{sessionid}"
         response = requests.get(update_url)
         print(response)
         if response.status_code != 200:

@@ -174,7 +174,7 @@ class ViewTournament extends HTMLElement {
 
   async loadTournois() {
     try {
-        const response = await fetch('http://127.0.0.1:8005/tournament/view/', {
+        const response = await fetch('https://127.0.0.1:8005/tournament/view/', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ class ViewTournament extends HTMLElement {
 
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
-    this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
+    this.socket = new WebSocket('wss://127.0.0.1:8005/tournament/websocket/');
 
     this.socket.onopen = () => {
         console.log('WebSocket connection established');

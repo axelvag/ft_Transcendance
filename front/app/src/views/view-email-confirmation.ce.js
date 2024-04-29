@@ -1,6 +1,6 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 
-const BASE_URL = import.meta.env.BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 class ViewEmailConfirmation extends HTMLElement {
   async connectedCallback() {
@@ -34,7 +34,7 @@ class ViewEmailConfirmation extends HTMLElement {
     console.log(uidb64);
     console.log(token);
 
-    const response1 = await fetch(`http://127.0.0.1:8001/accounts/is_user_active/${uidb64}/${token}`);
+    const response1 = await fetch(API_BASE_URL + `/accounts/is_user_active/${uidb64}/${token}`);
     const data1 = await response1.json();
     if (data1.success) {
       // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
@@ -42,7 +42,7 @@ class ViewEmailConfirmation extends HTMLElement {
       this.querySelector('#email-confirm-loading').hidden = true;
       this.querySelector('#email-confirm-success').hidden = false;
     } else {
-      const response = await fetch(`http://127.0.0.1:8001/accounts/activate/${uidb64}/${token}`);
+      const response = await fetch(API_BASE_URL + `/accounts/activate/${uidb64}/${token}`);
       const data = await response.json();
       console.log(data);
       this.querySelector('#email-confirm-loading').hidden = true;
@@ -66,7 +66,7 @@ class ViewEmailConfirmation extends HTMLElement {
       this.querySelector('#email-confirm-loading').hidden = false;
 
       // Effectuez une nouvelle demande de confirmation par e-mail
-      const response = await fetch(`http://127.0.0.1:8001/accounts/resend_email_confirmation/${uidb64}`);
+      const response = await fetch(API_BASE_URL + `/accounts/resend_email_confirmation/${uidb64}`);
       const data = await response.json();
     });
   }
