@@ -57,8 +57,8 @@ class ViewTournamentSalon extends HTMLElement {
         });
     }
 
-    this.initWebSocket();
-    this.addPlayer();
+    await this.initWebSocket();
+    // this.addPlayer();
   }
 
   disconnectedCallback() {
@@ -68,7 +68,6 @@ class ViewTournamentSalon extends HTMLElement {
   }
 
   async addPlayer() {
-
     const formData = {
       user_id: this.#user.id,
       username: this.#user.username,
@@ -170,6 +169,7 @@ class ViewTournamentSalon extends HTMLElement {
         console.log('WebSocket connection established');
         this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
         this.socket.send(JSON.stringify({user_id: this.#user.id}));
+        this.addPlayer();
     };
 
     this.socket.onmessage = (event) => {
