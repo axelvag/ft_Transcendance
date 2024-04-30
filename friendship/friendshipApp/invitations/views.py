@@ -1,12 +1,3 @@
-# Todo
-# [x] check au de debut de send invitation si une amitie est deja creait entre les deux ou une invitation a deja etait envoyer pour ce couple && check si l'invitation a etait accepte
-# [x] ne pas retourne son username dans search
-# [] check avant d'afficher les amis en ligne ou hors ligne si ils sont amis
-
-# [x] Dans search -> retourner que des amis qu'ils ne sont pas encore amies.
-# [] Bug quand on reject l'invitation, puis on re invite double , triple notification
-# [] Mettre un compteur des invitations dans l'onglet invitation 
-
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
@@ -28,15 +19,15 @@ User = get_user_model()
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
-        response = requests.get(update_url)
-        
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
+        response = requests.get(update_url, verify=False)
+
         if response.status_code != 200:
             return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
-        
+
         # Si la vérification est réussie, exécuter la vue originale
         return view_func(request, *args, **kwargs)
-    
+
     return wrapper
 
 @csrf_exempt
@@ -384,7 +375,6 @@ def offline_friends(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
-
 # def get_profile_info(user_id):
 #     profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
 #     try:
@@ -395,11 +385,11 @@ def offline_friends(request, user_id):
 #             return {}
 #     except requests.exceptions.RequestException:
 #         return {}
-        
+
 def get_profile_info(user_id, cookies):
-    profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:
-        response = requests.get(profile_service_url, cookies={'sessionid': cookies})
+        response = requests.get(profile_service_url, cookies={'sessionid': cookies}, verify=False)
         if response.status_code == 200:
             return response.json()
         else:

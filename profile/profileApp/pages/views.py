@@ -8,6 +8,11 @@ from django.contrib.auth import get_user_model
 import logging
 import requests
 from django.contrib.auth.decorators import login_required
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+BASE_URL = os.getenv('BASE_URL')
 
 User = get_user_model()
 
@@ -15,15 +20,15 @@ User = get_user_model()
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
-        response = requests.get(update_url)
-        
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
+        response = requests.get(update_url, verify=False)
+
         if response.status_code != 200:
             return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
-        
+
         # Si la vérification est réussie, exécuter la vue originale
         return view_func(request, *args, **kwargs)
-    
+
     return wrapper
 
 @csrf_exempt
@@ -60,11 +65,11 @@ def update_user(request):
             return JsonResponse({"success": False, "message": "Invalid or missing JSON data."}, status=400)
 
     # Mise à jour des informations d'authentification via un service externe
-    auth_service_url = "http://authentification:8001/accounts/update_profile/"
+    auth_service_url = "https://authentification:8001/accounts/update_profile/"
     auth_data = {'id': user_id, 'username': username}#, 'email': email}
 
     try:
-        auth_response = requests.post(auth_service_url, json=auth_data)
+        auth_response = requests.post(auth_service_url, json=auth_data, verify=False)
         if auth_response.status_code == 400:
             return JsonResponse({"success": False, "message": "This user name is already taken."})
         if auth_response.status_code != 200:
@@ -107,7 +112,7 @@ def update_user(request):
         return JsonResponse({"success": False, "message": "Error updating or creating profile."})
 
     # Construction de l'URL de l'avatar
-    base_url = 'http://127.0.0.1:8001'
+    base_url = BASE_URL + ':8001'
 
     avatar_url = base_url + profile.avatar.url if profile and profile.avatar else None
     if avatar is None:
@@ -145,9 +150,9 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         profile = None
 
     # Faites un appel au service d'authentification pour obtenir username et email
-    auth_service_url = "http://authentification:8001/accounts/get_profile/"
+    auth_service_url = "https://authentification:8001/accounts/get_profile/"
     try:
-        auth_response = requests.get(f"{auth_service_url}{user_id}")
+        auth_response = requests.get(f"{auth_service_url}{user_id}", verify=False)
         if auth_response.status_code == 200:
             auth_data = auth_response.json()
             username = auth_data.get('username', '')
@@ -159,7 +164,7 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         return JsonResponse({"success": False, "message": "Error calling authentication service."})
 
     # Construction de l'URL de l'avatar si disponible
-    base_url = 'http://127.0.0.1:8001'
+    base_url = BASE_URL + ':8001'
 
     avatar_url = base_url + profile.avatar.url if profile and profile.avatar else None
     if profile is not None and avatar_url is None:

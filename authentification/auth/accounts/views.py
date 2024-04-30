@@ -417,7 +417,7 @@ def oauth_callback(request):
             'code': code,
             'redirect_uri': settings.OAUTH_REDIRECT_URI,
         }
-        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data)
+        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data, verify=False)
         print(response.status_code)
         if response.status_code == 200:
             access_token = response.json().get('access_token')
@@ -425,6 +425,7 @@ def oauth_callback(request):
             profile_data = requests.get(
                 "https://api.intra.42.fr/v2/me",
                 headers={"Authorization": f"Bearer {access_token}"},
+                verify=False
             )
             print(profile_data)
             if profile_data.status_code == 200:

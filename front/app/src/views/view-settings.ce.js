@@ -4,6 +4,7 @@ import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
 import { getCsrfToken, deleteUser } from '@/auth.js';
+import { BASE_URL } from '@/constants.js';
 
 class ViewSettings extends HTMLElement {
   connectedCallback() {
@@ -36,7 +37,7 @@ class ViewSettings extends HTMLElement {
     console.log("Je rentre ici pour le supprime l'user")
     try {
       const csrfToken = await getCsrfToken();
-      const deleteProfile = await fetch(`http://127.0.0.1:8002/delete_user_profile/${user.id}/`, {
+      const deleteProfile = await fetch(`${BASE_URL}:8002/delete_user_profile/${user.id}/`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {

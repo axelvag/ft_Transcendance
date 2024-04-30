@@ -148,19 +148,20 @@ EMAIL_HOST_USER = 'transcendence42lyon@gmail.com'
 EMAIL_HOST_PASSWORD = 'zotbqnassvkvftvk'
 
 
-CORS_ALLOWED_ORIGINS = [
-    f"{URL}:5500",  # Remplacez par l'URL de votre frontend
-    f"{URL}:8000",
-    f"{URL}:8002",
-]
-
-# print(URL)
 
 # CORS_ORIGINS_ALLOWED_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = ['https://*']
+
+# CORS_ALLOWED_ORIGINS = [
+#     f"{URL}:5500",  # Remplacez par l'URL de votre frontend
+#     f"{URL}:8000",
+#     f"{URL}:8443",
+#     f"{URL}:8002",
+# ]
 
 ALLOWED_HOSTS=['*']
 
@@ -180,8 +181,8 @@ CORS_ALLOW_HEADERS = [
 
 CSRF_TRUSTED_ORIGINS = [f'{os.getenv("BASE_URL")}:8000']
 
-OAUTH_CLIENT_ID = 'u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0'
-OAUTH_CLIENT_SECRET = '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'
+OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
+OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
 OAUTH_REDIRECT_URI = f'{os.getenv("BASE_URL")}:8000/auth42-callback'  # Ajustez selon votre URI de redirection
 OAUTH_AUTHORIZATION_URL = 'https://api.intra.42.fr/oauth/authorize'
 OAUTH_TOKEN_URL = 'https://api.intra.42.fr/oauth/token'

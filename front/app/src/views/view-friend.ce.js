@@ -3,10 +3,13 @@ import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user, getCsrfToken } from '@/auth.js';
 import { showModal } from '@/modal.js';
 
-const BASE_URL = import.meta.env.BASE_URL;
+// const BASE_URL = import.meta.env.BASE_URL;
+import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 
 class ViewFriend extends HTMLElement {
   connectedCallback() {
+    this.wsUrl = `${WS_BASE_URL}:8003/ws/invitations/${user.id}/`;
+    this.wsInstance = new WebSocket(this.wsUrl);
     this.innerHTML = `
     <default-layout-sidebar></default-layout-sidebar>
     <default-layout-main>
@@ -88,14 +91,12 @@ class ViewFriend extends HTMLElement {
   }
 
   initInvitationsWebSocket() {
-    const wsUrl = `ws://127.0.0.1:8003/ws/invitations/${user.id}/`;
-    const wsInstance = new WebSocket(wsUrl);
 
-    wsInstance.onopen = () => {
+    this.wsInstance.onopen = () => {
       console.log("WebSocket for invitation connected");
     };
 
-    wsInstance.onmessage = (event) => {
+    this.wsInstance.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
       if (data.action === "accept_invitation" || data.action === "reject_invitation") {
@@ -119,20 +120,26 @@ class ViewFriend extends HTMLElement {
       }
     };
 
-    wsInstance.onerror = (event) => {
+    this.wsInstance.onerror = (event) => {
       console.error("WebSocket error observed:", event);
     };
 
-    wsInstance.onclose = (event) => {
+   this.wsInstance.onclose = (event) => {
       console.log("WebSocket close:", event.code, event.reason);
     };
   }
 
+  closeWebSocket() {
+    if (this.wsInstance) {
+      this.wsInstance.close();
+      console.log("WebSocket connection closed manually.");
+    }
+  }
   // list send invitation 
   async loadSentInvitations() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/list_sent_invitations/${user.id}/`, {
+      const response = await fetch(`${BASE_URL}:8003/list_sent_invitations/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -210,7 +217,7 @@ class ViewFriend extends HTMLElement {
   async cancelSentInvitation(invitationId, from_user_username) {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/cancel_sent_invitation/`, {
+      const response = await fetch(`${BASE_URL}:8003/cancel_sent_invitation/`, {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -235,7 +242,7 @@ class ViewFriend extends HTMLElement {
   async loadFriendRequests() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/list_received_invitations/${user.id}/`, {
+      const response = await fetch(`${BASE_URL}:8003/list_received_invitations/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -326,7 +333,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch('http://127.0.0.1:8003/accept_invitation/', {
+      const response = await fetch(BASE_URL + ':8003/accept_invitation/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -356,7 +363,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch('http://127.0.0.1:8003/reject_invitation/', {
+      const response = await fetch(BASE_URL + ':8003/reject_invitation/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -401,7 +408,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`, {
+      const response = await fetch(`${BASE_URL}:8003/search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -484,7 +491,7 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch('http://127.0.0.1:8003/send_invitation/', {
+      const response = await fetch(BASE_URL + ':8003/send_invitation/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -516,7 +523,7 @@ class ViewFriend extends HTMLElement {
   async loadOnlineFriends() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/online_friends/${user.id}/`, {
+      const response = await fetch(`${BASE_URL}:8003/online_friends/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -587,7 +594,7 @@ class ViewFriend extends HTMLElement {
   async loadOfflineFriends() {
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`http://127.0.0.1:8003/offline_friends/${user.id}/`, {
+      const response = await fetch(`${BASE_URL}:8003/offline_friends/${user.id}/`, {
         method: 'GET',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -661,7 +668,7 @@ class ViewFriend extends HTMLElement {
     try {
       const csrfToken = await getCsrfToken();
       const data = { friend_id: friendId, user_id: user.id };
-      const response = await fetch('http://127.0.0.1:8003/remove_friend/', {
+      const response = await fetch(BASE_URL + ':8003/remove_friend/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrfToken,
@@ -684,3 +691,10 @@ class ViewFriend extends HTMLElement {
 }
 
 customElements.define('view-friend', ViewFriend);
+
+export const closeViewFriendWebSocket = () => {
+  const instance = document.querySelector('view-friend');
+  if (instance) {
+    instance.closeWebSocket();
+  }
+};

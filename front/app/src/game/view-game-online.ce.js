@@ -1,5 +1,6 @@
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-import { getProfile, getCsrfToken } from '@/auth.js';
+import { getProfile } from '@/auth.js';
+import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 
 class ViewGameOnline extends HTMLElement {
   #game;
@@ -56,14 +57,11 @@ class ViewGameOnline extends HTMLElement {
       };
     }
 
-    const profile = await fetch(`http://127.0.0.1:8002/get_user_profile/${playerId}`, {
-      method: 'GET',
-      headers: { 'X-CSRFToken': await getCsrfToken() },
+    const profile = await fetch(`${BASE_URL}:8002/get_user_profile/${playerId}/`, {
       credentials: 'include',
     })
       .then(res => res.json())
-      .then(res => res.getProfile);
-    console.log('profile', profile.getProfile);
+
     return {
       id: playerId,
       name: profile.username,
@@ -74,7 +72,9 @@ class ViewGameOnline extends HTMLElement {
 
   async displayMatchup() {
     try {
-      this.#game = await fetch(`http://127.0.0.1:8009/games/${this.getAttribute('game-id')}`).then(res => res.json());
+      this.#game = await fetch(`${BASE_URL}:8009/games/${this.getAttribute('game-id')}`, {
+        credentials: 'include',
+      }).then(res => res.json());
       this.#playerLeft = await this.getPlayerProfile(this.#game.player_left_id);
       this.#playerRight = await this.getPlayerProfile(this.#game.player_right_id);
       console.log(this.#playerLeft, this.#playerRight);
@@ -165,7 +165,7 @@ class ViewGameOnline extends HTMLElement {
   }
 
   async joinGame() {
-    this.#ws = new WebSocket(`ws://127.0.0.1:8009/play/${this.#game.id}/${this.#user.id}`);
+    this.#ws = new WebSocket(`${WS_BASE_URL}:8009/play/${this.#game.id}`);
     this.#ws.onmessage = this.handleMessage;
     this.#ws.onerror = this.displayGameNotFound;
     this.#ws.onopen = () => console.log('ws play opened');
