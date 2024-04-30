@@ -1,10 +1,15 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user, getCsrfToken } from '@/auth.js';
+import { showModal } from '@/modal.js';
+
+// const BASE_URL = import.meta.env.BASE_URL;
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 
 class ViewFriend extends HTMLElement {
   connectedCallback() {
+    this.wsUrl = `${WS_BASE_URL}:8003/ws/invitations/${user.id}/`;
+    this.wsInstance = new WebSocket(this.wsUrl);
     this.innerHTML = `
     <default-layout-sidebar></default-layout-sidebar>
     <default-layout-main>
@@ -86,14 +91,12 @@ class ViewFriend extends HTMLElement {
   }
 
   initInvitationsWebSocket() {
-    const wsUrl = `${WS_BASE_URL}:8003/ws/invitations/${user.id}/`;
-    const wsInstance = new WebSocket(wsUrl);
 
-    wsInstance.onopen = () => {
+    this.wsInstance.onopen = () => {
       console.log("WebSocket for invitation connected");
     };
 
-    wsInstance.onmessage = (event) => {
+    this.wsInstance.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
       if (data.action === "accept_invitation" || data.action === "reject_invitation") {
@@ -117,15 +120,21 @@ class ViewFriend extends HTMLElement {
       }
     };
 
-    wsInstance.onerror = (event) => {
+    this.wsInstance.onerror = (event) => {
       console.error("WebSocket error observed:", event);
     };
 
-    wsInstance.onclose = (event) => {
+   this.wsInstance.onclose = (event) => {
       console.log("WebSocket close:", event.code, event.reason);
     };
   }
 
+  closeWebSocket() {
+    if (this.wsInstance) {
+      this.wsInstance.close();
+      console.log("WebSocket connection closed manually.");
+    }
+  }
   // list send invitation 
   async loadSentInvitations() {
     try {
@@ -180,8 +189,11 @@ class ViewFriend extends HTMLElement {
             // Juste après avoir ajouté l'email dans userInfoDiv
             const cancelButton = document.createElement('button');
             cancelButton.textContent = 'Cancel';
-            cancelButton.classList.add('btn', 'btn-warning'); // 'ms-auto' pour pousser le bouton à la droite dans un flex container
-            cancelButton.onclick = () => this.cancelSentInvitation(invitation.invitation_id, invitation.from_user_username); // Assurez-vous que c'est la bonne clé pour l'ID de l'invitation
+            cancelButton.classList.add('btn', 'btn-warning');
+            cancelButton.onclick = () => showModal('Confirm Invitation Deletion', 'Are you sure you want to delete your invitation ? This action cannot be undone.', {
+              okCallback: () => this.cancelSentInvitation(invitation.invitation_id, invitation.from_user_username),
+              cancelCallback: () => console.log('Deletion cancelled.')
+            });
 
             listItem.appendChild(userInfoDiv);
             listItem.appendChild(cancelButton);
@@ -559,7 +571,10 @@ class ViewFriend extends HTMLElement {
           const deleteButton = document.createElement('button');
           deleteButton.textContent = 'Delete';
           deleteButton.classList.add('btn', 'btn-danger');
-          deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
+          deleteButton.onclick = () => showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
+            okCallback: () => this.confirmDeleteFriend(friend.friend_id),
+            cancelCallback: () => console.log('Deletion cancelled.')
+          });
 
           listItem.appendChild(deleteButton);
 
@@ -628,7 +643,10 @@ class ViewFriend extends HTMLElement {
           const deleteButton = document.createElement('button');
           deleteButton.textContent = 'Delete';
           deleteButton.classList.add('btn', 'btn-danger');
-          deleteButton.onclick = () => this.confirmDeleteFriend(friend.friend_id);
+          deleteButton.onclick = () => showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
+            okCallback: () => this.confirmDeleteFriend(),
+            cancelCallback: () => console.log('Deletion cancelled.')
+          });
 
           listItem.appendChild(deleteButton);
           offlineFriendsList.appendChild(listItem);
@@ -673,3 +691,10 @@ class ViewFriend extends HTMLElement {
 }
 
 customElements.define('view-friend', ViewFriend);
+
+export const closeViewFriendWebSocket = () => {
+  const instance = document.querySelector('view-friend');
+  if (instance) {
+    instance.closeWebSocket();
+  }
+};

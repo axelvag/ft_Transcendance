@@ -4,6 +4,11 @@ import { WS_BASE_URL } from '@/constants.js';
 
 let websocketInstance = null;
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// LAISSEZ LES COMMENTAIRE CE CODE DOIT ETRE PRESENTS SUR CERTAINS NAVIGATEUR A TEST......
+// si les notif buf decommentais le code.
+/////////////////////////////////////////////////////////////////////////////////////////
+
 const initWebSocket = () => {
 
   if (!user.id) {
@@ -59,6 +64,5 @@ const initWebSocket = () => {
     console.log('WebSocket is already initialized and open.');
   }
 };
-
 
 export { initWebSocket };
