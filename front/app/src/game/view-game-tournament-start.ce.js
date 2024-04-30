@@ -13,6 +13,7 @@ import {
   getMatch,
   fetchTournamentInfo,
   fetchDeletePlayerAndTournament,
+  fetchLeaveMatch,
 } from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
@@ -37,6 +38,8 @@ class ViewTournamentstart extends HTMLElement {
     const isLoggedIn = await isAuthenticated();
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
+    if(this.#tournament.id === null)
+      redirectTo(this.#backUrl);
     // const tabTournamentFront = this.generateTournamentTab();
 
     this.innerHTML = `
@@ -55,8 +58,16 @@ class ViewTournamentstart extends HTMLElement {
     `;
 
     // Ajout d'un écouteur d'événements pour le bouton de sortie
-    this.querySelector('#leaveTournamentBtn').addEventListener('click', () => {
-        this.deletePlayer();
+    this.querySelector('#leaveTournamentBtn').addEventListener('click', async () => {
+        await this.infoMatch();
+        this.#match = getMatch();
+        console.log(this.#match);
+        if(this.#match.status !== 2)
+        {
+          await this.UserLeave();
+        }
+        // await fetchDeletePlayerAndTournament();
+        await this.deletePlayer();
     });
 
     this.initWebSocket();
@@ -66,10 +77,18 @@ class ViewTournamentstart extends HTMLElement {
       this.displayUpdate();
   }
 
-  disconnectedCallback() {
+  async disconnectedCallback() {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.close();
     }
+    // await this.infoMatch();
+    // this.#match = getMatch();
+    // console.log(this.#match);
+    // if(this.#match.status === 0)
+    // {
+    //   await this.UserLeave();
+    //   await fetchDeletePlayerAndTournament();
+    // }
   }
   
   async createMatchs() {
@@ -79,7 +98,7 @@ class ViewTournamentstart extends HTMLElement {
       await this.infoMatch();
       // console.log("Matchs created");
       const matches = await fetchGetMatchs();
-      // console.log(matches);
+      console.log(matches);
       if (matches.success)
         this.displayMatches(matches.matches_by_tour);
       else 
@@ -232,7 +251,7 @@ displayMatches(matchesByTour) {
         const winnerMessageElement = document.createElement('div');
         let winnerMessage = "Waiting for result";
         const lastMatch = matches[matches.length - 1];
-        console.log("yooooooooooooooooooooooooooo",matches[matches.length - 1]);
+        // console.log("yooooooooooooooooooooooooooo",matches[matches.length - 1]);
         if (lastMatch && lastMatch.winner_id) {
             winnerMessage = lastMatch.winner_id;
         }
@@ -318,6 +337,16 @@ displayMatches(matchesByTour) {
     await fetchInfoMatch();
   }
 
+  async UserLeave() {
+    const winner = await fetchLeaveMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+    console.log(winner);
+    if (winner.success) {
+        await this.displayUpdate();
+    } else {
+        console.log("Error: winner failed!");
+    }
+  }
+
 
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
@@ -342,7 +371,15 @@ displayMatches(matchesByTour) {
         }
     };
 
-    this.socket.onclose = () => {
+    this.socket.onclose = async () => {
+      // await this.infoMatch();
+      // this.#match = getMatch();
+      // console.log(this.#match);
+      // if(this.#match.status === 0)
+      // {
+      //   await this.UserLeave();
+      //   await fetchDeletePlayerAndTournament();
+      // }
         console.log('WebSocket connection closed');
     };
 

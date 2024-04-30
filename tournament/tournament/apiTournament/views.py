@@ -248,7 +248,9 @@ def delete_joueur(request, user_id):
         user_group_name = f"user_{user_id}"
         for joueur in joueurs:
             tournament_id = joueur.tournament_id  # Récupération de l'ID du tournoi avant la suppression
-            joueur.delete()
+            joueur.tournament = None
+            joueur.save()
+            # joueur.delete()
 
             # Construire le nom du groupe de canaux pour le tournoi spécifique
             tournament_group_name = f"tournoi_{tournament_id}"

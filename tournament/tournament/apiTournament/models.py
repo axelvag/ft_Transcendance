@@ -20,7 +20,7 @@ class Joueur(models.Model):
 
     username = models.CharField(max_length=100)
     user_id = models.IntegerField()
-    tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='players', null=True)
+    tournament = models.ForeignKey(Tournoi, on_delete=models.SET_NULL, related_name='players', null=True)
     status_ready = models.IntegerField(default=NOT_READY)
 
 class Match(models.Model):

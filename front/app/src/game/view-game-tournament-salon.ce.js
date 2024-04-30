@@ -75,6 +75,7 @@ class ViewTournamentSalon extends HTMLElement {
       tournament_id: this.#tournament.id,
     };
     const data = await fetchAddPlayer(formData);
+    console.log(data);
     if (data.success === false) {
       this.viewPlayer();
     }
