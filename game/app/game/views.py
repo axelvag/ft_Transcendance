@@ -169,6 +169,7 @@ class UserGameStatusView(View):
         if current_game:
             # User is currently in a game
             logger.info(f"User {user_id} is in-game")
+
             return JsonResponse({
                 'in_game': True
             }, status=200)

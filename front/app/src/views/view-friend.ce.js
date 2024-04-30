@@ -124,7 +124,7 @@ class ViewFriend extends HTMLElement {
       console.error("WebSocket error observed:", event);
     };
 
-   this.wsInstance.onclose = (event) => {
+    this.wsInstance.onclose = (event) => {
       console.log("WebSocket close:", event.code, event.reason);
     };
   }
@@ -536,7 +536,7 @@ class ViewFriend extends HTMLElement {
       const { online_friends } = await response.json();
 
       console.table("online_friends", online_friends);
-  
+
       const onlineFriendsList = this.querySelector('#online-friends');
       onlineFriendsList.innerHTML = '';
 
@@ -569,19 +569,19 @@ class ViewFriend extends HTMLElement {
           emailSpan.textContent = friend.email;
           listItem.appendChild(emailSpan);
 
-          // InGame Status
-          if (friend.in_game === true){
-            const inGameSpan = document.createElement('span');
-            inGameSpan.textContent = "In game";
-            inGameSpan.style.color = 'green';
-            listItem.appendChild(inGameSpan);
-          }
-          else{
-            const inGameSpan = document.createElement('span');
-            inGameSpan.textContent = "not in the game";
-            inGameSpan.style.color = 'red';
-            listItem.appendChild(inGameSpan);
-          }
+          // In-game status as a badge
+          const statusBadge = document.createElement('span');
+          // statusBadge.classList.add('badge', friend.in_game ? 'badge-success' : 'badge-danger');
+          statusBadge.textContent = friend.in_game ? "In game" : "Not in game";
+
+          // Set badge styling explicitly
+          statusBadge.style.backgroundColor = friend.in_game ? 'green' : 'gray';
+          statusBadge.style.color = 'white';
+          statusBadge.style.padding = '5px 10px';
+          statusBadge.style.borderRadius = '5px';
+          statusBadge.style.fontSize = '0.85em';
+          listItem.appendChild(statusBadge);
+
 
           // Delete friend button
           const deleteButton = document.createElement('button');
