@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 import json
 import requests
 from game.models import Game
+import requests
 
 # @method_decorator(csrf_exempt, name='dispatch')
 class SearchOpponentConsumer(AsyncWebsocketConsumer):

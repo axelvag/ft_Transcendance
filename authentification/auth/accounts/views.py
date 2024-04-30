@@ -407,8 +407,7 @@ def oauth_callback(request):
     except json.JSONDecodeError:
         return JsonResponse(data={'errors': "Invalid JSON format"}, status=406)
     code = data.get('code')
-    print(code)
-    print(settings.OAUTH_CLIENT_ID)
+    logging.critical(code)
     if code:
         token_data = {
             'grant_type': 'authorization_code',
@@ -428,6 +427,7 @@ def oauth_callback(request):
                 verify=False
             )
             print(profile_data)
+            logging.critical(profile_data)
             if profile_data.status_code == 200:
                 profile_data_json = profile_data.json()
                 print(profile_data_json)

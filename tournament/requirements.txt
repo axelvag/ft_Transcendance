@@ -1,0 +1,11 @@
+asgiref==3.8.0
+
+Django==4.2.11
+sqlparse==0.4.4
+typing-extensions==4.10.0
+django-cors-headers==3.10.0
+psycopg2-binary
+requests
+python-dotenv==0.19.1
+channels==4.0.0
+daphne==4.0.0
