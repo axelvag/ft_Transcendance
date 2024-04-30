@@ -2,9 +2,8 @@ import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { redirectTo } from '@/router.js';
 import { user } from '@/auth.js';
-import { getCsrfToken, resetLocalUser, deleteUser } from '@/auth.js';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { getCsrfToken, deleteUser } from '@/auth.js';
+import { BASE_URL } from '@/constants.js';
 
 class ViewSettings extends HTMLElement {
   connectedCallback() {
@@ -29,7 +28,7 @@ class ViewSettings extends HTMLElement {
   async suppUser() {
     try {
       const csrfToken = await getCsrfToken();
-      const deleteProfile = await fetch(`https://127.0.0.1:8002/delete_user_profile/${user.id}/`, {
+      const deleteProfile = await fetch(`${BASE_URL}:8002/delete_user_profile/${user.id}/`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {

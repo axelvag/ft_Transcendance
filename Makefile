@@ -5,13 +5,13 @@ PROFILE ?= prod
 all: volumes build up
 
 build:
-	docker compose -f docker-compose.yml --profile $(PROFILE) --env-file .env build
+	docker compose -f docker-compose.yml --profile $(PROFILE) build
 
 up:
 	docker compose -f docker-compose.yml --profile $(PROFILE) up -d
 
 stop:
-	docker compose -f docker-compose.yml --profile prod --profile dev --env-file .env stop
+	docker compose -f docker-compose.yml --profile prod --profile dev stop
 
 volumes:
 	# mkdir -p /var/lib/postgresql/data
@@ -25,7 +25,7 @@ fclean:
 	docker compose -f docker-compose.yml down -v --rmi all --remove-orphans
 
 rebuild:
-	docker compose -f docker-compose.yml --env-file .env build --no-cache
+	docker compose -f docker-compose.yml build --no-cache
 
 ps:
 	docker compose ps

@@ -195,7 +195,7 @@ def tournoi_info(request, user_id):
             }
             return JsonResponse(tournoi_info)
         else:
-            return JsonResponse({'error': 'Joueur not found or not associated with a tournament'}, status=404)
+            return JsonResponse({'error': 'Joueur not found or not associated with a tournament'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
