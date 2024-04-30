@@ -182,20 +182,20 @@ def get_user_profile(request, user_id):  # Assurez-vous que user_id est correcte
         "avatar42": profile.avatar42 if profile else None,
     })
 
-
 @csrf_exempt
-@verif_sessionID
+# @verif_sessionID
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
-    logging.critical("delete user")
     logging.info(f"Attempting to delete profile for user_id: {user_id}")
 
     try:
         profile = Profile.objects.get(user_id=user_id)
+        logging.info(f"Profile found: {profile}")
         profile.delete()
         return JsonResponse({"success": True, "message": "Profile deleted successfully."})
     except Profile.DoesNotExist:
-        return JsonResponse({"success": False, "message": "Profile not found."}, status=404)
+        logging.info(f"No profile found for user_id: {user_id}, but that's okay.")
+        return JsonResponse({"success": True, "message": "No profile found, but operation considered successful."})
     except Exception as e:
         logging.error(f"Error deleting profile: {e}")
         return JsonResponse({"success": False, "message": "Error deleting profile."}, status=500)

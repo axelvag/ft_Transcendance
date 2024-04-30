@@ -181,8 +181,8 @@ CORS_ALLOW_HEADERS = [
 
 CSRF_TRUSTED_ORIGINS = [f'{os.getenv("BASE_URL")}:8000']
 
-OAUTH_CLIENT_ID = 'u-s4t2ud-032700fdff8bf6b743669184234c5670698f0f0ef95b498514fc13b5e7af32f0'
-OAUTH_CLIENT_SECRET  = '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'
+OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
+OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
 OAUTH_REDIRECT_URI = f'{os.getenv("BASE_URL")}:8000/auth42-callback'  # Ajustez selon votre URI de redirection
 OAUTH_AUTHORIZATION_URL = 'https://api.intra.42.fr/oauth/authorize'
 OAUTH_TOKEN_URL = 'https://api.intra.42.fr/oauth/token'

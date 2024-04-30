@@ -2,9 +2,7 @@ import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { getProfile } from '@/auth.js';
 import { redirectTo } from '@/router.js';
-
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { BASE_URL } from '@/constants.js';
 
 class ViewGameHistory extends HTMLElement {
   #user;
@@ -63,7 +61,7 @@ class ViewGameHistory extends HTMLElement {
       opponentIds = [...new Set(opponentIds)];
       await Promise.all(
         opponentIds.map(async opponentId => {
-          const opponent = await fetch(`https://127.0.0.1:8002/get_user_profile/${opponentId}/`, {
+          const opponent = await fetch(`${BASE_URL}:8002/get_user_profile/${opponentId}/`, {
             credentials: 'include',
           })
             .then(res => res.json())
