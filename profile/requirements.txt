@@ -1,6 +1,6 @@
 asgiref==3.7.2
 
-Django==4.2.9
+Django==4.2.10
 sqlparse==0.4.4
 typing-extensions==4.9.0
 django-cors-headers==3.10.0
@@ -8,3 +8,5 @@ psycopg2-binary
 requests
 Pillow
 python-dotenv==0.19.1
+gunicorn==21.2.0
+daphne==4.0.0

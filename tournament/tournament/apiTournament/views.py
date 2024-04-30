@@ -26,8 +26,8 @@ User = get_user_model()
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"http://authentification:8001/accounts/verif_sessionid/{session_id}"
-        response = requests.get(update_url)
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
+        response = requests.get(update_url, verify=False)
         
         if response.status_code != 200:
             return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
@@ -232,7 +232,7 @@ def tournoi_info(request, user_id):
             }
             return JsonResponse(tournoi_info)
         else:
-            return JsonResponse({'error': 'Joueur not found or not associated with a tournament'}, status=404)
+            return JsonResponse({'error': 'Joueur not found or not associated with a tournament'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 

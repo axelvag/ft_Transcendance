@@ -60,7 +60,7 @@ class GameSelectPlayer extends HTMLElement {
                 id="${option.id}"
                 alt="${option.name}"
                 src="${option.avatar}"
-                class="img-fluid"
+                class="object-fit-cover"
                 width="64"
                 height="64"
               />

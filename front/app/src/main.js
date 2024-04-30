@@ -23,6 +23,9 @@ import { initTheme } from '@/theme.js';
 // notifications
 import { initNotifications } from '@/notifications.js';
 
+// modal
+import { showModal } from '@/modal.js';
+
 // init
 initTheme();
 initNotifications();

@@ -11,7 +11,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
 import os
+
+
+load_dotenv()
+BASE_URL = os.getenv('BASE_URL')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,16 +38,16 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
   'daphne',
-  'channels',
   'django.contrib.admin',
   'django.contrib.auth',
   'django.contrib.contenttypes',
   'django.contrib.sessions',
   'django.contrib.messages',
   'django.contrib.staticfiles',
-  'corsheaders',
+  'ws_api',
   'game',
-  'ws_api'
+  'corsheaders',
+  'channels',
 ]
 
 MIDDLEWARE = [
@@ -137,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS
 # https://pypi.org/project/django-cors-headers/
 CORS_ALLOWED_ORIGINS = [
-  "http://127.0.0.1:8000"
+  BASE_URL + ":8000"
 ]
 
 CORS_ALLOW_CREDENTIALS = True

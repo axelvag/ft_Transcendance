@@ -304,18 +304,40 @@ def resend_email_rest(request, uidb64):
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseServerError.status_code)
 
+# @login_required
+# @require_http_methods(["DELETE"])
+# def delete_user(request, username):
+#     print("delete userrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+#     try:
+#         user = User.objects.get(username=username)
+#         user.delete()
+#         return JsonResponse({"success": True, "message": "User deleted successfully."}, status=200)
+#     except User.DoesNotExist:
+#         return JsonResponse({"success": False, "message": "User not found."}, status=404)
+#     except Exception as e:
+#         return JsonResponse({"success": False, "message": str(e)}, status=500)
+
 @login_required
 @require_http_methods(["DELETE"])
 def delete_user(request, username):
-    print("delete userrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+
     try:
         user = User.objects.get(username=username)
-        user.delete()
-        return JsonResponse({"success": True, "message": "User deleted successfully."}, status=200)
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+
+        response = requests.post(f"http://friendship:8003/delete_user_data/{user_id}/")
+        if response.status_code == 200:
+            user.delete()
+            return JsonResponse({"success": True, "message": "User deleted successfully."}, status=200)
+        else:
+            return JsonResponse({"success": False, "message": "Failed to delete user data in friendship service."}, status=response.status_code)
     except User.DoesNotExist:
         return JsonResponse({"success": False, "message": "User not found."}, status=404)
     except Exception as e:
+        logging.critical(f"Error: {str(e)}")
         return JsonResponse({"success": False, "message": str(e)}, status=500)
+
 
 def is_user_logged_in(request):
     if request.user.is_authenticated:
@@ -394,13 +416,15 @@ def oauth_callback(request):
             'code': code,
             'redirect_uri': settings.OAUTH_REDIRECT_URI,
         }
-        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data)
+        response = requests.post("https://api.intra.42.fr/oauth/token", data=token_data, verify=False)
+        print(response.status_code)
         if response.status_code == 200:
             access_token = response.json().get('access_token')
             print(access_token)
             profile_data = requests.get(
                 "https://api.intra.42.fr/v2/me",
                 headers={"Authorization": f"Bearer {access_token}"},
+                verify=False
             )
             print(profile_data)
             logging.critical(profile_data)

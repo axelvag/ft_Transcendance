@@ -1,7 +1,5 @@
-import { getProfile } from '@/auth.js';
 import { redirectTo } from '@/router.js';
-
-const wsBaseUrl = 'ws://127.0.0.1:8009';
+import { WS_BASE_URL } from '@/constants.js';
 
 class ViewGameOnlineMatchmaking extends HTMLElement {
   #ws;
@@ -11,8 +9,7 @@ class ViewGameOnlineMatchmaking extends HTMLElement {
     this.handleError = this.handleError.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
 
-    const user = getProfile();
-    this.#ws = new WebSocket(wsBaseUrl + `/search-opponent/${user.id}`);
+    this.#ws = new WebSocket(`${WS_BASE_URL}:8009/search-opponent`);
     this.#ws.onerror = this.handleError;
     this.#ws.onmessage = this.handleMessage;
     this.#ws.onopen = () => console.log('WebSocket opened');

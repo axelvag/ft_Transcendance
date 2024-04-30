@@ -2,6 +2,7 @@ import { getProfile } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
 import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
+import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 
 class ViewTournament extends HTMLElement {
   #user;
@@ -57,7 +58,7 @@ class ViewTournament extends HTMLElement {
                 Tournament Size
                 </label>
                 <br>
-                  <input type="range" id="tournamentSizeRange" name="tournamentSize" min="4" max="16" value="8" step="4" />
+                  <input type="range" id="tournamentSizeRange" name="tournamentSize" min="4" max="8" value="8" step="4" />
                   <span id="tournamentSizeValue">8</span>
                 <div id="tournamentSize-error" class="invalid-feedback"></div>
               </div>
@@ -174,7 +175,7 @@ class ViewTournament extends HTMLElement {
 
   async loadTournois() {
     try {
-        const response = await fetch('http://127.0.0.1:8005/tournament/view/', {
+        const response = await fetch(BASE_URL + ':8005/tournament/view/', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -230,7 +231,7 @@ class ViewTournament extends HTMLElement {
 
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
-    this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
+    this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
         console.log('WebSocket connection established');

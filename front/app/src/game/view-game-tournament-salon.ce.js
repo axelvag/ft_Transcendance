@@ -4,6 +4,7 @@ import { getTournament, resetLocalTournament, fetchDeletePlayerSalon, fetchAddPl
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
+import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 
 class ViewTournamentSalon extends HTMLElement {
   #user;
@@ -57,8 +58,8 @@ class ViewTournamentSalon extends HTMLElement {
         });
     }
 
-    this.initWebSocket();
-    this.addPlayer();
+    await this.initWebSocket();
+    // this.addPlayer();
   }
 
   disconnectedCallback() {
@@ -68,7 +69,6 @@ class ViewTournamentSalon extends HTMLElement {
   }
 
   async addPlayer() {
-
     const formData = {
       user_id: this.#user.id,
       username: this.#user.username,
@@ -96,7 +96,7 @@ class ViewTournamentSalon extends HTMLElement {
 
   async viewPlayer() {
     try {
-        const response = await fetch(`http://127.0.0.1:8005/tournament/get_player/${this.#tournament.id}/`, {
+        const response = await fetch(`${BASE_URL}:8005/tournament/get_player/${this.#tournament.id}/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ class ViewTournamentSalon extends HTMLElement {
 
         for (const player of players) {
             const csrfToken = await getCsrfToken();
-            const userProfileResponse = await fetch(`http://127.0.0.1:8002/get_user_profile/${player.user_id}/`, {
+            const userProfileResponse = await fetch(`${BASE_URL}:8002/get_user_profile/${player.user_id}/`, {
                 method: 'GET',
                 headers: {
                     'X-CSRFToken': csrfToken,
@@ -186,12 +186,13 @@ class ViewTournamentSalon extends HTMLElement {
 
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
-    this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
+    this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
         console.log('WebSocket connection established');
         this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
         this.socket.send(JSON.stringify({user_id: this.#user.id}));
+        this.addPlayer();
     };
 
     this.socket.onmessage = (event) => {

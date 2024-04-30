@@ -2,8 +2,7 @@ import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { getCsrfToken } from '@/auth.js';
 import { sendEmailPasswordReset } from '@/auth.js';
-
-const BASE_URL = import.meta.env.BASE_URL;
+import { BASE_URL } from '@/constants.js';
 
 class ViewNewPass extends HTMLElement {
   async connectedCallback() {
@@ -48,7 +47,7 @@ class ViewNewPass extends HTMLElement {
     const token = params.get('token');
     console.log(this.uidb64);
     console.log(token);
-    const response = await fetch(`http://127.0.0.1:8001/accounts/activate_mail_pass/${this.uidb64}/${token}`);
+    const response = await fetch(`${BASE_URL}:8001/accounts/activate_mail_pass/${this.uidb64}/${token}`);
     const data = await response.json();
     console.log(data);
     this.querySelector('#email-confirm-loading').hidden = true;
@@ -73,7 +72,7 @@ class ViewNewPass extends HTMLElement {
       this.querySelector('#email-confirm-loading').hidden = false;
 
       // Effectuez une nouvelle demande de confirmation par e-mail
-      const response = await fetch(`http://127.0.0.1:8001/accounts/resend_email_rest/${this.uidb64}`);
+      const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_rest/${this.uidb64}`);
       const data = await response.json();
     });
   }
@@ -87,23 +86,12 @@ class ViewNewPass extends HTMLElement {
 
     const csrfToken = await getCsrfToken();
 
-    const url = `http://127.0.0.1:8001/accounts/password-change/${this.uidb64}`; // Ajout de uidb64 à l'URL
+    const url = `${BASE_URL}:8001/accounts/password-change/${this.uidb64}`; // Ajout de uidb64 à l'URL
     console.log(url);
     const formData = {
       new_password: password1, // Assurez-vous que ces clés correspondent aux attentes de votre backend
       confirm_password: password2,
     };
-
-    console.log(JSON.stringify(formData));
-    // const response = await fetch(url, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'X-CSRFToken': csrfToken,
-    //   },
-    //   credentials: 'include',
-    //   body: JSON.stringify(formData),
-    // });
 
     const data = await sendEmailPasswordReset(formData, csrfToken, url);
     console.log(data);
