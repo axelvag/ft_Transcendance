@@ -469,9 +469,9 @@ def set_player_ready(request, player_id, match_id):
 
 
 def get_profile_info_cookie(user_id, cookies):
-    profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:
-        response = requests.get(profile_service_url, cookies={'sessionid': cookies})
+        response = requests.get(profile_service_url, cookies={'sessionid': cookies}, verify=False)
         if response.status_code == 200:
             return response.json()
         else:
@@ -482,12 +482,13 @@ def get_profile_info_cookie(user_id, cookies):
 
 @verif_sessionID
 @require_http_methods(["GET"])
-def get_latest_match_for_user(request, user_id):
+def get_latest_match_for_user(request, user_id, tournament_id):
     try:
         joueur = Joueur.objects.get(user_id=user_id)
         # Obtenir les matchs où le joueur est soit player_1 soit player_2, et qui ne sont pas encore terminés.
         latest_match = Match.objects.filter(
             (Q(player_1=joueur) | Q(player_2=joueur)),
+            tournament_id=tournament_id,
             # status=Match.NOT_PLAYED
         ).order_by('-tour').first()  # Trier par 'tour' en ordre décroissant et prendre le premier
 

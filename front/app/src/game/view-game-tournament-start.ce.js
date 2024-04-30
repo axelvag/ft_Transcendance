@@ -17,6 +17,7 @@ import {
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
+import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 
 class ViewTournamentstart extends HTMLElement {
   #user;
@@ -36,7 +37,6 @@ class ViewTournamentstart extends HTMLElement {
     const isLoggedIn = await isAuthenticated();
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
-
     // const tabTournamentFront = this.generateTournamentTab();
 
     this.innerHTML = `
@@ -77,9 +77,9 @@ class ViewTournamentstart extends HTMLElement {
     console.log(data);
     if (data.success) {
       await this.infoMatch();
-      console.log("Matchs created");
+      // console.log("Matchs created");
       const matches = await fetchGetMatchs();
-      console.log(matches);
+      // console.log(matches);
       if (matches.success)
         this.displayMatches(matches.matches_by_tour);
       else 
@@ -252,7 +252,7 @@ displayMatches(matchesByTour) {
     console.log(`Player ${playerId} is ready!`);
 
     try {
-        const response = await fetch(`http://127.0.0.1:8005/tournament/ready/${playerId}/${this.#match.id}/`, {
+        const response = await fetch(`${BASE_URL}:8005/tournament/ready/${playerId}/${this.#match.id}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -307,7 +307,7 @@ displayMatches(matchesByTour) {
   
   async displayUpdate() {
     const matches = await fetchGetMatchs();
-      console.log(matches);
+      console.log("iciiiiiiiiiiiiiiiiiiiiiiiii", matches);
       if (matches.success)
         this.displayMatches(matches.matches_by_tour);
       else 
@@ -321,7 +321,7 @@ displayMatches(matchesByTour) {
 
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
-    this.socket = new WebSocket('ws://127.0.0.1:8005/tournament/websocket/');
+    this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
         console.log('WebSocket connection established start tournament');

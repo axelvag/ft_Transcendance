@@ -191,7 +191,7 @@ const fetchTournamentInfo = async () => {
 
 const fetchInfoMatch = async () => {
   let user = getProfile();
-  const response = await fetch(`http://127.0.0.1:8005/tournament/get_latest_match_for_user/${user.id}`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/get_latest_match_for_user/${user.id}/${tournament.id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ const fetchInfoMatch = async () => {
     credentials: 'include',
   })
   const data = await response.json();
-  console.log(data);
+  console.log("last match", data);
   if (data.success) {
     setLocalMatch(data.matches_data);
   } else {
@@ -208,7 +208,7 @@ const fetchInfoMatch = async () => {
 };
 
 const fetchCreateMatchs = async () => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/create_matches/${tournament.id}/`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/create_matches/${tournament.id}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -219,7 +219,7 @@ const fetchCreateMatchs = async () => {
 };
 
 const fetchGetMatchs = async () => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/get_matches/${tournament.id}`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/get_matches/${tournament.id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ const fetchGetMatchs = async () => {
 };
 
 const fetchWinnerMatch = async () => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -243,7 +243,7 @@ const fetchWinnerMatch = async () => {
 
 const fetchDeletePlayerAndTournament = async () => {
   let user = getProfile();
-  const response = await fetch(`http://127.0.0.1:8005/tournament/delete_player/${user.id}/`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/delete_player/${user.id}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -254,6 +254,7 @@ const fetchDeletePlayerAndTournament = async () => {
   console.log(data);
   if (data.success) {
     resetLocalTournament();
+    resetLocalMatch();
   } else {
     console.log("error");
   }
