@@ -1,6 +1,8 @@
 import { redirectTo } from '@/router.js';
 import { notify } from '@/notifications.js';
 import { BASE_URL, OAUTH_AUTHORIZE_URL } from '@/constants.js';
+import { closeViewFriendWebSocket } from '@/views/view-friend.ce.js';
+
 
 const user = {
   isAuthenticated: undefined,
@@ -132,6 +134,9 @@ const getCsrfToken = async () => {
 
 const logout = async () => {
   try {
+
+    closeViewFriendWebSocket();
+
     const csrfToken = await getCsrfToken();
     await fetch(`${BASE_URL}:8001/accounts/logout/`, {
       method: 'POST',
@@ -294,8 +299,10 @@ const deleteUser = async csrfToken => {
       'X-Requested-With': 'XMLHttpRequest',
       'X-CSRFToken': csrfToken,
     },
+    body: JSON.stringify({ user_id: user.id }),
   });
 
+  console.table(response);
   const data = await response.json();
   if (data.success) {
     console.log('delete user and profil');

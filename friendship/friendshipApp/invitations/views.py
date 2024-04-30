@@ -1,12 +1,3 @@
-# Todo
-# [x] check au de debut de send invitation si une amitie est deja creait entre les deux ou une invitation a deja etait envoyer pour ce couple && check si l'invitation a etait accepte
-# [x] ne pas retourne son username dans search
-# [] check avant d'afficher les amis en ligne ou hors ligne si ils sont amis
-
-# [x] Dans search -> retourner que des amis qu'ils ne sont pas encore amies.
-# [] Bug quand on reject l'invitation, puis on re invite double , triple notification
-# [] Mettre un compteur des invitations dans l'onglet invitation 
-
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
@@ -398,10 +389,35 @@ def offline_friends(request, user_id):
 def get_profile_info(user_id, cookies):
     profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:
-        response = requests.get(profile_service_url, cookies={'sessionid': cookies})
+        response = requests.get(profile_service_url, cookies={'sessionid': cookies}, verify=False)
         if response.status_code == 200:
             return response.json()
         else:
             return {}
     except requests.exceptions.RequestException:
         return {}
+
+@csrf_exempt
+# @verif_sessionID
+@require_http_methods(["POST"])
+def delete_user_data(request, user_id):
+
+    if not user_id:
+        return JsonResponse({"status": "error", "message": "User ID is required."}, status=400)
+
+    try:
+        user = User.objects.get(id=user_id)
+
+        # Suppression des friendships, invitations et notifications
+        Friendship.objects.filter(Q(user=user) | Q(friend=user)).delete()
+        Invitation.objects.filter(Q(from_user=user) | Q(to_user=user)).delete()
+        Notification.objects.filter(user=user).delete()
+        # hasattr, verifie dans si l'objet user possede un attribut status
+        if hasattr(user, 'status'):
+            user.status.delete()
+        
+        return JsonResponse({"status": "success", "message": "User data deleted successfully."}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "User not found."}, status=404)
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
