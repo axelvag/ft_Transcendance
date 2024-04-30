@@ -11,6 +11,8 @@ import '@/views/view-login.ce.js';
 import '@/game/view-game-set-mode.ce.js';
 import '@/game/view-game-offline.ce.js';
 import '@/game/view-game-online.ce.js';
+import '@/game/view-game-tournament.ce.js';
+import '@/game/view-game-tournament-salon.ce.js';
 import '@/game/view-game-online-matchmaking.ce.js';
 import '@/game/view-game-history.ce.js';
 import '@/views/view-friend.ce.js';
@@ -141,6 +143,20 @@ const router = new Router({
       path: '/game/duo',
       title: 'Game duo',
       template: '<view-game-offline duo></view-game-offline>',
+    },
+    {
+      name: 'game-tournament',
+      path: '/game/tournament',
+      title: 'Game tournament',
+      template: '<view-game-tournament></view-game-tournament>',
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'game-tournament-salon',
+      path: '/game/tournament/waiting',
+      title: 'Game tournament salon',
+      template: '<view-game-tournament-salon></view-game-tournament-salon>',
+      beforeEnter: isLoggedInGuard,
     },
     {
       name: 'game-online-search-player',

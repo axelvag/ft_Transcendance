@@ -116,6 +116,24 @@ services:
       - .env
     restart: on-failure
 
+  tournament:
+    build:
+      context: ./tournament
+      dockerfile: Dockerfile
+    container_name: tournament
+    ports:
+      - "8005:8005"
+    volumes:
+      - shared_ssl:/etc/ssl
+      - ./tournament/tournament:/tournament
+    networks:
+      - back
+    depends_on:
+      - data_base
+    env_file:
+      - .env
+    restart: on-failure
+
   # Back - game
   game:
     build:

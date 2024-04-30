@@ -1,4 +1,5 @@
 import { redirectTo } from '@/router.js';
+import { fetchTournamentInfo, fetchDeletePlayer } from '@/tournament.js';
 import { notify } from '@/notifications.js';
 import { BASE_URL, OAUTH_AUTHORIZE_URL } from '@/constants.js';
 import { closeViewFriendWebSocket } from '@/views/view-friend.ce.js';
@@ -105,6 +106,7 @@ const isAuthenticated = async () => {
         if (userProfileData.success) {
           console.log(userProfileData.avatar42);
           setLocalUser(userProfileData);
+          await fetchTournamentInfo();
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
@@ -162,7 +164,7 @@ const logout = async () => {
       autohide: false,
     });
   }
-
+  fetchDeletePlayer();
   resetLocalUser();
 };
 
@@ -308,6 +310,7 @@ const deleteUser = async csrfToken => {
     console.log('delete user and profil');
     user.isAuthenticated = false;
     resetLocalUser(data);
+    localStorage.setItem('isLogged', 'false');
   }
 };
 
@@ -395,6 +398,11 @@ const handleOAuthResponse = async () => {
           });
         }
       }
+      else{
+        console.error('Failed Auth42', data.error);
+        redirectTo('/');
+      }
+
     } catch (error) {
       console.error('Erreur:', error);
       notify({
