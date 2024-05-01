@@ -8,6 +8,7 @@ const tournament = {
   name: null,
   maxPlayer: null,
   admin_id: null,
+  status: null,
 };
 
 const setLocalTournament = data => {
@@ -15,6 +16,7 @@ const setLocalTournament = data => {
   tournament.name = data.name || '';
   tournament.maxPlayer = data.maxPlayer || '';
   tournament.admin_id = data.admin_id || '';
+  tournament.status = data.status || 0;
 };
 
 const resetLocalTournament = () => {
@@ -22,6 +24,7 @@ const resetLocalTournament = () => {
   tournament.name = null;
   tournament.maxPlayer = null;
   tournament.admin_id = null;
+  tournament.status = null;
 };
 
 const getTournament = () => {
@@ -30,28 +33,41 @@ const getTournament = () => {
     name: tournament.name,
     maxPlayer: tournament.maxPlayer,
     admin_id: tournament.admin_id,
+    status: tournament.status,
   };
 };
 
 const match = {
   id: null,
   winner: null,
+  status: null,
+  player1id: null,
+  player2id: null,
 };
 
 const setLocalMatch = data => {
   match.id = data.match_id || '';
   match.winner = data.player_1_id || '';
+  match.status = data.status || '';
+  match.player1id = data.player_1_id || '';
+  match.player2id = data.player_2_id || '';
 };
 
 const resetLocalMatch = () => {
   match.id = null;
   match.winner = null;
+  match.status = null;
+  match.player1id = null;
+  match.player2id = null;
 };
 
 const getMatch = () => {
   return {
     id: match.id,
     winner: match.winner,
+    status: match.status,
+    player1id: match.player1id,
+    player2id: match.player2id,
   };
 };
 
@@ -177,6 +193,7 @@ const fetchTournamentInfo = async () => {
     credentials: 'include',
   })
   const data = await response.json();
+  console.log("tournoi infooooooooooo", data);
   if (data.id) {
     setLocalTournament(data);
   } else {
@@ -186,7 +203,7 @@ const fetchTournamentInfo = async () => {
 
 const fetchInfoMatch = async () => {
   let user = getProfile();
-  const response = await fetch(`http://127.0.0.1:8005/tournament/get_latest_match_for_user/${user.id}`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/get_latest_match_for_user/${user.id}/${tournament.id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -194,7 +211,7 @@ const fetchInfoMatch = async () => {
     credentials: 'include',
   })
   const data = await response.json();
-  console.log(data);
+  console.log("last match", data);
   if (data.success) {
     setLocalMatch(data.matches_data);
   } else {
@@ -203,7 +220,7 @@ const fetchInfoMatch = async () => {
 };
 
 const fetchCreateMatchs = async () => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/create_matches/${tournament.id}/`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/create_matches/${tournament.id}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -214,7 +231,7 @@ const fetchCreateMatchs = async () => {
 };
 
 const fetchGetMatchs = async () => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/get_matches/${tournament.id}`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/get_matches/${tournament.id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -225,7 +242,23 @@ const fetchGetMatchs = async () => {
 };
 
 const fetchWinnerMatch = async () => {
-  const response = await fetch(`http://127.0.0.1:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+};
+
+const fetchLeaveMatch = async () => {
+  let user = getProfile();
+  if(user.id === match.player1id)
+    match.winner = match.player2id;
+  else
+    match.winner = match.player1id;
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -236,5 +269,23 @@ const fetchWinnerMatch = async () => {
 };
 
 
+const fetchDeletePlayerAndTournament = async () => {
+  let user = getProfile();
+  const response = await fetch(`${BASE_URL}:8005/tournament/delete_player/${user.id}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  const data = await response.json();
+  console.log(data);
+  if (data.success) {
+    resetLocalTournament();
+    resetLocalMatch();
+  } else {
+    console.log("error");
+  }
+};
 
-export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch };
+export { tournament, fetchLeaveMatch, fetchDeletePlayerAndTournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch };

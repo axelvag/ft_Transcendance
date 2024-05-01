@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 
 # Create your models here.
 class Tournoi(models.Model):
@@ -8,7 +9,7 @@ class Tournoi(models.Model):
 
     name = models.CharField(max_length=100)
     # matchs = models.ManyToManyField(Match)
-    status = models.BooleanField(default=CREATED)
+    status = models.IntegerField(default=CREATED)
     max_players = models.IntegerField(default=16, blank=True)
     start_datetime = models.DateTimeField(null=True)
     admin_id = models.BigIntegerField(default=0)
@@ -19,7 +20,7 @@ class Joueur(models.Model):
 
     username = models.CharField(max_length=100)
     user_id = models.IntegerField()
-    tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='players', null=True)
+    tournament = models.ForeignKey(Tournoi, on_delete=models.SET_NULL, related_name='players', null=True)
     status_ready = models.IntegerField(default=NOT_READY)
 
 class Match(models.Model):
@@ -35,3 +36,4 @@ class Match(models.Model):
     tour = models.IntegerField(default=1)  # Pour suivre le tour du match dans le tourno
     status = models.IntegerField(default=NOT_PLAYED)
     tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='matches', null=True)  # Ajout de la relation avec le modèle Tournoi
+    match_id = models.IntegerField(default=1)

@@ -10,14 +10,20 @@ import {
   fetchGetMatchs,
   fetchInfoMatch,
   fetchWinnerMatch,
+  getMatch,
+  fetchTournamentInfo,
+  fetchDeletePlayerAndTournament,
+  fetchLeaveMatch,
 } from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
+import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 
 class ViewTournamentstart extends HTMLElement {
   #user;
   #tournament;
+  #match
   #backUrl = '/'; // Définissez ici l'URL de redirection par défaut
 
   constructor() {
@@ -32,7 +38,8 @@ class ViewTournamentstart extends HTMLElement {
     const isLoggedIn = await isAuthenticated();
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
-
+    if(this.#tournament.id === null)
+      redirectTo(this.#backUrl);
     // const tabTournamentFront = this.generateTournamentTab();
 
     this.innerHTML = `
@@ -51,21 +58,45 @@ class ViewTournamentstart extends HTMLElement {
     `;
 
     // Ajout d'un écouteur d'événements pour le bouton de sortie
-    this.querySelector('#leaveTournamentBtn').addEventListener('click', () => {
-      resetLocalTournament();
-      this.deletePlayer();
-      redirectTo(this.#backUrl);
+    this.querySelector('#leaveTournamentBtn').addEventListener('click', async () => {
+        await this.infoMatch();
+        this.#match = getMatch();
+        console.log(this.#match);
+        if(this.#match.status !== 2)
+        {
+          await this.UserLeave();
+        }
+        // await fetchDeletePlayerAndTournament();
+        await this.deletePlayer();
     });
 
-    await this.createMatchs();
-    await this.infoMatch();
+    this.initWebSocket();
+    if(this.#tournament.status != 2)
+      await this.createMatchs();
+    else
+      this.displayUpdate();
   }
 
+  async disconnectedCallback() {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.close();
+    }
+    // await this.infoMatch();
+    // this.#match = getMatch();
+    // console.log(this.#match);
+    // if(this.#match.status === 0)
+    // {
+    //   await this.UserLeave();
+    //   await fetchDeletePlayerAndTournament();
+    // }
+  }
+  
   async createMatchs() {
     const data = await fetchCreateMatchs();
     console.log(data);
     if (data.success) {
-      console.log("Matchs created");
+      await this.infoMatch();
+      // console.log("Matchs created");
       const matches = await fetchGetMatchs();
       console.log(matches);
       if (matches.success)
@@ -78,6 +109,7 @@ class ViewTournamentstart extends HTMLElement {
   }
 
 displayMatches(matchesByTour) {
+  this.#match = getMatch();
   const tournamentTabElement = this.querySelector('#tournamentTabFront');
   tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
   tournamentTabElement.style.display = 'flex'; // Aligner les conteneurs de tours horizontalement
@@ -85,7 +117,7 @@ displayMatches(matchesByTour) {
   tournamentTabElement.style.overflowX = 'auto'; // Défilement horizontal si nécessaire
 
   const totalTours = matchesByTour.length; // Nombre total de tours
-
+  
   matchesByTour.forEach((matches, tourIndex) => {
       const tourElement = document.createElement('div');
       tourElement.classList.add('tour');
@@ -98,32 +130,35 @@ displayMatches(matchesByTour) {
           tourTitle = "Finale";
       } else if (tourIndex === totalTours - 2) {
           tourTitle = "Demi-finale";
-      } else {
+        } else {
           tourTitle = `Tour ${tourIndex + 1}`;
-      }
-
-      const titleElement = document.createElement('h3');
-      titleElement.textContent = tourTitle;
-      tourElement.appendChild(titleElement);
-
-      matches.forEach((match) => {
+        }
+        
+        const titleElement = document.createElement('h3');
+        titleElement.textContent = tourTitle;
+        tourElement.appendChild(titleElement);
+        
+        matches.forEach((match) => {
           const matchElement = document.createElement('div');
           matchElement.classList.add('match');
-
+          
           let player1Name = match.player_1_username || "Waiting for a winner";
           let player2Name = match.player_2_username || "Waiting for a winner";
           let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
           let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
-
+          
           // Gérer l'affichage lorsque les joueurs ne sont pas encore déterminés
           if (player1Name === "Waiting for a winner") {
-              avatarImg1 = ""; // Ne pas afficher d'avatar
+            avatarImg1 = ""; // Ne pas afficher d'avatar
           }
           if (player2Name === "Waiting for a winner") {
-              avatarImg2 = ""; // Ne pas afficher d'avatar
+            avatarImg2 = ""; // Ne pas afficher d'avatar
           }
-
-          if (this.#user.id === match.player_1_id || this.#user.id === match.player_2_id) {
+          
+          console.log(this.#match.id);
+          console.log(match.match_id);
+          if(this.#match.id === match.match_id && match.status != 2) {
+            console.log("passe ici");
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
               const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
@@ -147,7 +182,31 @@ displayMatches(matchesByTour) {
                   <br><br>
                 </div>
                 `;
-          } else {
+          } 
+          else if (match.status === 2) {
+            console.log("match status === 22222222222222222222");
+            console.log(match.winner_id);
+            console.log(player1Name);
+            // Apply green text color if the player is the winner
+            const player1Style = match.winner_id === player1Name ? 'color:green;' : 'color:red;';
+            const player2Style = match.winner_id === player2Name ? 'color:green;' : 'color:red;';
+
+            matchElement.innerHTML = `
+                <div class="match-info">
+                    <div class="player-info d-flex align-items-center">
+                        ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
+                        <span class="player" style="${player1Style}">${player1Name}</span>
+                    </div>
+                    <div class="vs">vs</div>
+                    <div class="player-info d-flex align-items-center">
+                        ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
+                        <span class="player" style="${player2Style}">${player2Name}</span>
+                    </div>
+                    <br><br>
+                </div>
+            `;
+          }
+          else {
             matchElement.innerHTML = `
             <div class="match-info">
               <div class="player-info d-flex align-items-center">
@@ -164,11 +223,11 @@ displayMatches(matchesByTour) {
             `;
           }
           // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
-       if (this.#user.id === match.player_1_id) {
+       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2) {
             const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
             player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
         }
-        if (this.#user.id === match.player_2_id) {
+        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2) {
             const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
             player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
         }
@@ -192,8 +251,9 @@ displayMatches(matchesByTour) {
         const winnerMessageElement = document.createElement('div');
         let winnerMessage = "Waiting for result";
         const lastMatch = matches[matches.length - 1];
-        if (lastMatch && lastMatch.winner) {
-            winnerMessage = lastMatch.winner.username;
+        // console.log("yooooooooooooooooooooooooooo",matches[matches.length - 1]);
+        if (lastMatch && lastMatch.winner_id) {
+            winnerMessage = lastMatch.winner_id;
         }
         winnerMessageElement.innerHTML = `<h5>Winner: ${winnerMessage}</h5>`;
         winnerContainer.appendChild(winnerMessageElement);
@@ -211,7 +271,7 @@ displayMatches(matchesByTour) {
     console.log(`Player ${playerId} is ready!`);
 
     try {
-        const response = await fetch(`http://127.0.0.1:8005/tournament/ready/${playerId}/`, {
+        const response = await fetch(`${BASE_URL}:8005/tournament/ready/${playerId}/${this.#match.id}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -224,17 +284,18 @@ displayMatches(matchesByTour) {
         }
 
         const data = await response.json();
+        console.log(data);
         if (data.success) {
             console.log(`Player ${playerId} is now marked as ready in the backend.`);
-            this.displayUpdate();
+            await this.displayUpdate();
 
             if (data.match_started) {
                 console.log("Match started!!!");
-                const winner = await this.fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+                const winner = await fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
                 console.log(winner);
 
                 if (winner.success) {
-                    this.displayUpdate();
+                    await this.displayUpdate();
                 } else {
                     console.log("Error: winner failed!");
                 }
@@ -249,12 +310,23 @@ displayMatches(matchesByTour) {
 
   
   async deletePlayer() {
-    const data = await fetchDeletePlayerSalon();
+    await fetchDeletePlayerAndTournament();
+    redirectTo(this.#backUrl);
+  }
+  
+  async fetchTournamentInfo() {
+    await fetchTournamentInfo();
+    this.#tournament = getTournament();
+    console.log(this.#tournament);
+  }
+  
+  async removePlayerFromTournament() {
+    await removePlayerFromTournament();
   }
   
   async displayUpdate() {
     const matches = await fetchGetMatchs();
-      console.log(matches);
+      console.log("iciiiiiiiiiiiiiiiiiiiiiiiii", matches);
       if (matches.success)
         this.displayMatches(matches.matches_by_tour);
       else 
@@ -265,6 +337,61 @@ displayMatches(matchesByTour) {
     await fetchInfoMatch();
   }
 
+  async UserLeave() {
+    const winner = await fetchLeaveMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+    console.log(winner);
+    if (winner.success) {
+        await this.displayUpdate();
+    } else {
+        console.log("Error: winner failed!");
+    }
+  }
+
+
+  initWebSocket() {
+    // Assurez-vous que l'URL correspond à votre serveur WebSocket.
+    this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
+
+    this.socket.onopen = () => {
+        console.log('WebSocket connection established start tournament');
+        // this.socket.send(JSON.stringify({user_id: this.#user.id}));
+        this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
+    };
+
+    this.socket.onmessage = (event) => {
+        // Logique pour gérer les messages entrants.
+        const data = JSON.parse(event.data);
+
+        if (data.action === 'player_ready') {
+            this.displayUpdate();
+        }
+        if (data.action === 'winner') {
+          this.infoMatch();
+          this.displayUpdate();
+        }
+    };
+
+    this.socket.onclose = async () => {
+      // await this.infoMatch();
+      // this.#match = getMatch();
+      // console.log(this.#match);
+      // if(this.#match.status === 0)
+      // {
+      //   await this.UserLeave();
+      //   await fetchDeletePlayerAndTournament();
+      // }
+        console.log('WebSocket connection closed');
+    };
+
+    this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+
+    window.addEventListener('beforeunload', () => {
+      this.socket.close();
+    });
+
+  }
   // generateTournamentTab() {
   //   let message = ''; // Variable pour stocker le message à afficher
 
