@@ -158,7 +158,8 @@ displayMatches(matchesByTour) {
           console.log(this.#match.id);
           console.log(match.match_id);
           if(this.#match.id === match.match_id && match.status != 2) {
-            console.log("passe ici");
+            console.log(this.#match);
+            console.log("passe icii", player1Name,  player2Name);
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
               const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
@@ -171,13 +172,13 @@ displayMatches(matchesByTour) {
                   <div class="player-info d-flex align-items-center">
                     ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
                     <span class="player">${player1Name}</span>
-                    ${isPlayer1 ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : readyIconPlayer1}
+                    ${(isPlayer1 && this.#match.player1id !== "" && this.#match.player1id !== "" ) ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : ((this.#match.player1id !== "" && this.#match.player1id !== "") ? readyIconPlayer1 : "")}
                   </div>
                   <div class="vs">vs</div>
                   <div class="player-info d-flex align-items-center">
                     ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
                     <span class="player">${player2Name}</span>
-                    ${isPlayer2 ? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : readyIconPlayer2}
+                    ${(isPlayer2 && this.#match.player1id !== "" && this.#match.player1id !== "" )? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : ((this.#match.player1id !== "" && this.#match.player1id !== "") ? readyIconPlayer2 : "")}
                   </div>
                   <br><br>
                 </div>
@@ -223,11 +224,11 @@ displayMatches(matchesByTour) {
             `;
           }
           // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
-       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2) {
+       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player1id !== "") {
             const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
             player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
         }
-        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2) {
+        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player1id !== "") {
             const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
             player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
         }
@@ -381,14 +382,6 @@ displayMatches(matchesByTour) {
     };
 
     this.socket.onclose = async () => {
-      // await this.infoMatch();
-      // this.#match = getMatch();
-      // console.log(this.#match);
-      // if(this.#match.status === 0)
-      // {
-      //   await this.UserLeave();
-      //   await fetchDeletePlayerAndTournament();
-      // }
         console.log('WebSocket connection closed');
     };
 
@@ -401,183 +394,6 @@ displayMatches(matchesByTour) {
     });
 
   }
-  // generateTournamentTab() {
-  //   let message = ''; // Variable pour stocker le message à afficher
-
-  //   switch (this.#tournament.maxPlayer) {
-  //     case 4:
-  //       return this.generateTournamentTab4();
-  //     case 8:
-  //       message = '8 Joueurs';
-  //       break;
-  //     case 12:
-  //       message = '12 Joueurs';
-  //       break;
-  //     case 16:
-  //       message = '16 Joueurs';
-  //       break;
-  //     default:
-  //       message = 'Tournoi vide';
-  //       break;
-  //   }
-
-  //   return message;
-  // }
-
-  // // Les cases des bracket avec le username personnalise
-  // fakecardTournament(username) {
-  //   const user = getProfile();
-  //   return `
-  //   <div class="card text-center mb-3" style="width: 18rem;">
-  //     <div class="card-body">
-  //       <h5 class="card-title">${username}</h5>
-  //       <div class="d-flex justify-content-center">
-  //         <img src="https://images.emojiterra.com/google/android-nougat/512px/2754.png" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 50%;" width="90" height="90" alt="${user.username}">
-  //       </div>
-  //     </div>
-  //   </div>
-  //   `;
-  // }
-
-  // // Les cases des bracket avec le username personnalise
-  // cardTournament(player, TabUser) {
-  //   const user = TabUser.find(item => item.id === player.user_id);
-
-  //   console.log(user);
-
-  //   let avatarSrc = user.avatar;
-
-  //   if (user.avatar == null) 
-  //   {
-  //     if (user.avatar42 == null)
-  //       avatarSrc = "https://oasys.ch/wp-content/uploads/2019/03/photo-avatar-profil.png";
-  //     else
-  //       avatarSrc = user.avatar42;
-  //   }
-
-  //   // console.log(user.getProfile.avatar);
-
-  //   const thisIsMeReady = this.#user.id === player.user_id;
-  //   const readyButton = thisIsMeReady ? `<a href="#" class="btn btn-primary mt-3">Ready</a>` : '<br><br>';
-
-  //   return `
-  //   <div class="card text-center mb-3" style="width: 18rem;">
-  //     <div class="card-body">
-  //       <h5 class="card-title">${player.username}</h5>
-  //       <div class="d-flex justify-content-center">
-  //         <img src="${avatarSrc}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 50%;" width="90" height="90" alt="${user.username}">
-  //       </div>
-  //       ${readyButton}
-  //     </div>
-  //   </div>
-  //   `;
-  // }
-
-  // async generateTournamentTab4() {
-  //   try {
-  //     if (!this.#tournament.id) {
-  //       throw new Error('Tournament ID is not defined');
-  //     }
-
-  //     // console.log('Tournament ID:', this.#tournament.id);
-
-  //     /////////////////////////TAB PLAYER user_id username
-  //     const response = await fetch(`http://127.0.0.1:8005/tournament/get_player/${this.#tournament.id}/`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       credentials: 'include',
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`);
-  //     }
-
-  //     const players = await response.json();
-
-  //     //////////////////// TAB USER id username avatar avatar42
-  //     const TabUser = [];
-
-  //     await Promise.all(
-  //       players.map(async player => {
-  //         const csrfToken = await getCsrfToken();
-  //         const responseUser = await fetch(`http://127.0.0.1:8002/get_user_profile/${player.user_id}/`, {
-  //           method: 'GET',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //             'X-CSRFToken': csrfToken,
-  //           },
-  //           credentials: 'include',
-  //         });
-  //         if (!responseUser.ok) {
-  //           throw new Error(`HTTP error! status: ${responseUser.status}`);
-  //         }
-
-  //         const user = await responseUser.json();
-
-  //         TabUser.push(user); // Ajout de l'utilisateur au tableau TabUser
-  //       })
-  //     );
-
-  //     /////////////////// AFFICHE
-  //     console.log('Players:', players);
-  //     console.log('TabUser:', TabUser);
-
-  //     const lastRowHtml =
-  //       '<div class="row">' +
-  //       players
-  //         .map(
-  //           player =>
-  //             `<div class="col mt-4">
-  //             ${this.cardTournament(player, TabUser)}
-  //           </div>`
-  //         )
-  //         .join('') +
-  //       '</div>';
-
-  //     const listElement = this.querySelector('#tournamentTabFront');
-
-  //     console.log(listElement);
-  //     listElement.innerHTML = `
-  //     <div>
-  //       <div class="container text-center">
-  //         <div class="row">
-  //           <div class="col d-flex justify-content-center">
-  //             <div id="tournamentTabMessage" class="mt-4">${this.fakecardTournament('...')}</div>
-  //           </div>
-  //         </div>
-  //         <div class="row">
-  //           <div class="col d-flex justify-content-center">
-  //             <div id="tournamentTabMessage" class="mt-4">${this.fakecardTournament('...')}</div>
-  //           </div>
-  //           <div class="col d-flex justify-content-center">
-  //             <div id="tournamentTabMessage" class="mt-4">${this.fakecardTournament('...')}</div>
-  //           </div>
-  //         </div>
-  //         ${lastRowHtml}
-  //       </div>
-  //     </div>
-  //     `;
-
-  //     listElement.querySelectorAll('.btn.btn-primary').forEach(btn => {
-  //       btn.addEventListener('click', () => {
-  //         console.log('Ready button clicked');
-  //         // redirectTo('/game/online');
-  //       });
-  //     });
-  //     // players.forEach(player => {
-  //     //   const playerElement = document.createElement('div');
-  //     //   playerElement.innerHTML = `
-  //     //       <div class="col"><div id="tournamentTabMessage" class="mt-4">${this.cardTournament(
-  //     //         player.username
-  //     //       )}</div></div>
-  //     //     `;
-  //     //   listElement.appendChild(playerElement);
-  //     // });
-  //   } catch (error) {
-  //     console.error('Could not load tournament:', error);
-    // }
-  // }
 }
 
 customElements.define('view-game-tournament-start', ViewTournamentstart);
