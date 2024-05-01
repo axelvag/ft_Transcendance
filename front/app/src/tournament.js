@@ -43,14 +43,16 @@ const match = {
   status: null,
   player1id: null,
   player2id: null,
+  leave: null,
 };
 
 const setLocalMatch = data => {
   match.id = data.match_id || '';
   match.winner = data.player_1_id || '';
-  match.status = data.status || '';
+  match.status = data.status || 0;
   match.player1id = data.player_1_id || '';
   match.player2id = data.player_2_id || '';
+  match.leave = data.leave || 0;
 };
 
 const resetLocalMatch = () => {
@@ -59,6 +61,7 @@ const resetLocalMatch = () => {
   match.status = null;
   match.player1id = null;
   match.player2id = null;
+  match.leave = null;
 };
 
 const getMatch = () => {
@@ -68,6 +71,7 @@ const getMatch = () => {
     status: match.status,
     player1id: match.player1id,
     player2id: match.player2id,
+    leave: match.leave,
   };
 };
 
@@ -102,8 +106,15 @@ const TournamentExist = async (tournamentId) => {
     credentials: 'include',
   });
   const data = await response.json();
+  console.log("sidebarrrrrrrrrrrr", data);
+  console.log(data.status);
   if (data.success) {
-    redirectTo(`/game/tournament/waiting`);
+    if(data.data.status === 1){
+      console.log("start");
+      redirectTo(`/game/tournament/start`);
+    }
+    else
+      redirectTo(`/game/tournament/waiting`);
     notify({
       icon: 'info',
       iconClass: 'text-info',
@@ -195,7 +206,10 @@ const fetchTournamentInfo = async () => {
   const data = await response.json();
   console.log("tournoi infooooooooooo", data);
   if (data.id) {
-    setLocalTournament(data);
+    // if(data.status !== 2)
+      setLocalTournament(data);
+    // else
+    //   await fetchDeletePlayerAndTournament();
   } else {
     console.log("player is not in a tournament");
   }
@@ -268,6 +282,38 @@ const fetchLeaveMatch = async () => {
   return response.json();
 };
 
+const updateWinnerLeave = async () => {
+  if(match.leave === 1)
+    match.winner = match.player2id;
+  else 
+    match.winner = match.player1id;
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+};
+
+const fetchLeaveMatchAlone = async () => {
+  let user = getProfile();
+  let player;
+  if(user.id === match.player1id)
+    player = 1;
+  else
+    player = 2;
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_leave/${match.id}/${player}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+};
+
 
 const fetchDeletePlayerAndTournament = async () => {
   let user = getProfile();
@@ -288,4 +334,4 @@ const fetchDeletePlayerAndTournament = async () => {
   }
 };
 
-export { tournament, fetchLeaveMatch, fetchDeletePlayerAndTournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch };
+export { tournament, updateWinnerLeave, fetchLeaveMatch, fetchDeletePlayerAndTournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch, fetchLeaveMatchAlone };

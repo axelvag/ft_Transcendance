@@ -1,6 +1,6 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
-import { getTournament, resetLocalTournament, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament } from '@/tournament.js';
+import { getTournament, resetLocalTournament, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament , fetchTournamentInfo, fetchDeletePlayerAndTournament} from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
@@ -14,15 +14,24 @@ class ViewTournamentSalon extends HTMLElement {
   constructor() {
     super();
     this.#user = getProfile();
-    this.#tournament = getTournament();
   }
   
   async connectedCallback() {
+    await fetchTournamentInfo();
+    this.#tournament = getTournament();
     const isLoggedIn = await isAuthenticated();
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
-    if(this.#tournament.id === null)
+    if(this.#tournament.id === null || this.#tournament.status !== 0){
+      if(this.#tournament.status === 2)
+        await fetchDeletePlayerAndTournament();
+      if(this.#tournament.status === 1){
+        redirectTo(`/game/tournament/start`);
+        return;
+      }
       redirectTo(this.#backUrl);
+      return;
+    }
 
     let deleteTournamentButtonHTML = '';
     if (this.#user.id === this.#tournament.admin_id) {
@@ -215,11 +224,11 @@ class ViewTournamentSalon extends HTMLElement {
         if (data.action === 'display_player') {
           this.viewPlayer();
         }
-        if (data.action === 'player_disconnected') {
-          resetLocalTournament();
-          this.deletePlayer();
-          this.socket.close();
-        }
+        // if (data.action === 'player_disconnected') {
+        //   resetLocalTournament();
+        //   this.deletePlayer();
+        //   this.socket.close();
+        // }
     };
 
     this.socket.onclose = () => {

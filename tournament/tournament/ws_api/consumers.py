@@ -105,10 +105,10 @@ class MyConsumer(AsyncWebsocketConsumer):
             "action": "delete_tournament"
         }))
         
-    async def player_disconnected(self, event):
-        await self.send(text_data=json.dumps({
-            "action": "player_disconnected"
-        }))
+    # async def player_disconnected(self, event):
+    #     await self.send(text_data=json.dumps({
+    #         "action": "player_disconnected"
+    #     }))
         
     async def display_player(self, event):
         await self.send(text_data=json.dumps({

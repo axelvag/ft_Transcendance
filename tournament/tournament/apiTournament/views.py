@@ -104,6 +104,7 @@ def tournament_detail(request, tournament_id):
                 'name': tournament.name,
                 'maxPlayer': tournament.max_players,
                 'admin_id': tournament.admin_id,
+                'status': tournament.status,
                 # Ajoutez d'autres champs selon votre modèle
             }
         }
@@ -386,7 +387,14 @@ def create_matches(request, tournament_id):
 
         tournament.status = Tournoi.IN_PROGRESS
         tournament.save()
-
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
+            {
+                "type": "tournoi_cree",  # Type de message
+                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+            }
+        )
         return JsonResponse({'success': True, "message": f"Les matchs ont été créés avec succès pour tous les tours. Nombre de matchs créés: {len(matches_created)}."}, status=201)
 
 
@@ -503,6 +511,7 @@ def get_latest_match_for_user(request, user_id, tournament_id):
                 "player_2_username": latest_match.player_2.username if latest_match.player_2 else None,
                 "status": latest_match.status,
                 "tour": latest_match.tour,
+                "leave": latest_match.leave,
                 # Ajoutez ici d'autres données que vous souhaitez retourner.
             }
             return JsonResponse({'success': True, 'matches_data': match_data}, status=200)
@@ -567,6 +576,7 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id):
             next_match.save()
         else:
             return JsonResponse({'message': "Aucun match disponible pour la mise à jour."}, status=404)
+
     except IndexError:
         return JsonResponse({'error': "Index hors de portée."}, status=400)
     except Exception as e:
@@ -603,15 +613,27 @@ def delete_player_and_tournament_if_empty(request, player_id):
         # player.delete()
 
         # Vérifier si d'autres joueurs sont encore inscrits dans le tournoi
-        if not tournament.players.exists():  # 'players' doit être le related_name dans le modèle ForeignKey
-            # Si aucun joueur n'est restant, supprimer le tournoi
-            tournament.delete()
-            message = "Player and tournament deleted."
-        else:
-            message = "Player deleted, but tournament still has players."
+        # if not tournament.players.exists():  # 'players' doit être le related_name dans le modèle ForeignKey
+        #     # Si aucun joueur n'est restant, supprimer le tournoi
+        #     tournament.delete()
+        #     message = "Player and tournament deleted."
+        # else:
+        message = "Player deleted, but tournament still here."
 
         return JsonResponse({'success': True, 'message': message}, status=200)
     except Joueur.DoesNotExist:
         return JsonResponse({'error': "Player not found."}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+        
+@csrf_exempt  # Exempter de CSRF pour simplifier l'exemple
+@verif_sessionID
+@require_http_methods(["POST"])  # S'assurer que la requête est de type POST
+def update_leave(request, match_id, player):
+    try:
+        match = Match.objects.get(id=match_id)
+        match.leave = player
+        match.save()
+        return JsonResponse({'success': True, 'message': "match update leave player"}, status=200)
+    except ObjectDoesNotExist:
+        return JsonResponse({'error': "Match ou Joueur non trouvé."}, status=404)

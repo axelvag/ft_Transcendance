@@ -14,6 +14,8 @@ import {
   fetchTournamentInfo,
   fetchDeletePlayerAndTournament,
   fetchLeaveMatch,
+  fetchLeaveMatchAlone,
+  updateWinnerLeave,
 } from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
@@ -38,8 +40,10 @@ class ViewTournamentstart extends HTMLElement {
     const isLoggedIn = await isAuthenticated();
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
-    if(this.#tournament.id === null)
+    if(this.#tournament.id === null){
       redirectTo(this.#backUrl);
+      return;
+    }
     // const tabTournamentFront = this.generateTournamentTab();
 
     this.innerHTML = `
@@ -64,7 +68,10 @@ class ViewTournamentstart extends HTMLElement {
         console.log(this.#match);
         if(this.#match.status !== 2)
         {
-          await this.UserLeave();
+          if(this.#match.player1id !== "" && this.#match.player2id !== "")
+            await this.UserLeave();
+          else
+            await this.UserLeaveAlone();
         }
         // await fetchDeletePlayerAndTournament();
         await this.deletePlayer();
@@ -78,17 +85,10 @@ class ViewTournamentstart extends HTMLElement {
   }
 
   async disconnectedCallback() {
+
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.close();
     }
-    // await this.infoMatch();
-    // this.#match = getMatch();
-    // console.log(this.#match);
-    // if(this.#match.status === 0)
-    // {
-    //   await this.UserLeave();
-    //   await fetchDeletePlayerAndTournament();
-    // }
   }
   
   async createMatchs() {
@@ -294,11 +294,11 @@ displayMatches(matchesByTour) {
                 const winner = await fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
                 console.log(winner);
 
-                if (winner.success) {
-                    await this.displayUpdate();
-                } else {
-                    console.log("Error: winner failed!");
-                }
+                // if (winner.success) {
+                //     await this.displayUpdate();
+                // } else {
+                //     console.log("Error: winner failed!");
+                // }
             }
         } else {
             console.error('Could not mark the player as ready in the backend.', data.error);
@@ -325,6 +325,10 @@ displayMatches(matchesByTour) {
   }
   
   async displayUpdate() {
+    this.#match = getMatch();
+    console.log("display update match", this.#match);
+    if(this.#match.status === 0 && this.#match.leave !== 0)
+      await updateWinnerLeave();
     const matches = await fetchGetMatchs();
       console.log("iciiiiiiiiiiiiiiiiiiiiiiiii", matches);
       if (matches.success)
@@ -346,6 +350,11 @@ displayMatches(matchesByTour) {
         console.log("Error: winner failed!");
     }
   }
+  
+  async UserLeaveAlone() {
+    const data = await fetchLeaveMatchAlone();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+    console.log(data);
+  }
 
 
   initWebSocket() {
@@ -358,7 +367,7 @@ displayMatches(matchesByTour) {
         this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
     };
 
-    this.socket.onmessage = (event) => {
+    this.socket.onmessage = async (event) => {
         // Logique pour gérer les messages entrants.
         const data = JSON.parse(event.data);
 
@@ -366,8 +375,8 @@ displayMatches(matchesByTour) {
             this.displayUpdate();
         }
         if (data.action === 'winner') {
-          this.infoMatch();
-          this.displayUpdate();
+          await this.infoMatch();
+          await this.displayUpdate();
         }
     };
 

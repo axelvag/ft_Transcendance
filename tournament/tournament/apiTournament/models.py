@@ -27,6 +27,9 @@ class Match(models.Model):
     NOT_PLAYED = 0
     IN_PROGRESS = 1
     FINISHED = 2
+    NOT_LEAVE = 0
+    # P1_LEAVE = 1
+    # P2_LEAVE = 2
     
     player_1 = models.ForeignKey(Joueur, related_name='player_1', on_delete=models.CASCADE, null=True)
     player_1_score = models.IntegerField(null=True)
@@ -35,5 +38,6 @@ class Match(models.Model):
     winner = models.ForeignKey(Joueur, related_name='won_games', on_delete=models.SET_NULL, null=True, blank=True)
     tour = models.IntegerField(default=1)  # Pour suivre le tour du match dans le tourno
     status = models.IntegerField(default=NOT_PLAYED)
+    leave = models.IntegerField(default=NOT_LEAVE)
     tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='matches', null=True)  # Ajout de la relation avec le modèle Tournoi
     match_id = models.IntegerField(default=1)

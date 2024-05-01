@@ -1,8 +1,9 @@
 import { getProfile } from '@/auth.js';
 import { isAuthenticated } from '@/auth.js';
-import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament } from '@/tournament.js';
+import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, getTournament, fetchDeletePlayerAndTournament, fetchTournamentInfo } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
+import { redirectTo } from '../router';
 
 class ViewTournament extends HTMLElement {
   #user;
@@ -13,6 +14,15 @@ class ViewTournament extends HTMLElement {
     this.#tournament = getTournament();
   }
   async connectedCallback() {
+    if(this.#tournament.status === 2){
+      await fetchDeletePlayerAndTournament();
+      await fetchTournamentInfo();
+      this.#tournament = getTournament();
+    }
+    if(this.#tournament.status === 1){
+      redirectTo(`/game/tournament/start`);
+      return;
+    }
     const isLoggedIn = await isAuthenticated();
     const backUrl = isLoggedIn ? '/game' : '/';
 
@@ -203,18 +213,22 @@ class ViewTournament extends HTMLElement {
       
           // Incorporer le message conditionnel dans l'HTML de l'élément du tournoi
           tournoiElement.innerHTML = `
-              <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <div style="display: flex; flex-direction: column;">
-                      <h3>${tournoi.name}</h3>
-                      ${isInTournamentMessage} <!-- Ajouter le message ici -->
-                      <div style="display: flex;">
-                          <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
-                          <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
-                      </div>
-                  </div>
-                  <button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; flex-direction: column;">
+                <h3>${tournoi.name}</h3>
+                ${isInTournamentMessage}
+                <div style="display: flex;">
+                  <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
+                  <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
+                </div>
               </div>
-              <hr style="border-top: 1px solid #ccc; margin: 10px 0;">
+              ${
+                tournoi.nombre_joueurs < tournoi.max_players
+                  ? `<button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>`
+                  : ''
+              }
+            </div>
+            <hr style="border-top: 1px solid #ccc; margin: 10px 0;">
           `;
       
           listElement.appendChild(tournoiElement);

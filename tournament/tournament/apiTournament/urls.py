@@ -19,4 +19,5 @@ urlpatterns = [
     path('get_latest_match_for_user/<int:user_id>/<int:tournament_id>', views.get_latest_match_for_user, name='get_latest_match_for_user'),
     path('update_winner/<int:match_id>/<int:winner_id>/', views.update_winner_and_prepare_next_match, name='update_winner_and_prepare_next_match'),
     path('delete_player/<int:player_id>/', views.delete_player_and_tournament_if_empty, name='delete_player'),
+    path('update_leave/<int:match_id>/<int:player>/', views.update_leave, name='update_leave'),
 ]
