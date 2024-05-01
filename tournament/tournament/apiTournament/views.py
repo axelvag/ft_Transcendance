@@ -6,7 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from datetime import timedelta
 import json
-from .models import Joueur, Tournoi
+from .models import Joueur, Tournoi, Match
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -15,6 +15,10 @@ from channels.layers import get_channel_layer
 import logging
 from django.db.models import Count
 import requests
+from django.db.models import Q
+from collections import defaultdict
+from django.db import transaction
+from django.db.models import F
 
 User = get_user_model()
 
@@ -278,3 +282,297 @@ def delete_tournoi(request, tournoi_id):
     except Exception as e:
         # Pour capturer d'autres erreurs potentielles
         return JsonResponse({'success': False, 'message': 'An error occurred: {}'.format(str(e))}, status=500)
+
+
+# @csrf_exempt
+# @verif_sessionID
+# @require_http_methods(["POST"])
+# def start_tournament(request, tournament_id):
+#     try:
+#         tournament = Tournoi.objects.get(pk=tournament_id)
+#         tournament.status = Tournoi.IN_PROGRESS
+#         tournament.save()
+#         return JsonResponse({'message': 'Tournoi mis à jour avec succès en cours.'}, status=200)
+#     except Tournoi.DoesNotExist:
+#         return JsonResponse({'error': 'Tournoi non trouvé.'}, status=404)
+
+
+import random
+
+@csrf_exempt
+@verif_sessionID
+@require_http_methods(["POST"])
+def create_matches(request, tournament_id):
+    with transaction.atomic():  # S'assurer que les opérations suivantes sont atomiques
+        # S'assurer que la même instance de tournoi n'est pas traitée simultanément par une autre requête
+        tournament = Tournoi.objects.select_for_update().get(id=tournament_id)
+        
+        if Match.objects.filter(tournament=tournament).exists():
+            return JsonResponse({'success': True, "message": "Matches already created for this tournament"}, status=200)
+    
+        tournament = None
+        # Vérifier si le tournoi est prêt pour la création de matchs
+        tournament = Tournoi.objects.filter(id=tournament_id, status=Tournoi.CREATED).first()
+        if not tournament:
+            return JsonResponse({"error": "Le tournoi n'est pas dans un état valide pour créer des matchs."}, status=400)
+
+        # Récupérer tous les joueurs du tournoi
+        players = list(Joueur.objects.filter(tournament=tournament_id))
+        if len(players) % 2 != 0:
+            return JsonResponse({"error": "Nombre impair de joueurs, impossible de créer des matchs pairs."}, status=400)
+
+        # Mélanger la liste des joueurs pour randomiser les appariements
+        random.shuffle(players)
+
+        # Créer les matchs pour le premier tour
+        matches_created = []
+        number_of_matches = len(players) // 2
+        for i in range(0, len(players), 2):
+            match = Match.objects.create(
+                player_1=players[i],
+                player_2=players[i+1],
+                tournament=tournament,
+                tour=1,  # Premier tour
+                status=Match.NOT_PLAYED
+            )
+            matches_created.append(match)
+
+        # Créer des matchs pour les tours suivants avec les joueurs à null
+        current_tour = 2
+        while number_of_matches > 1:
+            for _ in range(number_of_matches // 2):
+                match = Match.objects.create(
+                    tournament=tournament,
+                    tour=current_tour,
+                    status=Match.NOT_PLAYED
+                )
+                matches_created.append(match)
+            number_of_matches //= 2
+            current_tour += 1
+
+        # Mettre à jour le statut du tournoi pour indiquer que les matchs sont en cours
+        tournament.status = Tournoi.IN_PROGRESS
+        tournament.save()
+
+        return JsonResponse({'success': True, "message": f"Les matchs ont été créés avec succès pour tous les tours. Nombre de matchs créés: {len(matches_created)}."}, status=201)
+
+# @verif_sessionID
+# @require_http_methods(["GET"])
+# def get_matches(request, tournament_id):
+#     try:
+#         cookies = request.COOKIES.get('sessionid', None)
+#         matches = Match.objects.filter(tournament_id=tournament_id)
+
+#         matches_data = []
+#         for match in matches:
+#             # Obtenir les informations de profil pour chaque joueur
+#             profile_info1 = get_profile_info_cookie(match.player_1.user_id, cookies)
+#             profile_info2 = get_profile_info_cookie(match.player_2.user_id, cookies)
+
+#             # Ajouter les informations du match à la liste
+#             matches_data.append({
+#                 "match_id": match.id,
+#                 "player_1_id": match.player_1.user_id,
+#                 "player_1_username": match.player_1.username,
+#                 "player_1_avatar": profile_info1.get('avatar'),
+#                 "player_2_id": match.player_2.user_id,
+#                 "player_2_username": match.player_2.username,
+#                 "player_2_avatar": profile_info2.get('avatar'),
+#                 "status": match.status,
+#                 "player_1_ready": match.player_1.status_ready,
+#                 "player_2_ready": match.player_2.status_ready,
+#             })
+
+#         # Renvoyez les données JSON avec 'success' et les données des matchs
+#         return JsonResponse({'success': True, 'matches': matches_data}, safe=False)
+
+#     except Tournoi.DoesNotExist:
+#         # Gérez le cas où le tournoi n'existe pas
+#         return JsonResponse({'error': "Tournoi non trouvé."}, status=404)
+
+@verif_sessionID
+@require_http_methods(["GET"])
+def get_matches(request, tournament_id):
+    try:
+        # Vérifier l'existence du tournoi
+        tournament = Tournoi.objects.get(id=tournament_id)
+        matches = Match.objects.filter(tournament=tournament).order_by('tour', 'id')
+
+        # Préparer les données des matchs groupées par tour
+        tours_data = defaultdict(list)
+        for match in matches:
+            profile_info1 = get_profile_info_cookie(match.player_1.user_id, request.COOKIES.get('sessionid')) if match.player_1 else {}
+            profile_info2 = get_profile_info_cookie(match.player_2.user_id, request.COOKIES.get('sessionid')) if match.player_2 else {}
+
+            match_data = {
+                "match_id": match.id,
+                "player_1_id": match.player_1.user_id if match.player_1 else None,
+                "player_1_username": match.player_1.username if match.player_1 else None,
+                "player_1_avatar": profile_info1.get('avatar'),
+                "player_2_id": match.player_2.user_id if match.player_2 else None,
+                "player_2_username": match.player_2.username if match.player_2 else None,
+                "player_2_avatar": profile_info2.get('avatar'),
+                "status": match.status,
+                "player_1_ready": match.player_1.status_ready if match.player_1 else False,
+                "player_2_ready": match.player_2.status_ready if match.player_2 else False,
+                "winner": match.winner,
+            }
+            tours_data[match.tour].append(match_data)
+
+        # Convertir le dictionnaire en liste de listes pour respecter le format souhaité
+        sorted_tours = sorted(tours_data.items())
+        matches_by_tour = [tour_matches for _, tour_matches in sorted_tours]
+
+        return JsonResponse({'success': True, 'matches_by_tour': matches_by_tour}, safe=False)
+
+    except Tournoi.DoesNotExist:
+        return JsonResponse({'error': "Tournoi non trouvé."}, status=404)
+
+
+@csrf_exempt
+@verif_sessionID
+@require_http_methods(["POST"])
+def set_player_ready(request, player_id):
+    try:
+        player = Joueur.objects.get(user_id=player_id)
+
+        # Bascule l'état de préparation du joueur
+        if player.status_ready == Joueur.READY:
+            player.status_ready = Joueur.NOT_READY
+        else:
+            player.status_ready = Joueur.READY
+        player.save()
+
+        # Récupérez le match correspondant au joueur
+        match = Match.objects.filter(Q(player_1=player) | Q(player_2=player)).first()
+        if not match:
+            return JsonResponse({"success": False, "error": "Match correspondant non trouvé."}, status=404)
+
+        # Vérifiez si les deux joueurs sont prêts
+        if match.player_1.status_ready == Joueur.READY and match.player_2.status_ready == Joueur.READY:
+            match.status = Match.IN_PROGRESS
+            match.save()
+            return JsonResponse({"success": True, "match_started": True})
+        
+        return JsonResponse({"success": True, "match_started": False, "player_status": player.status_ready})
+
+    except Joueur.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Joueur non trouvé."}, status=404)
+
+
+
+def get_profile_info_cookie(user_id, cookies):
+    profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
+    try:
+        response = requests.get(profile_service_url, cookies={'sessionid': cookies})
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {}
+    except requests.exceptions.RequestException:
+        return {}
+
+
+import math
+
+
+@csrf_exempt
+@verif_sessionID
+@require_http_methods(["GET"])
+def get_next_rounds(request, tournament_id):
+    try:
+        # Récupérer le tournoi
+        tournament = Tournoi.objects.get(id=tournament_id)
+        
+        # Calculer le nombre de joueurs et le nombre de tours nécessaires
+        num_players = tournament.players.count()
+        current_round = 1  # Remplacez ceci par le tour actuel du tournoi
+        remaining_players = num_players - 2**(current_round - 1)  # Nombre de joueurs restants après le tour actuel
+        remaining_rounds = math.ceil(math.log2(remaining_players))  # Nombre de tours restants après le tour actuel
+
+        # Générer les tours restants avec l'état d'attente
+        rounds_data = []
+        for i in range(current_round + 1, current_round + 1 + remaining_rounds):
+            round_info = {
+                "round": i,
+                "matches": []  # Liste vide pour indiquer un tour vide
+            }
+            rounds_data.append(round_info)
+
+        # Renvoyer les données JSON avec les tours restants
+        return JsonResponse({"success": True, "rounds": rounds_data})
+
+    except Tournoi.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Tournoi non trouvé."}, status=404)
+
+
+@verif_sessionID
+@require_http_methods(["GET"])
+def get_latest_match_for_user(request, user_id):
+    try:
+        joueur = Joueur.objects.get(user_id=user_id)
+        # Obtenir les matchs où le joueur est soit player_1 soit player_2, et qui ne sont pas encore terminés.
+        latest_match = Match.objects.filter(
+            (Q(player_1=joueur) | Q(player_2=joueur)),
+            # status=Match.NOT_PLAYED
+        ).order_by('-tour').first()  # Trier par 'tour' en ordre décroissant et prendre le premier
+
+        if latest_match:
+            match_data = {
+                "match_id": latest_match.id,
+                "player_1_id": latest_match.player_1.user_id if latest_match.player_1 else None,
+                "player_1_username": latest_match.player_1.username if latest_match.player_1 else None,
+                "player_2_id": latest_match.player_2.user_id if latest_match.player_2 else None,
+                "player_2_username": latest_match.player_2.username if latest_match.player_2 else None,
+                "status": latest_match.status,
+                "tour": latest_match.tour,
+                # Ajoutez ici d'autres données que vous souhaitez retourner.
+            }
+            return JsonResponse({'success': True, 'matches_data': match_data}, status=200)
+        else:
+            return JsonResponse({"error": "Aucun match en cours trouvé pour l'utilisateur."}, status=404)
+    
+    except Joueur.DoesNotExist:
+        return JsonResponse({'error': "Utilisateur non trouvé."}, status=404)
+
+
+@csrf_exempt
+@verif_sessionID
+@require_http_methods(["POST"])
+def update_winner_and_prepare_next_match(request, match_id, winner_id):
+    with transaction.atomic():
+        # Trouver le match actuel et mettre à jour le vainqueur
+        try:
+            match = Match.objects.select_for_update().get(id=match_id)
+            winner = Joueur.objects.get(id=winner_id)
+            match.winner = winner
+            match.status = Match.FINISHED
+            match.save()
+        except (Match.DoesNotExist, Joueur.DoesNotExist):
+            return JsonResponse({'error': "Match ou Joueur non trouvé."}, status=404)
+        
+        # Déterminer le prochain match
+        next_tour = match.tour + 1
+        try:
+            tournament = match.tournament
+            # Trouver le prochain match en cours pour le tournoi actuel et le tour suivant
+            next_match = Match.objects.filter(tournament=tournament, tour=next_tour, player_1=None).first()
+            if not next_match:
+                next_match = Match.objects.filter(tournament=tournament, tour=next_tour, player_2=None).first()
+            
+            # Mise à jour du prochain match avec le vainqueur
+            if next_match:
+                if next_match.player_1 is None:
+                    next_match.player_1 = winner
+                else:
+                    next_match.player_2 = winner
+                next_match.save()
+        except Match.DoesNotExist:
+            # Si aucun match n'est trouvé pour le tour suivant, cela peut signifier que le tournoi est terminé
+            return JsonResponse({'message': "Aucun match suivant à mettre à jour. Le tournoi pourrait être terminé."}, status=200)
+            
+        # Retourner une réponse de succès
+        return JsonResponse({
+            'success': True,
+            'message': "Le vainqueur a été mis à jour et le match suivant a été préparé."
+        }, status=200)

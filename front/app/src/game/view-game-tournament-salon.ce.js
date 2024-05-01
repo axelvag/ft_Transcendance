@@ -152,6 +152,28 @@ class ViewTournamentSalon extends HTMLElement {
 
         // Calculer le nombre de joueurs en attente
         const nbPlayersWaiting = this.#tournament.maxPlayer - players.length;
+        console.log(this.#tournament.maxPlayer);
+        console.log(players.length);
+        if (nbPlayersWaiting === 0) {
+          // Si aucun joueur en attente, passer à view-game-tournament.ce.js
+          // if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+          //   this.socket.close();
+          // }
+          //status tournament in progress
+        //   const response = await fetch(`http://127.0.0.1:8005/tournament/start/${this.#tournament.id}/`, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     credentials: 'include',
+        // });
+
+        // if (!response.ok) {
+        //     throw new Error(`HTTP error! status: ${response.status}`);
+        // }
+          redirectTo(`/game/tournament/start`);
+          return; // Arrêter l'exécution de la fonction
+        }
         const waitingElement = document.createElement('div');
         waitingElement.innerHTML = `<h3>${nbPlayersWaiting} player(s) waiting</h3>`;
         listElement.appendChild(waitingElement);

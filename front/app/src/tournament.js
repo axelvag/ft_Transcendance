@@ -33,6 +33,28 @@ const getTournament = () => {
   };
 };
 
+const match = {
+  id: null,
+  winner: null,
+};
+
+const setLocalMatch = data => {
+  match.id = data.match_id || '';
+  match.winner = data.player_1_id || '';
+};
+
+const resetLocalMatch = () => {
+  match.id = null;
+  match.winner = null;
+};
+
+const getMatch = () => {
+  return {
+    id: match.id,
+    winner: match.winner,
+  };
+};
+
 const fetchGetTournament = async (tournamentId) => {
   const response = await fetch(`${BASE_URL}:8005/tournament/get/${tournamentId}/`, {
     method: 'GET',
@@ -162,4 +184,57 @@ const fetchTournamentInfo = async () => {
   }
 };
 
-export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist };
+const fetchInfoMatch = async () => {
+  let user = getProfile();
+  const response = await fetch(`http://127.0.0.1:8005/tournament/get_latest_match_for_user/${user.id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  const data = await response.json();
+  console.log(data);
+  if (data.success) {
+    setLocalMatch(data.matches_data);
+  } else {
+    console.log("player is not in a match");
+  }
+};
+
+const fetchCreateMatchs = async () => {
+  const response = await fetch(`http://127.0.0.1:8005/tournament/create_matches/${tournament.id}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+};
+
+const fetchGetMatchs = async () => {
+  const response = await fetch(`http://127.0.0.1:8005/tournament/get_matches/${tournament.id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+};
+
+const fetchWinnerMatch = async () => {
+  const response = await fetch(`http://127.0.0.1:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+};
+
+
+
+export { tournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch };
