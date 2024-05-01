@@ -1,13 +1,14 @@
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { getProfile } from '@/auth.js';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
-
+import { fetchWinnerMatch2 } from '@/tournament.js';
 class ViewGameOnline extends HTMLElement {
   #game;
   #user;
   #playerLeft;
   #playerRight;
   #ws;
+  #leavePath;
 
   constructor() {
     super();
@@ -23,6 +24,8 @@ class ViewGameOnline extends HTMLElement {
   }
 
   async connectedCallback() {
+    this.#leavePath = this.hasAttribute('tournament-id') ? '/game/tournament/start' : '/game';
+
     this.innerHTML = `
       <default-layout-main>
         <div class="text-center">
@@ -90,6 +93,7 @@ class ViewGameOnline extends HTMLElement {
   }
 
   renderGame() {
+
     let gameHtml = `
       <div class="d-flex justify-content-center align-items-center my-5">
         <game-player
@@ -130,13 +134,13 @@ class ViewGameOnline extends HTMLElement {
       gameHtml += `
         <div class="mb-4">
           <button id="viewGameOnline-endBtn" class="btn btn-secondary fw-semibold">CLICK TO WIN</button>
-          <button class="btn btn-primary" data-link="/game">Leave</button>
+          <button class="btn btn-primary" data-link="${this.#leavePath}">Leave</button>
         </div>
       `;
     } else {
       gameHtml += `
         <div class="mb-4">
-          <button class="btn btn-primary" data-link="/game">Leave</button>
+          <button class="btn btn-primary" data-link="${this.#leavePath}">Leave</button>
         </div>
       `;
     }
@@ -145,7 +149,7 @@ class ViewGameOnline extends HTMLElement {
 
     const endBtn = this.querySelector('#viewGameOnline-endBtn');
     if (endBtn) {
-      endBtn.addEventListener('click', () => {
+      endBtn.addEventListener('click', async () => {
         if (!this.#ws) {
           alert('WebSocket connection is not available.');
           return;
@@ -160,6 +164,8 @@ class ViewGameOnline extends HTMLElement {
         };
         console.log('ws msg', msg);
         this.#ws.send(JSON.stringify(msg));
+        // todo fetch winner id 
+        await fetchWinnerMatch2(this.#user.id);
       });
     }
   }

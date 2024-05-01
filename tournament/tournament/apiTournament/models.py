@@ -37,3 +37,4 @@ class Match(models.Model):
     status = models.IntegerField(default=NOT_PLAYED)
     tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='matches', null=True)  # Ajout de la relation avec le modèle Tournoi
     match_id = models.IntegerField(default=1)
+    game_id = models.IntegerField(null=True, blank=True)
