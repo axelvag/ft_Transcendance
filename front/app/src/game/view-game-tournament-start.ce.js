@@ -162,8 +162,8 @@ displayMatches(matchesByTour) {
             console.log("passe icii", player1Name,  player2Name);
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
-              const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
-              const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Prêt') : '';
+              const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
+              const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Play') : '';
               let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
               let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
               // si on est en final -> tourIndex === totalTours - 1
@@ -182,7 +182,7 @@ displayMatches(matchesByTour) {
                           <h5 class="card-title">${player1Name}</h5>
                         </div>
                         <div class="col-3 mb-2">
-                          ${isPlayer1 ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : readyIconPlayer1}
+                          ${(isPlayer1 && this.#match.player1id !== "" && this.#match.player2id !== "" ) ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer1 : "")}
                         </div>
                       </div>
                     </div>
@@ -196,7 +196,7 @@ displayMatches(matchesByTour) {
                           <h5 class="card-title">${player2Name}</h5>
                         </div>
                         <div class="col-3 mb-2">
-                        ${isPlayer2 ? `<button id="ready-player2-${match.match_id}" class="ready-button mt-2">${buttonPlayer2}</button>` : readyIconPlayer2}
+                          ${(isPlayer2 && this.#match.player1id !== "" && this.#match.player2id !== "" )? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer2 : "")}
                         </div>
                       </div>
                     </div>
@@ -275,11 +275,11 @@ displayMatches(matchesByTour) {
             `;
           }
           // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
-       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player1id !== "") {
+       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player2id !== "") {
             const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
             player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
         }
-        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player1id !== "") {
+        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player2id !== "") {
             const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
             player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
         }
