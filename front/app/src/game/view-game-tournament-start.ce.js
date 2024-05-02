@@ -162,8 +162,8 @@ displayMatches(matchesByTour) {
             console.log("passe icii", player1Name,  player2Name);
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
-              const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Prêt') : '';
-              const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Prêt') : '';
+              const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
+              const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Play') : '';
               let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
               let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
 
@@ -172,13 +172,13 @@ displayMatches(matchesByTour) {
                   <div class="player-info d-flex align-items-center">
                     ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
                     <span class="player">${player1Name}</span>
-                    ${(isPlayer1 && this.#match.player1id !== "" && this.#match.player1id !== "" ) ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : ((this.#match.player1id !== "" && this.#match.player1id !== "") ? readyIconPlayer1 : "")}
+                    ${(isPlayer1 && this.#match.player1id !== "" && this.#match.player2id !== "" ) ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer1 : "")}
                   </div>
                   <div class="vs">vs</div>
                   <div class="player-info d-flex align-items-center">
                     ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
                     <span class="player">${player2Name}</span>
-                    ${(isPlayer2 && this.#match.player1id !== "" && this.#match.player1id !== "" )? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : ((this.#match.player1id !== "" && this.#match.player1id !== "") ? readyIconPlayer2 : "")}
+                    ${(isPlayer2 && this.#match.player1id !== "" && this.#match.player2id !== "" )? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer2 : "")}
                   </div>
                   <br><br>
                 </div>
@@ -224,11 +224,11 @@ displayMatches(matchesByTour) {
             `;
           }
           // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
-       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player1id !== "") {
+       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player2id !== "") {
             const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
             player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
         }
-        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player1id !== "") {
+        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player2id !== "") {
             const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
             player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
         }

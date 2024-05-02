@@ -69,24 +69,30 @@ def create_tournament(request):
 @verif_sessionID
 @require_http_methods(["GET"])
 def view(request):
-    # Filtrez les tournois avec un status égal à 0 et annotez chaque tournoi avec le nombre de joueurs
+    # Filtrer les tournois avec un statut égal à 0 et annoter chaque tournoi avec le nombre de joueurs
     tournois = Tournoi.objects.filter(status=0).annotate(nombre_joueurs=Count('players'))
 
-    # Préparez les données pour la réponse
-    data = [
-        {
+    # Préparer les données pour la réponse
+    data = []
+
+    for tournoi in tournois:
+        profile_info = get_profile_info_cookie(tournoi.admin_id, request.COOKIES.get('sessionid')) if tournoi.admin_id else {}
+        
+        tournoi_data = {
             'id': tournoi.id,
             'name': tournoi.name,
             'status': tournoi.status,
             'max_players': tournoi.max_players,
             'start_datetime': tournoi.start_datetime,
-            'nombre_joueurs': tournoi.nombre_joueurs  # Inclure le nombre de joueurs ici
+            'nombre_joueurs': tournoi.nombre_joueurs,  # Inclure le nombre de joueurs ici
+            'admin_username': profile_info.get('username'),
         }
-        for tournoi in tournois
-    ]
 
-    # Retournez les données en JSON
-    return JsonResponse(data, safe=False, status = 200)
+        data.append(tournoi_data)
+
+    # Retourner les données en JSON
+    return JsonResponse(data, safe=False, status=200)
+
 
 
 @verif_sessionID
@@ -95,7 +101,8 @@ def tournament_detail(request, tournament_id):
     try:
         # Essayez de récupérer le tournoi par son ID
         tournament = Tournoi.objects.get(pk=tournament_id)
-        
+        profile_info = get_profile_info_cookie(tournament.admin_id, request.COOKIES.get('sessionid')) if tournament.admin_id else {}
+        logging.critical(profile_info)
         # Préparez les données à renvoyer si le tournoi est trouvé
         data = {
             'success': True,
@@ -105,6 +112,7 @@ def tournament_detail(request, tournament_id):
                 'maxPlayer': tournament.max_players,
                 'admin_id': tournament.admin_id,
                 'status': tournament.status,
+                'admin_username': profile_info.get('username'),
                 # Ajoutez d'autres champs selon votre modèle
             }
         }

@@ -8,6 +8,7 @@ const tournament = {
   name: null,
   maxPlayer: null,
   admin_id: null,
+  admin_username: null,
   status: null,
 };
 
@@ -17,6 +18,7 @@ const setLocalTournament = data => {
   tournament.maxPlayer = data.maxPlayer || '';
   tournament.admin_id = data.admin_id || '';
   tournament.status = data.status || 0;
+  tournament.admin_username = data.admin_username || '';
 };
 
 const resetLocalTournament = () => {
@@ -25,6 +27,7 @@ const resetLocalTournament = () => {
   tournament.maxPlayer = null;
   tournament.admin_id = null;
   tournament.status = null;
+  tournament.admin_username = null;
 };
 
 const getTournament = () => {
@@ -34,6 +37,7 @@ const getTournament = () => {
     maxPlayer: tournament.maxPlayer,
     admin_id: tournament.admin_id,
     status: tournament.status,
+    admin_username: tournament.admin_username,
   };
 };
 
@@ -84,6 +88,7 @@ const fetchGetTournament = async (tournamentId) => {
     credentials: 'include',
   });
   const data = await response.json();
+  console.log(data);
   if (data.success) {
     setLocalTournament(data.data);
     redirectTo(`/game/tournament/waiting`);

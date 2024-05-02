@@ -219,7 +219,7 @@ class ViewTournament extends HTMLElement {
                 ${isInTournamentMessage}
                 <div style="display: flex;">
                   <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
-                  <p>Start Date: ${new Date(tournoi.start_datetime).toLocaleDateString()}</p>
+                  <p>Create by: ${tournoi.admin_username}</p>
                 </div>
               </div>
               ${
