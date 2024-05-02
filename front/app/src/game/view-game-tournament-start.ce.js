@@ -119,6 +119,7 @@ displayMatches(matchesByTour) {
   const totalTours = matchesByTour.length; // Nombre total de tours
   
   matchesByTour.forEach((matches, tourIndex) => {
+      console.log("tourrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
       const tourElement = document.createElement('div');
       tourElement.classList.add('tour');
       tourElement.style.display = 'flex';
@@ -159,7 +160,7 @@ displayMatches(matchesByTour) {
           console.log(match.match_id);
           if(this.#match.id === match.match_id && match.status != 2) {
             console.log(this.#match);
-            console.log("passe icii", player1Name,  player2Name);
+            console.log("passe icii", player1Name,  player2Name, match.player_1_ready, match.player_2_ready);
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
               const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
@@ -235,6 +236,7 @@ displayMatches(matchesByTour) {
           tourElement.appendChild(matchElement);
       });
       if (tourIndex === totalTours - 1) {
+        // tournamentTabElement.appendChild(tourElement);
         const finaleHeader = document.createElement('div');
         finaleHeader.style.display = 'flex';
         finaleHeader.style.alignItems = 'center'; // Centrer les éléments verticalement
@@ -261,6 +263,7 @@ displayMatches(matchesByTour) {
 
         finaleHeader.appendChild(winnerContainer);
         tourElement.insertBefore(finaleHeader, tourElement.firstChild);
+        // tourElement.appendChild(finaleHeader);
       }
       
 
