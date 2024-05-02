@@ -103,6 +103,7 @@ def tournament_detail(request, tournament_id):
         tournament = Tournoi.objects.get(pk=tournament_id)
         profile_info = get_profile_info_cookie(tournament.admin_id, request.COOKIES.get('sessionid')) if tournament.admin_id else {}
         logging.critical(profile_info)
+        player_count = tournament.players.count()
         # Préparez les données à renvoyer si le tournoi est trouvé
         data = {
             'success': True,
@@ -113,6 +114,7 @@ def tournament_detail(request, tournament_id):
                 'admin_id': tournament.admin_id,
                 'status': tournament.status,
                 'admin_username': profile_info.get('username'),
+                'nombreDeJoueur': player_count,
                 # Ajoutez d'autres champs selon votre modèle
             }
         }

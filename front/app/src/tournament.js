@@ -88,7 +88,7 @@ const fetchGetTournament = async (tournamentId) => {
     credentials: 'include',
   });
   const data = await response.json();
-  console.log(data);
+  console.log("fdsfsfsdfsdfsdfsdfsfsdf",data);
   if (data.success) {
     setLocalTournament(data.data);
     redirectTo(`/game/tournament/waiting`);
