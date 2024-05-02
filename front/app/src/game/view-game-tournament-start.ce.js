@@ -287,37 +287,50 @@ displayMatches(matchesByTour) {
           tourElement.appendChild(matchElement);
       });
       if (tourIndex === totalTours - 1) {
-        // tournamentTabElement.appendChild(tourElement);
+        // Ajouter le `tourElement` courant à `tournamentTabElement`
+        tournamentTabElement.appendChild(tourElement);
+    
+        // Créer un nouveau `tourElement` pour `finaleHeader`
+        const finalTourElement = document.createElement('div');
+        finalTourElement.classList.add('tour');
+        finalTourElement.style.display = 'flex';
+        finalTourElement.style.flexDirection = 'column'; // Alignement vertical des éléments dans ce tour
+        finalTourElement.style.marginRight = '150px'; // Espacement entre les tours
+    
+        // Créer le `finaleHeader`
         const finaleHeader = document.createElement('div');
         finaleHeader.style.display = 'flex';
-        finaleHeader.style.alignItems = 'flex-start'; // Centrer les éléments verticalement
-        finaleHeader.appendChild(titleElement);
-
+        finaleHeader.style.alignItems = 'flex-start';
+    
+        // finaleHeader.appendChild(titleElement);
+    
         const winnerContainer = document.createElement('div');
         winnerContainer.style.display = 'flex';
-        winnerContainer.style.flexDirection = 'column'; // Empiler le titre "Winner" et le message verticalement
-        winnerContainer.style.marginLeft = '150px'; // Pousser le conteneur à droite
-
+        winnerContainer.style.flexDirection = 'column'; // Empiler les éléments verticalement
+        // winnerContainer.style.marginLeft = '150px';
+    
         const winnerTitleElement = document.createElement('h3');
         winnerTitleElement.textContent = 'Winner';
         winnerContainer.appendChild(winnerTitleElement);
-
+    
         const winnerMessageElement = document.createElement('div');
         let winnerMessage = "Waiting for result";
         const lastMatch = matches[matches.length - 1];
-        // console.log("yooooooooooooooooooooooooooo",matches[matches.length - 1]);
         if (lastMatch && lastMatch.winner_id) {
             winnerMessage = lastMatch.winner_id;
         }
         winnerMessageElement.innerHTML = `<h5>Winner: ${winnerMessage}</h5>`;
         winnerContainer.appendChild(winnerMessageElement);
-
+    
         finaleHeader.appendChild(winnerContainer);
-        tourElement.insertBefore(finaleHeader, tourElement.firstChild);
-        // tourElement.appendChild(finaleHeader);
-      }
-      
-
+    
+        // Ajouter `finaleHeader` à `finalTourElement`
+        finalTourElement.appendChild(finaleHeader);
+    
+        // Ajouter `finalTourElement` à `tournamentTabElement`
+        tournamentTabElement.appendChild(finalTourElement);
+    }
+    if (tourIndex !== totalTours - 1) 
       tournamentTabElement.appendChild(tourElement);
   });
 }
