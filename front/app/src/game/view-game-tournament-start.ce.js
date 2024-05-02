@@ -119,6 +119,7 @@ displayMatches(matchesByTour) {
   const totalTours = matchesByTour.length; // Nombre total de tours
   
   matchesByTour.forEach((matches, tourIndex) => {
+      console.log("tourrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
       const tourElement = document.createElement('div');
       tourElement.classList.add('tour');
       tourElement.style.display = 'flex';
@@ -159,7 +160,7 @@ displayMatches(matchesByTour) {
           console.log(match.match_id);
           if(this.#match.id === match.match_id && match.status != 2) {
             console.log(this.#match);
-            console.log("passe icii", player1Name,  player2Name);
+            console.log("passe icii", player1Name,  player2Name, match.player_1_ready, match.player_2_ready);
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
               const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
@@ -167,7 +168,7 @@ displayMatches(matchesByTour) {
               let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
               let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
               // si on est en final -> tourIndex === totalTours - 1
-              let vsElement = tourIndex === totalTours - 1 ? `<div class=" col-6 vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+              let vsElement = tourIndex === totalTours - 1 ? `<div class=" vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
               let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
               // Le bracket ou le joueur vas jouer
               matchElement.innerHTML = `
@@ -211,7 +212,7 @@ displayMatches(matchesByTour) {
             // Apply green text color if the player is the winner
             const player1Style = match.winner_id === player1Name ? 'color:green;' : 'color:red;';
             const player2Style = match.winner_id === player2Name ? 'color:green;' : 'color:red;';
-            let vsElement = tourIndex === totalTours - 1 ? `<div class=" col-6 vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+            let vsElement = tourIndex === totalTours - 1 ? `<div class=" vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
             let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
             // Les brackets deja finis
             matchElement.innerHTML = `
@@ -244,7 +245,7 @@ displayMatches(matchesByTour) {
           }
           // Les brackets pas encores faits ou des autres
           else {
-            let vsElement = tourIndex === totalTours - 1 ? `<div class=" col-6 vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+            let vsElement = tourIndex === totalTours - 1 ? `<div class=" vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
             let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
             matchElement.innerHTML = `
               ${SpaceDownBracketFinal}
@@ -286,61 +287,64 @@ displayMatches(matchesByTour) {
           tourElement.appendChild(matchElement);
       });
       if (tourIndex === totalTours - 1) {
+        // Ajouter le `tourElement` courant à `tournamentTabElement`
+        tournamentTabElement.appendChild(tourElement);
+    
+        // Créer un nouveau `tourElement` pour `finaleHeader`
+        const finalTourElement = document.createElement('div');
+        finalTourElement.classList.add('tour');
+        finalTourElement.style.display = 'flex';
+        finalTourElement.style.flexDirection = 'column'; // Alignement vertical des éléments dans ce tour
+        finalTourElement.style.marginRight = '150px'; // Espacement entre les tours
+    
+        // Créer le `finaleHeader`
         const finaleHeader = document.createElement('div');
         finaleHeader.style.display = 'flex';
-        finaleHeader.style.alignItems = 'flex-start'; // Centrer les éléments verticalement
-        finaleHeader.appendChild(titleElement);
-
+        finaleHeader.style.alignItems = 'flex-start';
+    
+        // finaleHeader.appendChild(titleElement);
+    
         const winnerContainer = document.createElement('div');
         winnerContainer.style.display = 'flex';
-        winnerContainer.style.flexDirection = 'column'; // Empiler le titre "Winner" et le message verticalement
-        winnerContainer.style.marginLeft = '300px'; // Pousser le conteneur à droite
-
+        winnerContainer.style.flexDirection = 'column'; // Empiler les éléments verticalement
+        // winnerContainer.style.marginLeft = '150px';
+    
         const winnerTitleElement = document.createElement('h3');
         winnerTitleElement.textContent = 'Winner';
         winnerContainer.appendChild(winnerTitleElement);
-
-        const winnerMessageElement = document.createElement('div');
-        let winnerMessage = "Waiting for result";
-        const lastMatch = matches[matches.length - 1];
-        // console.log("yooooooooooooooooooooooooooo",matches[matches.length - 1]);
-        if (lastMatch && lastMatch.winner_id) {
-            winnerMessage = lastMatch.winner_id;
-        }
-        winnerMessageElement.innerHTML = `<h5>Winner: ${winnerMessage}</h5>`;
-        winnerContainer.appendChild(winnerMessageElement);
-
+    
         finaleHeader.appendChild(winnerContainer);
-        tourElement.insertBefore(finaleHeader, tourElement.firstChild);
+    
+        
+        // Ajouter `finaleHeader` à `finalTourElement`
+        finalTourElement.appendChild(finaleHeader);
 
-        // Avatar du gagnant
-        // const winnerAvatar = document.createElement('div');
-        // let winnerAvatarPath = "";
-        // winnerAvatar.style.display = 'flex';
-        // if (lastMatch && lastMatch.winner_id) {
-        //   if (lastMatch.winner_id === lastMatch.player_1_username) {
-        //     winnerAvatarPath = lastMatch.player_1_avatar;
-        //   }
-        //   else if (lastMatch.winner_id === lastMatch.player_2_username) {
-        //     winnerAvatarPath = lastMatch.player_2_avatar;
-        //   }
-        // }
-        // winnerAvatar.innerHTML = `<img src="${winnerAvatarPath}" class="img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="Winner Avatar">`;
-        // tournamentTabElement.appendChild(winnerAvatar);
-      }
-      const lastMatch = matches[matches.length - 1];
-      if (lastMatch && lastMatch.winner_id && tourIndex === totalTours - 1) {
-        const winnerAvatar = document.createElement('div');
-        let winnerAvatarPath = "";
-        if (lastMatch.winner_id === lastMatch.player_1_username) {
-          winnerAvatarPath = lastMatch.player_1_avatar;
+        // Ajouter l'avatar du gagnant
+        const lastMatch = matches[matches.length - 1];
+        if (lastMatch && lastMatch.winner_id && tourIndex === totalTours - 1) {
+          const winnerAvatar = document.createElement('p');
+          let winnerAvatarPath = "";
+          if (lastMatch.winner_id === lastMatch.player_1_username) {
+            winnerAvatarPath = lastMatch.player_1_avatar;
+          }
+          else if (lastMatch.winner_id === lastMatch.player_2_username) {
+            winnerAvatarPath = lastMatch.player_2_avatar;
+          }
+          console.log(winnerAvatarPath);
+          winnerAvatar.innerHTML = `
+              <br><br><br><br>
+              <h3 class="text-center mb-3">${lastMatch.winner_id}</h3>
+              <img src="${winnerAvatarPath}" class="img-fluid rounded-circle m-n1" style="max-width: 100%; width: 200px; height: 200px;" height="200" alt="Winner Avatar">
+              <img src="/assets/img/winner.png" class="img-fluid rounded-circle m-n1" style="max-width: 100%; width: 200px; height: 200px;" alt="Winner Avatar">
+              `;
+          finalTourElement.appendChild(winnerAvatar);
         }
-        else if (lastMatch.winner_id === lastMatch.player_2_username) {
-          winnerAvatarPath = lastMatch.player_2_avatar;
-        }
-        winnerAvatar.innerHTML = `<img src="${winnerAvatarPath}" class="img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="Winner Avatar">`;
-        tourElement.appendChild(winnerAvatar);
-      }
+    
+        // Ajouter `finalTourElement` à `tournamentTabElement`
+        tournamentTabElement.appendChild(finalTourElement);
+        
+    }
+    if (tourIndex !== totalTours - 1) 
       tournamentTabElement.appendChild(tourElement);
   });
 }
