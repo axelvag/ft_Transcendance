@@ -148,10 +148,10 @@ displayMatches(matchesByTour) {
           let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
           
           // Gérer l'affichage lorsque les joueurs ne sont pas encore déterminés
-          if (player1Name === "Waiting for a winner") {
+          if (player1Name === "...") {
             avatarImg1 = ""; // Ne pas afficher d'avatar
           }
-          if (player2Name === "Waiting for a winner") {
+          if (player2Name === "...") {
             avatarImg2 = ""; // Ne pas afficher d'avatar
           }
           
@@ -294,7 +294,7 @@ displayMatches(matchesByTour) {
         const winnerContainer = document.createElement('div');
         winnerContainer.style.display = 'flex';
         winnerContainer.style.flexDirection = 'column'; // Empiler le titre "Winner" et le message verticalement
-        winnerContainer.style.marginLeft = '150px'; // Pousser le conteneur à droite
+        winnerContainer.style.marginLeft = '300px'; // Pousser le conteneur à droite
 
         const winnerTitleElement = document.createElement('h3');
         winnerTitleElement.textContent = 'Winner';
@@ -312,9 +312,35 @@ displayMatches(matchesByTour) {
 
         finaleHeader.appendChild(winnerContainer);
         tourElement.insertBefore(finaleHeader, tourElement.firstChild);
-      }
-      
 
+        // Avatar du gagnant
+        // const winnerAvatar = document.createElement('div');
+        // let winnerAvatarPath = "";
+        // winnerAvatar.style.display = 'flex';
+        // if (lastMatch && lastMatch.winner_id) {
+        //   if (lastMatch.winner_id === lastMatch.player_1_username) {
+        //     winnerAvatarPath = lastMatch.player_1_avatar;
+        //   }
+        //   else if (lastMatch.winner_id === lastMatch.player_2_username) {
+        //     winnerAvatarPath = lastMatch.player_2_avatar;
+        //   }
+        // }
+        // winnerAvatar.innerHTML = `<img src="${winnerAvatarPath}" class="img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="Winner Avatar">`;
+        // tournamentTabElement.appendChild(winnerAvatar);
+      }
+      const lastMatch = matches[matches.length - 1];
+      if (lastMatch && lastMatch.winner_id && tourIndex === totalTours - 1) {
+        const winnerAvatar = document.createElement('div');
+        let winnerAvatarPath = "";
+        if (lastMatch.winner_id === lastMatch.player_1_username) {
+          winnerAvatarPath = lastMatch.player_1_avatar;
+        }
+        else if (lastMatch.winner_id === lastMatch.player_2_username) {
+          winnerAvatarPath = lastMatch.player_2_avatar;
+        }
+        winnerAvatar.innerHTML = `<img src="${winnerAvatarPath}" class="img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="Winner Avatar">`;
+        tourElement.appendChild(winnerAvatar);
+      }
       tournamentTabElement.appendChild(tourElement);
   });
 }
