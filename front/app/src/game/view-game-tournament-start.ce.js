@@ -334,8 +334,8 @@ displayMatches(matchesByTour) {
           winnerAvatar.innerHTML = `
               <br><br><br><br>
               <h3 class="text-center mb-3">${lastMatch.winner_id}</h3>
-              <img src="${winnerAvatarPath}" class="img-fluid rounded-circle m-n1" style="max-width: 100%; width: 200px; height: 200px;" height="200" alt="Winner Avatar">
-              <img src="/assets/img/winner.png" class="img-fluid rounded-circle m-n1" style="max-width: 100%; width: 200px; height: 200px;" alt="Winner Avatar">
+              <img src="${winnerAvatarPath}" class="img-fluid rounded-circle m-n1" style="max-width: 100%; width: 200px; height: 200px; position:absolute;z-index:2" alt="Winner Avatar">
+              <img src="/assets/img/winner.png" class="img-fluid rounded-circle m-n1" style="max-width: 100%; width: 200px; height: 200px; position:absolute;z-index:2" alt="Winner Avatar">
               `;
           finalTourElement.appendChild(winnerAvatar);
         }
