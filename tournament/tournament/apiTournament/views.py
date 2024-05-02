@@ -349,10 +349,16 @@ def create_matches(request, tournament_id):
             return JsonResponse({"error": "Le tournoi n'est pas dans un état valide pour créer des matchs."}, status=400)
 
         players = list(Joueur.objects.filter(tournament=tournament_id))
+
+        logging.critical("Liste des joueurs avant mélange: %s", players)
+
         if len(players) % 2 != 0:
             return JsonResponse({"error": "Nombre impair de joueurs, impossible de créer des matchs pairs."}, status=400)
 
         random.shuffle(players)
+
+        logging.critical("Liste des joueurs après mélange: %s", players)
+
         matches_created = []
         
         number_of_matches = len(players) // 2
@@ -373,15 +379,17 @@ def create_matches(request, tournament_id):
             player_1 = players[i]
             player_2 = players[i+1]
 
+            logging.critical(f"Pairing: Player 1 - {player_1}, Player 2 - {player_2}")
+
             # Vérifiez que les deux joueurs existent
-            if not (Joueur.objects.filter(id=player_1.id).exists() and Joueur.objects.filter(id=player_2.id).exists()):
+            if not (Joueur.objects.filter(user_id=player_1.id).exists() and Joueur.objects.filter(user_id=player_2.id).exists()):
                 return JsonResponse({"error": f"Un des joueurs n'existe pas : {player_1.id} ou {player_2.id}"}, status=400)
 
 
             # Créez un nouveau jeu via le service externe
             response = requests.post("https://game:8009/games", json={
-                "player_left_id": player_1.id,
-                "player_right_id": player_2.id,
+                "player_left_id": player_1.user_id,
+                "player_right_id": player_2.user_id,
             }, cookies=request.COOKIES, verify=False)
 
             print(response.status_code, response.json())
@@ -390,7 +398,12 @@ def create_matches(request, tournament_id):
                 return JsonResponse({"error": "Failed to create game in external service."}, status=response.status_code)
 
             game_data = response.json()
+
+            logging.critical("game_data: %s", game_data)
+
             game_id = game_data.get("id")
+
+            logging.critical("game id after request service game: %s", game_id)
 
             # Créez le match en local
             match = Match.objects.create(
@@ -602,18 +615,23 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id):
             elif match.match_id % 2 == 0:
                 next_match.player_2 = winner
 
-            # Vérifiez que le `game_id` est nul avant de créer le jeu
-            if next_match.game_id is None:
-                response = requests.post("https://game:8009/games", json={
-                    "player_left_id": next_match.player_1.id,
-                    "player_right_id": next_match.player_2.id,
-                }, cookies=request.COOKIES, verify=False)
+            logging.critical("5555555555555555555555555555555555555555555")
+            # Vérifiez que les deux joueurs existent avant de créer un jeu
+            if next_match.player_1 and next_match.player_2:
+                logging.critical("666666666666666666666666666666666666666666")
+                # Vérifiez que le `game_id` est nul avant de créer le jeu
+                if next_match.game_id is None:
+                    logging.critical("77777777777777777777777777777777777777777")
+                    response = requests.post("https://game:8009/games", json={
+                        "player_left_id": next_match.player_1.user_id,
+                        "player_right_id": next_match.player_2.user_id,
+                    }, cookies=request.COOKIES, verify=False)
 
-                if response.status_code != 201:
-                    return JsonResponse({"error": "Failed to create game in external service."}, status=response.status_code)
+                    if response.status_code != 201:
+                        return JsonResponse({"error": "Failed to create game in external service."}, status=response.status_code)
 
-                game_data = response.json()
-                next_match.game_id = game_data.get("id")
+                    game_data = response.json()
+                    next_match.game_id = game_data.get("id")
             
             next_match.save()
         else:
@@ -632,6 +650,7 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id):
             "message": "Un joueur win"
         }
     )
+    logging.critical("00000000000000000000000000000000000000")
     return JsonResponse({
         'success': True,
         'message': "Le vainqueur a été mis à jour et le match suivant a été préparé."
