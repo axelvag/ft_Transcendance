@@ -143,8 +143,8 @@ displayMatches(matchesByTour) {
           const matchElement = document.createElement('div');
           matchElement.classList.add('match');
           
-          let player1Name = match.player_1_username || "Waiting for a winner";
-          let player2Name = match.player_2_username || "Waiting for a winner";
+          let player1Name = match.player_1_username || "...";
+          let player2Name = match.player_2_username || "...";
           let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
           let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
           
@@ -167,22 +167,42 @@ displayMatches(matchesByTour) {
               const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Play') : '';
               let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
               let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
-
+              // si on est en final -> tourIndex === totalTours - 1
+              let vsElement = tourIndex === totalTours - 1 ? `<div class=" col-6 vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+              let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
+              // Le bracket ou le joueur vas jouer
               matchElement.innerHTML = `
-                <div class="match-info">
-                  <div class="player-info d-flex align-items-center">
-                    ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
-                    <span class="player">${player1Name}</span>
-                    ${(isPlayer1 && this.#match.player1id !== "" && this.#match.player2id !== "" ) ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer1 : "")}
-                  </div>
-                  <div class="vs">vs</div>
-                  <div class="player-info d-flex align-items-center">
-                    ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
-                    <span class="player">${player2Name}</span>
-                    ${(isPlayer2 && this.#match.player1id !== "" && this.#match.player2id !== "" )? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer2 : "")}
+                  ${SpaceDownBracketFinal}
+                  <div class="match-info">
+                    <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="col-3">
+                          ${avatarImg1 ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">` : ""}
+                        </div>
+                        <div class="col-6">
+                          <h5 class="card-title">${player1Name}</h5>
+                        </div>
+                        <div class="col-3 mb-2">
+                          ${(isPlayer1 && this.#match.player1id !== "" && this.#match.player2id !== "" ) ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer1 : "")}
+                        </div>
+                      </div>
+                    </div>
+                    ${vsElement}
+                    <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="col-3">
+                          ${avatarImg2 ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">` : ""}
+                        </div>
+                        <div class="col-6">
+                          <h5 class="card-title">${player2Name}</h5>
+                        </div>
+                        <div class="col-3 mb-2">
+                          ${(isPlayer2 && this.#match.player1id !== "" && this.#match.player2id !== "" )? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer2 : "")}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <br><br>
-                </div>
                 `;
           } 
           else if (match.status === 2) {
@@ -192,36 +212,67 @@ displayMatches(matchesByTour) {
             // Apply green text color if the player is the winner
             const player1Style = match.winner_id === player1Name ? 'color:green;' : 'color:red;';
             const player2Style = match.winner_id === player2Name ? 'color:green;' : 'color:red;';
-
+            let vsElement = tourIndex === totalTours - 1 ? `<div class=" col-6 vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+            let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
+            // Les brackets deja finis
             matchElement.innerHTML = `
-                <div class="match-info">
-                    <div class="player-info d-flex align-items-center">
-                        ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
-                        <span class="player" style="${player1Style}">${player1Name}</span>
+            ${SpaceDownBracketFinal}
+              <div class="match-info">
+                <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
+                  <div class="card-body d-flex align-items-center">
+                    <div class="col-3">
+                      ${avatarImg1 ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">` : ""}
                     </div>
-                    <div class="vs">vs</div>
-                    <div class="player-info d-flex align-items-center">
-                        ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
-                        <span class="player" style="${player2Style}">${player2Name}</span>
+                    <div class="col-6">
+                      <h5 class="card-title" style="${player1Style}">${player1Name}</h5>
                     </div>
-                    <br><br>
+                  </div>
                 </div>
-            `;
-          }
-          else {
-            matchElement.innerHTML = `
-            <div class="match-info">
-              <div class="player-info d-flex align-items-center">
-                ${avatarImg1 ? `<img src="${avatarImg1}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
-                <span class="player">${player1Name}</span>
-              </div>
-              <div class="vs">vs</div>
-              <div class="player-info d-flex align-items-center">
-                ${avatarImg2 ? `<img src="${avatarImg2}" class="object-fit-cover rounded-circle mr-2" width="28" height="28" />` : ""}
-                <span class="player">${player2Name}</span>
+                ${vsElement}
+                <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
+                  <div class="card-body d-flex align-items-center">
+                    <div class="col-3">
+                      ${avatarImg2 ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">` : ""}
+                    </div>
+                    <div class="col-6">
+                      <h5 class="card-title" style="${player2Style}">${player2Name}</h5>
+                    </div>
+                  </div>
+                </div>
               </div>
               <br><br>
-            </div>
+            `;
+          }
+          // Les brackets pas encores faits ou des autres
+          else {
+            let vsElement = tourIndex === totalTours - 1 ? `<div class=" col-6 vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+            let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
+            matchElement.innerHTML = `
+              ${SpaceDownBracketFinal}
+              <div class="match-info">
+                <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
+                  <div class="card-body d-flex align-items-center">
+                    <div class="col-3">
+                      ${avatarImg1 ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">` : ""}
+                    </div>
+                    <div class="col-6">
+                      <h5 class="card-title">${player1Name}</h5>
+                    </div>
+                  </div>
+                </div>
+                ${vsElement}
+                <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
+                  <div class="card-body d-flex align-items-center">
+                    <div class="col-3">
+                      ${avatarImg2 ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">` : ""}
+                    </div>
+                    <div class="col-6">
+                      <h5 class="card-title">${player2Name}</h5>
+                    </div>
+                  </div>
+                </div>
+                <br><br>
+              </div>
             `;
           }
           // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
@@ -239,7 +290,7 @@ displayMatches(matchesByTour) {
         // tournamentTabElement.appendChild(tourElement);
         const finaleHeader = document.createElement('div');
         finaleHeader.style.display = 'flex';
-        finaleHeader.style.alignItems = 'center'; // Centrer les éléments verticalement
+        finaleHeader.style.alignItems = 'flex-start'; // Centrer les éléments verticalement
         finaleHeader.appendChild(titleElement);
 
         const winnerContainer = document.createElement('div');
