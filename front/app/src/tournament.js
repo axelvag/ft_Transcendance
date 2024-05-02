@@ -211,10 +211,7 @@ const fetchTournamentInfo = async () => {
   const data = await response.json();
   console.log("tournoi infooooooooooo", data);
   if (data.id) {
-    // if(data.status !== 2)
-      setLocalTournament(data);
-    // else
-    //   await fetchDeletePlayerAndTournament();
+    setLocalTournament(data);
   } else {
     console.log("player is not in a tournament");
   }

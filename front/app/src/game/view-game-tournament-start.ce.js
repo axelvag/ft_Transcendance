@@ -2,22 +2,17 @@ import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
 import {
   getTournament,
-  resetLocalTournament,
-  fetchDeletePlayerSalon,
-  fetchAddPlayer,
-  fetchDeleteTournament,
   fetchCreateMatchs,
   fetchGetMatchs,
   fetchInfoMatch,
   fetchWinnerMatch,
   getMatch,
-  fetchTournamentInfo,
   fetchDeletePlayerAndTournament,
   fetchLeaveMatch,
   fetchLeaveMatchAlone,
   updateWinnerLeave,
 } from '@/tournament.js';
-import { isAuthenticated, getCsrfToken } from '@/auth.js';
+import { isAuthenticated } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
@@ -372,12 +367,6 @@ displayMatches(matchesByTour) {
               console.log("Match started!!!");
               const winner = await fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
               console.log(winner);
-
-              // if (winner.success) {
-              //     await this.displayUpdate();
-              // } else {
-              //     console.log("Error: winner failed!");
-              // }
           }
           else{
             console.log(`Player ${playerId} is now marked as ready in the backend.`);
@@ -396,16 +385,6 @@ displayMatches(matchesByTour) {
   async deletePlayer() {
     await fetchDeletePlayerAndTournament();
     redirectTo(this.#backUrl);
-  }
-  
-  async fetchTournamentInfo() {
-    await fetchTournamentInfo();
-    this.#tournament = getTournament();
-    console.log(this.#tournament);
-  }
-  
-  async removePlayerFromTournament() {
-    await removePlayerFromTournament();
   }
   
   async displayUpdate() {

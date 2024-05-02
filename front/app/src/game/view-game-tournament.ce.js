@@ -239,10 +239,6 @@ class ViewTournament extends HTMLElement {
     }
   }
 
-  async deletePlayer() {
-    await fetchDeletePlayer();
-  }
-
   initWebSocket() {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
     this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');

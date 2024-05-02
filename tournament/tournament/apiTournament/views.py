@@ -147,13 +147,6 @@ def create_joueur(request):
     except Tournoi.DoesNotExist:
         return JsonResponse({'error': 'Tournoi not found'}, status=404)
 
-    # Utiliser get_or_create pour éviter de créer un doublon
-    # joueur, created = Joueur.objects.get_or_create(
-    #     user_id=user_id, 
-    #     tournament_id=tournament_id, 
-    #     defaults={'username': username, 'tournament': tournament}
-    # )
-
     joueur, created = Joueur.objects.get_or_create(
         user_id=user_id,
         defaults={'username': username}
@@ -208,20 +201,6 @@ def create_joueur(request):
         return JsonResponse({'success': True, 'message': 'Joueur updated with new tournament successfully', 'joueur_id': joueur.id})
 
     return JsonResponse({"success": False, 'message': 'Joueur already exists', 'joueur_id': joueur.id})
-
-
-# @verif_sessionID
-# @require_http_methods(["GET"])
-# def view_joueur(request, tournament_id):
-#     # Filtrez les tournois avec un status égal à 0
-#     joueur = Joueur.objects.filter(tournament=tournament_id)
-
-#     # Préparez les données pour la réponse
-#     # Note : Adaptez les champs 'name', 'max_players', etc., selon votre modèle
-#     data = list(joueur.values('user_id', 'username'))
-
-#     # Retournez les données en JSON
-#     return JsonResponse(data, safe=False)
 
 @verif_sessionID
 @require_http_methods(["GET"])
@@ -353,19 +332,6 @@ def delete_tournoi(request, tournoi_id):
     except Exception as e:
         # Pour capturer d'autres erreurs potentielles
         return JsonResponse({'success': False, 'message': 'An error occurred: {}'.format(str(e))}, status=500)
-
-
-# @csrf_exempt
-# @verif_sessionID
-# @require_http_methods(["POST"])
-# def start_tournament(request, tournament_id):
-#     try:
-#         tournament = Tournoi.objects.get(pk=tournament_id)
-#         tournament.status = Tournoi.IN_PROGRESS
-#         tournament.save()
-#         return JsonResponse({'message': 'Tournoi mis à jour avec succès en cours.'}, status=200)
-#     except Tournoi.DoesNotExist:
-#         return JsonResponse({'error': 'Tournoi non trouvé.'}, status=404)
 
 
 import random
@@ -645,15 +611,7 @@ def delete_player_and_tournament_if_empty(request, player_id):
         player.tournament = None
         player.status_ready = Joueur.NOT_READY
         player.save()
-        # player.delete()
-
-        # Vérifier si d'autres joueurs sont encore inscrits dans le tournoi
-        # if not tournament.players.exists():  # 'players' doit être le related_name dans le modèle ForeignKey
-        #     # Si aucun joueur n'est restant, supprimer le tournoi
-        #     tournament.delete()
-        #     message = "Player and tournament deleted."
-        # else:
-        message = "Player deleted, but tournament still here."
+        message = "Player deleted."
 
         return JsonResponse({'success': True, 'message': message}, status=200)
     except Joueur.DoesNotExist:
