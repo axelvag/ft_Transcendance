@@ -350,36 +350,18 @@ def create_matches(request, tournament_id):
 
         players = list(Joueur.objects.filter(tournament=tournament_id))
 
-        logging.critical("Liste des joueurs avant mélange: %s", players)
-
         if len(players) % 2 != 0:
             return JsonResponse({"error": "Nombre impair de joueurs, impossible de créer des matchs pairs."}, status=400)
 
         random.shuffle(players)
-
-        logging.critical("Liste des joueurs après mélange: %s", players)
-
         matches_created = []
         
         number_of_matches = len(players) // 2
         match_id = 1  # Réinitialiser match_id à 1 pour le premier tour
         for i in range(0, len(players), 2):
-            # match = Match.objects.create(
-            #     player_1=players[i],
-            #     player_2=players[i+1],
-            #     tournament=tournament,
-            #     tour=1,
-            #     status=Match.NOT_PLAYED,
-            #     match_id=match_id
-            #     # request service game
-            # )
-            # matches_created.append(match)
-            # match_id += 1
 
             player_1 = players[i]
             player_2 = players[i+1]
-
-            logging.critical(f"Pairing: Player 1 - {player_1}, Player 2 - {player_2}")
 
             # Vérifiez que les deux joueurs existent
             if not (Joueur.objects.filter(user_id=player_1.id).exists() and Joueur.objects.filter(user_id=player_2.id).exists()):
@@ -392,18 +374,11 @@ def create_matches(request, tournament_id):
                 "player_right_id": player_2.user_id,
             }, cookies=request.COOKIES, verify=False)
 
-            print(response.status_code, response.json())
-
             if response.status_code != 201:
                 return JsonResponse({"error": "Failed to create game in external service."}, status=response.status_code)
 
             game_data = response.json()
-
-            logging.critical("game_data: %s", game_data)
-
             game_id = game_data.get("id")
-
-            logging.critical("game id after request service game: %s", game_id)
 
             # Créez le match en local
             match = Match.objects.create(
@@ -615,13 +590,10 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id):
             elif match.match_id % 2 == 0:
                 next_match.player_2 = winner
 
-            logging.critical("5555555555555555555555555555555555555555555")
             # Vérifiez que les deux joueurs existent avant de créer un jeu
             if next_match.player_1 and next_match.player_2:
-                logging.critical("666666666666666666666666666666666666666666")
                 # Vérifiez que le `game_id` est nul avant de créer le jeu
                 if next_match.game_id is None:
-                    logging.critical("77777777777777777777777777777777777777777")
                     response = requests.post("https://game:8009/games", json={
                         "player_left_id": next_match.player_1.user_id,
                         "player_right_id": next_match.player_2.user_id,
@@ -650,7 +622,6 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id):
             "message": "Un joueur win"
         }
     )
-    logging.critical("00000000000000000000000000000000000000")
     return JsonResponse({
         'success': True,
         'message': "Le vainqueur a été mis à jour et le match suivant a été préparé."
