@@ -368,20 +368,22 @@ displayMatches(matchesByTour) {
         const data = await response.json();
         console.log(data);
         if (data.success) {
+          if (data.match_started) {
+              console.log("Match started!!!");
+              const winner = await fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+              console.log(winner);
+
+              // if (winner.success) {
+              //     await this.displayUpdate();
+              // } else {
+              //     console.log("Error: winner failed!");
+              // }
+          }
+          else{
             console.log(`Player ${playerId} is now marked as ready in the backend.`);
-            await this.displayUpdate();
+            // await this.displayUpdate();
+          }
 
-            if (data.match_started) {
-                console.log("Match started!!!");
-                const winner = await fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
-                console.log(winner);
-
-                // if (winner.success) {
-                //     await this.displayUpdate();
-                // } else {
-                //     console.log("Error: winner failed!");
-                // }
-            }
         } else {
             console.error('Could not mark the player as ready in the backend.', data.error);
         }

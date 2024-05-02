@@ -210,18 +210,45 @@ def create_joueur(request):
     return JsonResponse({"success": False, 'message': 'Joueur already exists', 'joueur_id': joueur.id})
 
 
+# @verif_sessionID
+# @require_http_methods(["GET"])
+# def view_joueur(request, tournament_id):
+#     # Filtrez les tournois avec un status égal à 0
+#     joueur = Joueur.objects.filter(tournament=tournament_id)
+
+#     # Préparez les données pour la réponse
+#     # Note : Adaptez les champs 'name', 'max_players', etc., selon votre modèle
+#     data = list(joueur.values('user_id', 'username'))
+
+#     # Retournez les données en JSON
+#     return JsonResponse(data, safe=False)
+
 @verif_sessionID
 @require_http_methods(["GET"])
 def view_joueur(request, tournament_id):
-    # Filtrez les tournois avec un status égal à 0
-    joueur = Joueur.objects.filter(tournament=tournament_id)
+    # Filtrer les joueurs liés au tournoi
+    joueurs = Joueur.objects.filter(tournament=tournament_id)
 
-    # Préparez les données pour la réponse
-    # Note : Adaptez les champs 'name', 'max_players', etc., selon votre modèle
-    data = list(joueur.values('user_id', 'username'))
+    # Liste pour stocker les données de réponse
+    data = []
 
-    # Retournez les données en JSON
+    for joueur in joueurs:
+        # Récupérer le profil utilisateur via la fonction get_profile_info_cookie
+        profile_info = get_profile_info_cookie(joueur.user_id, request.COOKIES.get('sessionid'))
+
+        # Assembler les données du joueur et les informations du profil
+        joueur_data = {
+            'user_id': joueur.user_id,
+            'username': joueur.username,
+            'avatar': profile_info.get('avatar'),  # Ajout de l'avatar ou d'autres infos
+            'avatar42': profile_info.get('avatar42'),  # Ajout de l'avatar ou d'autres infos
+        }
+
+        data.append(joueur_data)
+
+    # Retourner les données sous forme de réponse JSON
     return JsonResponse(data, safe=False)
+
 
 @verif_sessionID
 @require_http_methods(["GET"])

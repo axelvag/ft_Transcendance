@@ -119,29 +119,16 @@ class ViewTournamentSalon extends HTMLElement {
         }
 
         const players = await response.json();
+        console.log(players);
         const listElement = this.querySelector('#playersList');
         listElement.innerHTML = '<h2>Players in the Tournaments</h2><br>'; // Titre pour la section
 
         for (const player of players) {
-            const csrfToken = await getCsrfToken();
-            const userProfileResponse = await fetch(`${BASE_URL}:8002/get_user_profile/${player.user_id}/`, {
-                method: 'GET',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                },
-                credentials: 'include',
-            });
-
-            if (!userProfileResponse.ok) {
-                throw new Error(`HTTP error! status: ${userProfileResponse.status}`);
-            }
-
-            const user = await userProfileResponse.json();
             let avatar = "/assets/img/default-profile.jpg";
-            if(user.avatar42 !== null && user.avatar42 !== undefined)
-              avatar = user.avatar42;
-            if (user.avatar !== null && user.avatar !== undefined)
-              avatar = user.avatar;
+            if(player.avatar42 !== null && player.avatar42 !== undefined)
+              avatar = player.avatar42;
+            if (player.avatar !== null && player.avatar !== undefined)
+              avatar = player.avatar;
             const playerElement = document.createElement('div');
             playerElement.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -165,24 +152,8 @@ class ViewTournamentSalon extends HTMLElement {
         console.log(this.#tournament.maxPlayer);
         console.log(players.length);
         if (nbPlayersWaiting === 0) {
-          // Si aucun joueur en attente, passer à view-game-tournament.ce.js
-          // if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-          //   this.socket.close();
-          // }
-          //status tournament in progress
-        //   const response = await fetch(`http://127.0.0.1:8005/tournament/start/${this.#tournament.id}/`, {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     credentials: 'include',
-        // });
-
-        // if (!response.ok) {
-        //     throw new Error(`HTTP error! status: ${response.status}`);
-        // }
           redirectTo(`/game/tournament/start`);
-          return; // Arrêter l'exécution de la fonction
+          return;
         }
         const waitingElement = document.createElement('div');
         waitingElement.innerHTML = `<h3>${nbPlayersWaiting} player(s) waiting</h3>`;
@@ -224,11 +195,6 @@ class ViewTournamentSalon extends HTMLElement {
         if (data.action === 'display_player') {
           this.viewPlayer();
         }
-        // if (data.action === 'player_disconnected') {
-        //   resetLocalTournament();
-        //   this.deletePlayer();
-        //   this.socket.close();
-        // }
     };
 
     this.socket.onclose = () => {
