@@ -114,7 +114,7 @@ displayMatches(matchesByTour) {
   const totalTours = matchesByTour.length; // Nombre total de tours
   
   matchesByTour.forEach((matches, tourIndex) => {
-      console.log("tourrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+      // console.log("tourrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
       const tourElement = document.createElement('div');
       tourElement.classList.add('tour');
       tourElement.style.display = 'flex';
@@ -150,12 +150,51 @@ displayMatches(matchesByTour) {
           if (player2Name === "...") {
             avatarImg2 = ""; // Ne pas afficher d'avatar
           }
+
+          // Les joueurs ne ce mettent pas READY donc on lance un chrono
+          if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
+          {
+            console.log("AAAAA id:", match.match_id, "status:", match.status, "player1id:", match.player1id, "player2id:", match.player2id);
+            console.log("player1Name", player1Name, "player2Name", player2Name);
+            console.log("player1ready:", match.player_1_ready, "player2ready:", match.player_2_ready);
+
+            // Lancez un chrono de 20 secondes
+            const matchId = match.match_id;
+            const chronoTimeout = setTimeout(async () => {
+                console.log("CHRONO END", matchId);
+                // Vérifiez si le statut du match est toujours différent de 2 après le délai
+                if (match.status !== 2) {
+                    console.log("BBBBB id:", match.match_id, "status:", match.status, "player1id:", match.player1id, "player2id:", match.player2id);
+                    console.log("player1Name", player1Name, "player2Name", player2Name);
+                    console.log("player1ready:", match.player_1_ready, "player2ready:", match.player_2_ready);
+                    // Si les 2 player ne sont pas prêt, appelez la fonction UserLeave
+                    if (match.player_1_ready === 0 && match.player_2_ready === 0)
+                    {
+                        console.log("Both players are not ready!");
+                        await this.UserLeave();
+                    }
+                    else
+                    {
+                        // Sinon, déterminez quel joueur est parti et appelez la fonction UserLeaveAlone
+                        if (match.player_1_ready === 0) {
+                            // Joueur 1 est parti
+                            console.log("Player 1 is not ready!");
+                            await this.UserLeaveAlone(match.player_1_id);
+                        } else {
+                            // Joueur 2 est parti
+                            console.log("Player 2 is not ready!");
+                            await this.UserLeaveAlone(match.player_2_id);
+                        }
+                    }
+                }
+            }, 20000); // 20000 millisecondes = 20 secondes
+          }
           
-          console.log(this.#match.id);
-          console.log(match.match_id);
+          // console.log(this.#match.id);
+          // console.log(match.match_id);
           if(this.#match.id === match.match_id && match.status != 2) {
             console.log(this.#match);
-            console.log("passe icii", player1Name,  player2Name, match.player_1_ready, match.player_2_ready);
+            // console.log("passe icii", player1Name,  player2Name, match.player_1_ready, match.player_2_ready);
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
               const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
@@ -201,9 +240,9 @@ displayMatches(matchesByTour) {
                 `;
           } 
           else if (match.status === 2) {
-            console.log("match status === 22222222222222222222");
-            console.log(match.winner_id);
-            console.log(player1Name);
+            // console.log("match status === 22222222222222222222");
+            // console.log(match.winner_id);
+            // console.log(player1Name);
             // Apply green text color if the player is the winner
             const player1Style = match.winner_id === player1Name ? 'color:green;' : 'color:red;';
             const player2Style = match.winner_id === player2Name ? 'color:green;' : 'color:red;';
@@ -363,7 +402,7 @@ displayMatches(matchesByTour) {
         }
 
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         if (data.success) {
           if (data.match_started) {
               console.log("Match started!!!");
@@ -391,11 +430,11 @@ displayMatches(matchesByTour) {
   
   async displayUpdate() {
     this.#match = getMatch();
-    console.log("display update match", this.#match);
+    // console.log("display update match", this.#match);
     if(this.#match.status === 0 && this.#match.leave !== 0)
       await updateWinnerLeave();
     const matches = await fetchGetMatchs();
-      console.log("iciiiiiiiiiiiiiiiiiiiiiiiii", matches);
+      // console.log("iciiiiiiiiiiiiiiiiiiiiiiiii", matches);
       if (matches.success)
         this.displayMatches(matches.matches_by_tour);
       else 
