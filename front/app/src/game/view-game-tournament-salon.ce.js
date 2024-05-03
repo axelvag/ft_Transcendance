@@ -39,21 +39,28 @@ class ViewTournamentSalon extends HTMLElement {
         deleteTournamentButtonHTML = `<button id="deleteTournamentBtn" class="btn btn-warning">Delete Tournament</button>`;
     }
 
+    let buttonsHTML = '';
+    if (this.#tournament.maxPlayer - 1 !== this.#tournament.nombreDeJoueur) {
+        buttonsHTML = `
+          <div class="d-flex justify-content-between align-items-center mb-5">
+            <button id="leaveTournamentBtn" class="btn btn-danger">Leave Tournament</button>
+            ${deleteTournamentButtonHTML}  <!-- Ajout du bouton de suppression si applicable -->
+          </div>
+        `;
+    }
+
     this.innerHTML = `
       <div class="min-vh-100 halo-bicolor d-flex flex-column p-2">
         <div class="d-flex justify-content-between align-items-center mb-5">
           <h1 class="fw-bold text-center m-0">Waiting room for ${this.#tournament.name} Tournament</h1>
-          <div>
-            <button id="leaveTournamentBtn" class="btn btn-danger">Leave Tournament</button>
-            ${deleteTournamentButtonHTML}  <!-- Ajout du bouton de suppression si applicable -->
-          </div>
+          ${buttonsHTML}
         </div>
         <div id="playersList" class="mt-4"></div>
       </div>
     `;
 
     // Ajout d'un écouteur d'événements pour le bouton de sortie
-    this.querySelector('#leaveTournamentBtn').addEventListener('click', () => {
+    this.querySelector('#leaveTournamentBtn')?.addEventListener('click', () => {
       resetLocalTournament();
       this.deletePlayer();
       redirectTo(this.#backUrl);
@@ -152,16 +159,48 @@ class ViewTournamentSalon extends HTMLElement {
         console.log(this.#tournament.maxPlayer);
         console.log(players.length);
         if (nbPlayersWaiting === 0) {
-          redirectTo(`/game/tournament/start`);
-          return;
+          this.startCountdownAndRedirect(listElement);
+          // redirectTo(`/game/tournament/start`);
+          // return;
         }
-        const waitingElement = document.createElement('div');
-        waitingElement.innerHTML = `<h3>${nbPlayersWaiting} player(s) waiting</h3>`;
-        listElement.appendChild(waitingElement);
+        else{
+          const waitingElement = document.createElement('div');
+          waitingElement.innerHTML = `<h3>${nbPlayersWaiting} player(s) waiting</h3>`;
+          listElement.appendChild(waitingElement);
+        }
 
     } catch (error) {
         console.error('Could not load tournament:', error);
     }
+}
+
+startCountdownAndRedirect(listElement) {
+  let countdown = 5;
+  const countdownElement = document.createElement('div');
+  countdownElement.setAttribute('id', 'countdown');
+  listElement.appendChild(countdownElement);
+
+  const intervalId = setInterval(() => {
+      if (countdown === 0) {
+          clearInterval(intervalId);
+          redirectTo(`/game/tournament/start`);
+      } else {
+          countdownElement.innerHTML = `<h3>Tournament starts in ${countdown}...</h3>`;
+          countdown--;
+      }
+  }, 1000);
+}
+
+ updateButtons() {
+  // Exemple de condition pour afficher ou masquer les boutons
+
+  const leaveTournamentBtn = document.getElementById('leaveTournamentBtn');
+  const deleteTournamentBtn = document.getElementById('deleteTournamentBtn');
+
+  leaveTournamentBtn.style.display = 'none';  // Masquer le bouton
+  if (deleteTournamentBtn) {
+      deleteTournamentBtn.style.display = 'none';  // Masquer si applicable
+  }
 }
 
 
@@ -194,6 +233,10 @@ class ViewTournamentSalon extends HTMLElement {
         }
         if (data.action === 'display_player') {
           this.viewPlayer();
+        }
+        
+        if (data.action === 'update_boutton') {
+          this.updateButtons();
         }
     };
 

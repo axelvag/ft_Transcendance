@@ -318,13 +318,15 @@ displayMatches(matchesByTour) {
         const lastMatch = matches[matches.length - 1];
         if (lastMatch && lastMatch.winner_id && tourIndex === totalTours - 1) {
           const winnerAvatar = document.createElement('p');
-          let winnerAvatarPath = "";
+          let winnerAvatarPath = "/assets/img/default-profile.jpg";
           if (lastMatch.winner_id === lastMatch.player_1_username) {
             winnerAvatarPath = lastMatch.player_1_avatar;
           }
           else if (lastMatch.winner_id === lastMatch.player_2_username) {
             winnerAvatarPath = lastMatch.player_2_avatar;
           }
+          if(winnerAvatarPath === null)
+            winnerAvatarPath = "/assets/img/default-profile.jpg";
           console.log(winnerAvatarPath);
           winnerAvatar.innerHTML = `
               <br><br><br><br>
@@ -406,12 +408,12 @@ displayMatches(matchesByTour) {
 
   async UserLeave() {
     const winner = await fetchLeaveMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
-    console.log(winner);
-    if (winner.success) {
-        await this.displayUpdate();
-    } else {
-        console.log("Error: winner failed!");
-    }
+  //   console.log(winner);
+  //   if (winner.success) {
+  //       await this.displayUpdate();
+  //   } else {
+  //       console.log("Error: winner failed!");
+  //   }
   }
   
   async UserLeaveAlone() {
@@ -444,7 +446,7 @@ displayMatches(matchesByTour) {
     };
 
     this.socket.onclose = async () => {
-        console.log('WebSocket connection closed');
+        console.log('WebSocket connection closedd');
     };
 
     this.socket.onerror = (error) => {
@@ -454,7 +456,6 @@ displayMatches(matchesByTour) {
     window.addEventListener('beforeunload', () => {
       this.socket.close();
     });
-
   }
 }
 

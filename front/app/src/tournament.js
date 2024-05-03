@@ -10,6 +10,7 @@ const tournament = {
   admin_id: null,
   admin_username: null,
   status: null,
+  nombreDeJoueur: null,
 };
 
 const setLocalTournament = data => {
@@ -19,6 +20,7 @@ const setLocalTournament = data => {
   tournament.admin_id = data.admin_id || '';
   tournament.status = data.status || 0;
   tournament.admin_username = data.admin_username || '';
+  tournament.nombreDeJoueur = data.nombreDeJoueur || 0;
 };
 
 const resetLocalTournament = () => {
@@ -28,6 +30,7 @@ const resetLocalTournament = () => {
   tournament.admin_id = null;
   tournament.status = null;
   tournament.admin_username = null;
+  tournament.nombreDeJoueur = null;
 };
 
 const getTournament = () => {
@@ -38,6 +41,7 @@ const getTournament = () => {
     admin_id: tournament.admin_id,
     status: tournament.status,
     admin_username: tournament.admin_username,
+    nombreDeJoueur: tournament.nombreDeJoueur,
   };
 };
 

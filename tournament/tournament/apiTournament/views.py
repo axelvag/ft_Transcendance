@@ -104,6 +104,17 @@ def tournament_detail(request, tournament_id):
         profile_info = get_profile_info_cookie(tournament.admin_id, request.COOKIES.get('sessionid')) if tournament.admin_id else {}
         logging.critical(profile_info)
         player_count = tournament.players.count()
+        if player_count == tournament.max_players - 1:
+            tournament_group_name = f"tournoi_{tournament_id}"
+            # Envoi du message au groupe de canaux spécifique du tournoi
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
+                {
+                    "type": "update_boutton",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
+                    "message": "ne pas afficher les bouttons"
+                }
+            )
         # Préparez les données à renvoyer si le tournoi est trouvé
         data = {
             'success': True,

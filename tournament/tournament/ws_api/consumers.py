@@ -124,3 +124,8 @@ class MyConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "action": "winner"
         }))
+        
+    async def update_boutton(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "update_boutton"
+        }))
