@@ -85,6 +85,7 @@ const editProfileTemplate = user => `
         <div class="d-inline-block d-flex flex-column align-items-center position-relative">
           <img id="viewProfile-edit-avatarImg" src="${user.avatar}" class="rounded-circle" style="width: 128px; height: 128px; object-fit: cover; cover; border: 3px solid #b558f6;">
           <input type="file" id="avatarFile" name="avatar" accept="image/*" hidden>
+          <div id="error-avatar" class="alert alert-danger mt-3" style="display: none;"></div>
           <label class="btn btn-primary btn-sm mt-2" for="avatarFile">
             Change Avatar
           </label>
@@ -108,10 +109,12 @@ const editProfileTemplate = user => `
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="firstname">First Name</label>
           <input class="form-control form-control-lg" type="text" id="firstname" value="${user.firstname}">
+          <div id="error-firstname" class="alert alert-danger mt-3" style="display: none;"></div>
         </div>
         <div class="col-lg-6 mb-4">
           <label class="form-label" for="lastname">Last Name</label>
           <input class="form-control form-control-lg" type="text" id="lastname" value="${user.lastname}">
+          <div id="error-lastname" class="alert alert-danger mt-3" style="display: none;"></div>
         </div>
       </div>
       <div class="py-3 mb-4 d-flex gap-3">

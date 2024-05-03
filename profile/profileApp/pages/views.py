@@ -10,6 +10,7 @@ import requests
 from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
 import os
+from django.core.files.images import get_image_dimensions
 
 load_dotenv()
 BASE_URL = os.getenv('BASE_URL')
@@ -63,6 +64,23 @@ def update_user(request):
                 avatar42 = None
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "message": "Invalid or missing JSON data."}, status=400)
+
+    # Validation for length
+    if len(username) > 100 or len(first_name) > 100 or len(last_name) > 100:
+        return JsonResponse({"success": False, "message": "Username, first name, or last name exceed 100 characters."}, status=400)
+
+    # Avatar checks
+    if avatar:
+        if avatar.size > 1024 * 1024 * 5:  # 5 MB limit
+            return JsonResponse({"success": False, "message": "Avatar file size must be under 5MB."}, status=400)
+
+        if not avatar.content_type in ['image/jpeg', 'image/png']:
+            return JsonResponse({"success": False, "message": "Avatar must be a JPEG or PNG file."}, status=400)
+
+        # Optional: Check image dimensions
+        width, height = get_image_dimensions(avatar)
+        if width > 3000 or height > 3000:
+            return JsonResponse({"success": False, "message": "Avatar dimensions should be less than 3000x3000px."}, status=400)
 
     # Mise à jour des informations d'authentification via un service externe
     auth_service_url = "https://authentification:8001/accounts/update_profile/"
