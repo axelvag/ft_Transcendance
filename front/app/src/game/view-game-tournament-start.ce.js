@@ -261,8 +261,10 @@ class ViewTournamentstart extends HTMLElement {
                     <div class="col-3">
                       ${avatarImg1 ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">` : ""}
                     </div>
-                    <div class="col-9 d-flex justify-content-between align-items-center">
-                      <h5 class="card-title mb-0 ms-2" ">${player1Name}</h5>
+                    <div class="col-6">
+                      <h5 class="card-title" ">${player1Name}</h5>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
                       <div class="score-box text-center text-white" style="border: 1px solid black; padding: 0 10px; border-radius: 5px; ${player1BoxStyle}">
                         ${player1Text}
                       </div>
@@ -275,8 +277,10 @@ class ViewTournamentstart extends HTMLElement {
                     <div class="col-3">
                       ${avatarImg2 ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">` : ""}
                     </div>
-                    <div class="col-9 d-flex justify-content-between align-items-center">
-                      <h5 class="card-title mb-0 ms-2" ">${player2Name}</h5>
+                    <div class="col-6">
+                      <h5 class="card-title" ">${player2Name}</h5>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
                       <div class="score-box text-center text-white" style="border: 1px solid black; padding: 0 10px; border-radius: 5px; ${player2BoxStyle}">
                         ${player2Text}
                       </div>
