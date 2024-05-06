@@ -152,43 +152,43 @@ displayMatches(matchesByTour) {
           }
 
           // Les joueurs ne ce mettent pas READY donc on lance un chrono
-          if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
-          {
-            console.log("AAAAA id:", match.match_id, "status:", match.status, "player1id:", match.player1id, "player2id:", match.player2id);
-            console.log("player1Name", player1Name, "player2Name", player2Name);
-            console.log("player1ready:", match.player_1_ready, "player2ready:", match.player_2_ready);
+          // if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
+          // {
+          //   console.log("AAAAA id:", match.match_id, "status:", match.status, "player1id:", match.player1id, "player2id:", match.player2id);
+          //   console.log("player1Name", player1Name, "player2Name", player2Name);
+          //   console.log("player1ready:", match.player_1_ready, "player2ready:", match.player_2_ready);
 
-            // Lancez un chrono de 20 secondes
-            const matchId = match.match_id;
-            const chronoTimeout = setTimeout(async () => {
-                console.log("CHRONO END", matchId);
-                // Vérifiez si le statut du match est toujours différent de 2 après le délai
-                if (match.status !== 2) {
-                    console.log("BBBBB id:", match.match_id, "status:", match.status, "player1id:", match.player1id, "player2id:", match.player2id);
-                    console.log("player1Name", player1Name, "player2Name", player2Name);
-                    console.log("player1ready:", match.player_1_ready, "player2ready:", match.player_2_ready);
-                    // Si les 2 player ne sont pas prêt, appelez la fonction UserLeave
-                    if (match.player_1_ready === 0 && match.player_2_ready === 0)
-                    {
-                        console.log("Both players are not ready!");
-                        await this.UserLeave();
-                    }
-                    else
-                    {
-                        // Sinon, déterminez quel joueur est parti et appelez la fonction UserLeaveAlone
-                        if (match.player_1_ready === 0) {
-                            // Joueur 1 est parti
-                            console.log("Player 1 is not ready!");
-                            await this.UserLeaveAlone(match.player_1_id);
-                        } else {
-                            // Joueur 2 est parti
-                            console.log("Player 2 is not ready!");
-                            await this.UserLeaveAlone(match.player_2_id);
-                        }
-                    }
-                }
-            }, 20000); // 20000 millisecondes = 20 secondes
-          }
+          //   // Lancez un chrono de 20 secondes
+          //   const matchId = match.match_id;
+          //   const chronoTimeout = setTimeout(async () => {
+          //       console.log("CHRONO END", matchId);
+          //       // Vérifiez si le statut du match est toujours différent de 2 après le délai
+          //       if (match.status !== 2) {
+          //           console.log("BBBBB id:", match.match_id, "status:", match.status, "player1id:", match.player1id, "player2id:", match.player2id);
+          //           console.log("player1Name", player1Name, "player2Name", player2Name);
+          //           console.log("player1ready:", match.player_1_ready, "player2ready:", match.player_2_ready);
+          //           // Si les 2 player ne sont pas prêt, appelez la fonction UserLeave
+          //           if (match.player_1_ready === 0 && match.player_2_ready === 0)
+          //           {
+          //               console.log("Both players are not ready!");
+          //               await this.UserLeave();
+          //           }
+          //           else
+          //           {
+          //               // Sinon, déterminez quel joueur est parti et appelez la fonction UserLeaveAlone
+          //               if (match.player_1_ready === 0) {
+          //                   // Joueur 1 est parti
+          //                   console.log("Player 1 is not ready!");
+          //                   await this.UserLeaveAlone(match.player_1_id);
+          //               } else {
+          //                   // Joueur 2 est parti
+          //                   console.log("Player 2 is not ready!");
+          //                   await this.UserLeaveAlone(match.player_2_id);
+          //               }
+          //           }
+          //       }
+          //   }, 20000); // 20000 millisecondes = 20 secondes
+          // }
           
           // console.log(this.#match.id);
           // console.log(match.match_id);
