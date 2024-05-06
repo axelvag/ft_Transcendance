@@ -73,7 +73,7 @@ class ViewTournamentstart extends HTMLElement {
     });
 
     this.initWebSocket();
-    if(this.#tournament.status != 2)
+    if (this.#tournament.status != 2)
       await this.createMatchs();
     else
       this.displayUpdate();
@@ -85,7 +85,7 @@ class ViewTournamentstart extends HTMLElement {
       this.socket.close();
     }
   }
-  
+
   async createMatchs() {
     const data = await fetchCreateMatchs();
     console.log(data);
@@ -96,25 +96,24 @@ class ViewTournamentstart extends HTMLElement {
       console.log(matches);
       if (matches.success)
         this.displayMatches(matches.matches_by_tour);
-      else 
+      else
         console.log("error : get matchs failled !");
     } else {
       console.log("error : create matchs failled !");
     }
   }
 
-displayMatches(matchesByTour) {
-  this.#match = getMatch();
-  const tournamentTabElement = this.querySelector('#tournamentTabFront');
-  tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
-  tournamentTabElement.style.display = 'flex'; // Aligner les conteneurs de tours horizontalement
-  tournamentTabElement.style.flexDirection = 'row'; // Aligner les éléments en ligne
-  tournamentTabElement.style.overflowX = 'auto'; // Défilement horizontal si nécessaire
+  displayMatches(matchesByTour) {
+    this.#match = getMatch();
+    const tournamentTabElement = this.querySelector('#tournamentTabFront');
+    tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
+    tournamentTabElement.style.display = 'flex'; // Aligner les conteneurs de tours horizontalement
+    tournamentTabElement.style.flexDirection = 'row'; // Aligner les éléments en ligne
+    tournamentTabElement.style.overflowX = 'auto'; // Défilement horizontal si nécessaire
 
-  const totalTours = matchesByTour.length; // Nombre total de tours
-  
-  matchesByTour.forEach((matches, tourIndex) => {
-      // console.log("tourrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+    const totalTours = matchesByTour.length; // Nombre total de tours
+
+    matchesByTour.forEach((matches, tourIndex) => {
       const tourElement = document.createElement('div');
       tourElement.classList.add('tour');
       tourElement.style.display = 'flex';
@@ -123,7 +122,7 @@ displayMatches(matchesByTour) {
 
       let tourTitle;
       if (tourIndex === totalTours - 1) {
-          tourTitle = "Finale";
+        tourTitle = "Finale";
       } else if (tourIndex === totalTours - 2) {
           tourTitle = "Demi-finale";
         } else {
@@ -240,15 +239,20 @@ displayMatches(matchesByTour) {
                 `;
           } 
           else if (match.status === 2) {
-            // console.log("match status === 22222222222222222222");
-            // console.log(match.winner_id);
-            // console.log(player1Name);
-            // Apply green text color if the player is the winner
-            const player1Style = match.winner_id === player1Name ? 'color:green;' : 'color:red;';
-            const player2Style = match.winner_id === player2Name ? 'color:green;' : 'color:red;';
-            let vsElement = tourIndex === totalTours - 1 ? `<div class=" vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+            console.log("finishedddddddddddddddddddddddd", match);
+        
+            // Vérifier si aucun joueur n'a atteint un score de 5
+            const forfeit = match.player_1_score < 5 && match.player_2_score < 5;
+            // const player1Style = match.winner_id === player1Name ? 'color:green;' : (forfeit && match.winner_id !== player1Name ? 'color:gray;' : 'color:red;');
+            // const player2Style = match.winner_id === player2Name ? 'color:green;' : (forfeit && match.winner_id !== player2Name ? 'color:gray;' : 'color:red;');
+            const player1BoxStyle = match.winner_id === player1Name ? 'background-color:green;' : (forfeit && match.winner_id !== player1Name ? 'background-color:gray;' : 'background-color:red;');
+            const player2BoxStyle = match.winner_id === player2Name ? 'background-color:green;' : (forfeit && match.winner_id !== player2Name ? 'background-color:gray;' : 'background-color:red;');
+            const player1Text = forfeit && match.winner_id !== player1Name ? 'Forfait' : match.player_1_score;
+            const player2Text = forfeit && match.winner_id !== player2Name ? 'Forfait' : match.player_2_score;
+        
+            let vsElement = tourIndex === totalTours - 1 ? `<div class="vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
             let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
-            // Les brackets deja finis
+        
             matchElement.innerHTML = `
             ${SpaceDownBracketFinal}
               <div class="match-info">
@@ -257,8 +261,11 @@ displayMatches(matchesByTour) {
                     <div class="col-3">
                       ${avatarImg1 ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">` : ""}
                     </div>
-                    <div class="col-6">
-                      <h5 class="card-title" style="${player1Style}">${player1Name}</h5>
+                    <div class="col-9 d-flex justify-content-between align-items-center">
+                      <h5 class="card-title mb-0 ms-2" ">${player1Name}</h5>
+                      <div class="score-box text-center text-white" style="border: 1px solid black; padding: 0 10px; border-radius: 5px; ${player1BoxStyle}">
+                        ${player1Text}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -268,15 +275,18 @@ displayMatches(matchesByTour) {
                     <div class="col-3">
                       ${avatarImg2 ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">` : ""}
                     </div>
-                    <div class="col-6">
-                      <h5 class="card-title" style="${player2Style}">${player2Name}</h5>
+                    <div class="col-9 d-flex justify-content-between align-items-center">
+                      <h5 class="card-title mb-0 ms-2" ">${player2Name}</h5>
+                      <div class="score-box text-center text-white" style="border: 1px solid black; padding: 0 10px; border-radius: 5px; ${player2BoxStyle}">
+                        ${player2Text}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               <br><br>
             `;
-          }
+        }        
           // Les brackets pas encores faits ou des autres
           else {
             let vsElement = tourIndex === totalTours - 1 ? `<div class=" vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
@@ -318,7 +328,7 @@ displayMatches(matchesByTour) {
             const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
             player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
         }
-          tourElement.appendChild(matchElement);
+        tourElement.appendChild(matchElement);
       });
       if (tourIndex === totalTours - 1) {
         // Ajouter le `tourElement` courant à `tournamentTabElement`
@@ -382,47 +392,39 @@ displayMatches(matchesByTour) {
     }
     if (tourIndex !== totalTours - 1) 
       tournamentTabElement.appendChild(tourElement);
-  });
-}
+    });
+  }
 
   async handleReadyButtonClick(playerId) {
     console.log(`Player ${playerId} is ready!`);
 
     try {
-        const response = await fetch(`${BASE_URL}:8005/tournament/ready/${playerId}/${this.#match.id}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        });
+      const response = await fetch(`${BASE_URL}:8005/tournament/ready/${playerId}/${this.#match.id}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-        const data = await response.json();
-        // console.log(data);
-        if (data.success) {
-          if (data.match_started) {
-              console.log("Match started!!!");
-              const winner = await fetchWinnerMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
-              console.log(winner);
-          }
-          else{
-            console.log(`Player ${playerId} is now marked as ready in the backend.`);
-            // await this.displayUpdate();
-          }
-
-        } else {
-            console.error('Could not mark the player as ready in the backend.', data.error);
-        }
+      const data = await response.json();
+      console.log("LaaaaaDatattatatatatatata", data);
+      if (data.success) {
+        redirectTo(`/game/online/${data.game_id}/${this.#tournament.id}`);
+        console.log(`Player ${playerId} is now marked as ready in the backend.`);
+      } else {
+        console.error('Could not mark the player as ready in the backend.', data.error);
+      }
     } catch (error) {
-        console.error('There was a problem with the fetch operation: ' + error.message);
+      console.error('There was a problem with the fetch operation: ' + error.message);
     }
   }
 
-  
+
   async deletePlayer() {
     await fetchDeletePlayerAndTournament();
     redirectTo(this.#backUrl);
@@ -440,7 +442,7 @@ displayMatches(matchesByTour) {
       else 
         console.log("error : get matchs failled !");
   }
-  
+
   async infoMatch() {
     await fetchInfoMatch();
   }
@@ -466,9 +468,9 @@ displayMatches(matchesByTour) {
     this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
-        console.log('WebSocket connection established start tournament');
-        // this.socket.send(JSON.stringify({user_id: this.#user.id}));
-        this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
+      console.log('WebSocket connection established start tournament');
+      // this.socket.send(JSON.stringify({user_id: this.#user.id}));
+      this.socket.send(JSON.stringify({ tournoi_id: this.#tournament.id }));
     };
 
     this.socket.onmessage = async (event) => {
@@ -489,7 +491,7 @@ displayMatches(matchesByTour) {
     };
 
     this.socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
+      console.error('WebSocket error:', error);
     };
 
     window.addEventListener('beforeunload', () => {

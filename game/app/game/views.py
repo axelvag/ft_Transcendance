@@ -7,6 +7,7 @@ from django.db.models import Q
 from .models import Game
 import json
 import requests
+import logging
 
 def verify_sessionid(request):
   session_id = request.COOKIES.get('sessionid', None)

@@ -364,6 +364,7 @@ def create_matches(request, tournament_id):
             return JsonResponse({"error": "Le tournoi n'est pas dans un état valide pour créer des matchs."}, status=400)
 
         players = list(Joueur.objects.filter(tournament=tournament_id))
+
         if len(players) % 2 != 0:
             return JsonResponse({"error": "Nombre impair de joueurs, impossible de créer des matchs pairs."}, status=400)
 
@@ -373,13 +374,36 @@ def create_matches(request, tournament_id):
         number_of_matches = len(players) // 2
         match_id = 1  # Réinitialiser match_id à 1 pour le premier tour
         for i in range(0, len(players), 2):
+
+            player_1 = players[i]
+            player_2 = players[i+1]
+
+            # Vérifiez que les deux joueurs existent
+            if not (Joueur.objects.filter(user_id=player_1.id).exists() and Joueur.objects.filter(user_id=player_2.id).exists()):
+                return JsonResponse({"error": f"Un des joueurs n'existe pas : {player_1.id} ou {player_2.id}"}, status=400)
+
+
+            # Créez un nouveau jeu via le service externe
+            response = requests.post("https://game:8009/games", json={
+                "player_left_id": player_1.user_id,
+                "player_right_id": player_2.user_id,
+            }, cookies=request.COOKIES, verify=False)
+
+            if response.status_code != 201:
+                return JsonResponse({"error": "Failed to create game in external service."}, status=response.status_code)
+
+            game_data = response.json()
+            game_id = game_data.get("id")
+
+            # Créez le match en local
             match = Match.objects.create(
-                player_1=players[i],
-                player_2=players[i+1],
+                player_1=player_1,
+                player_2=player_2,
                 tournament=tournament,
                 tour=1,
                 status=Match.NOT_PLAYED,
-                match_id=match_id
+                match_id=match_id,
+                game_id=game_id  # Assurez-vous que `game_id` est une colonne dans votre modèle Match
             )
             matches_created.append(match)
             match_id += 1
@@ -430,9 +454,11 @@ def get_matches(request, tournament_id):
                 "match_id": match.id,
                 "player_1_id": match.player_1.user_id if match.player_1 else None,
                 "player_1_username": match.player_1.username if match.player_1 else None,
+                "player_1_score": match.player_1_score,
                 "player_1_avatar": profile_info1.get('avatar'),
                 "player_2_id": match.player_2.user_id if match.player_2 else None,
                 "player_2_username": match.player_2.username if match.player_2 else None,
+                "player_2_score": match.player_2_score,
                 "player_2_avatar": profile_info2.get('avatar'),
                 "status": match.status,
                 "player_1_ready": match.player_1.status_ready if match.player_1 else False,
@@ -483,9 +509,9 @@ def set_player_ready(request, player_id, match_id):
         if match.player_1.status_ready == Joueur.READY and match.player_2.status_ready == Joueur.READY:
             match.status = Match.IN_PROGRESS
             match.save()
-            return JsonResponse({"success": True, "match_started": True})
+            return JsonResponse({"success": True, "match_started": True, "game_id": match.game_id})
         
-        return JsonResponse({"success": True, "match_started": False, "player_status": player.status_ready})
+        return JsonResponse({"success": True, "match_started": False, "player_status": player.status_ready, "game_id": match.game_id})
 
     except Joueur.DoesNotExist:
         return JsonResponse({"success": False, "error": "Joueur non trouvé."}, status=404)
@@ -526,6 +552,7 @@ def get_latest_match_for_user(request, user_id, tournament_id):
                 "status": latest_match.status,
                 "tour": latest_match.tour,
                 "leave": latest_match.leave,
+                "game_id": latest_match.game_id,
                 # Ajoutez ici d'autres données que vous souhaitez retourner.
             }
             return JsonResponse({'success': True, 'matches_data': match_data}, status=200)
@@ -539,13 +566,15 @@ def get_latest_match_for_user(request, user_id, tournament_id):
 @csrf_exempt
 @verif_sessionID
 @require_http_methods(["POST"])
-def update_winner_and_prepare_next_match(request, match_id, winner_id):
+def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, score2):
     try:
         match = Match.objects.get(id=match_id)
         winner = Joueur.objects.get(user_id=winner_id)
         winner.status_ready = 0
         match.winner = winner
         match.status = Match.FINISHED
+        match.player_1_score = score1
+        match.player_2_score = score2
         match.save()
         winner.save()
     except ObjectDoesNotExist:
@@ -587,6 +616,22 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id):
                 next_match.player_1 = winner
             elif match.match_id % 2 == 0:
                 next_match.player_2 = winner
+
+            # Vérifiez que les deux joueurs existent avant de créer un jeu
+            if next_match.player_1 and next_match.player_2:
+                # Vérifiez que le `game_id` est nul avant de créer le jeu
+                if next_match.game_id is None:
+                    response = requests.post("https://game:8009/games", json={
+                        "player_left_id": next_match.player_1.user_id,
+                        "player_right_id": next_match.player_2.user_id,
+                    }, cookies=request.COOKIES, verify=False)
+
+                    if response.status_code != 201:
+                        return JsonResponse({"error": "Failed to create game in external service."}, status=response.status_code)
+
+                    game_data = response.json()
+                    next_match.game_id = game_data.get("id")
+            
             next_match.save()
         else:
             return JsonResponse({'message': "Aucun match disponible pour la mise à jour."}, status=404)

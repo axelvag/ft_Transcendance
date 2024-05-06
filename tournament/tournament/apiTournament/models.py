@@ -41,3 +41,4 @@ class Match(models.Model):
     leave = models.IntegerField(default=NOT_LEAVE)
     tournament = models.ForeignKey(Tournoi, on_delete=models.CASCADE, related_name='matches', null=True)  # Ajout de la relation avec le modèle Tournoi
     match_id = models.IntegerField(default=1)
+    game_id = models.IntegerField(null=True, blank=True)
