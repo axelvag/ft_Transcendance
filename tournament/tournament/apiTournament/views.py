@@ -552,6 +552,8 @@ def get_latest_match_for_user(request, user_id, tournament_id):
                 "status": latest_match.status,
                 "tour": latest_match.tour,
                 "leave": latest_match.leave,
+                "player1ready" : latest_match.player_1.status_ready if latest_match.player_1 else None,
+                "player2ready" : latest_match.player_2.status_ready if latest_match.player_2 else None,
                 "game_id": latest_match.game_id,
                 # Ajoutez ici d'autres données que vous souhaitez retourner.
             }

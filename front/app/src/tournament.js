@@ -53,6 +53,8 @@ const match = {
   player2id: null,
   leave: null,
   game_id: null,
+  player1ready: null,
+  player2ready: null,
 };
 
 const setLocalMatch = data => {
@@ -63,6 +65,8 @@ const setLocalMatch = data => {
   match.player2id = data.player_2_id || '';
   match.leave = data.leave || 0;
   match.game_id = data.game_id || null;
+  match.player1ready = data.player1ready || 0;
+  match.player2ready = data.player2ready || 0;
 };
 
 const resetLocalMatch = () => {
@@ -72,6 +76,8 @@ const resetLocalMatch = () => {
   match.player1id = null;
   match.player2id = null;
   match.leave = null;
+  match.player1ready = null;
+  match.player2ready = null;
 };
 
 // const getMatch = () => {
@@ -339,6 +345,29 @@ const fetchLeaveMatchAlone = async () => {
   return response.json();
 };
 
+const fetchUserNobodyReadyTime = async () => {
+  match.winner = Math.random() < 0.5 ? match.player1id : match.player2id;
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+}
+
+const fetchUserOneReadyTime = async (winnerId) => {
+  match.winner = winnerId; // Attribuer le gagnant
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+  return response.json();
+}
 
 const fetchDeletePlayerAndTournament = async () => {
   let user = getProfile();
@@ -359,4 +388,4 @@ const fetchDeletePlayerAndTournament = async () => {
   }
 };
 
-export { tournament, updateWinnerLeave, fetchWinnerMatch2, fetchLeaveMatch, fetchDeletePlayerAndTournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch, fetchLeaveMatchAlone };
+export { tournament, updateWinnerLeave, fetchWinnerMatch2, fetchLeaveMatch, fetchDeletePlayerAndTournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch, fetchLeaveMatchAlone, fetchUserNobodyReadyTime, fetchUserOneReadyTime };
