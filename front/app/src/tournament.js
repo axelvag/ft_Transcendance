@@ -96,254 +96,418 @@ const resetLocalMatch = () => {
 const getMatch = () => ({ ...match });
 
 const fetchGetTournament = async (tournamentId) => {
-  const response = await fetch(`${BASE_URL}:8005/tournament/get/${tournamentId}/`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-  const data = await response.json();
-  console.log("fdsfsfsdfsdfsdfsdfsfsdf",data);
-  if (data.success) {
-    setLocalTournament(data.data);
-    redirectTo(`/game/tournament/waiting`);
-    notify({
-      icon: 'info',
-      iconClass: 'text-info',
-      message: `The tournament was successfully joined</b>`,
+  try {
+    const response = await fetch(`${BASE_URL}:8005/tournament/get/${tournamentId}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
     });
-  } else {
-    console.error('Tournoi non trouvé ou erreur de récupération.');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      setLocalTournament(data.data);
+      redirectTo(`/game/tournament/waiting`);
+      notify({
+        icon: 'info',
+        iconClass: 'text-info',
+        message: `The tournament was successfully joined</b>`,
+      });
+    } else {
+      console.error('Tournoi non trouvé ou erreur de récupération.');
+    }
+  } catch (error) {
+    console.error("An error occurred:", error);
   }
 };
 
 const TournamentExist = async (tournamentId) => {
-  const response = await fetch(`${BASE_URL}:8005/tournament/get/${tournamentId}/`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-  const data = await response.json();
-  console.log("sidebarrrrrrrrrrrr", data);
-  console.log(data.status);
-  if (data.success) {
-    if(data.data.status === 1){
-      console.log("start");
-      redirectTo(`/game/tournament/start`);
-    }
-    else
-      redirectTo(`/game/tournament/waiting`);
-    notify({
-      icon: 'info',
-      iconClass: 'text-info',
-      message: `The tournament was successfully joined</b>`,
+  try {
+    const response = await fetch(`${BASE_URL}:8005/tournament/get/${tournamentId}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
     });
-  } else {
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      if (data.data.status === 1) {
+        redirectTo(`/game/tournament/start`);
+      } else {
+        redirectTo(`/game/tournament/waiting`);
+      }
+      notify({
+        icon: 'info',
+        iconClass: 'text-info',
+        message: `The tournament was successfully joined</b>`,
+      });
+    } else {
+      redirectTo(`/game/tournament`);
+      notify({
+        icon: 'info',
+        iconClass: 'text-info',
+        message: `The tournament has been deleted !</b>`,
+      });
+    }
+  } catch (error) {
+    console.error("An error occurred:", error);
     redirectTo(`/game/tournament`);
     notify({
       icon: 'info',
       iconClass: 'text-info',
-      message: `The tournament has been deleted !</b>`,
+      message: `An error occurred while fetching the tournament</b>`,
     });
   }
 };
 
+
 const fetchCreateTournament = async (formData) => {
-  const response = await fetch(BASE_URL + ':8005/tournament/create_tournament/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(formData),
-  })
-  return response.json();
+  try {
+    const response = await fetch(BASE_URL + ':8005/tournament/create_tournament/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 const fetchDeletePlayer = async () => {
-  let user = getProfile();
-  const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  const data = await response.json();
-  if (data.success) {
-    resetLocalTournament();
-  } else {
-    console.log("error");
+  try {
+    let user = getProfile();
+    const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.success) {
+      resetLocalTournament();
+    } else {
+      console.log("error");
+    }
+  } catch (error) {
+    console.error("An error occurred:", error);
   }
 };
 
 const fetchDeletePlayerSalon = async () => {
-  let user = getProfile();
-  const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
-};
+  try {
+    let user = getProfile();
+    const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
 
-const fetchDeleteTournament = async () => {
-  const response = await fetch(`${BASE_URL}:8005/tournament/delete_tournment/${tournament.id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
-};
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-const fetchAddPlayer = async (formData) => {
-  const response = await fetch(BASE_URL + ':8005/tournament/create_joueur/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(formData),
-  })
-  return response.json();
-};
-
-const fetchTournamentInfo = async () => {
-  let user = getProfile();
-  const response = await fetch(`${BASE_URL}:8005/tournament/tournoi_info/${user.id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  const data = await response.json();
-  console.log("tournoi infooooooooooo", data);
-  if (data.id) {
-    setLocalTournament(data);
-  } else {
-    console.log("player is not in a tournament");
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
   }
 };
 
+const fetchDeleteTournament = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}:8005/tournament/delete_tournment/${tournament.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+const fetchAddPlayer = async (formData) => {
+  try {
+    const response = await fetch(BASE_URL + ':8005/tournament/create_joueur/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+const fetchTournamentInfo = async () => {
+  try {
+    let user = getProfile();
+    const response = await fetch(`${BASE_URL}:8005/tournament/tournoi_info/${user.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.id) {
+      setLocalTournament(data);
+    } else {
+      console.log("player is not in a tournament");
+    }
+  } catch (error) {
+    console.error("An error occurred:", error);
+  }
+};
+
+
 const fetchInfoMatch = async () => {
-  let user = getProfile();
-  const response = await fetch(`${BASE_URL}:8005/tournament/get_latest_match_for_user/${user.id}/${tournament.id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  const data = await response.json();
-  console.log("last match", data);
-  if (data.success) {
-    setLocalMatch(data.matches_data);
-  } else {
-    console.log("player is not in a match");
+  try {
+    let user = getProfile();
+    const response = await fetch(`${BASE_URL}:8005/tournament/get_latest_match_for_user/${user.id}/${tournament.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    // console.log("last match", data);
+
+    if (data.success) {
+      setLocalMatch(data.matches_data);
+    } else {
+      console.log("player is not in a match");
+    }
+  } catch (error) {
+    console.error("An error occurred:", error);
   }
 };
 
 const fetchCreateMatchs = async () => {
-  const response = await fetch(`${BASE_URL}:8005/tournament/create_matches/${tournament.id}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
+  try {
+    const response = await fetch(`${BASE_URL}:8005/tournament/create_matches/${tournament.id}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 const fetchGetMatchs = async () => {
-  const response = await fetch(`${BASE_URL}:8005/tournament/get_matches/${tournament.id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
+  try {
+    if (tournament.id === null) {
+      console.log("Tournament ID is null. Doing nothing.");
+      return { success: false, error: "Tournament ID is null" };
+    }
+
+    const response = await fetch(`${BASE_URL}:8005/tournament/get_matches/${tournament.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
 };
 
-const fetchWinnerMatch = async () => {
-  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
-};
+
+
+// const fetchWinnerMatch = async () => {
+//   const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     credentials: 'include',
+//   })
+//   return response.json();
+// };
 
 const fetchWinnerMatch2 = async (winner, scorePlayer1, scroePlayer2) => {
-  console.log("wineeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer", scorePlayer1, scroePlayer2);
-  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${winner}/${scorePlayer1}/${scroePlayer2}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
+  try {
+    console.log("wineeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer", scorePlayer1, scroePlayer2);
+    const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${winner}/${scorePlayer1}/${scroePlayer2}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 
 const fetchLeaveMatch = async () => {
-  let user = getProfile();
-  if (user.id === match.player1id)
-    match.winner = match.player2id;
-  else
-    match.winner = match.player1id;
-  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
+  try {
+    let user = getProfile();
+    if (user.id === match.player1id)
+      match.winner = match.player2id;
+    else
+      match.winner = match.player1id;
+
+    const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 const updateWinnerLeave = async () => {
-  if(match.leave === 1)
-    match.winner = match.player2id;
-  else 
-    match.winner = match.player1id;
-  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
+  try {
+    if (match.leave === 1)
+      match.winner = match.player2id;
+    else
+      match.winner = match.player1id;
+
+    const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 const fetchLeaveMatchAlone = async () => {
-  let user = getProfile();
-  let player;
-  if(user.id === match.player1id)
-    player = 1;
-  else
-    player = 2;
-  const response = await fetch(`${BASE_URL}:8005/tournament/update_leave/${match.id}/${player}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  return response.json();
+  try {
+    let user = getProfile();
+    let player;
+
+    if (user.id === match.player1id)
+      player = 1;
+    else
+      player = 2;
+
+    const response = await fetch(`${BASE_URL}:8005/tournament/update_leave/${match.id}/${player}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
+  }
 };
+
 
 const fetchUserNobodyReadyTime = async () => {
   match.winner = Math.random() < 0.5 ? match.player1id : match.player2id;
@@ -370,22 +534,41 @@ const fetchUserOneReadyTime = async (winnerId) => {
 }
 
 const fetchDeletePlayerAndTournament = async () => {
-  let user = getProfile();
-  const response = await fetch(`${BASE_URL}:8005/tournament/delete_player/${user.id}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  })
-  const data = await response.json();
-  console.log(data);
-  if (data.success) {
-    resetLocalTournament();
-    resetLocalMatch();
-  } else {
-    console.log("error");
+  try {
+    let user = getProfile();
+    if (user.id === null) {
+      console.log("User ID is null. Doing nothing.");
+      return { success: false, error: "User ID is null" };
+    }
+
+    const response = await fetch(`${BASE_URL}:8005/tournament/delete_player/${user.id}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+
+    if (data.success) {
+      resetLocalTournament();
+      resetLocalMatch();
+    } else {
+      console.log("error");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return { success: false, error: error.message };
   }
 };
+
 
 export { tournament, updateWinnerLeave, fetchWinnerMatch2, fetchLeaveMatch, fetchDeletePlayerAndTournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch, fetchLeaveMatchAlone, fetchUserNobodyReadyTime, fetchUserOneReadyTime };

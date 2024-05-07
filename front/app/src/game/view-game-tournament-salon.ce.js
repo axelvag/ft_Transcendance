@@ -5,6 +5,7 @@ import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
+import { notify } from '@/notifications.js';
 
 class ViewTournamentSalon extends HTMLElement {
   #user;
@@ -229,6 +230,11 @@ startCountdownAndRedirect(listElement) {
           resetLocalTournament();
           this.deletePlayer();
           redirectTo(this.#backUrl);
+          notify({
+            icon: 'info',
+            iconClass: 'text-info',
+            message: `The tournament has been deleted !</b>`,
+          });
           this.socket.close();
         }
         if (data.action === 'display_player') {
