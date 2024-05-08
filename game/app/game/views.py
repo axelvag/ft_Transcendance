@@ -118,7 +118,7 @@ class GamePlayerHistoryView(View):
     
     player_id = None
     try:
-      player_id = verify_sessionid(request)
+      player_id = str(verify_sessionid(request))
     except Exception as e:
       return JsonResponse({'error': str(e)}, safe=False, status=403)
     
