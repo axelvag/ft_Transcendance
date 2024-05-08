@@ -87,6 +87,9 @@
     display: flex;
     align-items: center;
     gap: 2em;
+    &:empty {
+      display: none;
+    }
 
     @include media-breakpoint-down(lg) {
       font-size: 0.675rem;

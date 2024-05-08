@@ -1,5 +1,5 @@
 import './components/game-matchup.ce.js';
-import './components/game-play-fake.ce.js';
+import './components/game-play.ce.js';
 import { getProfile } from '@/auth.js';
 import { notifyError } from '@/notifications.js';
 import { redirectTo } from '@/router.js';
@@ -152,8 +152,7 @@ class ViewGameOnline extends HTMLElement {
 
   displayGamePlay() {
     this.innerHTML = `
-      <game-play-fake
-        back-route="${this.#backRoute}"
+      <game-play
         game-id="${this.#game.id}"
         player-left-id="${this.#playerLeft.id}"
         player-left-name="${this.#playerLeft.name}"
@@ -163,7 +162,7 @@ class ViewGameOnline extends HTMLElement {
         player-right-name="${this.#playerRight.name}"
         player-right-avatar="${this.#playerRight.avatar}"
         player-right-type="${this.#playerRight.type}"
-      ></game-play-fake>
+      ></game-play>
     `;
   }
 

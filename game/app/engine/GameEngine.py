@@ -12,14 +12,23 @@ class GameEngine:
     self._width = 800
     self._height = 600
     self._wallThickness = 10
+    self._wallDepth = 30
     self._ballSize = 20
     self._ballSpeedOnStart = 300
     self._ballAcceleration = 1.05
     self._ballSpeedMax = 500
     self._paddleHeight = 100
     self._paddleWidth = 20
+    self._paddleDepth = 20
     self._paddlePadding = 30
     self._paddleSpeed = 300
+
+    self._tableWidth = 1200
+    self._tableHeight = 650
+    self._tableDepth = 510
+    self._tableLegsSize = 340
+    self._tableBoardHoleDepth = 30
+
     self._scoreMax = 5
     self._startRoundDelay = 500
     self._endRoundDelay = 500
@@ -32,20 +41,9 @@ class GameEngine:
     self._ballXOnPaddleCollision = self._paddleStartCenterX - self._paddleWidth / 2 - self._ballSize / 2
     self._ballXOnScore = self._width / 2 + self._ballSize
     self._hitOnPaddleMax = (self._paddleHeight + self._ballSize) / 2
-
-    # todo: use users' data
-    self._playerLeft = {
-      'id': 'ryu',
-      'name': 'Ryu',
-      'avatar': './assets/img/avatar-ryu.jpg',
-    }
-    self._playerRight = {
-      'id': 'ken',
-      'name': 'Ken',
-      'avatar': './assets/img/avatar-ken.jpg',
-    }
-
-    self._timer = PauseableTimeout()
+    self._scoreLeft = 0
+    self._scoreRight = 0
+    self._status = 'initialized'
 
     self._ball = MovableRect({
       'startCenter': Vec2(0, 0),
@@ -62,30 +60,38 @@ class GameEngine:
       'height': self._paddleHeight,
       'width': self._paddleWidth,
     })
-    self._scoreLeft = 0
-    self._scoreRight = 0
+
+    self._previousCollider = None
+    self._timer = PauseableTimeout()
     self._ballSpeed = 0
     self._ballDir = Vec2(0, 0)
-    self._status = 'initialized'
-    self._previousCollider = None
     self._isBallMovingBeforePause = False
+
     self._listeners = []
   
   def _getState(self):
     return {
-      'playerLeft': self._playerLeft,
-      'playerRight': self._playerRight,
       'width': self._width,
       'height': self._height,
       'wallThickness': self._wallThickness,
+      'wallDepth': self._wallDepth,
       'ballSize': self._ballSize,
       'ballSpeedOnStart': self._ballSpeedOnStart,
       'ballAcceleration': self._ballAcceleration,
       'ballSpeedMax': self._ballSpeedMax,
+      'ballYOnWallCollision': self._ballYOnWallCollision,
+      'ballXOnPaddleCollision': self._ballXOnPaddleCollision,
       'paddleHeight': self._paddleHeight,
       'paddleWidth': self._paddleWidth,
+      'paddleDepth': self._paddleDepth,
       'paddlePadding': self._paddlePadding,
       'paddleSpeed': self._paddleSpeed,
+      'paddleMaxCenterY': self._paddleMaxCenterY,
+      'tableWidth': self._tableWidth,
+      'tableHeight': self._tableHeight,
+      'tableDepth': self._tableDepth,
+      'tableLegsSize': self._tableLegsSize,
+      'tableBoardHoleDepth': self._tableBoardHoleDepth,
       'scoreMax': self._scoreMax,
       'innerWidth': self._innerWidth,
       'innerHeight': self._innerHeight,
@@ -132,7 +138,7 @@ class GameEngine:
     self._previousCollider = None
 
     self._notify({
-      'event': 'init',
+      'type': 'init',
       'state': self._getState(),
     })
 
@@ -143,6 +149,7 @@ class GameEngine:
     self._ball.startTime = now()
     self._ball.endTime = self._ball.startTime
     self._notify({
+      'type': 'update',
       'event': 'newRound',
       'state': {
         'status': self._status,
@@ -158,7 +165,10 @@ class GameEngine:
       self._ballDir = Vec2(xDir, yDir).normalize()
       self._ballSpeed = self._ballSpeedOnStart
       self._calculateNextCollision()
-      self._notify({ 'state': { 'ball': self._ball.json() } })
+      self._notify({
+        'type': 'update',
+        'state': { 'ball': self._ball.json() }
+      })
       self._previousCollider = None
     
     self._timer.set(timerFn, self._startRoundDelay)
@@ -255,6 +265,7 @@ class GameEngine:
       self._ballDir.reflect(collision['normal'])
       self._calculateNextCollision()
       self._notify({
+        'type': 'update',
         'event': 'collision',
         'state': { 'ball': self._ball.json() },
       })
@@ -297,12 +308,14 @@ class GameEngine:
         
         self._calculateNextCollision()
         self._notify({
+          'type': 'update',
           'event': 'collision',
           'state': { 'ball': self._ball.json() },
         })
       else:
         self._calculateNextCollision()
         self._notify({
+          'type': 'update',
           'state': { 'ball': self._ball.json() },
         })
 
@@ -330,6 +343,7 @@ class GameEngine:
 
       # send update
       self._notify({
+        'type': 'update',
         'event': 'victory' if isMaxScoreReached else 'score',
         'state': {
           'ball': self._ball.json(),
@@ -341,7 +355,10 @@ class GameEngine:
 
   def _start(self):
     if (self._status != 'initialized'):
-      self._notify({ 'state': { 'status': self._status } })
+      self._notify({
+        'type': 'update',
+        'state': { 'status': self._status }
+      })
       return
     self._startNewRound('left')
 
@@ -361,6 +378,7 @@ class GameEngine:
 
     self._status = 'paused'
     self._notify({
+      'type': 'update',
       'state': {
         'ball': self._ball.json(),
         'paddleLeft': self._paddleLeft.json(),
@@ -381,6 +399,7 @@ class GameEngine:
       self._calculateNextCollision()
     
     self._notify({
+      'type': 'update',
       'state': {
         'ball': self._ball.json(),
         'status': self._status,
@@ -408,7 +427,10 @@ class GameEngine:
     if (dir != 0):
       self._paddleLeft.endCenter.y = self._paddleMaxCenterY * dir
       self._paddleLeft.endTime = self._paddleLeft.startTime + (math.fabs(self._paddleLeft.endCenter.y - self._paddleLeft.startCenter.y) / self._paddleSpeed) * 1000
-    self._notify({ 'state': { 'paddleLeft': self._paddleLeft.json() } })
+    self._notify({
+      'type': 'update',
+      'state': { 'paddleLeft': self._paddleLeft.json() }
+    })
 
   def _updatePaddleRightMove(self, dir):
     if (self._status != 'running'):
@@ -428,7 +450,10 @@ class GameEngine:
     if (dir != 0):
       self._paddleRight.endCenter.y = self._paddleMaxCenterY * dir
       self._paddleRight.endTime = self._paddleRight.startTime + (math.fabs(self._paddleRight.endCenter.y - self._paddleRight.startCenter.y) / self._paddleSpeed) * 1000
-    self._notify({ 'state': { 'paddleRight': self._paddleRight.json() } })
+    self._notify({
+      'type': 'update',
+      'state': { 'paddleRight': self._paddleRight.json() }
+    })
 
   def subscribe(self, callback):
     self._listeners.append(callback)

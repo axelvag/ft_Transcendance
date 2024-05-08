@@ -4,6 +4,7 @@ import './game-scoreboard.ce.js';
 import './game-dialog.ce.js';
 import './game-play.ce.scss';
 import GameWorker from '../utils/GameWorker.js?worker';
+import GameWorkerRemote from '../utils/GameWorkerRemote.js?worker';
 import AudioPlayer from '../utils/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
@@ -68,6 +69,7 @@ const template = `
 `;
 
 class GamePlay extends HTMLElement {
+  #isOnline = false;
   #keys = {};
   #touchs = {
     left: { up: false, down: false },
@@ -92,7 +94,19 @@ class GamePlay extends HTMLElement {
     this.handleTouchStart = this.handleTouchStart.bind(this);
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
 
-    this.gameWorker = new GameWorker();
+    this.#isOnline = this.hasAttribute('game-id');
+    if (this.#isOnline) {
+      this.gameWorker = new GameWorkerRemote();
+      this.gameWorker.postMessage({
+        type: 'join',
+        data: {
+          gameId: this.getAttribute('game-id'),
+          userId: this.getAttribute('user-id'),
+        },
+      });
+    } else {
+      this.gameWorker = new GameWorker();
+    }
 
     this.#audioPlayer = new AudioPlayer();
     this.#audioPlayer.load('collision', '/assets/sounds/hit.wav');
@@ -138,11 +152,10 @@ class GamePlay extends HTMLElement {
 
     // Game events
     this.gameWorker.onmessage = function (e) {
-      const { type, data } = e.data || {};
-
-      if (type === 'init') {
+      const data = e.data || {};
+      if (data.type === 'init') {
         this.handleInitMessage(data);
-      } else if (type === 'update') {
+      } else if (data.type === 'update') {
         this.handleUpdateMessage(data);
       }
     };
@@ -166,6 +179,18 @@ class GamePlay extends HTMLElement {
       e.preventDefault();
       this.gameWorker.postMessage({ type: 'pause' });
     });
+
+    // display `Waiting` dialog
+    if (this.#isOnline) {
+      this.#gameState = {
+        status: 'waiting',
+        playerLeft: { ...this.#playerLeft },
+        playerRight: { ...this.#playerRight },
+      };
+      this.renderPlayers();
+      this.renderDialog();
+      this.querySelector('.gamePlay').hidden = false;
+    }
   }
 
   disconnectedCallback() {
@@ -246,6 +271,16 @@ class GamePlay extends HTMLElement {
     };
 
     switch (this.#gameState.status) {
+      case 'waiting':
+        this.dialogEl.render({
+          open: true,
+          players,
+          title: 'Waiting for opponent...',
+          back: {
+            action: () => redirectTo('/game'),
+          },
+        });
+        break;
       case 'paused':
         this.dialogEl.render({
           open: true,
@@ -273,9 +308,8 @@ class GamePlay extends HTMLElement {
   }
 
   handleInitMessage(data) {
-    const json = JSON.parse(data);
     // todo: validate data
-    const dataState = json?.state;
+    const dataState = data?.state;
     this.#gameState = {
       playerLeft: { ...this.#playerLeft },
       playerRight: { ...this.#playerRight },
@@ -312,9 +346,8 @@ class GamePlay extends HTMLElement {
   }
 
   handleUpdateMessage(data) {
-    const json = JSON.parse(data);
     // todo: validate data
-    const updates = json?.state;
+    const updates = data?.state;
     this.#gameState = {
       ...this.#gameState,
       ...updates,
@@ -335,7 +368,7 @@ class GamePlay extends HTMLElement {
     }
 
     // sounds
-    this.#audioPlayer.play(json?.event);
+    this.#audioPlayer.play(data?.event);
   }
 
   handleKeyDown(event) {

@@ -1,5 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from asgiref.sync import async_to_sync
 import json
 import requests
 from game.models import Game
@@ -63,14 +64,23 @@ class PlayConsumer(AsyncWebsocketConsumer):
     await self.channel_layer.group_add(self.group_name, self.channel_name)
 
     # notify
-    await self.send_group({'game': self.game.json()})
+    await self.send_group({
+      'type': 'log',
+      'game': self.game.json()
+    })
+
+    # start the game if both players are connected
+    await database_sync_to_async(self.game.try_start)(async_to_sync(self.send_group))
 
   async def disconnect(self, close_code):
     await self.channel_layer.group_discard(self.group_name, self.channel_name)
     await database_sync_to_async(self.game.leave)(self.user_id)
 
     # notify
-    await self.send_group({'game': self.game.json()})
+    await self.send_group({
+      'type': 'log',
+      'game': self.game.json()
+    })
 
   async def receive(self, text_data):
     try:
@@ -81,10 +91,11 @@ class PlayConsumer(AsyncWebsocketConsumer):
       if action == 'end':
         result = await database_sync_to_async(self.game.end)(recieved_data)
         if result:
-          await self.send_group({'game': self.game.json()})
+          await self.send_group({
+            'type': 'log',
+            'game': self.game.json()
+          })
     except json.JSONDecodeError:
-      # Handle the exception if the text data is not valid JSON
-      print("Error decoding JSON", text_data.strip())
       return
 
   async def send_group(self, data):
@@ -92,7 +103,7 @@ class PlayConsumer(AsyncWebsocketConsumer):
       self.group_name,
       {
         'type': 'game.message',
-        'message': data
+        'message': data,
       }
     )
 
