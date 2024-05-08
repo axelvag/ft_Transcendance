@@ -5,7 +5,6 @@ from django.utils import timezone
 class Game(models.Model):
   STATUS_CHOICES = [
     ('WAITING', 'Waiting'),
-    ('READY', 'Ready'),
     ('RUNNING', 'Running'),
     ('FINISHED', 'Finished'),
     ('ABORTED', 'Aborted')
@@ -58,7 +57,7 @@ class Game(models.Model):
     elif self.player_right_id == player_id:
       self.player_right_connected = True
     if self.player_left_connected and self.player_right_connected:
-      self.status = 'READY'
+      self.status = 'RUNNING'
     self.save()
     return True
 
@@ -79,7 +78,7 @@ class Game(models.Model):
 
   def end(self, data):
     self.refresh_from_db()
-    if self.status not in ['READY', 'RUNNING']:
+    if self.status != 'RUNNING':
       return False
     if data is None:
       return False
