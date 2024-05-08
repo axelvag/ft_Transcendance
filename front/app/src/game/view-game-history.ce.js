@@ -28,19 +28,10 @@ class ViewGameHistory extends HTMLElement {
 
     this.#bodyEl = this.querySelector('#viewGameHistory-body');
     this.fetchGames();
-
-    document.addEventListener('click', this.handleClickRow);
   }
 
   disconnectedCallback() {
     document.removeEventListener('click', this.handleClickRow);
-  }
-
-  handleClickRow(event) {
-    const rowEl = event.target.closest('tr[data-game-id]');
-    if (!rowEl) return;
-    const gameId = rowEl.getAttribute('data-game-id');
-    redirectTo(`/game/online/${gameId}`);
   }
 
   formatDateTime(dateTime) {
@@ -63,8 +54,7 @@ class ViewGameHistory extends HTMLElement {
         opponentIds.map(async opponentId => {
           const opponent = await fetch(`${BASE_URL}:8002/get_user_profile/${opponentId}/`, {
             credentials: 'include',
-          })
-            .then(res => res.json())
+          }).then(res => res.json());
           opponents[opponentId] = opponent;
         })
       );
@@ -90,7 +80,7 @@ class ViewGameHistory extends HTMLElement {
       this.#bodyEl.innerHTML = '<p>No game found</p>';
     } else {
       const getRowHtml = game => `
-        <tr data-game-id="${game.id}">
+        <tr data-game-id="${game.id}" data-link="/game-history/${game.id}">
           <td class="bg-transparent align-middle py-3">
             <img
               src="${game.opponent?.avatar || '/assets/img/default-profile.jpg'}"
@@ -100,10 +90,11 @@ class ViewGameHistory extends HTMLElement {
             />
             <small>${game.opponent?.username}</small>
           </td>
-          <td class="bg-transparent align-middle">${game.is_victory
-          ? '<span class="badge text-bg-success">VICTORY</span>'
-          : '<span class="badge text-bg-danger">DEFEAT</span>'
-        }</td>
+          <td class="bg-transparent align-middle">${
+            game.is_victory
+              ? '<span class="badge text-bg-success">VICTORY</span>'
+              : '<span class="badge text-bg-danger">DEFEAT</span>'
+          }</td>
           <td class="bg-transparent align-middle">
             ${game.player_forfeit ? 'Forfeit' : game.player_score}
             -
