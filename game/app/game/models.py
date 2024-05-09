@@ -98,23 +98,3 @@ class Game(models.Model):
     self.save()
     return True
 
-  def listen_engine(self, data):
-    type = data.get('type', None)
-    if type != 'update':
-      return
-    gameState = data.get('state', None)
-    if gameState is None:
-      return
-    gameState_status = gameState.get('status', None)
-    if (gameState_status == 'finished' and self.status == 'RUNNING'):
-      player_left_score = gameState.get('scoreLeft', 0)
-      player_right_score = gameState.get('scoreRight', 0)
-      if player_left_score > player_right_score:
-        winner_id = self.player_left_id
-      else:
-        winner_id = self.player_right_id
-      self.end({
-        'winner_id': winner_id,
-        'player_left_score': player_left_score,
-        'player_right_score': player_right_score,
-      })

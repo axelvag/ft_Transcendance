@@ -77,8 +77,7 @@ class PlayConsumer(AsyncWebsocketConsumer):
     if self.game.status == 'RUNNING' and self.game_id not in engines:
       engine = GameEngine()
       engines[self.game_id] = engine
-      engine.subscribe(async_to_sync(self.send_group))
-      engine.subscribe(self.game.listen_engine)
+      engine.subscribe(self.on_engine_event)
       await sync_to_async(engine.emit)('init', {})
       await sync_to_async(engine.emit)('start', {})
 
@@ -128,3 +127,29 @@ class PlayConsumer(AsyncWebsocketConsumer):
       return None
     except Exception as e:
       return None
+
+  def on_engine_event(self, data):
+    # send the data to the players
+    async_to_sync(self.send_group)(data)
+    # check if the game is finished
+    type = data.get('type', None)
+    if type != 'update':
+      return
+    gameState = data.get('state', None)
+    if gameState is None:
+      return
+    gameState_status = gameState.get('status', None)
+    if (gameState_status == 'finished'):
+      player_left_score = gameState.get('scoreLeft', 0)
+      player_right_score = gameState.get('scoreRight', 0)
+      if player_left_score > player_right_score:
+        winner_id = self.game.player_left_id
+      else:
+        winner_id = self.game.player_right_id
+      self.game.end({
+        'winner_id': winner_id,
+        'player_left_score': player_left_score,
+        'player_right_score': player_right_score,
+      })
+      engines[self.game_id].reset()
+
