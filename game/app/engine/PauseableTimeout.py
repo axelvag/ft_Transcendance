@@ -8,6 +8,9 @@ class PauseableTimeout:
     self._delay = None
     self._callback = None
 
+  def __del__(self):
+    self.clear()
+
   def set(self, callback, delay):
     self.clear()
     self._callback = callback

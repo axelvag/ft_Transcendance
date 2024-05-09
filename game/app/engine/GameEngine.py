@@ -68,6 +68,10 @@ class GameEngine:
     self._isBallMovingBeforePause = False
 
     self._listeners = []
+
+  def __del__(self):
+    if self._timer:
+      self._timer.clear()
   
   def _getState(self):
     return {
