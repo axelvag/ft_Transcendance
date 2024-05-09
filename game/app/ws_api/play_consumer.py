@@ -1,9 +1,12 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 import json
 import requests
 from game.models import Game
+from engine.GameEngine import GameEngine
+
+engines = {}
 
 # @method_decorator(csrf_exempt, name='dispatch')
 class PlayConsumer(AsyncWebsocketConsumer):
@@ -70,7 +73,14 @@ class PlayConsumer(AsyncWebsocketConsumer):
     })
 
     # start the game if both players are connected
-    await database_sync_to_async(self.game.try_start)(async_to_sync(self.send_group))
+    await database_sync_to_async(self.game.refresh_from_db)()
+    if self.game.status == 'RUNNING' and self.game_id not in engines:
+      engine = GameEngine()
+      engines[self.game_id] = engine
+      engine.subscribe(async_to_sync(self.send_group))
+      engine.subscribe(self.game.listen_engine)
+      await sync_to_async(engine.emit)('init', {})
+      await sync_to_async(engine.emit)('start', {})
 
   async def disconnect(self, close_code):
     await self.channel_layer.group_discard(self.group_name, self.channel_name)

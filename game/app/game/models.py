@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from engine.GameEngine import GameEngine
 
 class Game(models.Model):
   STATUS_CHOICES = [
@@ -98,16 +97,6 @@ class Game(models.Model):
     self.player_right_forfeit = data.get('player_right_forfeit', False)
     self.save()
     return True
-
-  def try_start(self, send_group):
-    self.refresh_from_db()
-    if self.status == 'RUNNING':
-      engine = GameEngine()
-      engine.subscribe(send_group)
-      engine.subscribe(self.listen_engine)
-      engine.emit('init', {})
-      engine.emit('start', {})
-      self.save()
 
   def listen_engine(self, data):
     type = data.get('type', None)
