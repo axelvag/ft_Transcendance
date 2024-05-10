@@ -152,64 +152,33 @@ class ViewTournamentstart extends HTMLElement {
           }
 
           // Les joueurs ne ce mettent pas READY donc on lance un chrono
-          // if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
-          // {
-          //   // console.log("AAAAA id:", this.#match.id, "status:", this.#match.status, "player1id:", this.#match.player1id, "player2id:", this.#match.player2id);
-          //   // console.log("player1Name", player1Name, "player2Name", player2Name);
-          //   // console.log("player1ready:", this.#match.player1ready, "player2ready:", this.#match.player2ready);
-
-          //   // Lancez un chrono de 20 secondes, je gere seulement si aucun des 2 joueurs n'est prêt
-          //   const matchId = match.match_id;
-          //   if (this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "")
-          //     return;
-          //   console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
-          //   const chronoTimeout = setTimeout(async () => {
-          //     this.infoMatch();
-          //     this.#match = getMatch();
-          //     if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
-          //       return;
-          //     console.log("FIN 20s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
-          //     if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
-          //     {
-          //       console.log("Both players are not ready!:", player1Name, " et ", player2Name);
-          //       // await this.UserNobodyReadyTime();
-          //       return ;
-          //     }
-          //       // console.log("CHRONO END", matchId);
-          //       // this.infoMatch();
-          //       // this.#match = getMatch();
-          //       // await fetchTournamentInfo();
-          //       // this.#tournament = getTournament();
-          //       // if (this.#tournament.status === 2) {
-          //       //   return;
-          //       // }
-          //       // // Vérifiez si le statut du match est toujours différent de 2 après le délai
-          //       // console.log("match ", this.#match.id, " status ", this.#match.status);
-          //       // if (match.status !== 2 && (this.#match.player1ready !== null || this.#match.player2ready === null))
-          //       // {
-          //       //     console.log("BBBBB id:", this.#match.id, "status:", match.status, "player1id:", this.#match.player1id, "player2id:", this.#match.player2id);
-          //       //     console.log("player1Name", player1Name, "player2Name", player2Name);
-          //       //     console.log("player1ready:", this.#match.player1ready, "player2ready:", this.#match.player2ready);
-          //       //     // Si les 2 player ne sont pas prêt, appelez la fonction UserLeave
-          //       //     if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
-          //       //     {
-          //       //         console.log("Both players are not ready!");
-          //       //         await this.UserNobodyReadyTime();
-          //       //         return ;
-          //       //     }
-          //       //     else
-          //       //     {
-          //       //       console.log("Solo players are not ready!", this.#match.player1ready, this.#match.player2ready);
-          //       //         // Sinon, déterminez quel joueur est parti et appelez la fonction UserLeaveAlone
-          //       //         if (this.#match.player1ready === 0 && this.#match.player2ready === 1)
-          //       //           await this.UserOneReadyTime(this.#match.player2id);  // le 2 vas gagner
-          //       //         else if (this.#match.player1ready === 1 && this.#match.player2ready === 0)
-          //       //           await this.UserOneReadyTime(this.#match.player1id); // le 1 vas gagner
-          //       //         return ;
-          //       //     }
-          //       // }
-          //   }, 20000); // 20000 millisecondes = 20 secondes
-          // }
+          if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
+          {
+            // Lancez un chrono de 60 secondes, je gere seulement si aucun des 2 joueurs n'est prêt
+            const matchId = match.match_id;
+            if (this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "")
+              return;
+            console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
+            const chronoTimeout = setTimeout(async () => {
+              // A la fin du chrono, on met les joueurs READY de force
+              this.infoMatch();
+              this.#match = getMatch();
+              if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
+                return;
+              console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
+              if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
+              {
+                if (this.#match.player1ready === 0) {
+                  console.log(player1Name, "vas etre READY de force");
+                  await this.handleReadyButtonClick(this.#match.player1id);
+                }
+                if (this.#match.player2ready === 0) {
+                  console.log(player2Name, "vas etre READY de force");
+                  await this.handleReadyButtonClick(this.#match.player2id);
+                }
+              }
+            }, 60000); // = 60 secondes
+          }
           
           // console.log(this.#match.id);
           // console.log(match.match_id);
