@@ -56,10 +56,24 @@ function reset() {
 
 function updatePaddleLeftMove(data = {}) {
   self.postMessage('updatePaddleLeftMove requested', data);
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  ws.send(
+    JSON.stringify({
+      action: 'updatePaddleLeftMove',
+      data,
+    })
+  );
 }
 
 function updatePaddleRightMove(data = {}) {
   self.postMessage('updatePaddleRightMove requested', data);
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  ws.send(
+    JSON.stringify({
+      action: 'updatePaddleRightMove',
+      data,
+    })
+  );
 }
 
 self.addEventListener('message', e => {

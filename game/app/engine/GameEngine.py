@@ -73,6 +73,11 @@ class GameEngine:
     if self._timer:
       self._timer.clear()
   
+  def clear(self):
+    if self._timer:
+      self._timer.clear()
+    self._listeners = []
+  
   def _getState(self):
     return {
       'width': self._width,
@@ -413,47 +418,79 @@ class GameEngine:
   def _reset(self):
     self._init()
 
-  def _updatePaddleLeftMove(self, dir):
+  def _updatePaddleLeftMove(self, data = {}):
     if (self._status != 'running'):
       return
 
-    # check if paddle is already moving in the same direction
-    currentDir = 0
-    if (self._paddleLeft.endCenter.y > self._paddleLeft.startCenter.y):
-      currentDir = 1
-    elif (self._paddleLeft.endCenter.y < self._paddleLeft.startCenter.y):
-      currentDir = -1
-    if (dir == currentDir):
-      return
+    if ('dir' in data):
+      dir = data['dir']
 
-    # update the move
-    self._paddleLeft.stop()
-    if (dir != 0):
-      self._paddleLeft.endCenter.y = self._paddleMaxCenterY * dir
-      self._paddleLeft.endTime = self._paddleLeft.startTime + (math.fabs(self._paddleLeft.endCenter.y - self._paddleLeft.startCenter.y) / self._paddleSpeed) * 1000
+      # check if paddle is already moving in the same direction
+      currentDir = 0
+      if (self._paddleLeft.endCenter.y > self._paddleLeft.startCenter.y):
+        currentDir = 1
+      elif (self._paddleLeft.endCenter.y < self._paddleLeft.startCenter.y):
+        currentDir = -1
+      if (dir == currentDir):
+        return
+      
+      # update the move
+      self._paddleLeft.stop()
+      if (dir != 0):
+        self._paddleLeft.endCenter.y = self._paddleMaxCenterY * dir
+        self._paddleLeft.endTime = self._paddleLeft.startTime + (math.fabs(self._paddleLeft.endCenter.y - self._paddleLeft.startCenter.y) / self._paddleSpeed) * 1000
+
+    elif ('targetY' in data):
+      targetY = data['targetY']
+
+      currentY = self._paddleLeft.center().y
+      self._paddleLeft.stop()
+      if (targetY > currentY + self._paddleHeight / 2):
+        self._paddleLeft.endCenter.y = targetY
+        self._paddleLeft.endTime = self._paddleLeft.startTime + ((targetY - currentY) / self._paddleSpeed) * 1000
+      elif (targetY < currentY - self._paddleHeight / 2):
+        self._paddleLeft.endCenter.y = targetY
+        self._paddleLeft.endTime = self._paddleLeft.startTime + ((currentY - targetY) / self._paddleSpeed) * 1000
+
     self._notify({
       'type': 'update',
       'state': { 'paddleLeft': self._paddleLeft.json() }
     })
 
-  def _updatePaddleRightMove(self, dir):
+  def _updatePaddleRightMove(self, data = {}):
     if (self._status != 'running'):
       return
 
-    # check if paddle is already moving in the same direction
-    currentDir = 0
-    if (self._paddleRight.endCenter.y > self._paddleRight.startCenter.y):
-      currentDir = 1
-    elif (self._paddleRight.endCenter.y < self._paddleRight.startCenter.y):
-      currentDir = -1
-    if (dir == currentDir):
-      return
+    if ('dir' in data):
+      dir = data['dir']
 
-    # update the move
-    self._paddleRight.stop()
-    if (dir != 0):
-      self._paddleRight.endCenter.y = self._paddleMaxCenterY * dir
-      self._paddleRight.endTime = self._paddleRight.startTime + (math.fabs(self._paddleRight.endCenter.y - self._paddleRight.startCenter.y) / self._paddleSpeed) * 1000
+      # check if paddle is already moving in the same direction
+      currentDir = 0
+      if (self._paddleRight.endCenter.y > self._paddleRight.startCenter.y):
+        currentDir = 1
+      elif (self._paddleRight.endCenter.y < self._paddleRight.startCenter.y):
+        currentDir = -1
+      if (dir == currentDir):
+        return
+
+      # update the move
+      self._paddleRight.stop()
+      if (dir != 0):
+        self._paddleRight.endCenter.y = self._paddleMaxCenterY * dir
+        self._paddleRight.endTime = self._paddleRight.startTime + (math.fabs(self._paddleRight.endCenter.y - self._paddleRight.startCenter.y) / self._paddleSpeed) * 1000
+
+    elif ('targetY' in data):
+      targetY = data['targetY']
+
+      currentY = self._paddleRight.center().y
+      self._paddleRight.stop()
+      if (targetY > currentY + self._paddleHeight / 2):
+        self._paddleRight.endCenter.y = targetY
+        self._paddleRight.endTime = self._paddleRight.startTime + ((targetY - currentY) / self._paddleSpeed) * 1000
+      elif (targetY < currentY - self._paddleHeight / 2):
+        self._paddleRight.endCenter.y = targetY
+        self._paddleRight.endTime = self._paddleRight.startTime + ((currentY - targetY) / self._paddleSpeed) * 1000
+
     self._notify({
       'type': 'update',
       'state': { 'paddleRight': self._paddleRight.json() }

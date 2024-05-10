@@ -78,8 +78,8 @@ class PlayConsumer(AsyncWebsocketConsumer):
       engine = GameEngine()
       engines[self.game_id] = engine
       engine.subscribe(self.on_engine_event)
-      await sync_to_async(engine.emit)('init', {})
-      await sync_to_async(engine.emit)('start', {})
+      await sync_to_async(engine.emit)('init')
+      await sync_to_async(engine.emit)('start')
 
   async def disconnect(self, close_code):
     await self.channel_layer.group_discard(self.group_name, self.channel_name)
@@ -96,14 +96,10 @@ class PlayConsumer(AsyncWebsocketConsumer):
       data = json.loads(text_data)
       action = data.get('action', None)
       recieved_data = data.get('data', None)
+      
+      if engines.get(self.game_id):
+        await sync_to_async(engines[self.game_id].emit)(action, recieved_data)
 
-      if action == 'end':
-        result = await database_sync_to_async(self.game.end)(recieved_data)
-        if result:
-          await self.send_group({
-            'type': 'log',
-            'game': self.game.json()
-          })
     except json.JSONDecodeError:
       return
 
@@ -151,5 +147,6 @@ class PlayConsumer(AsyncWebsocketConsumer):
         'player_left_score': player_left_score,
         'player_right_score': player_right_score,
       })
-      engines[self.game_id].reset()
+      engines[self.game_id].clear()
+      del engines[self.game_id]
 

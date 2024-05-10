@@ -130,14 +130,14 @@ class GamePlay extends HTMLElement {
       type: this.getAttribute('player-right-type'),
     };
 
-    // Disable ai controls
-    if (this.#playerLeft.type === 'ai') {
+    // Disable opponent controls (ai and remote player)
+    if (this.#playerLeft.type === 'ai' || (this.#isOnline && this.#playerLeft.type !== 'you')) {
       this.#playerLeftKeys = [];
       this.querySelectorAll('.gamePlay-touchBtn.is-playerLeft').forEach(el => {
         el.hidden = true;
       });
     }
-    if (this.#playerRight.type === 'ai') {
+    if (this.#playerRight.type === 'ai' || (this.#isOnline && this.#playerRight.type !== 'you')) {
       this.#playerRightKeys = [];
       this.querySelectorAll('.gamePlay-touchBtn.is-playerRight').forEach(el => {
         el.hidden = true;
@@ -162,7 +162,8 @@ class GamePlay extends HTMLElement {
     this.gameWorker.onmessage = this.gameWorker.onmessage.bind(this);
 
     // Game error
-    this.gameWorker.onerror = function () {
+    this.gameWorker.onerror = function (e) {
+      console.error(e.message);
       this.gameWorker.terminate();
       this.querySelector('#gamePlayErrorModal').hidden = false;
     };
