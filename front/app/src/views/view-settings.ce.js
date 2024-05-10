@@ -17,6 +17,51 @@ class ViewSettings extends HTMLElement {
           <h3>Delete Account</h3>
         </a>
       </div>
+
+      <br>
+      
+      <h1>Developer's Team</h1>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="card h-100">
+              <img src="/assets/img/dapereir.jpg" class="card-img-top img-fluid" style="max-width: 200px; max-height: 150px; width: auto; height: auto;" alt="dapereir">
+              <div class="card-body">
+                <h5 class="card-title">David Pereira</h5>
+                <p class="card-text">42 member dapereir.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card h-100">
+              <img src="/assets/img/lveloso.jpg" class="card-img-top img-fluid" style="max-width: 200px; max-height: 150px; width: auto; height: auto;" alt="lveloso">
+              <div class="card-body">
+                <h5 class="card-title">Lucas Veloso</h5>
+                <p class="card-text">42 member lveloso.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card h-100">
+              <img src="/assets/img/avaganay.jpg" class="card-img-top img-fluid" style="max-width: 200px; max-height: 150px; width: auto; height: auto;" alt="avaganay">
+              <div class="card-body">
+                <h5 class="card-title">Axel Vaganay</h5>
+                <p class="card-text">42 member avaganay.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card h-100">
+              <img src="/assets/img/ascatama.jpg" class="card-img-top img-fluid" style="max-width: 200px; max-height: 150px; width: auto; height: auto;" alt="ascatama">
+              <div class="card-body">
+                <h5 class="card-title">Alessio Scatamachia</h5>
+                <p class="card-text">42 member ascatama.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </default-layout-main>
     `;
 
