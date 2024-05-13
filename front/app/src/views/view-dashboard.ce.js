@@ -8,14 +8,14 @@ const profile = getProfile();
 
 class ViewDash extends HTMLElement {
   connectedCallback() {
-    window.addEventListener('storage', (event) => {
-    if (event.key === 'isLogged' && event.newValue === 'false') {
-      // Logique pour gérer la déconnexion, par exemple :
-      console.log("logout logout");
-      window.location.href = '/login'; // Rediriger vers la page de connexion
-      return;
-    }
-  });
+    window.addEventListener('storage', event => {
+      if (event.key === 'isLogged' && event.newValue === 'false') {
+        // Logique pour gérer la déconnexion, par exemple :
+        console.log('logout logout');
+        window.location.href = '/login'; // Rediriger vers la page de connexion
+        return;
+      }
+    });
     this.innerHTML = `
     <default-layout-sidebar></default-layout-sidebar>
     <default-layout-main>
@@ -45,18 +45,6 @@ class ViewDash extends HTMLElement {
             Play Now
           </button>
         </div>
-      </div>
-
-
-      <!-- RANK -->
-
-      <div class="d-flex justify-content-end mt-3">
-        <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg ml-auto mt-5" style="--bs-btn-color: var(--bs-body-color); font-size: 2rem;" href="#" data-link="/rank">
-          <span class="d-inline-block py-1">
-            <img src="assets/img/rank-icon.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
-            RANK
-          </span>
-        </a>
       </div>
         
 

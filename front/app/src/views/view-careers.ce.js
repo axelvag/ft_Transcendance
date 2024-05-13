@@ -25,23 +25,11 @@ class ViewCareers extends HTMLElement {
           </div>
         </div>
 
-        <!-- Nom et RANK -->
+        <!-- Nom -->
 
-        <div class="row">
-          <div class="col-md-6">
-            <h3 class="display-5 fw-bold btn-lg ms-5">
-              ${user.username}
-            </h3>
-          </div>
-          <div class="col-md-6">
-            <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg fs-2" style="--bs-btn-color: var(--bs-body-color);" href="#" data-link="/rank">
-              <span class="d-inline-block py-1">
-              <img src="assets/img/rank-icon.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
-              RANK
-              </span>
-            </a>
-          </div>
-        </div>
+        <h3 class="display-5 fw-bold btn-lg ms-5">
+          ${user.username}
+        </h3>
 
         <!-- Victories and Lost -->
 
@@ -130,7 +118,5 @@ class ViewCareers extends HTMLElement {
       </default-layout-main>
     `;
   }
-
-  
 }
 customElements.define('view-careers', ViewCareers);

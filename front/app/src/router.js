@@ -20,7 +20,6 @@ import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
 import '@/views/view-dashboard.ce.js';
 import '@/views/view-careers.ce.js';
-import '@/views/view-rank.ce.js';
 import '@/views/view-auth42-callback.ce.js';
 
 const isLoggedOutGuard = async () => {
@@ -169,13 +168,6 @@ const router = new Router({
       path: '/game/online/:gameId',
       title: 'Game online',
       template: params => `<view-game-online game-id="${params.gameId}" back-route="/game"></view-game-online>`,
-      beforeEnter: isLoggedInGuard,
-    },
-    {
-      name: 'rank',
-      path: '/rank',
-      title: 'Rank',
-      template: '<view-rank></view-rank>',
       beforeEnter: isLoggedInGuard,
     },
     {
