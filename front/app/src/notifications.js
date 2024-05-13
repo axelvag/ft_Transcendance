@@ -127,4 +127,36 @@ const notify = data => {
   toast.show();
 };
 
-export { initNotifications, notify };
+const notifyInfo = data => {
+  if (!data) {
+    data = {};
+  } else if (typeof data === 'string') {
+    data = { message: data };
+  }
+
+  data = {
+    icon: 'info',
+    iconClass: 'text-info',
+    ...data,
+  };
+
+  notify(data);
+};
+
+const notifyError = data => {
+  if (!data) {
+    data = {};
+  } else if (typeof data === 'string') {
+    data = { message: data };
+  }
+
+  data = {
+    icon: 'error',
+    iconClass: 'text-danger',
+    ...data,
+  };
+
+  notify(data);
+};
+
+export { initNotifications, notify, notifyInfo, notifyError };

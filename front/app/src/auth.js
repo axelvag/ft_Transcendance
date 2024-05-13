@@ -102,9 +102,7 @@ const isAuthenticated = async () => {
           credentials: 'include',
         });
         const userProfileData = await userProfileResponse.json();
-        console.log(userProfileData);
         if (userProfileData.success) {
-          console.log(userProfileData.avatar42);
           setLocalUser(userProfileData);
           await fetchTournamentInfo();
         } else {
@@ -304,10 +302,8 @@ const deleteUser = async csrfToken => {
     body: JSON.stringify({ user_id: user.id }),
   });
 
-  console.table(response);
   const data = await response.json();
   if (data.success) {
-    console.log('delete user and profil');
     user.isAuthenticated = false;
     resetLocalUser(data);
     localStorage.setItem('isLogged', 'false');
@@ -349,9 +345,6 @@ const handleOAuthResponse = async () => {
         formData.append('avatar', user.avatar);
         if (data.register === true) {
           try {
-            for (let [key, value] of formData.entries()) {
-              console.log(`${key}: ${value}`);
-            }
             const csrfToken = await getCsrfToken();
             const response = await fetch(BASE_URL + ':8002/update_user/', {
               method: 'POST',
@@ -380,7 +373,6 @@ const handleOAuthResponse = async () => {
         });
 
         const userProfileData = await userProfileResponse.json();
-        console.log(userProfileData);
         if (userProfileData.success) {
           setLocalUser(userProfileData);
           redirectTo('/dashboard');
@@ -398,7 +390,7 @@ const handleOAuthResponse = async () => {
           });
         }
       }
-      else{
+      else {
         console.error('Failed Auth42', data.error);
         redirectTo('/');
       }

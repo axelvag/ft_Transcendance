@@ -122,6 +122,13 @@ const router = new Router({
       beforeEnter: isLoggedInGuard,
     },
     {
+      name: 'game-history-record',
+      path: '/game-history/:gameId',
+      title: 'Game history record',
+      template: params => `<view-game-online game-id="${params.gameId}" back-route="/game-history"></view-game-online>`,
+      beforeEnter: isLoggedInGuard,
+    },
+    {
       name: 'settings',
       path: '/settings',
       title: 'Settings',
@@ -178,14 +185,15 @@ const router = new Router({
       name: 'game-online-play',
       path: '/game/online/:gameId',
       title: 'Game online',
-      template: params => `<view-game-online game-id="${params.gameId}"></view-game-online>`,
+      template: params => `<view-game-online game-id="${params.gameId}" back-route="/game"></view-game-online>`,
       beforeEnter: isLoggedInGuard,
     },
     {
       name: 'game-online-play-tournament',
       path: '/game/online/:gameId/:tournamentId',
       title: 'Game online',
-      template: params => `<view-game-online game-id="${params.gameId}" tournament-id="${params.tournamentId}"></view-game-online>`,
+      template: params =>
+        `<view-game-online game-id="${params.gameId}" back-route="/game/tournament/start"></view-game-online>`,
       beforeEnter: isLoggedInGuard,
     },
     {
