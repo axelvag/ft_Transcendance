@@ -19,7 +19,6 @@ import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
 import '@/views/view-dashboard.ce.js';
-import '@/views/view-careers.ce.js';
 import '@/views/view-auth42-callback.ce.js';
 
 const isLoggedOutGuard = async () => {
@@ -101,13 +100,6 @@ const router = new Router({
       path: '/friends',
       title: 'Friends',
       template: '<view-friend></view-friend>',
-      beforeEnter: isLoggedInGuard,
-    },
-    {
-      name: 'careers',
-      path: '/careers',
-      title: 'Careers',
-      template: '<view-careers></view-careers>',
       beforeEnter: isLoggedInGuard,
     },
     {
