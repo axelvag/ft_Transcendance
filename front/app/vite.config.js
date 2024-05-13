@@ -26,7 +26,7 @@ export default defineConfig({
   server: {
     host: true,
     port: '8000',
-    https: {
+    https: process.env.NODE_ENV === 'development' && {
       key: fs.readFileSync('/etc/ssl/private/nginx-selfsigned.key'),
       cert: fs.readFileSync('/etc/ssl/certs/nginx-selfsigned.crt'),
     },
