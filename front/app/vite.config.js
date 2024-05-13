@@ -30,5 +30,8 @@ export default defineConfig({
       key: fs.readFileSync('/etc/ssl/private/nginx-selfsigned.key'),
       cert: fs.readFileSync('/etc/ssl/certs/nginx-selfsigned.crt'),
     },
+    watch: {
+      usePolling: true,
+    },
   },
 });

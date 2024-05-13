@@ -118,7 +118,7 @@ class GamePlayerHistoryView(View):
     
     player_id = None
     try:
-      player_id = verify_sessionid(request)
+      player_id = str(verify_sessionid(request))
     except Exception as e:
       return JsonResponse({'error': str(e)}, safe=False, status=403)
     
@@ -133,16 +133,17 @@ class GamePlayerHistoryView(View):
       game_data = game.json()
       if game.player_left_id == player_id:
         player_score = game_data['player_left_score']
+        player_forfeit = game_data['player_left_forfeit']
         opponent_score = game_data['player_right_score']
+        opponent_forfeit = game_data['player_right_forfeit']
         opponent_id = game_data['player_right_id']
       else:
         player_score = game_data['player_right_score']
+        player_forfeit = game_data['player_right_forfeit']
         opponent_score = game_data['player_left_score']
+        opponent_forfeit = game_data['player_left_forfeit']
         opponent_id = game_data['player_left_id']
       is_victory = game_data['winner_id'] == player_id
-      won_by_forfeit = game_data['won_by_forfeit']
-      player_forfeit = won_by_forfeit and not is_victory
-      opponent_forfeit = won_by_forfeit and is_victory
       computed_games.append({
         'id': game_data.get('id', None),
         'opponent_id': opponent_id,
