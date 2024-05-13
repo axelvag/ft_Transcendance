@@ -1,7 +1,19 @@
-import { user, getProfile, saveUser } from '@/auth.js';
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-// import { getCsrfToken} from '@/auth.js';
+import { user, getProfile, saveUser, getCsrfToken, deleteUser } from '@/auth.js';
+import { showModal } from '@/modal.js';
+import { redirectTo } from '@/router.js';
+import { BASE_URL } from '@/constants.js';
+
+const deleteAccountSection = `
+  <h2 class="h3 fw-semibold border-bottom py-3 mt-5 mb-4 d-flex align-items-center">
+    <span class="flex-grow-1 flex-shrink-1 text-truncate">Delete your account</span>
+    <button id="delete-account" class="flex-grow-0 flex-shrink-0 btn btn-outline-danger btn-sm text-nowrap">
+      <ui-icon name="trash" scale="1.125" class="me-1"></ui-icon>
+      <span>Delete</span>
+    </button>
+  </h2>
+`;
 
 const loadingProfileTemplate = `
   <div class="placeholder-glow">
@@ -43,7 +55,7 @@ const viewProfileTemplate = user => `
   </h1>
   <h2 class="h3 fw-semibold border-bottom py-3 my-4 d-flex">
     <span class="flex-grow-1 flex-shrink-1 text-truncate">Profile information</span>
-    <button class="btn btn-outline-primary btn-sm" id="edit-profile">
+    <button class="flex-grow-0 flex-shrink-0 btn btn-outline-primary btn-sm text-nowrap" id="edit-profile">
       <ui-icon name="edit" scale="1.125" class="me-1"></ui-icon>
       Edit
     </button>
@@ -69,6 +81,7 @@ const viewProfileTemplate = user => `
       <div class="fs-5 fw-semibold">${[user.firstname, user.lastname].filter(Boolean).join(' ') || '-'}</div>
     </div>
   </div>
+  ${deleteAccountSection}
 `;
 
 const editProfileTemplate = user => `
@@ -127,6 +140,7 @@ const editProfileTemplate = user => `
       <ui-loader></ui-loader>
     </div>
   </div>
+  ${deleteAccountSection}
 `;
 
 class ViewProfile extends HTMLElement {
@@ -164,6 +178,10 @@ class ViewProfile extends HTMLElement {
     const resetProfileBtn = e.target.closest('#reset-profile');
     if (resetProfileBtn) {
       this.#resetProfile();
+    }
+    const deleteAccountBtn = e.target.closest('#delete-account');
+    if (deleteAccountBtn) {
+      this.#showDeleteConfirmation();
     }
   }
 
@@ -247,7 +265,6 @@ class ViewProfile extends HTMLElement {
         avatarFile: avatarPayload,
         // avatarFile: isDefaultAvatar ? user.avatarDefault : avatarFile,
       };
-      console.log('object newuser', newUser);
       try {
         this.querySelector('#profile-edit-loader').hidden = false;
         this.querySelector('#profile-edit').classList.add('opacity-25');
@@ -271,6 +288,42 @@ class ViewProfile extends HTMLElement {
         this.querySelector('#profile-edit').classList.remove('opacity-25');
         console.error(err);
       }
+    }
+  }
+
+  #showDeleteConfirmation() {
+    showModal(
+      'Confirm Account Deletion',
+      'Are you sure you want to delete your account? This action cannot be undone.',
+      {
+        okCallback: () => this.#deleteUser(),
+        cancelCallback: () => console.error('Deletion cancelled.'),
+      }
+    );
+  }
+
+  async #deleteUser() {
+    try {
+      const csrfToken = await getCsrfToken();
+      const deleteProfile = await fetch(`${BASE_URL}:8002/delete_user_profile/${user.id}/`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+      });
+      const deleteProfileData = await deleteProfile.json();
+      if (deleteProfileData.success) {
+        await deleteUser(csrfToken);
+      } else {
+        console.error('Failed to delete user profile:', deleteProfileData.message);
+        notifyError('Failed to delete user profile.');
+      }
+      redirectTo('/');
+    } catch (error) {
+      console.error('Error:', error);
+      notifyError('Failed to delete user profile.');
+      redirectTo('/');
     }
   }
 }
