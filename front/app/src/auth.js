@@ -162,7 +162,7 @@ const logout = async () => {
       autohide: false,
     });
   }
-  fetchDeletePlayer();
+  // fetchDeletePlayer();
   resetLocalUser();
 };
 
