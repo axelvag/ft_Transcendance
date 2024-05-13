@@ -163,6 +163,8 @@ class ViewTournamentstart extends HTMLElement {
               // A la fin du chrono, on met les joueurs READY de force
               this.infoMatch();
               this.#match = getMatch();
+              if (this.#match.player1id === "" || this.#match.player2id === "")
+                return;
               if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
                 return;
               console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");

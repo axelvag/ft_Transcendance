@@ -421,11 +421,15 @@ def oauth_callback(request):
         if response.status_code == 200:
             access_token = response.json().get('access_token')
             print(access_token)
-            profile_data = requests.get(
-                "https://api.intra.42.fr/v2/me",
-                headers={"Authorization": f"Bearer {access_token}"},
-                verify=False
-            )
+            try:
+                profile_data = requests.get(
+                    "https://api.intra.42.fr/v2/me",
+                    headers={"Authorization": f"Bearer {access_token}"},
+                    verify=False
+                )
+            except requests.RequestException as e:
+                print(f"Erreur de requête HTTP: {e}")
+                return JsonResponse({'error': 'Erreur de communication avec le service externe'}, status=503)
             print(profile_data)
             logging.critical(profile_data)
             if profile_data.status_code == 200:

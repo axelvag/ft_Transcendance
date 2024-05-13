@@ -32,7 +32,11 @@ class MyConsumer(AsyncWebsocketConsumer):
             print("Session ID non trouvé")
 
         update_url = f"https://authentification:8001/accounts/verif_sessionid/{sessionid}"
-        response = requests.get(update_url, verify=False)
+        try:
+            response = requests.get(update_url, verify=False)
+        except requests.RequestException as e:
+            print(f"Erreur de requête HTTP: {e}")
+            return JsonResponse({'error': 'Erreur de communication avec le service externe'}, status=503)
         print(response)
         if response.status_code != 200:
             raise ValidationError('wrong session ID')
