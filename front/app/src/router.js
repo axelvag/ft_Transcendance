@@ -85,7 +85,7 @@ const router = new Router({
       name: 'dashboard',
       path: '/dashboard',
       title: 'Dashboard',
-      template: '<view-dash></view-dash>',
+      template: '<view-dashboard></view-dashboard>',
       beforeEnter: isLoggedInGuard,
     },
     {

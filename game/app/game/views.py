@@ -155,3 +155,39 @@ class GamePlayerHistoryView(View):
         'ended_at': game_data.get('ended_at', None),
       })
     return JsonResponse(computed_games, safe=False, status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GamePlayerStatisticsView(View):
+  
+  def get(self, request):
+    
+    player_id = None
+    try:
+      player_id = str(verify_sessionid(request))
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
+    
+    # Get game history for a player
+    games = Game.objects.filter(
+      Q(player_left_id=player_id) | Q(player_right_id=player_id),
+      status='FINISHED'
+    )
+  
+    gameCounter = 0
+    victoryCounter = 0
+    defeatCounter = 0
+
+    for game in games:
+      game_data = game.json()
+      gameCounter += 1
+      if game_data["winner_id"] == player_id:
+        victoryCounter += 1
+      else:
+        defeatCounter += 1
+
+    return JsonResponse({
+      "games": gameCounter,
+      "victories": victoryCounter,
+      "defeats": defeatCounter,
+    }, safe=False, status=200)
