@@ -371,7 +371,7 @@ const fetchGetMatchs = async () => {
       return { success: false, error: "Tournament ID is null" };
     }
 
-    const response = await fetch(`${BASE_URL}:8005/tournament/get_matches/${tournament.id}`, {
+    const response = await fetch(`${BASE_URL}:8005/tournament/get_matches/${tournament.id}/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
