@@ -1,8 +1,12 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 import json
 import requests
 from game.models import Game
+from engine.GameEngine import GameEngine
+
+engines = {}
 
 # @method_decorator(csrf_exempt, name='dispatch')
 class PlayConsumer(AsyncWebsocketConsumer):
@@ -63,28 +67,40 @@ class PlayConsumer(AsyncWebsocketConsumer):
     await self.channel_layer.group_add(self.group_name, self.channel_name)
 
     # notify
-    await self.send_group({'game': self.game.json()})
+    await self.send_group({
+      'type': 'log',
+      'game': self.game.json()
+    })
+
+    # start the game if both players are connected
+    await database_sync_to_async(self.game.refresh_from_db)()
+    if self.game.status == 'RUNNING' and self.game_id not in engines:
+      engine = GameEngine()
+      engines[self.game_id] = engine
+      engine.subscribe(self.on_engine_event)
+      await sync_to_async(engine.emit)('init')
+      await sync_to_async(engine.emit)('start')
 
   async def disconnect(self, close_code):
     await self.channel_layer.group_discard(self.group_name, self.channel_name)
     await database_sync_to_async(self.game.leave)(self.user_id)
 
     # notify
-    await self.send_group({'game': self.game.json()})
+    await self.send_group({
+      'type': 'log',
+      'game': self.game.json()
+    })
 
   async def receive(self, text_data):
     try:
       data = json.loads(text_data)
       action = data.get('action', None)
       recieved_data = data.get('data', None)
+      
+      if engines.get(self.game_id):
+        await sync_to_async(engines[self.game_id].emit)(action, recieved_data)
 
-      if action == 'end':
-        result = await database_sync_to_async(self.game.end)(recieved_data)
-        if result:
-          await self.send_group({'game': self.game.json()})
     except json.JSONDecodeError:
-      # Handle the exception if the text data is not valid JSON
-      print("Error decoding JSON", text_data.strip())
       return
 
   async def send_group(self, data):
@@ -92,7 +108,7 @@ class PlayConsumer(AsyncWebsocketConsumer):
       self.group_name,
       {
         'type': 'game.message',
-        'message': data
+        'message': data,
       }
     )
 
@@ -107,3 +123,30 @@ class PlayConsumer(AsyncWebsocketConsumer):
       return None
     except Exception as e:
       return None
+
+  def on_engine_event(self, data):
+    # send the data to the players
+    async_to_sync(self.send_group)(data)
+    # check if the game is finished
+    type = data.get('type', None)
+    if type != 'update':
+      return
+    gameState = data.get('state', None)
+    if gameState is None:
+      return
+    gameState_status = gameState.get('status', None)
+    if (gameState_status == 'finished'):
+      player_left_score = gameState.get('scoreLeft', 0)
+      player_right_score = gameState.get('scoreRight', 0)
+      if player_left_score > player_right_score:
+        winner_id = self.game.player_left_id
+      else:
+        winner_id = self.game.player_right_id
+      self.game.end({
+        'winner_id': winner_id,
+        'player_left_score': player_left_score,
+        'player_right_score': player_right_score,
+      })
+      engines[self.game_id].clear()
+      del engines[self.game_id]
+

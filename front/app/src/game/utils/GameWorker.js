@@ -87,10 +87,6 @@ function getState() {
   };
 }
 
-function notify(type, data) {
-  self.postMessage({ type, data: JSON.stringify(data) });
-}
-
 function init() {
   if (!timer) {
     timer = new PausableTimeout();
@@ -126,7 +122,10 @@ function init() {
   status = 'initialized';
   previousCollider = null;
 
-  notify('init', { state: getState() });
+  self.postMessage({
+    type: 'init',
+    state: getState(),
+  });
 }
 
 function startNewRound(playerServing) {
@@ -135,7 +134,8 @@ function startNewRound(playerServing) {
   ball.endCenter.copy(ball.startCenter);
   ball.startTime = Date.now();
   ball.endTime = ball.startTime;
-  notify('update', {
+  self.postMessage({
+    type: 'update',
     event: 'newRound',
     state: {
       status: status,
@@ -152,7 +152,7 @@ function startNewRound(playerServing) {
     ballDir = Vec2.create(xDir, yDir).normalize();
     ballSpeed = ballSpeedOnStart;
     calculateNextCollision();
-    notify('update', { state: { ball: ball } });
+    self.postMessage({ type: 'update', state: { ball: ball } });
 
     previousCollider = null;
   }, startRoundDelay);
@@ -244,10 +244,7 @@ function onBallCollision(collision) {
     ball.startCenter.copy(ball.endCenter);
     ballDir.reflect(collision.normal);
     calculateNextCollision();
-    notify('update', {
-      event: 'collision',
-      state: { ball: ball },
-    });
+    self.postMessage({ type: 'update', event: 'collision', state: { ball: ball } });
   }
 
   // paddle
@@ -286,15 +283,10 @@ function onBallCollision(collision) {
         }
       }
       calculateNextCollision();
-      notify('update', {
-        event: 'collision',
-        state: { ball: ball },
-      });
+      self.postMessage({ type: 'update', event: 'collision', state: { ball: ball } });
     } else {
       calculateNextCollision();
-      notify('update', {
-        state: { ball: ball },
-      });
+      self.postMessage({ type: 'update', state: { ball: ball } });
     }
   }
 
@@ -325,7 +317,8 @@ function onBallCollision(collision) {
     }
 
     // send update
-    notify('update', {
+    self.postMessage({
+      type: 'update',
       event: isMaxScoreReached ? 'victory' : 'score',
       state: {
         ball: ball,
@@ -339,7 +332,7 @@ function onBallCollision(collision) {
 
 function start() {
   if (status !== 'initialized') {
-    notify('update', { state: { status: status } });
+    self.postMessage({ type: 'update', state: { status: status } });
     return;
   }
   startNewRound('left');
@@ -360,7 +353,8 @@ function pause() {
   }
 
   status = 'paused';
-  notify('update', {
+  self.postMessage({
+    type: 'update',
     state: {
       ball: ball,
       paddleLeft: paddleLeft,
@@ -380,7 +374,8 @@ function resume() {
     ball.startTime = Date.now();
     calculateNextCollision();
   }
-  notify('update', {
+  self.postMessage({
+    type: 'update',
     state: {
       ball: ball,
       status: status,
@@ -424,7 +419,7 @@ function updatePaddleLeftMove(data = {}) {
       paddleLeft.endTime = paddleLeft.startTime + ((currentY - targetY) / paddleSpeed) * 1000;
     }
   }
-  notify('update', { state: { paddleLeft: paddleLeft } });
+  self.postMessage({ type: 'update', state: { paddleLeft: paddleLeft } });
 }
 
 function updatePaddleRightMove(data = {}) {
@@ -459,7 +454,7 @@ function updatePaddleRightMove(data = {}) {
       paddleRight.endTime = paddleRight.startTime + ((currentY - targetY) / paddleSpeed) * 1000;
     }
   }
-  notify('update', { state: { paddleRight: paddleRight } });
+  self.postMessage({ type: 'update', state: { paddleRight: paddleRight } });
 }
 
 self.addEventListener('message', e => {

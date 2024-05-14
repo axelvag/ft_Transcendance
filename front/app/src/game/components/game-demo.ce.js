@@ -38,11 +38,11 @@ class GameDemo extends HTMLElement {
 
     // Game events
     this.gameWorker.onmessage = function (e) {
-      const { type, data } = e.data || {};
+      const data = e.data || {};
 
-      if (type === 'init') {
+      if (data.type === 'init') {
         this.handleInitMessage(data);
-      } else if (type === 'update') {
+      } else if (data.type === 'update') {
         this.handleUpdateMessage(data);
       }
     };
@@ -68,9 +68,8 @@ class GameDemo extends HTMLElement {
   }
 
   handleInitMessage(data) {
-    const json = JSON.parse(data);
     // todo: validate data
-    const dataState = json?.state;
+    const dataState = data?.state;
     this.#gameState = {
       playerLeft: { ...this.#playerLeft },
       playerRight: { ...this.#playerRight },
@@ -102,9 +101,8 @@ class GameDemo extends HTMLElement {
   }
 
   handleUpdateMessage(data) {
-    const json = JSON.parse(data);
     // todo: validate data
-    const updates = json?.state;
+    const updates = data?.state;
     this.#gameState = {
       ...this.#gameState,
       ...updates,

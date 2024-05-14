@@ -1,68 +1,104 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-// import { redirectTo } from '@/router.js';
-// import { user , getCsrfToken} from '@/auth.js';
-import { user, getProfile } from '@/auth.js';
+import { getProfile } from '@/auth.js';
+import { notifyError } from '@/notifications.js';
+import { BASE_URL } from '@/constants.js';
 
-const profile = getProfile();
-
-class ViewDash extends HTMLElement {
+class ViewDashboard extends HTMLElement {
   connectedCallback() {
-    window.addEventListener('storage', (event) => {
-    if (event.key === 'isLogged' && event.newValue === 'false') {
-      // Logique pour gérer la déconnexion, par exemple :
-      console.log("logout logout");
-      window.location.href = '/login'; // Rediriger vers la page de connexion
-      return;
-    }
-  });
+    const profile = getProfile();
+
+    const fullname = [profile.firstname, profile.lastname].join(' ').trim();
+
     this.innerHTML = `
-    <default-layout-sidebar></default-layout-sidebar>
-    <default-layout-main>
-      <div class="row">
-        <div class="col-8">
-          <div class="dashboard-text">
-            <h1 class="text-bicolor display-5 fw-bolder">
-              TRANSCENDANCE PONG
-            </h1>
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="row justify-content-end">
-            <div class="col-md-6 d-flex flex-column align-items-center">
-                <img src="${user.avatar}" class="img-thumbnail rounded-circle" alt="character" style="width: 128px; height: 128px; object-fit: cover;">
-                <h3 class="display-5 fw-bold btn-lg">
-                  ${user.username}
-                </h3>
+      <default-layout-sidebar></default-layout-sidebar>
+      <default-layout-main>
+
+        <div class="bg-body-secondary rounded mb-4 p-4">
+          <div class="row align-items-center flex-column-reverse flex-md-row">
+            <div class="col-md-8 px-4 text-center text-md-start">
+              <h3 class="display-3 text-truncate fw-bold text-truncate mb-4">
+                ${profile.username}
+              </h3>
+              <p class="fs-6 text-truncate fw-semibold text-truncate opacity-50 mb-2">
+                ${profile.email}
+              </p>
+              <p class="fs-6 text-truncate fw-semibold text-truncate opacity-50 mb-2">
+                ${fullname}
+              </p>
+              <p class="mt-4 pt-2">
+                <a class="btn btn-bicolor btn-sm py-2 px-3 fw-bold" href="#" data-link="/game">
+                  Start a game
+                  <ui-icon name="arrow-right" class="ms-2 d-none d-md-inline-block"></ui-icon>
+                </a>
+              </p>
+            </div>
+            <div class="col-md-4 text-center">
+              <img src="${profile.avatar}" class="img-thumbnail rounded-circle object-fit-cover my-3" alt="character" style="width: 196px; height: 196px;">
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="d-flex justify-content-center align-items-center mt-3" style="height: 20vh;">
-        <div class="big-button-play rounded-3">
-          <button type="button" class="btn btn-outline-light btn-lg" style="width: 400px; height: 180px; font-size: 4rem;" data-link="/game">
-            Play Now
-          </button>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="bg-body-secondary rounded py-4 px-3 mb-4 text-center">
+              <div class="display-1 fw-bold ff-score">
+                <span id="viewDashboard-gameCounter" class="text-bicolor">&nbsp;</span>
+              </div>
+              <div class="flex-grow-1 flex-shrink-1 text-truncate fs-5 fw-semibold opacity-50">
+                Games played
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="bg-body-secondary rounded py-4 px-3 mb-4 text-center">
+              <div class="display-1 fw-bold ff-score">
+                <span id="viewDashboard-victoryCounter" class="text-bicolor">&nbsp;</span>
+              </div>
+              <div class="flex-grow-1 flex-shrink-1 text-truncate fs-5 fw-semibold opacity-50">
+              Victories
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="bg-body-secondary rounded py-4 px-3 mb-4 text-center">
+              <div class="display-1 fw-bold ff-score">
+                <span id="viewDashboard-defeatCounter" class="text-bicolor">&nbsp;</span>
+              </div>
+              <div class="flex-grow-1 flex-shrink-1 text-truncate fs-5 fw-semibold opacity-50">
+              Defeats
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-
-      <!-- RANK -->
-
-      <div class="d-flex justify-content-end mt-3">
-        <a class="btn btn-outline-primary border-2 fw-semibold rounded-pill btn-lg ml-auto mt-5" style="--bs-btn-color: var(--bs-body-color); font-size: 2rem;" href="#" data-link="/rank">
-          <span class="d-inline-block py-1">
-            <img src="assets/img/rank-icon.png" alt="logo_rank" style="width: 50px; height: 50px; margin-right: 10px;">
-            RANK
-          </span>
-        </a>
-      </div>
-        
-
-    </default-layout-main>
+      </default-layout-main>
     `;
+
+    this.fetchStatistics();
+  }
+
+  async fetchStatistics() {
+    const gameCounterEl = this.querySelector('#viewDashboard-gameCounter');
+    const victoryCounterEl = this.querySelector('#viewDashboard-victoryCounter');
+    const defeatCounterEl = this.querySelector('#viewDashboard-defeatCounter');
+    console.log(gameCounterEl);
+    try {
+      const statistics = await fetch(`${BASE_URL}:8009/game-statistics`, {
+        credentials: 'include',
+      }).then(res => res.json());
+
+      if (gameCounterEl) gameCounterEl.textContent = statistics.games || 0;
+      if (victoryCounterEl) victoryCounterEl.textContent = statistics.victories || 0;
+      if (defeatCounterEl) defeatCounterEl.textContent = statistics.defeats || 0;
+    } catch (error) {
+      console.error(error);
+      notifyError('Fetching user statistics failed!');
+      if (gameCounterEl) gameCounterEl.textContent = '-';
+      if (victoryCounterEl) victoryCounterEl.textContent = '-';
+      if (defeatCounterEl) defeatCounterEl.textContent = '-';
+    }
   }
 }
 
-customElements.define('view-dash', ViewDash);
+customElements.define('view-dashboard', ViewDashboard);

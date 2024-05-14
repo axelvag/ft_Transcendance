@@ -149,6 +149,8 @@ class ViewFriend extends HTMLElement {
       const responseData = await response.json();
 
       const sentInvitationsList = document.getElementById('sent-invitations-list');
+      if (!sentInvitationsList)
+        return ;
       sentInvitationsList.innerHTML = '';
 
       if (responseData && responseData.invitations) {
@@ -252,6 +254,8 @@ class ViewFriend extends HTMLElement {
       const responseData = await response.json();
 
       const friendRequestsList = document.getElementById('friend-requests');
+      if (!friendRequestsList)
+        return ;
       friendRequestsList.innerHTML = '';
 
       if (responseData && responseData.invitations) {

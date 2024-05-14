@@ -3,6 +3,7 @@ Django==4.2.9
 psycopg2-binary==2.9.9
 django-cors-headers==4.3.1
 requests==2.31.0
+Twisted[tls,http2]
 
 # websockets
 channels==4.0.0

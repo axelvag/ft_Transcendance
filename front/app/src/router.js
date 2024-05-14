@@ -19,9 +19,6 @@ import '@/views/view-friend.ce.js';
 import '@/views/view-reinitialisation-pass-mail.ce.js';
 import '@/views/view-new-pass.ce.js';
 import '@/views/view-dashboard.ce.js';
-import '@/views/view-settings.ce.js';
-import '@/views/view-careers.ce.js';
-import '@/views/view-rank.ce.js';
 import '@/views/view-auth42-callback.ce.js';
 
 const isLoggedOutGuard = async () => {
@@ -88,7 +85,7 @@ const router = new Router({
       name: 'dashboard',
       path: '/dashboard',
       title: 'Dashboard',
-      template: '<view-dash></view-dash>',
+      template: '<view-dashboard></view-dashboard>',
       beforeEnter: isLoggedInGuard,
     },
     {
@@ -106,13 +103,6 @@ const router = new Router({
       beforeEnter: isLoggedInGuard,
     },
     {
-      name: 'careers',
-      path: '/careers',
-      title: 'Careers',
-      template: '<view-careers></view-careers>',
-      beforeEnter: isLoggedInGuard,
-    },
-    {
       name: 'game-history',
       path: '/game-history',
       title: 'Game history',
@@ -120,10 +110,10 @@ const router = new Router({
       beforeEnter: isLoggedInGuard,
     },
     {
-      name: 'settings',
-      path: '/settings',
-      title: 'Settings',
-      template: '<view-settings></view-settings>',
+      name: 'game-history-record',
+      path: '/game-history/:gameId',
+      title: 'Game history record',
+      template: params => `<view-game-online game-id="${params.gameId}" back-route="/game-history"></view-game-online>`,
       beforeEnter: isLoggedInGuard,
     },
     {
@@ -169,14 +159,7 @@ const router = new Router({
       name: 'game-online-play',
       path: '/game/online/:gameId',
       title: 'Game online',
-      template: params => `<view-game-online game-id="${params.gameId}"></view-game-online>`,
-      beforeEnter: isLoggedInGuard,
-    },
-    {
-      name: 'rank',
-      path: '/rank',
-      title: 'Rank',
-      template: '<view-rank></view-rank>',
+      template: params => `<view-game-online game-id="${params.gameId}" back-route="/game"></view-game-online>`,
       beforeEnter: isLoggedInGuard,
     },
     {
