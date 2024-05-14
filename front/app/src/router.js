@@ -172,6 +172,21 @@ const router = new Router({
       beforeEnter: isLoggedInGuard,
     },
     {
+      name: 'game-online-play-tournament',
+      path: '/game/online/:gameId/:tournamentId',
+      title: 'Game online',
+      template: params =>
+        `<view-game-online game-id="${params.gameId}" back-route="/game/tournament/start"></view-game-online>`,
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'game-online-play',
+      path: '/game/online/:gameId/:tournamentId',
+      title: 'Game online',
+      template: params => `<view-game-online game-id="${params.gameId}" back-route="/game"></view-game-online>`,
+      beforeEnter: isLoggedInGuard,
+    },
+    {
       name: 'not-found',
       path: '/not-found',
       title: 'Not Found',
