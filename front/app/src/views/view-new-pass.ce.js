@@ -37,7 +37,7 @@ class ViewNewPass extends HTMLElement {
         <div id="email-confirm-error" hidden>
           <h5 class="fw-bold">Error</h5>
           <p id="email-confirm-error-msg">Something didn't work!</p>
-          <button class="btn btn-primary">Renvoyer un Email</button>
+          <button class="btn btn-primary">Resend an Email</button>
         </div>
       </auth-layout>
     `;
