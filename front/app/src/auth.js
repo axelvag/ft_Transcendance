@@ -4,7 +4,6 @@ import { notify } from '@/notifications.js';
 import { BASE_URL, OAUTH_AUTHORIZE_URL } from '@/constants.js';
 import { closeViewFriendWebSocket } from '@/views/view-friend.ce.js';
 
-
 const user = {
   isAuthenticated: undefined,
   id: null,
@@ -134,7 +133,6 @@ const getCsrfToken = async () => {
 
 const logout = async () => {
   try {
-
     closeViewFriendWebSocket();
 
     const csrfToken = await getCsrfToken();
@@ -216,12 +214,9 @@ const saveUser = async newUser => {
       user.email = user.email;
 
       if (!data.avatar) {
-        if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined)
-          user.avatar = user.avatarDefault42;
-        else
-          user.avatar = 'assets/img/default-profile.jpg';
-      }
-      else {
+        if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) user.avatar = user.avatarDefault42;
+        else user.avatar = 'assets/img/default-profile.jpg';
+      } else {
         user.avatar = data.avatar;
       }
     }
@@ -389,19 +384,15 @@ const handleOAuthResponse = async () => {
             message: 'Failed to load user profile!',
           });
         }
-      }
-      else {
+      } else {
         console.error('Failed Auth42', data.error);
+        notifyError('Signin with 42 failed!');
         redirectTo('/');
       }
-
     } catch (error) {
       console.error('Erreur:', error);
-      notify({
-        icon: 'error',
-        iconClass: 'text-danger',
-        message: 'login with 42 failed!',
-      });
+      notifyError('Signin with 42 failed!');
+      redirectTo('/');
     }
   }
 };
