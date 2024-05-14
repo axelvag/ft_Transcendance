@@ -27,7 +27,7 @@ class ViewDashboard extends HTMLElement {
                 ${fullname}
               </p>
               <p class="mt-4 pt-2">
-                <a class="btn btn-primary btn-sm py-2 px-3 fw-bold" href="#" data-link="/game">
+                <a class="btn btn-bicolor btn-sm py-2 px-3 fw-bold" href="#" data-link="/game">
                   Start a game
                   <ui-icon name="arrow-right" class="ms-2 d-none d-md-inline-block"></ui-icon>
                 </a>
