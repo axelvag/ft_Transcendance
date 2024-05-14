@@ -198,25 +198,25 @@ const fetchCreateTournament = async (formData) => {
 
 const fetchDeletePlayer = async () => {
   try {
-    let user = getProfile();
-    const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.success) {
-      resetLocalTournament();
-    } else {
-      console.log("error");
-    }
+      let user = getProfile();
+      const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      if (data.success) {
+        resetLocalTournament();
+      } else {
+        console.log("error");
+      }
   } catch (error) {
     console.error("An error occurred:", error);
   }

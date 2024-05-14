@@ -135,6 +135,7 @@ const getCsrfToken = async () => {
 const logout = async () => {
   try {
 
+    await fetchDeletePlayer();
     closeViewFriendWebSocket();
 
     const csrfToken = await getCsrfToken();
@@ -162,8 +163,7 @@ const logout = async () => {
       autohide: false,
     });
   }
-  // fetchDeletePlayer();
-  resetLocalUser();
+  await resetLocalUser();
 };
 
 const getProfile = () => {

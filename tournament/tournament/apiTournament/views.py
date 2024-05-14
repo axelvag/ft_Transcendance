@@ -272,6 +272,7 @@ def tournoi_info(request, user_id):
 @require_http_methods(["DELETE"])
 def delete_joueur(request, user_id):
     try:
+        logging.critical("iciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         # Trouver tous les joueurs correspondants à user_id, supposant qu'un user_id puisse avoir plusieurs entrées
         joueurs = Joueur.objects.filter(user_id=user_id)
         
