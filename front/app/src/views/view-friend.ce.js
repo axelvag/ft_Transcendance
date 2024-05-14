@@ -149,6 +149,10 @@ class ViewFriend extends HTMLElement {
       const responseData = await response.json();
 
       const sentInvitationsList = document.getElementById('sent-invitations-list');
+      if (!sentInvitationsList) {
+        // console.error('Element with ID "sent-invitations-list" not found.');
+        return;
+      }
       sentInvitationsList.innerHTML = '';
 
       if (responseData && responseData.invitations) {
@@ -252,6 +256,10 @@ class ViewFriend extends HTMLElement {
       const responseData = await response.json();
 
       const friendRequestsList = document.getElementById('friend-requests');
+      if (!friendRequestsList) {
+        // console.error('Element with ID "friend-requests" not found.');
+        return;
+      }
       friendRequestsList.innerHTML = '';
 
       if (responseData && responseData.invitations) {
