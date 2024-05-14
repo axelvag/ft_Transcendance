@@ -25,13 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = '/app/media'
 MEDIA_URL = '/media/'
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-9!)%2m*51ebj2*=$q2xu&-l2bl66gz9c)*f3v*-_dv1fvl_wjy'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -55,8 +50,6 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -106,14 +99,13 @@ WSGI_APPLICATION = 'profileApp.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
+
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),  # Lecture de la variable d'environnement sans valeur par défaut
+        'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': '5432',  # Le port par défaut de PostgreSQL
+        'PORT': '5432',
     }
 }
 
@@ -175,47 +167,4 @@ CORS_ALLOWED_ORIGINS = [
     f"{URL}:8001",
 ]
 
-# CORS_ORIGINS_ALLOWED_ALL = True
-
-# CORS_ALLOW_CREDENTIALS = True
-
-# CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     f"{URL}:5500",  # Remplacez par l'URL de votre frontend
-#     f"{URL}:8000",
-# ]
-# CORS_ALLOWED_ORIGINS = ['https://*']
-
-# ALLOWED_HOSTS=['*']
-
-# CORS_ALLOW_HEADERS = [
-#     'accept',
-#     'accept-encoding',
-#     'authorization',
-#     'content-type',
-#     'dnt',
-#     'origin',
-#     'user-agent',
-#     'x-csrftoken',
-#     'x-requested-with',
-# ]
-
-# PASSWORD_RESET_TIMEOUT = 1
-
 CSRF_TRUSTED_ORIGINS = [f'{os.getenv("BASE_URL")}:8000']
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#         },
-#     },
-# }

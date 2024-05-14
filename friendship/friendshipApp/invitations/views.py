@@ -20,14 +20,16 @@ def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
         update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
-        response = requests.get(update_url, verify=False)
-
+        try:
+            response = requests.get(update_url, verify=False)
+        except requests.RequestException as e:
+                print(f"HTTP request error: {e}")
+                return JsonResponse({'error': 'Communication error with external service'}, status=503)
         if response.status_code != 200:
             return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
-
-        # Si la vérification est réussie, exécuter la vue originale
+        
         return view_func(request, *args, **kwargs)
-
+    
     return wrapper
 
 @csrf_exempt
@@ -42,7 +44,7 @@ def send_invitation(request):
         to_user = User.objects.get(username=username)
         from_user = User.objects.get(id=user_id)
         if from_user != to_user:
-            # Vérifier si une invitation a été acceptée ou existe dans l'une ou l'autre direction
+            # verif if a invitation has been accepted or existing in both direction
             invitation_query = Invitation.objects.filter(
                 (Q(from_user=from_user) & Q(to_user=to_user)) | 
                 (Q(from_user=to_user) & Q(to_user=from_user))
@@ -53,19 +55,19 @@ def send_invitation(request):
                 pending_invitation = invitation_query.filter(accepted=False).exists()
 
                 if accepted_invitation:
-                    # Une invitation entre ces utilisateurs a déjà été acceptée
+                    # A invitation has been accepted between those users 
                     return JsonResponse({
                         "status": "error",
                         "message": "A friendship already exists or an invitation has already been accepted."
                     }, status=409)
                 elif pending_invitation:
-                    # Une invitation en attente existe déjà entre ces utilisateurs
+                    # Invitation waiting
                     return JsonResponse({
                         "status": "error",
                         "message": "An invitation is already pending between these users."
                     }, status=409)
             
-            # Aucune invitation existante ou acceptée, procéder à la création d'une nouvelle invitation
+            # nothing invitation existing or accepted, create new invitation
             invitation = Invitation.objects.create(from_user=from_user, to_user=to_user)
             Notification.objects.create(
                 user=to_user,
@@ -73,22 +75,21 @@ def send_invitation(request):
                 invitation=invitation
             )
 
-            ############################################
+            # create notification
             notification = Notification.objects.create(
                 user=to_user,
                 message=f"You have a new invitation from {from_user.username}.",
                 invitation=invitation
             )
-            # Récupérer l'ID de la notification créée
+            # get ID notification created 
             notification_id = notification.id
             logging.critical(notification_id)
-            ############################################
 
 
             channel_layer = get_channel_layer()
             group_name = f"user{to_user.id}"
 
-            # Envoyer une notification WebSocket au groupe de l'utilisateur destinataire
+            # send notif WS group user 
             async_to_sync(channel_layer.group_send)(
                 group_name,
                 {
@@ -119,7 +120,7 @@ def search_users(request):
     except ValueError:
         return JsonResponse({"status": "error", "message": "Invalid user ID provided."}, status=400)
 
-    # récupére tous les identifiants des amis de l'utilisateur
+    # recup all friends identifiants of user
     user_friends = Friendship.objects.filter(
         Q(user_id=user_id) | Q(friend_id=user_id)
     ).values_list('user_id', 'friend_id')
@@ -131,7 +132,7 @@ def search_users(request):
         (Q(username__icontains=search_query) |
          Q(first_name__icontains=search_query) |
          Q(last_name__icontains=search_query)) &
-        ~Q(id__in=friend_ids) #exclure soit meme et si ils sont amies
+        ~Q(id__in=friend_ids) # not me
     ).distinct()[:10]
 
     user_data = []
@@ -139,8 +140,8 @@ def search_users(request):
         profile_info = get_profile_info(user.id, cookies)
         user_data.append({
             "username": user.username,
-            "email": user.email,  # Supposant que vous avez accès à l'email directement depuis l'objet user
-            "avatar_url": profile_info.get('avatar'),  # L'URL de l'avatar obtenue depuis l'API de profil
+            "email": user.email,
+            "avatar_url": profile_info.get('avatar'),
         })
 
     return JsonResponse(user_data, safe=False, status=200)
@@ -157,12 +158,12 @@ def accept_invitation(request):
     to_user = User.objects.get(username=username)
 
     try:
-        # recherche l'invitation non accepte
+        # search invitation none accepted 
         invitation = Invitation.objects.get(id=invitation_id, accepted=False)
         invitation.accepted = True
         invitation.save()
 
-        # Création de la relation d'amitié dans les deux sens
+        # create friendship in both direction 
         Friendship.objects.create(user=invitation.from_user, friend=invitation.to_user)
         Friendship.objects.create(user=invitation.to_user, friend=invitation.from_user)
 
@@ -224,11 +225,11 @@ def list_received_invitations(request, user_id):
 
         for invitation in invitations:
             from_user = invitation.from_user
-            profile_info = get_profile_info(from_user.id, cookies)  # Récupère les informations du profil
+            profile_info = get_profile_info(from_user.id, cookies)  # recup info profil
             invitations_data.append({
                 "from_user_username": from_user.username,
-                "from_user_email": profile_info.get('email'),  # Email depuis le profil
-                "from_user_avatar": profile_info.get('avatar'),  # Avatar URL depuis le profil
+                "from_user_email": profile_info.get('email'),
+                "from_user_avatar": profile_info.get('avatar'),
                 "invitation_id": invitation.id,
             })
         
@@ -236,7 +237,6 @@ def list_received_invitations(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({"status": "error", "message": "User does not exist."}, status=404)
 
-# affiche toutes les invitations envoyées par l'utilisateur qui n'ont pas encore été acceptées.
 @verif_sessionID
 @require_http_methods(["GET"])
 def list_sent_invitations(request, user_id):
@@ -244,17 +244,15 @@ def list_sent_invitations(request, user_id):
         cookies = request.COOKIES.get('sessionid', None)
         user = User.objects.get(id=user_id)
         invitations = Invitation.objects.filter(from_user=user, accepted=False)
-        invitations_data = [] #[{"to_user": invitation.to_user.username, "invitation_id": invitation.id} for invitation in invitations]
+        invitations_data = []
         
         for invitation in invitations:
-            # from_user = invitation.from_user
-            # profile_info = get_profile_info(from_user.id)
             to_user = invitation.to_user
             profile_info = get_profile_info(to_user.id, cookies)
             invitations_data.append({
                 "from_user_username": to_user.username,
-                "from_user_email": profile_info.get('email'),  # Email depuis le profil
-                "from_user_avatar": profile_info.get('avatar'),  # Avatar URL depuis le profil
+                "from_user_email": profile_info.get('email'),
+                "from_user_avatar": profile_info.get('avatar'),
                 "invitation_id": invitation.id,
             })
 
@@ -302,11 +300,11 @@ def remove_friend(request):
         user = User.objects.get(id=user_id)
         friend = User.objects.get(id=friend_id)
 
-        # suppressions des liens d'amitie
+        # remove friendship
         Friendship.objects.filter(user=user, friend=friend).delete()
         Friendship.objects.filter(user=friend, friend=user).delete()
 
-        # Suppression des invitations acceptées ou en attente entre ces utilisateurs
+        # remove all
         Invitation.objects.filter(
             (Q(from_user=user) & Q(to_user=friend)) |
             (Q(from_user=friend) & Q(to_user=user))
@@ -334,22 +332,19 @@ def online_friends(request, user_id):
     try:
         cookies = request.COOKIES.get('sessionid', None)
         friendships = Friendship.objects.filter(user_id=user_id)
+        # list that contains all identifiant friends users 
         friend_ids = [friendship.friend.id for friendship in friendships]
         
-        logging.critical("333333333333333333333333333333333333333333333333333333333")
         online_friends_data = []
         for friend_id in friend_ids:
             if UserStatus.objects.filter(user_id=friend_id, is_online=True).exists():
                 user = User.objects.get(id=friend_id)
                 profile_info = get_profile_info(user.id, cookies)
 
-                logging.critical("22222222222222222222222222222222222222222222222222222222")
                 game_service_url = f"https://game:8009/games/{friend_id}/game-status"
                 response = requests.get(game_service_url, verify=False)
                 in_game = False
-                logging.critical("11111111111111111111111111111111111111111111111111111")
-                if response.status_code == 200: #and response.json().get('in_game'):
-                    logging.critical("Iciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+                if response.status_code == 200:
                     in_game = True
 
                 online_friends_data.append({
@@ -388,17 +383,6 @@ def offline_friends(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
-# def get_profile_info(user_id):
-#     profile_service_url = f"http://profile:8002/get_user_profile/{user_id}/"
-#     try:
-#         response = requests.get(profile_service_url)
-#         if response.status_code == 200:
-#             return response.json()
-#         else:
-#             return {}
-#     except requests.exceptions.RequestException:
-#         return {}
-
 def get_profile_info(user_id, cookies):
     profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:
@@ -411,7 +395,6 @@ def get_profile_info(user_id, cookies):
         return {}
 
 @csrf_exempt
-# @verif_sessionID
 @require_http_methods(["POST"])
 def delete_user_data(request, user_id):
 
@@ -421,11 +404,11 @@ def delete_user_data(request, user_id):
     try:
         user = User.objects.get(id=user_id)
 
-        # Suppression des friendships, invitations et notifications
+        # remove friendships, invitations et notifications
         Friendship.objects.filter(Q(user=user) | Q(friend=user)).delete()
         Invitation.objects.filter(Q(from_user=user) | Q(to_user=user)).delete()
         Notification.objects.filter(user=user).delete()
-        # hasattr, verifie dans si l'objet user possede un attribut status
+        # hasattr, checks whether the user object has a status attribute
         if hasattr(user, 'status'):
             user.status.delete()
         

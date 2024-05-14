@@ -2,8 +2,6 @@ from django.urls import path
 from . import views
 from django.contrib import admin
 
-# from invitations import views
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('send_invitation/', views.send_invitation, name='send_invitation'),
