@@ -1,9 +1,9 @@
 {% autoescape off %}
-Bonjour {{ user.username }},
+Hi {{ user.username }},
 
-Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :
+Please click the link below to reset your password:
 
 {{ url }}:8000/new-pass?uidb64={{ uid }}&token={{ token }}
 
-Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet e-mail.
+If you have not requested this reset, please ignore this email.
 {% endautoescape %}

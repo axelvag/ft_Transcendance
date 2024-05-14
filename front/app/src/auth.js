@@ -234,20 +234,32 @@ const saveUser = async newUser => {
 };
 
 const loginUser = async (formData, csrfToken) => {
-  const response = await fetch(BASE_URL + ':8001/accounts/login/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
-    },
-    mode: 'cors',
-    credentials: 'include',
-    body: JSON.stringify(formData),
-  });
-  return response.json();
+  try {
+    const response = await fetch(BASE_URL + ':8001/accounts/login/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      mode: 'cors',
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
+    return response.json();
+  }
+  catch (error) {
+    console.error('Erreur:', error);
+    notify({
+      icon: 'error',
+      iconClass: 'text-danger',
+      message: 'delete user failed!',
+    });
+    return { success: false, error: error.message };
+  }
 };
 
 const sendSignUpRequest = async (formData, csrfToken) => {
+  try {
   const response = await fetch(BASE_URL + ':8001/accounts/register/', {
     method: 'POST',
     headers: {
@@ -259,54 +271,96 @@ const sendSignUpRequest = async (formData, csrfToken) => {
     body: JSON.stringify(formData),
   });
   return response.json();
+  }
+  catch (error) {
+    console.error('Erreur:', error);
+    notify({
+      icon: 'error',
+      iconClass: 'text-danger',
+      message: 'register user failed!',
+    });
+    return { success: false, error: error.message };
+  }
 };
 
 const passwordReset = async (formData, csrfToken) => {
-  const response = await fetch(BASE_URL + ':8001/accounts/password_reset/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
-    },
-    mode: 'cors',
-    credentials: 'include',
-    body: JSON.stringify(formData),
-  });
-  return response.json();
+  try {
+    const response = await fetch(BASE_URL + ':8001/accounts/password_reset/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      mode: 'cors',
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
+    return response.json();
+  }
+  catch (error) {
+    console.error('Erreur:', error);
+    notify({
+      icon: 'error',
+      iconClass: 'text-danger',
+      message: 'password reset failed!',
+    });
+    return { success: false, error: error.message };
+  }
 };
 
 const sendEmailPasswordReset = async (formData, csrfToken, url) => {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
-    },
-    mode: 'cors',
-    credentials: 'include',
-    body: JSON.stringify(formData),
-  });
-  return response.json();
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      mode: 'cors',
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
+    return response.json();
+  }
+  catch (error) {
+    console.error('Erreur:', error);
+    notify({
+      icon: 'error',
+      iconClass: 'text-danger',
+      message: 'send email failed!',
+    });
+    return { success: false, error: error.message };
+  }
 };
 
 const deleteUser = async csrfToken => {
-  const url = `${BASE_URL}:8001/accounts/delete_user/${user.username}`;
-  const response = await fetch(url, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      'X-CSRFToken': csrfToken,
-    },
-    body: JSON.stringify({ user_id: user.id }),
-  });
-
-  const data = await response.json();
-  if (data.success) {
-    user.isAuthenticated = false;
-    resetLocalUser(data);
-    localStorage.setItem('isLogged', 'false');
+  try {
+    const url = `${BASE_URL}:8001/accounts/delete_user/${user.username}`;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify({ user_id: user.id }),
+    });
+  
+    const data = await response.json();
+    if (data.success) {
+      user.isAuthenticated = false;
+      resetLocalUser(data);
+      localStorage.setItem('isLogged', 'false');
+    }
+  }
+  catch (error) {
+    console.error('Erreur:', error);
+    notify({
+      icon: 'error',
+      iconClass: 'text-danger',
+      message: 'delete user failed!',
+    });
   }
 };
 

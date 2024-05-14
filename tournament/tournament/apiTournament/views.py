@@ -30,8 +30,8 @@ def verif_sessionID(view_func):
         try:
             response = requests.get(update_url, verify=False)
         except requests.RequestException as e:
-                print(f"Erreur de requête HTTP: {e}")
-                return JsonResponse({'error': 'Erreur de communication avec le service externe'}, status=503)
+                print(f"HTTP request error: {e}")
+                return JsonResponse({'error': 'Communication error with external service'}, status=503)
         if response.status_code != 200:
             return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
         
@@ -60,10 +60,9 @@ def create_tournament(request):
             "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
             {
                 "type": "tournoi_cree",  # Type de message
-                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+                "message": "A new tournament has been created"  # Message à envoyer aux clients
             }
         )
-        logging.critical("Message WebSocket envoyé avec succès depuis la vue.")
         return JsonResponse({"success": True, "message": "Tournoi created successfully", "tournoi_id": tournois.id}, status=200)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
@@ -115,7 +114,7 @@ def tournament_detail(request, tournament_id):
                 tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
                 {
                     "type": "update_boutton",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-                    "message": "ne pas afficher les bouttons"
+                    "message": "don't show buttons"
                 }
             )
         # Préparez les données à renvoyer si le tournoi est trouvé
@@ -136,7 +135,7 @@ def tournament_detail(request, tournament_id):
         # Si le tournoi n'est pas trouvé, renvoyez success: false avec un message d'erreur
         data = {
             'success': False,
-            'error': "Tournoi non trouvé."
+            'error': "Tournament not found."
         }
     # Renvoie les données en format JSON
     return JsonResponse(data)
@@ -179,7 +178,7 @@ def create_joueur(request):
             tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
             {
                 "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-                "message": "Un nouveau joueur a été ajouté au tournoi"
+                "message": "A new player has been added to the tournament"
             }
         )
         channel_layer = get_channel_layer()
@@ -187,7 +186,7 @@ def create_joueur(request):
             "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
             {
                 "type": "tournoi_cree",  # Type de message
-                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+                "message": "A new tournament has been created"  # Message à envoyer aux clients
             }
         )
         return JsonResponse({"success": True, 'message': 'Joueur created successfully', 'joueur_id': joueur.id})
@@ -203,7 +202,7 @@ def create_joueur(request):
             tournament_group_name,  # Nom du groupe modifié pour être unique par tournoi
             {
                 "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-                "message": "Un nouveau joueur a été ajouté au tournoi"
+                "message": "A new player has been added to the tournament"
             }
         )
         channel_layer = get_channel_layer()
@@ -211,7 +210,7 @@ def create_joueur(request):
             "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
             {
                 "type": "tournoi_cree",  # Type de message
-                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+                "message": "A new tournament has been created"  # Message à envoyer aux clients
             }
         )
         return JsonResponse({'success': True, 'message': 'Joueur updated with new tournament successfully', 'joueur_id': joueur.id})
@@ -292,7 +291,7 @@ def delete_joueur(request, user_id):
                 tournament_group_name,  # Utiliser le nom du groupe basé sur l'ID du tournoi
                 {
                     "type": "add_player",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-                    "message": "Un joueur a été supprimé du tournoi"
+                    "message": "A player has been removed from the tournament"
                 }
             )
             channel_layer = get_channel_layer()
@@ -305,7 +304,7 @@ def delete_joueur(request, user_id):
                 "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
                 {
                     "type": "tournoi_cree",  # Type de message
-                    "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+                    "message": "A new tournament has been created"  # Message à envoyer aux clients
                 }
             )
         return JsonResponse({"success": True, 'message': 'Joueur(s) deleted successfully'})
@@ -331,7 +330,7 @@ def delete_tournoi(request, tournoi_id):
             tournament_group_name,  # Utiliser le nom du groupe basé sur l'ID du tournoi
             {
                 "type": "delete_tournament",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-                "message": "Un tournoi a été supprimé"
+                "message": "A tournament has been deleted"
             }
         )
         channel_layer = get_channel_layer()
@@ -339,7 +338,7 @@ def delete_tournoi(request, tournoi_id):
             "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
             {
                 "type": "tournoi_cree",  # Type de message
-                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+                "message": "A new tournament has been created"  # Message à envoyer aux clients
             }
         )
         return JsonResponse({'success': True, 'message': 'Tournoi and all associated players have been deleted.'})
@@ -364,12 +363,12 @@ def create_matches(request, tournament_id):
     
         tournament = Tournoi.objects.filter(id=tournament_id, status=Tournoi.CREATED).first()
         if not tournament:
-            return JsonResponse({"error": "Le tournoi n'est pas dans un état valide pour créer des matchs."}, status=400)
+            return JsonResponse({"error": "The tournament is not in a valid state to create matches."}, status=400)
 
         players = list(Joueur.objects.filter(tournament=tournament_id))
 
         if len(players) % 2 != 0:
-            return JsonResponse({"error": "Nombre impair de joueurs, impossible de créer des matchs pairs."}, status=400)
+            return JsonResponse({"error": "Odd number of players, impossible to create even matches."}, status=400)
 
         random.shuffle(players)
         matches_created = []
@@ -383,7 +382,7 @@ def create_matches(request, tournament_id):
 
             # Vérifiez que les deux joueurs existent
             if not (Joueur.objects.filter(user_id=player_1.id).exists() and Joueur.objects.filter(user_id=player_2.id).exists()):
-                return JsonResponse({"error": f"Un des joueurs n'existe pas : {player_1.id} ou {player_2.id}"}, status=400)
+                return JsonResponse({"error": f"One of the players does not exist : {player_1.id} ou {player_2.id}"}, status=400)
 
 
             # Créez un nouveau jeu via le service externe
@@ -433,10 +432,10 @@ def create_matches(request, tournament_id):
             "tournois",  # Nom du groupe WebSocket à informer (peut être n'importe quoi)
             {
                 "type": "tournoi_cree",  # Type de message
-                "message": "Un nouveau tournoi a été créé"  # Message à envoyer aux clients
+                "message": "A new tournament has been created"  # Message à envoyer aux clients
             }
         )
-        return JsonResponse({'success': True, "message": f"Les matchs ont été créés avec succès pour tous les tours. Nombre de matchs créés: {len(matches_created)}."}, status=201)
+        return JsonResponse({'success': True, "message": f"Matches were successfully created for all rounds. Number of matches created: {len(matches_created)}."}, status=201)
 
 
 @verif_sessionID
@@ -477,7 +476,7 @@ def get_matches(request, tournament_id):
         return JsonResponse({'success': True, 'matches_by_tour': matches_by_tour}, safe=False)
 
     except Tournoi.DoesNotExist:
-        return JsonResponse({'error': "Tournoi non trouvé."}, status=404)
+        return JsonResponse({'error': "Tournament not found."}, status=404)
 
 
 @csrf_exempt
@@ -497,7 +496,7 @@ def set_player_ready(request, player_id, match_id):
         # Récupérez le match correspondant au joueur
         match = Match.objects.get(id=match_id)
         if not match:
-            return JsonResponse({"success": False, "error": "Match correspondant non trouvé."}, status=404)
+            return JsonResponse({"success": False, "error": "Matching match not found."}, status=404)
 
         # Vérifiez si les deux joueurs sont prêts
         tournament_group_name = f"tournoi_{match.tournament.id}"
@@ -506,7 +505,7 @@ def set_player_ready(request, player_id, match_id):
             tournament_group_name,  # Utiliser le nom du groupe basé sur l'ID du tournoi
             {
                 "type": "player_ready",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-                "message": "Un joueur est pret"
+                "message": "A player is ready"
             }
         )
         if match.player_1.status_ready == Joueur.READY and match.player_2.status_ready == Joueur.READY:
@@ -517,7 +516,7 @@ def set_player_ready(request, player_id, match_id):
         return JsonResponse({"success": True, "match_started": False, "player_status": player.status_ready, "game_id": match.game_id})
 
     except Joueur.DoesNotExist:
-        return JsonResponse({"success": False, "error": "Joueur non trouvé."}, status=404)
+        return JsonResponse({"success": False, "error": "Player not found."}, status=404)
 
 
 
@@ -562,10 +561,10 @@ def get_latest_match_for_user(request, user_id, tournament_id):
             }
             return JsonResponse({'success': True, 'matches_data': match_data}, status=200)
         else:
-            return JsonResponse({"error": "Aucun match en cours trouvé pour l'utilisateur."}, status=404)
+            return JsonResponse({"error": "No current matches found for user."}, status=404)
     
     except Joueur.DoesNotExist:
-        return JsonResponse({'error': "Utilisateur non trouvé."}, status=404)
+        return JsonResponse({'error': "User not found."}, status=404)
 
 
 @csrf_exempt
@@ -583,7 +582,7 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, s
         match.save()
         winner.save()
     except ObjectDoesNotExist:
-        return JsonResponse({'error': "Match ou Joueur non trouvé."}, status=404)
+        return JsonResponse({'error': "Match or Player not found."}, status=404)
 
     next_tour = match.tour + 1
     tournament = match.tournament
@@ -607,10 +606,10 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, s
                 tournament_group_name,  # Utiliser le nom du groupe basé sur l'ID du tournoi
                 {
                     "type": "winner",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-                    "message": "Un joueur win"
+                    "message": "One player wins"
                 }
             )
-            return JsonResponse({'success': True, 'message': "Finale."}, status=200)
+            return JsonResponse({'success': True, 'message': "Final."}, status=200)
         # Trouver le prochain match basé sur l'index calculé si nécessaire
         # Cette logique doit être ajustée selon la structure exacte et la logique de votre application
         next_match = Match.objects.filter(tournament=tournament, tour=next_tour).order_by('match_id')[match_index - 1]
@@ -639,10 +638,10 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, s
             
             next_match.save()
         else:
-            return JsonResponse({'message': "Aucun match disponible pour la mise à jour."}, status=404)
+            return JsonResponse({'message': "No matches available for update."}, status=404)
 
     except IndexError:
-        return JsonResponse({'error': "Index hors de portée."}, status=400)
+        return JsonResponse({'error': "Index out of reach."}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
@@ -652,12 +651,12 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, s
         tournament_group_name,  # Utiliser le nom du groupe basé sur l'ID du tournoi
         {
             "type": "winner",  # Assurez-vous que cela correspond à la fonction dans votre consommateur
-            "message": "Un joueur win"
+            "message": "One player wins"
         }
     )
     return JsonResponse({
         'success': True,
-        'message': "Le vainqueur a été mis à jour et le match suivant a été préparé."
+        'message': "The winner has been updated and the next match has been prepared."
     }, status=200)
 
 
@@ -692,4 +691,4 @@ def update_leave(request, match_id, player):
         match.save()
         return JsonResponse({'success': True, 'message': "match update leave player"}, status=200)
     except ObjectDoesNotExist:
-        return JsonResponse({'error': "Match ou Joueur non trouvé."}, status=404)
+        return JsonResponse({'error': "Match or Player not found."}, status=404)
