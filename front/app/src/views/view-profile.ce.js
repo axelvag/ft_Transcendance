@@ -1,7 +1,6 @@
 import { user, getProfile, saveUser } from '@/auth.js';
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
-// import { getCsrfToken} from '@/auth.js';
 
 const loadingProfileTemplate = `
   <div class="placeholder-glow">
@@ -193,10 +192,8 @@ class ViewProfile extends HTMLElement {
       }
     });
 
-    // Ajoutez un gestionnaire pour le bouton "Default Avatar"
     const defaultAvatarButton = this.querySelector('#defaultAvatar');
     defaultAvatarButton.addEventListener('click', () => {
-      // Définissez ici l'URL de l'avatar par défaut
       let defaultAvatarUrl;
       if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) {
         defaultAvatarUrl = user.avatarDefault42;
@@ -206,7 +203,6 @@ class ViewProfile extends HTMLElement {
       const avatarImage = this.querySelector('#viewProfile-edit-avatarImg');
       avatarImage.src = defaultAvatarUrl;
       avatarImage.setAttribute('data-default-avatar', 'true');
-      // Optionnel: Réinitialisez l'input file en cas de sélection préalable d'un fichier
       avatarInput.value = '';
     });
   }
@@ -235,7 +231,7 @@ class ViewProfile extends HTMLElement {
           avatarURL = URL.createObjectURL(avatarFile);
           const avatarImage = profileEditForm.querySelector('img');
           avatarImage.src = avatarURL;
-          avatarPayload = avatarFile; // Le fichier de l'avatar sélectionné par l'utilisateur.
+          avatarPayload = avatarFile;
         }
       }
       const newUser = {
@@ -245,7 +241,6 @@ class ViewProfile extends HTMLElement {
         lastname: profileEditForm.querySelector('#lastname').value,
         id: user.id,
         avatarFile: avatarPayload,
-        // avatarFile: isDefaultAvatar ? user.avatarDefault : avatarFile,
       };
       console.log('object newuser', newUser);
       try {
@@ -256,10 +251,9 @@ class ViewProfile extends HTMLElement {
           this.#user = getProfile();
           this.#profileContentEl.innerHTML = viewProfileTemplate(this.#user);
         } else {
-          // if (response.message === "This user name is already taken.")
           {
             this.errorUsernameExisting = document.getElementById('error-username-existing');
-            this.errorUsernameExisting.textContent = 'An error has occurred'; // categorie special d'erreur
+            this.errorUsernameExisting.textContent = 'An error has occurred';
             this.errorUsernameExisting.style.display = 'block';
           }
           this.querySelector('#profile-edit-loader').hidden = true;
