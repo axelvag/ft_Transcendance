@@ -1,6 +1,4 @@
-# friendshipApp/invitations/routing.py
 from django.urls import re_path
-# from .consumers import InvitationConsumer
 from friendshipApp import consumers
 
 websocket_urlpatterns = [

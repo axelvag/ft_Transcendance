@@ -1,45 +1,33 @@
 PROFILE ?= prod
 
-.PHONY: all build rebuild stop stop volumes fclean sh-% prune
+.PHONY: all
+all: build up
 
-all: volumes build up
-
+.PHONY: build
 build:
 	docker compose -f docker-compose.yml --profile $(PROFILE) build
 
+.PHONY: up
 up:
 	docker compose -f docker-compose.yml --profile $(PROFILE) up -d --build
 
+.PHONY: stop
 stop:
 	docker compose -f docker-compose.yml --profile prod --profile dev stop
 
-volumes:
-	# mkdir -p /var/lib/postgresql/data
+.PHONY: fclean
+fclean: stop
+	docker compose -f docker-compose.yml --profile prod --profile dev down -v --rmi all --remove-orphans
 
-fclean:
-	@docker ps -a -q -f name=front | grep . > /dev/null; \
-    if [ $$? -eq 0 ]; then \
-        docker stop front > /dev/null 2>&1; \
-        docker rm front > /dev/null 2>&1; \
-    fi
-	docker compose -f docker-compose.yml down -v --rmi all --remove-orphans
-
-rebuild:
-	docker compose -f docker-compose.yml build --no-cache
-
-ps:
-	docker compose ps
-
-sh-%:
-	docker compose -f docker-compose.yml exec $* /bin/sh
-
+.PHONY: re
 re: fclean
-	@make --no-print-directory rebuild
 	@make --no-print-directory all
 
+.PHONY: sh-%
 sh-%:
 	docker compose -f docker-compose.yml exec $* /bin/sh
 
+.PHONY: prune
 prune:
 	-docker stop $$(docker ps -a -q)
 	-docker rm $$(docker ps -a -q)

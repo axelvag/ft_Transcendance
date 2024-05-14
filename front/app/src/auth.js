@@ -4,7 +4,6 @@ import { notify } from '@/notifications.js';
 import { BASE_URL, OAUTH_AUTHORIZE_URL } from '@/constants.js';
 import { closeViewFriendWebSocket } from '@/views/view-friend.ce.js';
 
-
 const user = {
   isAuthenticated: undefined,
   id: null,
@@ -54,17 +53,9 @@ const setLocalUser = data => {
   user.timeplay = 130;
   user.nbtotal = 1;
   user.friends = 0;
-  // user.victories = data.victories;
-  // user.lost = data.lost;
-  // user.online = data.online;
-  // user.local = data.local;
-  // user.nbtotal = data.nbtotal;
-  // user.timeplay = data.timeplay;
-  // user.friends = data.friends;
 };
 
 const resetLocalUser = () => {
-  // localStorage.setItem('isLogged', 'false');
   user.isAuthenticated = false;
   user.id = null;
   user.email = null;
@@ -216,12 +207,9 @@ const saveUser = async newUser => {
       user.email = user.email;
 
       if (!data.avatar) {
-        if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined)
-          user.avatar = user.avatarDefault42;
-        else
-          user.avatar = 'assets/img/default-profile.jpg';
-      }
-      else {
+        if (user.avatarDefault42 !== null && user.avatarDefault42 !== undefined) user.avatar = user.avatarDefault42;
+        else user.avatar = 'assets/img/default-profile.jpg';
+      } else {
         user.avatar = data.avatar;
       }
     }
@@ -443,19 +431,15 @@ const handleOAuthResponse = async () => {
             message: 'Failed to load user profile!',
           });
         }
-      }
-      else {
+      } else {
         console.error('Failed Auth42', data.error);
+        notifyError('Signin with 42 failed!');
         redirectTo('/');
       }
-
     } catch (error) {
       console.error('Erreur:', error);
-      notify({
-        icon: 'error',
-        iconClass: 'text-danger',
-        message: 'login with 42 failed!',
-      });
+      notifyError('Signin with 42 failed!');
+      redirectTo('/');
     }
   }
 };

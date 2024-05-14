@@ -9,6 +9,8 @@ import json
 import requests
 import logging
 
+logger = logging.getLogger(__name__)
+
 def verify_sessionid(request):
   session_id = request.COOKIES.get('sessionid', None)
   response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{session_id}", verify=False)
@@ -156,3 +158,58 @@ class GamePlayerHistoryView(View):
         'ended_at': game_data.get('ended_at', None),
       })
     return JsonResponse(computed_games, safe=False, status=200)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserGameStatusView(View):
+    def get(self, request, user_id):
+        # Find any game where the user is currently playing
+        current_game = Game.objects.filter(
+            (Q(player_left_id=user_id) | Q(player_right_id=user_id)) & Q(status='RUNNING')
+        ).first()
+
+        if current_game:
+            # User is currently in a game
+            logger.info(f"User {user_id} is in-game")
+
+            return JsonResponse({
+                'in_game': True
+            }, status=200)
+        else:
+            # User is not in any current game
+            logger.info(f"User {user_id} is not in-game")
+            return JsonResponse({'in_game': False}, status=204)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GamePlayerStatisticsView(View):
+  
+  def get(self, request):
+    
+    player_id = None
+    try:
+      player_id = str(verify_sessionid(request))
+    except Exception as e:
+      return JsonResponse({'error': str(e)}, safe=False, status=403)
+    
+    # Get game history for a player
+    games = Game.objects.filter(
+      Q(player_left_id=player_id) | Q(player_right_id=player_id),
+      status='FINISHED'
+    )
+  
+    gameCounter = 0
+    victoryCounter = 0
+    defeatCounter = 0
+
+    for game in games:
+      game_data = game.json()
+      gameCounter += 1
+      if game_data["winner_id"] == player_id:
+        victoryCounter += 1
+      else:
+        defeatCounter += 1
+
+    return JsonResponse({
+      "games": gameCounter,
+      "victories": victoryCounter,
+      "defeats": defeatCounter,
+    }, safe=False, status=200)

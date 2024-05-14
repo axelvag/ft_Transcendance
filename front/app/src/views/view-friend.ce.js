@@ -2,8 +2,6 @@ import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { user, getCsrfToken } from '@/auth.js';
 import { showModal } from '@/modal.js';
-
-// const BASE_URL = import.meta.env.BASE_URL;
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 
 class ViewFriend extends HTMLElement {
@@ -124,7 +122,7 @@ class ViewFriend extends HTMLElement {
       console.error("WebSocket error observed:", event);
     };
 
-   this.wsInstance.onclose = (event) => {
+    this.wsInstance.onclose = (event) => {
       console.log("WebSocket close:", event.code, event.reason);
     };
   }
@@ -135,6 +133,7 @@ class ViewFriend extends HTMLElement {
       console.log("WebSocket connection closed manually.");
     }
   }
+
   // list send invitation 
   async loadSentInvitations() {
     try {
@@ -149,6 +148,8 @@ class ViewFriend extends HTMLElement {
       const responseData = await response.json();
 
       const sentInvitationsList = document.getElementById('sent-invitations-list');
+      if (!sentInvitationsList)
+        return ;
       sentInvitationsList.innerHTML = '';
 
       if (responseData && responseData.invitations) {
@@ -157,12 +158,12 @@ class ViewFriend extends HTMLElement {
             const listItem = document.createElement('li');
             listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-            // Créer un conteneur pour l'avatar, le nom d'utilisateur et l'email
+            // create container for avatar, email, username, email
             const userInfoDiv = document.createElement('div');
             userInfoDiv.style.display = 'flex';
             userInfoDiv.style.alignItems = 'center';
 
-            // Ajouter l'avatar
+            // add avatar
             const avatarImg = document.createElement('img');
             if (!invitation.from_user_avatar)
               avatarImg.src = 'assets/img/default-profile.jpg';
@@ -175,18 +176,17 @@ class ViewFriend extends HTMLElement {
             avatarImg.style.marginRight = '50px';
             userInfoDiv.appendChild(avatarImg);
 
-            // Ajouter le nom d'utilisateur
+            // add username
             const usernameSpan = document.createElement('span');
             usernameSpan.textContent = invitation.from_user_username;
             usernameSpan.style.marginRight = '50px';
             userInfoDiv.appendChild(usernameSpan);
 
-            // Ajouter l'email
+            // add email
             const emailSpan = document.createElement('span');
             emailSpan.textContent = invitation.from_user_email;
             userInfoDiv.appendChild(emailSpan);
 
-            // Juste après avoir ajouté l'email dans userInfoDiv
             const cancelButton = document.createElement('button');
             cancelButton.textContent = 'Cancel';
             cancelButton.classList.add('btn', 'btn-warning');
@@ -252,6 +252,8 @@ class ViewFriend extends HTMLElement {
       const responseData = await response.json();
 
       const friendRequestsList = document.getElementById('friend-requests');
+      if (!friendRequestsList)
+        return ;
       friendRequestsList.innerHTML = '';
 
       if (responseData && responseData.invitations) {
@@ -273,9 +275,9 @@ class ViewFriend extends HTMLElement {
             else
               avatarImg.src = invitation.from_user_avatar;
             avatarImg.alt = 'User Avatar';
-            avatarImg.style.width = '40px'; // Set the size as needed
+            avatarImg.style.width = '40px';
             avatarImg.style.height = '40px';
-            avatarImg.style.borderRadius = '50%'; // Make it round
+            avatarImg.style.borderRadius = '50%';
             avatarImg.style.marginRight = '50px';
             userInfoDiv.appendChild(avatarImg);
 
@@ -447,9 +449,9 @@ class ViewFriend extends HTMLElement {
           else
             avatarImg.src = user.avatar_url;
           avatarImg.alt = 'User Avatar';
-          avatarImg.style.width = '40px'; // Set the size as needed
+          avatarImg.style.width = '40px';
           avatarImg.style.height = '40px';
-          avatarImg.style.borderRadius = '50%'; // Make it round
+          avatarImg.style.borderRadius = '50%';
           avatarImg.style.marginRight = '50px';
           userInfoDiv.appendChild(avatarImg);
 
@@ -462,7 +464,6 @@ class ViewFriend extends HTMLElement {
           // Add the user's email
           const emailSpan = document.createElement('span');
           emailSpan.textContent = user.email;
-          // emailSpan.style.marginRight = '150px';
           userInfoDiv.appendChild(emailSpan);
 
           // Create the friend request button
@@ -535,6 +536,8 @@ class ViewFriend extends HTMLElement {
       }
       const { online_friends } = await response.json();
 
+      console.table("online_friends", online_friends);
+
       const onlineFriendsList = this.querySelector('#online-friends');
       onlineFriendsList.innerHTML = '';
 
@@ -550,8 +553,8 @@ class ViewFriend extends HTMLElement {
           else
             avatarImg.src = friend.avatar_url;
           avatarImg.alt = 'User Avatar';
-          avatarImg.style.width = '40px';  // Or the size you prefer
-          avatarImg.style.height = '40px'; // Or the size you prefer
+          avatarImg.style.width = '40px';
+          avatarImg.style.height = '40px';
           avatarImg.style.borderRadius = '50%';
           avatarImg.style.marginRight = '50px';
           listItem.appendChild(avatarImg);
@@ -566,6 +569,20 @@ class ViewFriend extends HTMLElement {
           const emailSpan = document.createElement('span');
           emailSpan.textContent = friend.email;
           listItem.appendChild(emailSpan);
+
+          // In-game status as a badge
+          const statusBadge = document.createElement('span');
+          // statusBadge.classList.add('badge', friend.in_game ? 'badge-success' : 'badge-danger');
+          statusBadge.textContent = friend.in_game ? "In game" : "Not in game";
+
+          // Set badge styling explicitly
+          statusBadge.style.backgroundColor = friend.in_game ? 'green' : 'gray';
+          statusBadge.style.color = 'white';
+          statusBadge.style.padding = '5px 10px';
+          statusBadge.style.borderRadius = '5px';
+          statusBadge.style.fontSize = '0.85em';
+          listItem.appendChild(statusBadge);
+
 
           // Delete friend button
           const deleteButton = document.createElement('button');
@@ -612,7 +629,6 @@ class ViewFriend extends HTMLElement {
       if (offline_friends.length > 0) {
         offline_friends.forEach(friend => {
           const listItem = document.createElement('li');
-          // listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-start');
           listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-between');
 
           // Avatar

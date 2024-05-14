@@ -1,7 +1,6 @@
 import '@/components/layouts/default-layout/default-layout-sidebar.ce.js';
 import '@/components/layouts/default-layout/default-layout-main.ce.js';
 import { handleOAuthResponse } from '@/auth.js';
-import { notify } from '@/notifications.js';
 
 class ViewLoading extends HTMLElement {
   connectedCallback() {
@@ -14,22 +13,19 @@ class ViewLoading extends HTMLElement {
       }
     });
     this.innerHTML = `
-    <default-layout-main>
-      <div class="d-flex flex-column justify-content-center align-items-center">
-        <h1 class="text-bicolor display-3 fw-bolder">
-          TRANSCENDANCE PONG
-        </h1>
-        <div class="d-flex flex-column justify-content-center align-items-center vh-100">
-          <h2 class="display-6 fw-bolder">
-            Authentication in progress...
-          </h2>
-          <div class="spinner-border mb-5" role="status">
-            <span class="visually-hidden">Loading...</span>
+      <div class="vh-100 overflow-auto halo-bicolor d-flex flex-column p-2">
+        <div class="flex-shrink-0 my-auto text-center">
+          <h3 class="mb-4">
+            Signing in with
+            <ui-icon name="42" class="mx-2"></ui-icon>
+            ...
+          </h3>
+          <div class="fs-5 py-2">
+            <div class="spinner-border border-3"></div>
           </div>
         </div>
+        <div class="flex-shrink-0 py-4 mb-2"></div>
       </div>
-
-    </default-layout-main>
     `;
     handleOAuthResponse();
   }
