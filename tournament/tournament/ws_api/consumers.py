@@ -32,7 +32,11 @@ class MyConsumer(AsyncWebsocketConsumer):
             print("Session ID non trouvé")
 
         update_url = f"https://authentification:8001/accounts/verif_sessionid/{sessionid}"
-        response = requests.get(update_url, verify=False)
+        try:
+            response = requests.get(update_url, verify=False)
+        except requests.RequestException as e:
+            print(f"Erreur de requête HTTP: {e}")
+            return JsonResponse({'error': 'Erreur de communication avec le service externe'}, status=503)
         print(response)
         if response.status_code != 200:
             raise ValidationError('wrong session ID')
@@ -105,12 +109,27 @@ class MyConsumer(AsyncWebsocketConsumer):
             "action": "delete_tournament"
         }))
         
-    async def player_disconnected(self, event):
-        await self.send(text_data=json.dumps({
-            "action": "player_disconnected"
-        }))
+    # async def player_disconnected(self, event):
+    #     await self.send(text_data=json.dumps({
+    #         "action": "player_disconnected"
+    #     }))
         
     async def display_player(self, event):
         await self.send(text_data=json.dumps({
             "action": "display_player"
+        }))
+        
+    async def player_ready(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "player_ready"
+        }))
+    
+    async def winner(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "winner"
+        }))
+        
+    async def update_boutton(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "update_boutton"
         }))

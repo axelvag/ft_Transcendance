@@ -11,7 +11,7 @@ class DefaultLayoutSidebar extends HTMLElement {
     const tournament = getTournament();
 
     let tournamentButtonHTML = '';
-    if (tournament && tournament.id) {
+    if (tournament && tournament.id && tournament.status !== 2) {
       tournamentButtonHTML = `
         <div class="d-grid mb-3">
           <a
@@ -136,7 +136,7 @@ class DefaultLayoutSidebar extends HTMLElement {
     `;
 
     this.querySelector('#joinTournamentButton')?.addEventListener('click', () => {
-      if (tournament && tournament.id) {
+      if (tournament && tournament.id && tournament.status !== 2) {
         TournamentExist(tournament.id);
       }
     });

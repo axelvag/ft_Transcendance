@@ -11,8 +11,10 @@ import '@/views/view-login.ce.js';
 import '@/game/view-game-set-mode.ce.js';
 import '@/game/view-game-offline.ce.js';
 import '@/game/view-game-online.ce.js';
+import '@/game/view-game-history.ce.js';
 import '@/game/view-game-tournament.ce.js';
 import '@/game/view-game-tournament-salon.ce.js';
+import '@/game/view-game-tournament-start.ce.js';
 import '@/game/view-game-online-matchmaking.ce.js';
 import '@/game/view-game-history.ce.js';
 import '@/views/view-friend.ce.js';
@@ -149,6 +151,13 @@ const router = new Router({
       beforeEnter: isLoggedInGuard,
     },
     {
+      name: 'game-tournament-start',
+      path: '/game/tournament/start',
+      title: 'Game tournament start',
+      template: '<view-game-tournament-start></view-game-tournament-start>',
+      beforeEnter: isLoggedInGuard,
+    },
+    {
       name: 'game-online-search-player',
       path: '/game/online',
       title: 'Game online',
@@ -158,6 +167,21 @@ const router = new Router({
     {
       name: 'game-online-play',
       path: '/game/online/:gameId',
+      title: 'Game online',
+      template: params => `<view-game-online game-id="${params.gameId}" back-route="/game"></view-game-online>`,
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'game-online-play-tournament',
+      path: '/game/online/:gameId/:tournamentId',
+      title: 'Game online',
+      template: params =>
+        `<view-game-online game-id="${params.gameId}" back-route="/game/tournament/start"></view-game-online>`,
+      beforeEnter: isLoggedInGuard,
+    },
+    {
+      name: 'game-online-play',
+      path: '/game/online/:gameId/:tournamentId',
       title: 'Game online',
       template: params => `<view-game-online game-id="${params.gameId}" back-route="/game"></view-game-online>`,
       beforeEnter: isLoggedInGuard,

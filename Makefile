@@ -9,7 +9,7 @@ build:
 
 .PHONY: up
 up:
-	docker compose -f docker-compose.yml --profile $(PROFILE) up -d
+	docker compose -f docker-compose.yml --profile $(PROFILE) up -d --build
 
 .PHONY: stop
 stop:

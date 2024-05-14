@@ -1,10 +1,12 @@
 import { user } from '@/auth.js';
 import { getProfile } from '@/auth.js';
-import { getTournament, resetLocalTournament, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament } from '@/tournament.js';
+import { getTournament, resetLocalTournament, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament , fetchTournamentInfo, fetchDeletePlayerAndTournament} from '@/tournament.js';
 import { isAuthenticated, getCsrfToken } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
+import { notify } from '@/notifications.js';
+import { showModal } from '@/modal.js';
 
 class ViewTournamentSalon extends HTMLElement {
   #user;
@@ -14,15 +16,24 @@ class ViewTournamentSalon extends HTMLElement {
   constructor() {
     super();
     this.#user = getProfile();
-    this.#tournament = getTournament();
   }
   
   async connectedCallback() {
+    await fetchTournamentInfo();
+    this.#tournament = getTournament();
     const isLoggedIn = await isAuthenticated();
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
-    if(this.#tournament.id === null)
+    if(this.#tournament.id === null || this.#tournament.status !== 0){
+      if(this.#tournament.status === 2)
+        await fetchDeletePlayerAndTournament();
+      if(this.#tournament.status === 1){
+        redirectTo(`/game/tournament/start`);
+        return;
+      }
       redirectTo(this.#backUrl);
+      return;
+    }
 
     let deleteTournamentButtonHTML = '';
     if (this.#user.id === this.#tournament.admin_id) {
@@ -30,21 +41,28 @@ class ViewTournamentSalon extends HTMLElement {
         deleteTournamentButtonHTML = `<button id="deleteTournamentBtn" class="btn btn-warning">Delete Tournament</button>`;
     }
 
+    let buttonsHTML = '';
+    if (this.#tournament.maxPlayer - 1 !== this.#tournament.nombreDeJoueur) {
+        buttonsHTML = `
+          <div class="d-flex justify-content-between align-items-center mb-5">
+            <button id="leaveTournamentBtn" class="btn btn-danger">Leave Tournament</button>
+            ${deleteTournamentButtonHTML}  <!-- Ajout du bouton de suppression si applicable -->
+          </div>
+        `;
+    }
+
     this.innerHTML = `
       <div class="min-vh-100 halo-bicolor d-flex flex-column p-2">
         <div class="d-flex justify-content-between align-items-center mb-5">
           <h1 class="fw-bold text-center m-0">Waiting room for ${this.#tournament.name} Tournament</h1>
-          <div>
-            <button id="leaveTournamentBtn" class="btn btn-danger">Leave Tournament</button>
-            ${deleteTournamentButtonHTML}  <!-- Ajout du bouton de suppression si applicable -->
-          </div>
+          ${buttonsHTML}
         </div>
         <div id="playersList" class="mt-4"></div>
       </div>
     `;
 
     // Ajout d'un écouteur d'événements pour le bouton de sortie
-    this.querySelector('#leaveTournamentBtn').addEventListener('click', () => {
+    this.querySelector('#leaveTournamentBtn')?.addEventListener('click', () => {
       resetLocalTournament();
       this.deletePlayer();
       redirectTo(this.#backUrl);
@@ -54,12 +72,21 @@ class ViewTournamentSalon extends HTMLElement {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
 
-            this.deleteTournament();
+            // this.deleteTournament();
+            this.showDeleteConfirmation();
         });
     }
 
     await this.initWebSocket();
     // this.addPlayer();
+  }
+
+
+  showDeleteConfirmation() {
+    showModal('Confirm Tournament Deletion', 'Are you sure you want to delete your tournament? This action cannot be undone.', {
+      okCallback: () => this.deleteTournament(),
+      cancelCallback: () => console.log('Deletion cancelled.')
+    });
   }
 
   disconnectedCallback() {
@@ -75,6 +102,7 @@ class ViewTournamentSalon extends HTMLElement {
       tournament_id: this.#tournament.id,
     };
     const data = await fetchAddPlayer(formData);
+    console.log(data);
     if (data.success === false) {
       this.viewPlayer();
     }
@@ -109,29 +137,16 @@ class ViewTournamentSalon extends HTMLElement {
         }
 
         const players = await response.json();
+        console.log(players);
         const listElement = this.querySelector('#playersList');
         listElement.innerHTML = '<h2>Players in the Tournaments</h2><br>'; // Titre pour la section
 
         for (const player of players) {
-            const csrfToken = await getCsrfToken();
-            const userProfileResponse = await fetch(`${BASE_URL}:8002/get_user_profile/${player.user_id}/`, {
-                method: 'GET',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                },
-                credentials: 'include',
-            });
-
-            if (!userProfileResponse.ok) {
-                throw new Error(`HTTP error! status: ${userProfileResponse.status}`);
-            }
-
-            const user = await userProfileResponse.json();
             let avatar = "/assets/img/default-profile.jpg";
-            if(user.avatar42 !== null && user.avatar42 !== undefined)
-              avatar = user.avatar42;
-            if (user.avatar !== null && user.avatar !== undefined)
-              avatar = user.avatar;
+            if(player.avatar42 !== null && player.avatar42 !== undefined)
+              avatar = player.avatar42;
+            if (player.avatar !== null && player.avatar !== undefined)
+              avatar = player.avatar;
             const playerElement = document.createElement('div');
             playerElement.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -152,13 +167,51 @@ class ViewTournamentSalon extends HTMLElement {
 
         // Calculer le nombre de joueurs en attente
         const nbPlayersWaiting = this.#tournament.maxPlayer - players.length;
-        const waitingElement = document.createElement('div');
-        waitingElement.innerHTML = `<h3>${nbPlayersWaiting} player(s) waiting</h3>`;
-        listElement.appendChild(waitingElement);
+        console.log(this.#tournament.maxPlayer);
+        console.log(players.length);
+        if (nbPlayersWaiting === 0) {
+          this.startCountdownAndRedirect(listElement);
+          // redirectTo(`/game/tournament/start`);
+          // return;
+        }
+        else{
+          const waitingElement = document.createElement('div');
+          waitingElement.innerHTML = `<h3>${nbPlayersWaiting} player(s) waiting</h3>`;
+          listElement.appendChild(waitingElement);
+        }
 
     } catch (error) {
         console.error('Could not load tournament:', error);
     }
+}
+
+startCountdownAndRedirect(listElement) {
+  let countdown = 5;
+  const countdownElement = document.createElement('div');
+  countdownElement.setAttribute('id', 'countdown');
+  listElement.appendChild(countdownElement);
+
+  const intervalId = setInterval(() => {
+      if (countdown === 0) {
+          clearInterval(intervalId);
+          redirectTo(`/game/tournament/start`);
+      } else {
+          countdownElement.innerHTML = `<h3>Tournament starts in ${countdown}...</h3>`;
+          countdown--;
+      }
+  }, 1000);
+}
+
+ updateButtons() {
+  // Exemple de condition pour afficher ou masquer les boutons
+
+  const leaveTournamentBtn = document.getElementById('leaveTournamentBtn');
+  const deleteTournamentBtn = document.getElementById('deleteTournamentBtn');
+
+  leaveTournamentBtn.style.display = 'none';  // Masquer le bouton
+  if (deleteTournamentBtn) {
+      deleteTournamentBtn.style.display = 'none';  // Masquer si applicable
+  }
 }
 
 
@@ -187,15 +240,19 @@ class ViewTournamentSalon extends HTMLElement {
           resetLocalTournament();
           this.deletePlayer();
           redirectTo(this.#backUrl);
+          notify({
+            icon: 'info',
+            iconClass: 'text-info',
+            message: `The tournament has been deleted !</b>`,
+          });
           this.socket.close();
         }
         if (data.action === 'display_player') {
           this.viewPlayer();
         }
-        if (data.action === 'player_disconnected') {
-          resetLocalTournament();
-          this.deletePlayer();
-          this.socket.close();
+        
+        if (data.action === 'update_boutton') {
+          this.updateButtons();
         }
     };
 

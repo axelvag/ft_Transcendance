@@ -3,6 +3,7 @@ import { redirectTo } from '@/router.js';
 import { getCsrfToken } from '@/auth.js';
 import { sendEmailPasswordReset } from '@/auth.js';
 import { BASE_URL } from '@/constants.js';
+import { notify } from '@/notifications.js';
 
 class ViewNewPass extends HTMLElement {
   async connectedCallback() {
@@ -36,7 +37,7 @@ class ViewNewPass extends HTMLElement {
         <div id="email-confirm-error" hidden>
           <h5 class="fw-bold">Error</h5>
           <p id="email-confirm-error-msg">Something didn't work!</p>
-          <button class="btn btn-primary">Renvoyer un Email</button>
+          <button class="btn btn-primary">Resend an Email</button>
         </div>
       </auth-layout>
     `;
@@ -47,34 +48,44 @@ class ViewNewPass extends HTMLElement {
     const token = params.get('token');
     console.log(this.uidb64);
     console.log(token);
-    const response = await fetch(`${BASE_URL}:8001/accounts/activate_mail_pass/${this.uidb64}/${token}`);
-    const data = await response.json();
-    console.log(data);
-    this.querySelector('#email-confirm-loading').hidden = true;
-    if (data.success) {
-      // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
-      this.querySelector('#email-confirm-success').hidden = false;
-    } else {
-      if (data.message) {
-        this.querySelector('#email-confirm-error-msg').textContent = data.message;
-      }
-      this.querySelector('#email-confirm-error').hidden = false;
-    }
-    // }
-    this.querySelector('#new-pass-form').addEventListener('submit', this.submitForm.bind(this));
-    const resendButton = this.querySelector('#email-confirm-error button.btn');
-    // Ajoutez un gestionnaire d'événements pour le clic sur le bouton "Renvoyer un Email"
-    resendButton.addEventListener('click', async () => {
-      // Masquez le message d'erreur
-      this.querySelector('#email-confirm-error').hidden = true;
-
-      // Affichez le message "Loading..." pendant la requête
-      this.querySelector('#email-confirm-loading').hidden = false;
-
-      // Effectuez une nouvelle demande de confirmation par e-mail
-      const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_rest/${this.uidb64}`);
+    try{
+      const response = await fetch(`${BASE_URL}:8001/accounts/activate_mail_pass/${this.uidb64}/${token}`);
       const data = await response.json();
-    });
+      console.log(data);
+      this.querySelector('#email-confirm-loading').hidden = true;
+      if (data.success) {
+        // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
+        this.querySelector('#email-confirm-success').hidden = false;
+      } else {
+        if (data.message) {
+          this.querySelector('#email-confirm-error-msg').textContent = data.message;
+        }
+        this.querySelector('#email-confirm-error').hidden = false;
+      }
+      // }
+      this.querySelector('#new-pass-form').addEventListener('submit', this.submitForm.bind(this));
+      const resendButton = this.querySelector('#email-confirm-error button.btn');
+      // Ajoutez un gestionnaire d'événements pour le clic sur le bouton "Renvoyer un Email"
+      resendButton.addEventListener('click', async () => {
+        // Masquez le message d'erreur
+        this.querySelector('#email-confirm-error').hidden = true;
+  
+        // Affichez le message "Loading..." pendant la requête
+        this.querySelector('#email-confirm-loading').hidden = false;
+  
+        // Effectuez une nouvelle demande de confirmation par e-mail
+        const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_rest/${this.uidb64}`);
+        const data = await response.json();
+      });
+    }
+    catch(error){
+      console.error('Erreur:', error);
+      notify({
+        icon: 'error',
+        iconClass: 'text-danger',
+        message: 'new pass failed!',
+      });
+    }
   }
 
   async submitForm(event) {
@@ -98,9 +109,12 @@ class ViewNewPass extends HTMLElement {
     if (data.success) {
       redirectTo('/login');
       console.log('Success!');
-      alert('success');
+      notify({
+        icon: 'info',
+        iconClass: 'text-info',
+        message: `Your <b>new password </b> reset successfully!</b>`,
+      });
     } else {
-      alert('errors');
       console.log(data.errors);
     }
   }

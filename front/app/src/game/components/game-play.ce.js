@@ -9,6 +9,7 @@ import AudioPlayer from '../utils/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
+import { fetchWinnerMatch2 } from '@/tournament.js';
 
 const template = `
 <div class="gamePlay" hidden>
@@ -302,6 +303,8 @@ class GamePlay extends HTMLElement {
             action: () => redirectTo('/game'),
           },
         });
+        const winnerId = winner === 'left' ? players.playerLeft.id : players.playerRight.id;
+        fetchWinnerMatch2(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
         break;
       default:
         this.dialogEl.render({ open: false });
