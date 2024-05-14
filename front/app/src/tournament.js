@@ -316,30 +316,33 @@ const fetchTournamentInfo = async () => {
 
 
 const fetchInfoMatch = async () => {
-  try {
-    let user = getProfile();
-    const response = await fetch(`${BASE_URL}:8005/tournament/get_latest_match_for_user/${user.id}/${tournament.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
+  if (tournament.id !== null)
+  {
+    try {
+      let user = getProfile();
+      const response = await fetch(`${BASE_URL}:8005/tournament/get_latest_match_for_user/${user.id}/${tournament.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // console.log("last match", data);
+
+      if (data.success) {
+        setLocalMatch(data.matches_data);
+      } else {
+        console.log("player is not in a match");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
     }
-
-    const data = await response.json();
-    // console.log("last match", data);
-
-    if (data.success) {
-      setLocalMatch(data.matches_data);
-    } else {
-      console.log("player is not in a match");
-    }
-  } catch (error) {
-    console.error("An error occurred:", error);
   }
 };
 

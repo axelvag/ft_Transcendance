@@ -166,7 +166,7 @@ class ViewTournamentstart extends HTMLElement {
               this.#match = getMatch();
               await fetchTournamentInfo();
               this.#tournament = getTournament();
-              if (this.#tournament.status === 2)
+              if (this.#tournament.status === 2 || this.#tournament.id === null)
                 return;
               if (this.#match.player1id === "" || this.#match.player2id === "")
                 return;
