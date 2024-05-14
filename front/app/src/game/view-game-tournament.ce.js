@@ -4,6 +4,7 @@ import { setLocalTournament, fetchGetTournament, fetchCreateTournament, fetchDel
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 import { redirectTo } from '../router';
+import { showModal } from '@/modal.js';
 
 class ViewTournament extends HTMLElement {
   #user;
@@ -111,19 +112,27 @@ class ViewTournament extends HTMLElement {
       if (event.target.classList.contains('joinTournamentBtn')) {
           const tournamentId = event.target.id.replace('joinTournament-', '');
           if (this.#tournament.id !== null && this.#tournament.id.toString() !== tournamentId) {
-              const confirmLeave = confirm("Vous êtes déjà dans un tournoi. Si vous rejoignez ce tournoi, vous serez déconnecté de l'autre. Voulez-vous continuer ?");
-              if (!confirmLeave) {
-                  // Si l'utilisateur choisit de ne pas continuer, arrêtez l'exécution de la fonction ici
+              showModal('You are already in a tournament. ', 'If you join this tournament, you will be disconnected from the other. Do you want to continue ?', {
+                okCallback: async () => {
+                  console.log('User will be removed from the current tournament.');
+                  await fetchDeletePlayer();
+                  if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                    this.socket.close();
+                  }
+                  fetchGetTournament(tournamentId);
+                },
+                cancelCallback: () => {
                   return;
-              }
-              await fetchDeletePlayer();
-
+                }
+              });
+          }
+          else{
+            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                this.socket.close();
+            }
+            fetchGetTournament(tournamentId);
           }
   
-          if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-              this.socket.close();
-          }
-          fetchGetTournament(tournamentId);
       }
   });
 
@@ -155,16 +164,37 @@ class ViewTournament extends HTMLElement {
     // const csrfToken = await getCsrfToken();
 
     if (this.#tournament.id !== null) {
-      const confirmLeave = confirm("Vous êtes déjà dans un tournoi. Si vous cree ce tournoi, vous serez déconnecté de l'autre. Voulez-vous continuer ?");
-      if (!confirmLeave) {
-          // Si l'utilisateur choisit de ne pas continuer, arrêtez l'exécution de la fonction ici
+      showModal('You are already in a tournament. ', 'If you create this tournament, you will be disconnected from the other. Do you want to continue ?', {
+        okCallback: async () => {
+          console.log('User will be removed from the current tournament.');
+          await fetchDeletePlayer();
+          this.tournamentName = document.getElementById('tournamentName');
+          this.tournamentSizeValue = document.getElementById('tournamentSizeValue');
+
+        const formData = {
+          tournamentName: this.tournamentName.value,
+          tournamentSize: parseInt(this.tournamentSizeValue.textContent, 10), // Notez le changement ici pour utiliser textContent
+          admin_id: this.#user.id,
+        };
+        const data = await fetchCreateTournament(formData);
+        if (data.success) {
           this.querySelector('#formOverlay').style.display = 'none';
+          if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.socket.close();
+          }
+          fetchGetTournament(data.tournoi_id);
+        } else {
+          console.log(data);
+        }
+      },
+        cancelCallback: () => {
           return;
-      }
-      await fetchDeletePlayer();
+        }
+      });
     }
-    this.tournamentName = document.getElementById('tournamentName');
-    this.tournamentSizeValue = document.getElementById('tournamentSizeValue');
+    else {
+      this.tournamentName = document.getElementById('tournamentName');
+      this.tournamentSizeValue = document.getElementById('tournamentSizeValue');
 
     const formData = {
       tournamentName: this.tournamentName.value,
@@ -182,6 +212,7 @@ class ViewTournament extends HTMLElement {
       console.log(data);
     }
   }
+}
 
   async loadTournois() {
     try {

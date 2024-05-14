@@ -6,6 +6,7 @@ import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '../router';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 import { notify } from '@/notifications.js';
+import { showModal } from '@/modal.js';
 
 class ViewTournamentSalon extends HTMLElement {
   #user;
@@ -71,12 +72,21 @@ class ViewTournamentSalon extends HTMLElement {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
 
-            this.deleteTournament();
+            // this.deleteTournament();
+            this.showDeleteConfirmation();
         });
     }
 
     await this.initWebSocket();
     // this.addPlayer();
+  }
+
+
+  showDeleteConfirmation() {
+    showModal('Confirm Tournament Deletion', 'Are you sure you want to delete your tournament? This action cannot be undone.', {
+      okCallback: () => this.deleteTournament(),
+      cancelCallback: () => console.log('Deletion cancelled.')
+    });
   }
 
   disconnectedCallback() {

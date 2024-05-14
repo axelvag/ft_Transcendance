@@ -18,10 +18,21 @@ class ViewForgetPass extends HTMLElement {
           </div>
           <div class="d-grid pt-3">
             <button type="submit" class="btn btn-primary btn-lg fw-bold">
-              Envoyer
+              Send
             </button>
           </div>
         </form>
+        <div id="success-notification" style="display: none;">
+          <div class="alert alert-success mb-4">
+            <div class="mb-2"><strong>Reset successful!</strong></div>
+            <div>Please check your email for further instructions.</div>
+          </div>
+          <div class="d-grid">
+            <a href="#" data-link="/login" class="btn btn-primary btn-lg fw-bold">
+              Go to Login
+            </a>
+          </div>
+        </div>
       </auth-layout>
     `;
 
@@ -43,10 +54,13 @@ class ViewForgetPass extends HTMLElement {
     const data = await passwordReset(formData, csrfToken);
     console.log(data);
     if (data.success) {
+      const successNotification = document.getElementById('success-notification');
+      if (successNotification) successNotification.style.display = 'block';
+      document.getElementById('pass-form').style.display = 'none';
       // Redirection vers la page de connexion
-      console.log('yoooooooooooooo');
+      // console.log('yoooooooooooooo');
       // window.location.href = "/login";
-      alert('success');
+      // alert('success');
     } else {
       alert('errors');
       console.log(data.errors);
