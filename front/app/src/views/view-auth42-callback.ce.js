@@ -21,7 +21,7 @@ class ViewLoading extends HTMLElement {
         </h1>
         <div class="d-flex flex-column justify-content-center align-items-center vh-100">
           <h2 class="display-6 fw-bolder">
-            Authentification en cours...
+            Authentication in progress...
           </h2>
           <div class="spinner-border mb-5" role="status">
             <span class="visually-hidden">Loading...</span>
