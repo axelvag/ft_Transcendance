@@ -12,6 +12,7 @@ import {
   updateWinnerLeave,
   fetchUserNobodyReadyTime,
   fetchUserOneReadyTime,
+  fetchTournamentInfo,
 } from '@/tournament.js';
 import { isAuthenticated } from '@/auth.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
@@ -163,8 +164,8 @@ class ViewTournamentstart extends HTMLElement {
               // A la fin du chrono, on met les joueurs READY de force
               this.infoMatch();
               this.#match = getMatch();
+              await fetchTournamentInfo();
               this.#tournament = getTournament();
-              console.log("TOURAMENT STATUS ", this.#tournament.status);
               if (this.#tournament.status === 2)
                 return;
               if (this.#match.player1id === "" || this.#match.player2id === "")
