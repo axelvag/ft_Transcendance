@@ -22,3 +22,7 @@ $enable-negative-margins: true;
 .ff-score {
   font-family: Orbitron, sans-serif;
 }
+
+.flip-h {
+  transform: scale(-1, 1);
+}

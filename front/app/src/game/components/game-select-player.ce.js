@@ -60,7 +60,7 @@ class GameSelectPlayer extends HTMLElement {
                 id="${option.id}"
                 alt="${option.name}"
                 src="${option.avatar}"
-                class="object-fit-cover"
+                class="object-fit-cover ${this.#direction === 'right' ? 'flip-h' : ''}"
                 width="64"
                 height="64"
               />
@@ -88,6 +88,7 @@ class GameSelectPlayer extends HTMLElement {
               avatar="${this.#selected?.avatar}"
               type="${this.#playerType}"
               direction="${this.#direction}"
+              ${this.#direction === 'right' ? 'flip-avatar' : ''}
             ></game-player>
           </div>
           
