@@ -238,32 +238,33 @@ class ViewTournament extends HTMLElement {
           let isInTournamentMessage = '';
       
           if(this.#tournament.id === tournoi.id) {
-              // Si oui, définir le message avec le style en rouge
+              // Si l'utilisateur est déjà dans ce tournoi, afficher un message en rouge
               isInTournamentMessage = '<p style="color: red;">You are in this tournament</p>';
           }
       
-          // Incorporer le message conditionnel dans l'HTML de l'élément du tournoi
+          // Construction du HTML de chaque tournoi
+          let adminInfo = tournoi.admin_username ? `<p>Create by: ${tournoi.admin_username}</p>` : '';
           tournoiElement.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; flex-direction: column;">
-                <h3>${tournoi.name}</h3>
-                ${isInTournamentMessage}
-                <div style="display: flex;">
-                  <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
-                  <p>Create by: ${tournoi.admin_username}</p>
-                </div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; flex-direction: column;">
+                      <h3>${tournoi.name}</h3>
+                      ${isInTournamentMessage}
+                      <div style="display: flex;">
+                          <p style="margin-right: 10px;">Players: ${tournoi.nombre_joueurs} / ${tournoi.max_players}</p>
+                          ${adminInfo}
+                      </div>
+                  </div>
+                  ${
+                      tournoi.nombre_joueurs < tournoi.max_players
+                          ? `<button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>`
+                          : ''
+                  }
               </div>
-              ${
-                tournoi.nombre_joueurs < tournoi.max_players
-                  ? `<button id="joinTournament-${tournoi.id}" class="joinTournamentBtn">Join Tournament</button>`
-                  : ''
-              }
-            </div>
-            <hr style="border-top: 1px solid #ccc; margin: 10px 0;">
+              <hr style="border-top: 1px solid #ccc; margin: 10px 0;">
           `;
       
           listElement.appendChild(tournoiElement);
-      });
+      });      
       
     } catch (error) {
         console.error('Could not load tournament:', error);
