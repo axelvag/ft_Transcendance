@@ -326,7 +326,7 @@ def delete_user(request, username):
         data = json.loads(request.body)
         user_id = data.get('user_id')
 
-        response = requests.post(f"http://friendship:8003/delete_user_data/{user_id}/")
+        response = requests.post(f"https://friendship:8003/delete_user_data/{user_id}/", verify=False)
         if response.status_code == 200:
             user.delete()
             return JsonResponse({"success": True, "message": "User deleted successfully."}, status=200)
