@@ -59,7 +59,10 @@ class Game(models.Model):
     elif self.player_right_id == player_id:
       self.player_right_connected = True
     if self.player_left_connected and self.player_right_connected:
-      self.status = 'RUNNING'
+      self.status = 'READY'
+      # trasnsition RUNNING
+      if self.status == 'READY':
+            self.status = 'RUNNING'
     self.save()
     return True
 

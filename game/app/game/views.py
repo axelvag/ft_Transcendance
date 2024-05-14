@@ -7,6 +7,9 @@ from django.db.models import Q
 from .models import Game
 import json
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 def verify_sessionid(request):
   session_id = request.COOKIES.get('sessionid', None)
@@ -156,6 +159,25 @@ class GamePlayerHistoryView(View):
       })
     return JsonResponse(computed_games, safe=False, status=200)
 
+@method_decorator(csrf_exempt, name='dispatch')
+class UserGameStatusView(View):
+    def get(self, request, user_id):
+        # Find any game where the user is currently playing
+        current_game = Game.objects.filter(
+            (Q(player_left_id=user_id) | Q(player_right_id=user_id)) & Q(status='RUNNING')
+        ).first()
+
+        if current_game:
+            # User is currently in a game
+            logger.info(f"User {user_id} is in-game")
+
+            return JsonResponse({
+                'in_game': True
+            }, status=200)
+        else:
+            # User is not in any current game
+            logger.info(f"User {user_id} is not in-game")
+            return JsonResponse({'in_game': False}, status=204)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GamePlayerStatisticsView(View):

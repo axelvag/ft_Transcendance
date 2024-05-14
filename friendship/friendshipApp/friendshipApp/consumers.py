@@ -1,4 +1,3 @@
-# friendshipApp/invitations/consumers.py
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from invitations.models import Notification, UserStatus
@@ -28,43 +27,45 @@ class InvitationConsumer(AsyncWebsocketConsumer):
             print("Session ID non trouvé")
 
         update_url = f"https://authentification:8001/accounts/verif_sessionid/{sessionid}"
-        response = requests.get(update_url, verify=False)
-        # print(response)
+        try:
+            response = requests.get(update_url, verify=False)
+        except requests.RequestException as e:
+            print(f"Erreur de requête HTTP: {e}")
+            return JsonResponse({'error': 'Erreur de communication avec le service externe'}, status=503)
+
         if response.status_code != 200:
             raise ValidationError('wrong session ID')
 
         self.user_id = self.scope['url_route']['kwargs']['user_id']
         self.group_name = f"user{self.user_id}"
 
-        # Rejoindre le groupe
+        # join group
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
 
-        # Marquer l'utilisateur comme en ligne
+        # sign user online
         await self.update_user_status(True)
 
-        # Récupérer et envoyer les notifications non livrées de manière asynchrone
+        # get and send notification asynchrone
         notifications = await self.get_undelivered_notifications()
-        # unread_invitations_count = await self.get_unread_invitations_count()
         for notification in notifications:
             await self.send(text_data=json.dumps({"message": notification.message}))
-            # await self.mark_notification_as_delivered(notification)
             await self.mark_notification_as_delivered_by_id(notification.id)
 
-    # return list, obliger pour pouvoir iterer sur un querySet
+    # return list, required to iterate on querySet
     @database_sync_to_async
     def get_undelivered_notifications(self):
         return list(Notification.objects.filter(user_id=self.user_id, delivered=False))
 
     @database_sync_to_async
     def mark_notification_as_delivered_by_id(self, notification_id):
-        # Trouver la notification par son ID et la marquer comme livrée
+        # Find notif with this id 
         try:
             notification = Notification.objects.get(id=notification_id)
             notification.delivered = True
             notification.save()
         except Notification.DoesNotExist:
-            pass  # Gérer l'exception si nécessaire
+            pass
 
     @database_sync_to_async
     def update_user_status(self, is_online):
@@ -74,9 +75,9 @@ class InvitationConsumer(AsyncWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
-        # Marquer l'utilisateur comme hors ligne lors de la déconnexion
+        # sign user offline
         await self.update_user_status(False)
-        # Quitter le groupe
+        # leave group
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def receive(self, text_data=None, bytes_data=None):
@@ -87,11 +88,9 @@ class InvitationConsumer(AsyncWebsocketConsumer):
             notification_id = text_data_json['id']
             logging.critical("Helloooooooooo")
             await self.mark_notification_as_delivered_by_id(notification_id)
-        # pass
 
 
     async def invitation_notification(self, event):
-        # print(f"Sending invitation notification: {event}")
         logging.critical(event)
         await self.send(text_data=json.dumps({
             "message": event["message"],

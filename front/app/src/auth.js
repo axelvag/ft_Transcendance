@@ -53,17 +53,9 @@ const setLocalUser = data => {
   user.timeplay = 130;
   user.nbtotal = 1;
   user.friends = 0;
-  // user.victories = data.victories;
-  // user.lost = data.lost;
-  // user.online = data.online;
-  // user.local = data.local;
-  // user.nbtotal = data.nbtotal;
-  // user.timeplay = data.timeplay;
-  // user.friends = data.friends;
 };
 
 const resetLocalUser = () => {
-  // localStorage.setItem('isLogged', 'false');
   user.isAuthenticated = false;
   user.id = null;
   user.email = null;
