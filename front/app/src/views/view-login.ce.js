@@ -127,6 +127,7 @@ class ViewSignIn extends HTMLElement {
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
         }
+        await fetchTournamentInfo();
         redirectTo('/dashboard');
         notify({
           icon: 'info',
