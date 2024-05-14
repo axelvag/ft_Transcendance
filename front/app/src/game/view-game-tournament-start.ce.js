@@ -163,6 +163,10 @@ class ViewTournamentstart extends HTMLElement {
               // A la fin du chrono, on met les joueurs READY de force
               this.infoMatch();
               this.#match = getMatch();
+              this.#tournament = getTournament();
+              console.log("TOURAMENT STATUS ", this.#tournament.status);
+              if (this.#tournament.status === 2)
+                return;
               if (this.#match.player1id === "" || this.#match.player2id === "")
                 return;
               if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
@@ -171,11 +175,11 @@ class ViewTournamentstart extends HTMLElement {
               if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
               {
                 if (this.#match.player1ready === 0) {
-                  console.log(player1Name, "vas etre READY de force");
+                  console.log(player1Name, " vas etre READY de force");
                   await this.handleReadyButtonClick(this.#match.player1id);
                 }
                 if (this.#match.player2ready === 0) {
-                  console.log(player2Name, "vas etre READY de force");
+                  console.log(player2Name, " vas etre READY de force");
                   await this.handleReadyButtonClick(this.#match.player2id);
                 }
               }
