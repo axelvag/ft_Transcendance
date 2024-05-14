@@ -18,7 +18,7 @@ class ViewForgetPass extends HTMLElement {
           </div>
           <div class="d-grid pt-3">
             <button type="submit" class="btn btn-primary btn-lg fw-bold">
-              Envoyer
+              Send
             </button>
           </div>
         </form>
