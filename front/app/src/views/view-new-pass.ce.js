@@ -3,6 +3,7 @@ import { redirectTo } from '@/router.js';
 import { getCsrfToken } from '@/auth.js';
 import { sendEmailPasswordReset } from '@/auth.js';
 import { BASE_URL } from '@/constants.js';
+import { notify } from '@/notifications.js';
 
 class ViewNewPass extends HTMLElement {
   async connectedCallback() {
@@ -98,9 +99,12 @@ class ViewNewPass extends HTMLElement {
     if (data.success) {
       redirectTo('/login');
       console.log('Success!');
-      alert('success');
+      notify({
+        icon: 'info',
+        iconClass: 'text-info',
+        message: `Your <b>new password </b> reset successfully!</b>`,
+      });
     } else {
-      alert('errors');
       console.log(data.errors);
     }
   }
