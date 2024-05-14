@@ -153,6 +153,7 @@ class ViewGameOnline extends HTMLElement {
   displayGamePlay() {
     this.innerHTML = `
       <game-play
+        back-route=${this.#backRoute}
         game-id="${this.#game.id}"
         player-left-id="${this.#playerLeft.id}"
         player-left-name="${this.#playerLeft.name}"

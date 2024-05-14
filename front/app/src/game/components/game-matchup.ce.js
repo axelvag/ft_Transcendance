@@ -119,11 +119,16 @@ class GameMatchup extends HTMLElement {
   }
 
   renderBackRoute() {
-    // this.#backRoute = this.hasAttribute('tournament-id') ? '/game/tournament/start' : '/game';
-    this.#backRoute = this.getAttribute('back-route') || '/';
+    this.#backRoute = this.getAttribute('back-route');
     const backEl = this.querySelector('.gameMatchup-back');
     if (backEl) {
-      backEl.setAttribute('data-link', this.#backRoute);
+      if (this.#backRoute) {
+        backEl.hidden = false;
+        backEl.setAttribute('data-link', this.#backRoute);
+      } else {
+        backEl.hidden = true;
+        backEl.removeAttribute('data-link');
+      }
     }
   }
 
