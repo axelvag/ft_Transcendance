@@ -507,7 +507,7 @@ const fetchLeaveMatchAlone = async () => {
 
 const fetchUserNobodyReadyTime = async () => {
   match.winner = Math.random() < 0.5 ? match.player1id : match.player2id;
-  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -519,7 +519,7 @@ const fetchUserNobodyReadyTime = async () => {
 
 const fetchUserOneReadyTime = async winnerId => {
   match.winner = winnerId; // Attribuer le gagnant
-  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
+  const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

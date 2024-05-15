@@ -153,39 +153,44 @@ class ViewTournamentstart extends HTMLElement {
           }
 
           // Les joueurs ne ce mettent pas READY donc on lance un chrono
-          if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
-          {
-            // Lancez un chrono de 60 secondes, je gere seulement si aucun des 2 joueurs n'est prêt
-            const matchId = match.match_id;
-            if (this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "")
-              return;
-            console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
-            const chronoTimeout = setTimeout(async () => {
-              // A la fin du chrono, on met les joueurs READY de force
-              this.infoMatch();
-              this.#match = getMatch();
-              await fetchTournamentInfo();
-              this.#tournament = getTournament();
-              if (this.#tournament.status === 2 || this.#tournament.id === null || this.#match.id === null)
-                return;
-              if (this.#match.player1id === "" || this.#match.player2id === "")
-                return;
-              if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
-                return;
-              console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
-              if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
-              {
-                if (this.#match.player1ready === 0) {
-                  console.log(player1Name, " vas etre READY de force");
-                  await this.handleReadyButtonClick(this.#match.player1id);
-                }
-                if (this.#match.player2ready === 0) {
-                  console.log(player2Name, " vas etre READY de force");
-                  await this.handleReadyButtonClick(this.#match.player2id);
-                }
-              }
-            }, 60000); // = 60 secondes
+          if (!this.#match.player1ready || !this.#match.player2ready) {
+            this.startChronoIfNotReady(match.match_id, player1Name, player2Name);
           }
+          
+          // if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
+          // {
+          //   // Lancez un chrono de 60 secondes, je gere seulement si aucun des 2 joueurs n'est prêt
+          //   const matchId = match.match_id;
+          //   if (this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "")
+          //     return;
+          //   console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
+          //   const chronoTimeout = setTimeout(async () => {
+          //     // A la fin du chrono, on met les joueurs READY de force
+          //     this.infoMatch();
+          //     this.#match = getMatch();
+          //     await fetchTournamentInfo();
+          //     this.#tournament = getTournament();
+          //     if (this.#tournament.status === 2 || this.#tournament.id === null || this.#match.id === null)
+          //       return;
+          //     if (this.#match.player1id === "" || this.#match.player2id === "")
+          //       return;
+          //     console.log("MATCH STATUS ", this.#match.status)
+          //     if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
+          //       return;
+          //     console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
+          //     if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
+          //     {
+          //       if (this.#match.player1ready === 0 && this.#match.player1id === this.#user.id) {
+          //         console.log(player1Name, " vas etre READY de force");
+          //         await this.handleReadyButtonClick(this.#match.player1id);
+          //       }
+          //       if (this.#match.player2ready === 0 && this.#match.player2id === this.#user.id) {
+          //         console.log(player2Name, " vas etre READY de force");
+          //         await this.handleReadyButtonClick(this.#match.player2id);
+          //       }
+          //     }
+          //   }, 60000); // = 60 secondes
+          // }
           
           // console.log(this.#match.id);
           // console.log(match.match_id);
@@ -472,6 +477,44 @@ class ViewTournamentstart extends HTMLElement {
   async UserOneReadyTime(winnerId) {
     const data = await fetchUserOneReadyTime(winnerId);
     console.log(data);
+  }
+
+  startChronoIfNotReady(matchId, player1Name, player2Name) {
+    if (this.#match.id !== matchId || this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "") {
+      return;
+    }
+
+    console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
+    const matchTemp = this.#match.id;
+    const chronoTimeout = setTimeout(async () => {
+      // A la fin du chrono, on met les joueurs READY de force
+      await this.infoMatch();
+      this.#match = getMatch();
+      await fetchTournamentInfo();
+      this.#tournament = getTournament();
+      if (this.#tournament.status === 2 || this.#tournament.id === null || this.#match.id === null || this.#match.id !== matchTemp || this.#match.player1id === "" || this.#match.player2id === "") {
+        return;
+      }
+      console.log("MATCH STATUS ", this.#match.status);
+      if (this.#match.status === 2 || this.#match.status === 1) {
+        return;
+      }
+      console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
+      if (this.#match.player1ready === 0 && this.#match.player2ready === 0) {
+        this.UserNobodyReadyTime();
+      }
+      console.log("Les 2 joueurs sont READY");
+      if (this.#match.player1ready === 0 && this.#match.player2ready === 1 && this.#match.player1id === this.#user.id) {
+        console.log(player1Name, " vas etre READY de force");
+        // this.UserOneReadyTime(this.#match.player2id);
+        await this.handleReadyButtonClick(this.#match.player1id);
+      }
+      else if (this.#match.player2ready === 0 && this.#match.player1ready === 1 && this.#match.player2id === this.#user.id) {
+        console.log(player2Name, " vas etre READY de force");
+        // this.UserOneReadyTime(this.#match.player1id);
+        await this.handleReadyButtonClick(this.#match.player2id);
+      }
+    }, 60000); // 60 secondes
   }
 
   initWebSocket() {
