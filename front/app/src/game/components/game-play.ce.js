@@ -1,7 +1,7 @@
 import './game-renderer-3d.ce.js';
 import './game-player.ce.js';
 import './game-scoreboard.ce.js';
-import './game-dialog.ce.js';
+import './game-matchup.ce.js';
 import './game-play.ce.scss';
 import GameWorker from '../utils/GameWorker.js?worker';
 import GameWorkerRemote from '../utils/GameWorkerRemote.js?worker';
@@ -41,12 +41,12 @@ const template = `
       </div>
     </div>
     <div class="gamePlay-footer">
-      <a href="#" class="gamePlay-footer-btn pause">
+      <a href="#" class="gamePlay-footer-btn" data-action="pause">
         <ui-icon name="pause"></ui-icon>
       </a>
     </div>
   </div>
-  <game-dialog class="gamePlay-dialog"></game-dialog>
+  <div id="gamePlay-matchup"></div>
 </div>
 
 
@@ -87,13 +87,14 @@ class GamePlay extends HTMLElement {
   constructor() {
     super();
 
-    this.renderDialog = this.renderDialog.bind(this);
+    this.renderMatchup = this.renderMatchup.bind(this);
     this.handleInitMessage = this.handleInitMessage.bind(this);
     this.handleUpdateMessage = this.handleUpdateMessage.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleTouchStart = this.handleTouchStart.bind(this);
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
+    this.handleClick = this.handleClick.bind(this);
 
     this.#isOnline = this.hasAttribute('game-id');
     if (this.#isOnline) {
@@ -121,11 +122,13 @@ class GamePlay extends HTMLElement {
 
     // Players
     this.#playerLeft = {
+      id: this.getAttribute('player-left-id'),
       name: this.getAttribute('player-left-name'),
       avatar: this.getAttribute('player-left-avatar'),
       type: this.getAttribute('player-left-type'),
     };
     this.#playerRight = {
+      id: this.getAttribute('player-right-id'),
       name: this.getAttribute('player-right-name'),
       avatar: this.getAttribute('player-right-avatar'),
       type: this.getAttribute('player-right-type'),
@@ -145,8 +148,8 @@ class GamePlay extends HTMLElement {
       });
     }
 
-    // Dialog
-    this.dialogEl = this.querySelector('.gamePlay-dialog');
+    // Matchup
+    this.matchupEl = this.querySelector('#gamePlay-matchup');
 
     // Renderer
     this.rendererEl = this.querySelector('.gamePlay-renderer');
@@ -175,12 +178,7 @@ class GamePlay extends HTMLElement {
     document.addEventListener('keyup', this.handleKeyUp);
     document.addEventListener('touchstart', this.handleTouchStart);
     document.addEventListener('touchend', this.handleTouchEnd);
-
-    // pause button
-    this.querySelector('.pause').addEventListener('click', e => {
-      e.preventDefault();
-      this.gameWorker.postMessage({ type: 'pause' });
-    });
+    document.addEventListener('click', this.handleClick);
 
     // display `Waiting` dialog
     if (this.#isOnline) {
@@ -190,7 +188,7 @@ class GamePlay extends HTMLElement {
         playerRight: { ...this.#playerRight },
       };
       this.renderPlayers();
-      this.renderDialog();
+      this.renderMatchup();
       this.querySelector('.gamePlay').hidden = false;
     }
   }
@@ -204,6 +202,7 @@ class GamePlay extends HTMLElement {
     document.removeEventListener('keyup', this.handleKeyUp);
     document.removeEventListener('touchstart', this.handleTouchStart);
     document.removeEventListener('touchend', this.handleTouchEnd);
+    document.removeEventListener('click', this.handleClick);
 
     // close worker
     this.gameWorker.postMessage({ type: 'reset' });
@@ -244,70 +243,78 @@ class GamePlay extends HTMLElement {
     this.querySelector('game-scoreboard')?.setAttribute('score-right', this.#gameState.scoreRight || 0);
   }
 
-  renderDialog() {
-    const players = {
-      playerLeft: this.#gameState.playerLeft,
-      playerRight: this.#gameState.playerRight,
-    };
+  renderMatchup() {
+    try {
+      if (!this.matchupEl) return;
 
-    const controls = {
-      pause: {
-        icon: 'pause',
-        action: () => this.gameWorker.postMessage({ type: 'pause' }),
-      },
-      resume: {
-        icon: 'play',
-        action: () => this.gameWorker.postMessage({ type: 'resume' }),
-      },
-      quit: {
-        icon: 'quit',
-        action: () => redirectTo('/dashboard'),
-      },
-      restart: {
-        icon: 'restart',
-        action: () => {
-          this.gameWorker.postMessage({ type: 'reset' });
-          this.gameWorker.postMessage({ type: 'start' });
-        },
-      },
-    };
+      if (this.#gameState.status === 'running') {
+        this.matchupEl.innerHTML = '';
+        return;
+      }
 
-    switch (this.#gameState.status) {
-      case 'waiting':
-        this.dialogEl.render({
-          open: true,
-          players,
-          title: 'Waiting for opponent...',
-          back: {
-            action: () => redirectTo('/game'),
-          },
-        });
-        break;
-      case 'paused':
-        this.dialogEl.render({
-          open: true,
-          title: 'Paused',
-          controls: [controls.restart, { ...controls.resume, large: true }, controls.quit],
-        });
-        break;
-      case 'finished':
-        const winner = this.#gameState.scoreLeft > this.#gameState.scoreRight ? 'left' : 'right';
-        const winnerName = winner === 'left' ? players.playerLeft.name : players.playerRight.name;
-        this.dialogEl.render({
-          open: true,
-          players,
-          winner,
-          title: `${winnerName} wins!`,
-          controls: [{ ...controls.restart, large: true }],
-          back: {
-            action: () => redirectTo('/game'),
-          },
-        });
-        const winnerId = winner === 'left' ? players.playerLeft.id : players.playerRight.id;
-        fetchWinnerMatch2(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
-        break;
-      default:
-        this.dialogEl.render({ open: false });
+      let isPlayerLeftWinner = false;
+      let isPlayerRightWinner = false;
+      let title = '';
+      let details = '';
+
+      if (this.#gameState.status === 'finished') {
+        if (this.#gameState.scoreLeft > this.#gameState.scoreRight) {
+          isPlayerLeftWinner = true;
+        } else {
+          isPlayerRightWinner = true;
+        }
+      }
+
+      if (this.#gameState.status === 'waiting') {
+        title = 'Waiting for opponent...';
+        details = `
+          <button class="gameMatchup-btn" data-action="quit">
+            <ui-icon name="quit"></ui-icon>
+          </button>
+        `;
+      } else if (this.#gameState.status === 'paused') {
+        title = 'Paused';
+        details = `
+          <div class="gameMatchup-controls">
+            <button class="gameMatchup-btn" data-action="resume">
+              <ui-icon name="play"></ui-icon>
+            </button>
+            <button class="gameMatchup-btn" data-action="quit">
+              <ui-icon name="quit"></ui-icon>
+            </button>
+          </div>
+        `;
+      } else if (this.#gameState.status === 'finished') {
+        const winnerName = isPlayerLeftWinner ? this.#playerLeft.name : this.#playerRight.name;
+        title = `${winnerName} wins!`;
+        details = `
+          <button class="gameMatchup-btn" data-action="quit">
+            <ui-icon name="quit"></ui-icon>
+          </button>
+        `;
+      } else if (this.#gameState.status === 'aborted') {
+        title = 'Aborted';
+      }
+
+      this.matchupEl.innerHTML = `
+        <game-matchup
+          back-route="${this.getAttribute('back-route') || '/dashboard'}"
+          player-left-id="${this.#gameState.playerLeft.id}"
+          player-left-name="${this.#gameState.playerLeft.name}"
+          player-left-avatar="${this.#gameState.playerLeft.avatar}"
+          player-left-type="${this.#gameState.playerLeft.type}"
+          player-left-wins="${isPlayerLeftWinner}"
+          player-right-id="${this.#gameState.playerRight.id}"
+          player-right-name="${this.#gameState.playerRight.name}"
+          player-right-avatar="${this.#gameState.playerRight.avatar}"
+          player-right-type="${this.#gameState.playerRight.type}"
+          player-left-wins="${isPlayerRightWinner}"
+          title="${title}"
+          details='${details}'
+          ></game-matchup>
+        `;
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -321,7 +328,7 @@ class GamePlay extends HTMLElement {
     };
     this.style.setProperty('--gamePlay-ratio', `${this.#gameState.width / this.#gameState.height}`);
     this.renderPlayers();
-    this.renderDialog();
+    this.renderMatchup();
     this.renderScores();
     this.rendererEl.init(this.#gameState);
     this.rendererEl.start();
@@ -357,8 +364,8 @@ class GamePlay extends HTMLElement {
       ...updates,
     };
 
-    // dialog
-    this.renderDialog();
+    // matchup
+    this.renderMatchup();
 
     // renderer
     this.rendererEl.update(updates);
@@ -371,31 +378,20 @@ class GamePlay extends HTMLElement {
       this.renderScores();
     }
 
+    // send winner to tournament
+    if (updates.status === 'finished') {
+      const winnerId =
+        this.#gameState.scoreLeft > this.#gameState.scoreRight
+          ? this.#gameState.playerLeft.id
+          : this.#gameState.playerRight.id;
+      fetchWinnerMatch2(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
+    }
+
     // sounds
     this.#audioPlayer.play(data?.event);
   }
 
   handleKeyDown(event) {
-    // space
-    if (event.code === 'Space') {
-      switch (this.#gameState.status) {
-        case 'initialized':
-          this.gameWorker.postMessage({ type: 'start' });
-          return;
-        case 'running':
-          this.gameWorker.postMessage({ type: 'pause' });
-          return;
-        case 'paused':
-          this.gameWorker.postMessage({ type: 'resume' });
-          return;
-        case 'finished':
-          this.gameWorker.postMessage({ type: 'reset' });
-          this.gameWorker.postMessage({ type: 'start' });
-          this.renderDialog();
-          return;
-      }
-    }
-
     // paddle moves
     if (![...this.#playerLeftKeys, ...this.#playerRightKeys].includes(event.key)) return;
     if (this.#keys[event.key]) return;
@@ -457,6 +453,21 @@ class GamePlay extends HTMLElement {
       this.#updatePaddleLeftMove();
     } else {
       this.#updatePaddleRightMove();
+    }
+  }
+
+  handleClick(e) {
+    const actionBtn = e.target.closest('[data-action]');
+    if (!actionBtn) return;
+
+    e.preventDefault();
+    const action = actionBtn.getAttribute('data-action');
+    if (action === 'quit') {
+      redirectTo(this.getAttribute('back-route') || '/dashboard');
+    } else if (action === 'resume') {
+      this.gameWorker.postMessage({ type: 'resume' });
+    } else if (action === 'pause') {
+      this.gameWorker.postMessage({ type: 'pause' });
     }
   }
 
