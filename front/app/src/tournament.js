@@ -95,7 +95,7 @@ const resetLocalMatch = () => {
 
 const getMatch = () => ({ ...match });
 
-const fetchGetTournament = async (tournamentId) => {
+const fetchGetTournament = async tournamentId => {
   try {
     const response = await fetch(`${BASE_URL}:8005/tournament/get/${tournamentId}/`, {
       method: 'GET',
@@ -123,11 +123,11 @@ const fetchGetTournament = async (tournamentId) => {
       console.error('Tournoi non trouvé ou erreur de récupération.');
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
   }
 };
 
-const TournamentExist = async (tournamentId) => {
+const TournamentExist = async tournamentId => {
   try {
     const response = await fetch(`${BASE_URL}:8005/tournament/get/${tournamentId}/`, {
       method: 'GET',
@@ -163,7 +163,7 @@ const TournamentExist = async (tournamentId) => {
       });
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     redirectTo(`/game/tournament`);
     notify({
       icon: 'info',
@@ -173,8 +173,7 @@ const TournamentExist = async (tournamentId) => {
   }
 };
 
-
-const fetchCreateTournament = async (formData) => {
+const fetchCreateTournament = async formData => {
   try {
     const response = await fetch(BASE_URL + ':8005/tournament/create_tournament/', {
       method: 'POST',
@@ -191,34 +190,34 @@ const fetchCreateTournament = async (formData) => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
 
 const fetchDeletePlayer = async () => {
   try {
-      let user = getProfile();
-      const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      if (data.success) {
-        resetLocalTournament();
-      } else {
-        console.log("error");
-      }
+    let user = getProfile();
+    const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.success) {
+      resetLocalTournament();
+    } else {
+      console.log('error');
+    }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
   }
 };
 
@@ -239,7 +238,7 @@ const fetchDeletePlayerSalon = async () => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
@@ -260,12 +259,12 @@ const fetchDeleteTournament = async () => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
 
-const fetchAddPlayer = async (formData) => {
+const fetchAddPlayer = async formData => {
   try {
     const response = await fetch(BASE_URL + ':8005/tournament/create_joueur/', {
       method: 'POST',
@@ -282,7 +281,7 @@ const fetchAddPlayer = async (formData) => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
@@ -307,26 +306,27 @@ const fetchTournamentInfo = async () => {
     if (data.id) {
       setLocalTournament(data);
     } else {
-      console.log("player is not in a tournament");
+      console.log('player is not in a tournament');
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
   }
 };
 
-
 const fetchInfoMatch = async () => {
-  if (tournament.id !== null)
-  {
+  if (tournament.id !== null) {
     try {
       let user = getProfile();
-      const response = await fetch(`${BASE_URL}:8005/tournament/get_latest_match_for_user/${user.id}/${tournament.id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${BASE_URL}:8005/tournament/get_latest_match_for_user/${user.id}/${tournament.id}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -338,10 +338,10 @@ const fetchInfoMatch = async () => {
       if (data.success) {
         setLocalMatch(data.matches_data);
       } else {
-        console.log("player is not in a match");
+        console.log('player is not in a match');
       }
     } catch (error) {
-      console.error("An error occurred:", error);
+      console.error('An error occurred:', error);
     }
   }
 };
@@ -362,7 +362,7 @@ const fetchCreateMatchs = async () => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
@@ -370,8 +370,8 @@ const fetchCreateMatchs = async () => {
 const fetchGetMatchs = async () => {
   try {
     if (tournament.id === null) {
-      console.log("Tournament ID is null. Doing nothing.");
-      return { success: false, error: "Tournament ID is null" };
+      console.log('Tournament ID is null. Doing nothing.');
+      return { success: false, error: 'Tournament ID is null' };
     }
 
     const response = await fetch(`${BASE_URL}:8005/tournament/get_matches/${tournament.id}/`, {
@@ -388,12 +388,10 @@ const fetchGetMatchs = async () => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
-
-
 
 // const fetchWinnerMatch = async () => {
 //   const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
@@ -408,14 +406,17 @@ const fetchGetMatchs = async () => {
 
 const fetchWinnerMatch2 = async (winner, scorePlayer1, scroePlayer2) => {
   try {
-    console.log("wineeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer", scorePlayer1, scroePlayer2);
-    const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${winner}/${scorePlayer1}/${scroePlayer2}/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
+    console.log('wineeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer', scorePlayer1, scroePlayer2);
+    const response = await fetch(
+      `${BASE_URL}:8005/tournament/update_winner/${match.id}/${winner}/${scorePlayer1}/${scroePlayer2}/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -423,19 +424,16 @@ const fetchWinnerMatch2 = async (winner, scorePlayer1, scroePlayer2) => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
 
-
 const fetchLeaveMatch = async () => {
   try {
     let user = getProfile();
-    if (user.id === match.player1id)
-      match.winner = match.player2id;
-    else
-      match.winner = match.player1id;
+    if (user.id === match.player1id) match.winner = match.player2id;
+    else match.winner = match.player1id;
 
     const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
       method: 'POST',
@@ -451,17 +449,15 @@ const fetchLeaveMatch = async () => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
 
 const updateWinnerLeave = async () => {
   try {
-    if (match.leave === 1)
-      match.winner = match.player2id;
-    else
-      match.winner = match.player1id;
+    if (match.leave === 1) match.winner = match.player2id;
+    else match.winner = match.player1id;
 
     const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
       method: 'POST',
@@ -477,7 +473,7 @@ const updateWinnerLeave = async () => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
@@ -487,10 +483,8 @@ const fetchLeaveMatchAlone = async () => {
     let user = getProfile();
     let player;
 
-    if (user.id === match.player1id)
-      player = 1;
-    else
-      player = 2;
+    if (user.id === match.player1id) player = 1;
+    else player = 2;
 
     const response = await fetch(`${BASE_URL}:8005/tournament/update_leave/${match.id}/${player}/`, {
       method: 'POST',
@@ -506,11 +500,10 @@ const fetchLeaveMatchAlone = async () => {
 
     return await response.json();
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
-
 
 const fetchUserNobodyReadyTime = async () => {
   match.winner = Math.random() < 0.5 ? match.player1id : match.player2id;
@@ -520,11 +513,11 @@ const fetchUserNobodyReadyTime = async () => {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-  })
+  });
   return response.json();
-}
+};
 
-const fetchUserOneReadyTime = async (winnerId) => {
+const fetchUserOneReadyTime = async winnerId => {
   match.winner = winnerId; // Attribuer le gagnant
   const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/`, {
     method: 'POST',
@@ -532,16 +525,16 @@ const fetchUserOneReadyTime = async (winnerId) => {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-  })
+  });
   return response.json();
-}
+};
 
 const fetchDeletePlayerAndTournament = async () => {
   try {
     let user = getProfile();
     if (user.id === null) {
-      console.log("User ID is null. Doing nothing.");
-      return { success: false, error: "User ID is null" };
+      console.log('User ID is null. Doing nothing.');
+      return { success: false, error: 'User ID is null' };
     }
 
     const response = await fetch(`${BASE_URL}:8005/tournament/delete_player/${user.id}/`, {
@@ -563,15 +556,39 @@ const fetchDeletePlayerAndTournament = async () => {
       resetLocalTournament();
       resetLocalMatch();
     } else {
-      console.log("error");
+      console.log('error');
     }
 
     return data;
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return { success: false, error: error.message };
   }
 };
 
-
-export { tournament, updateWinnerLeave, fetchWinnerMatch2, fetchLeaveMatch, fetchDeletePlayerAndTournament, setLocalTournament, resetLocalTournament, getTournament, fetchGetTournament, fetchCreateTournament, fetchDeletePlayer, fetchDeletePlayerSalon, fetchAddPlayer, fetchDeleteTournament, fetchTournamentInfo, TournamentExist, fetchCreateMatchs, fetchGetMatchs, fetchInfoMatch, fetchWinnerMatch, getMatch, fetchLeaveMatchAlone, fetchUserNobodyReadyTime, fetchUserOneReadyTime };
+export {
+  tournament,
+  updateWinnerLeave,
+  fetchWinnerMatch2,
+  // fetchWinnerMatch,
+  fetchLeaveMatch,
+  fetchDeletePlayerAndTournament,
+  setLocalTournament,
+  resetLocalTournament,
+  getTournament,
+  fetchGetTournament,
+  fetchCreateTournament,
+  fetchDeletePlayer,
+  fetchDeletePlayerSalon,
+  fetchAddPlayer,
+  fetchDeleteTournament,
+  fetchTournamentInfo,
+  TournamentExist,
+  fetchCreateMatchs,
+  fetchGetMatchs,
+  fetchInfoMatch,
+  getMatch,
+  fetchLeaveMatchAlone,
+  fetchUserNobodyReadyTime,
+  fetchUserOneReadyTime,
+};

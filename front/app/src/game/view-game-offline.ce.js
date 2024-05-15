@@ -14,9 +14,12 @@ class ViewGameOffline extends HTMLElement {
     this.displayPlayerLeftSelect = this.displayPlayerLeftSelect.bind(this);
     this.displayPlayerRightSelect = this.displayPlayerRightSelect.bind(this);
     this.displayGame = this.displayGame.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   async connectedCallback() {
+    document.addEventListener('click', this.handleClick);
+
     this.#duo = this.hasAttribute('duo');
 
     const isLoggedIn = await isAuthenticated();
@@ -40,6 +43,10 @@ class ViewGameOffline extends HTMLElement {
       type: this.#duo ? '' : 'ai',
     };
     this.displayPlayerLeftSelect();
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('click', this.handleClick);
   }
 
   displayPlayerLeftSelect() {
@@ -81,34 +88,33 @@ class ViewGameOffline extends HTMLElement {
   }
 
   displayPlayers() {
-    this.innerHTML = `
-      <game-dialog></game-dialog>
+    const details = `
+      <button class="gameMatchup-btn" data-action="start">
+        <ui-icon name="play"></ui-icon>
+      </button>
     `;
 
-    const gameDialog = this.querySelector('game-dialog');
-    gameDialog.render({
-      open: true,
-      back: {
-        action: this.displayPlayerRightSelect,
-      },
-      players: {
-        playerLeft: this.#playerLeft,
-        playerRight: this.#playerRight,
-      },
-      title: 'Ready?',
-      controls: [
-        {
-          icon: 'play',
-          action: this.displayGame,
-          large: true,
-        },
-      ],
-    });
+    this.innerHTML = `
+      <game-matchup
+        back-route="/dashboard"
+        player-left-id="${this.#playerLeft.id}"
+        player-left-name="${this.#playerLeft.name}"
+        player-left-avatar="${this.#playerLeft.avatar}"
+        player-left-type="${this.#playerLeft.type}"
+        player-right-id="${this.#playerRight.id}"
+        player-right-name="${this.#playerRight.name}"
+        player-right-avatar="${this.#playerRight.avatar}"
+        player-right-type="${this.#playerRight.type}"
+        title="Ready?",
+        details='${details}'
+      ></game-matchup>
+    `;
   }
 
   displayGame() {
     this.innerHTML = `
       <game-play
+        back-route="/dashboard"
         player-left-id="${this.#playerLeft.id}"
         player-left-name="${this.#playerLeft.name}"
         player-left-avatar="${this.#playerLeft.avatar}"
@@ -119,6 +125,16 @@ class ViewGameOffline extends HTMLElement {
         player-right-type="${this.#playerRight.type}"
       ></game-play>
     `;
+  }
+
+  handleClick(e) {
+    const actionBtn = e.target.closest('[data-action]');
+    if (!actionBtn) return;
+
+    const action = actionBtn.getAttribute('data-action');
+    if (action === 'start') {
+      this.displayGame();
+    }
   }
 }
 
