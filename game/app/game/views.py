@@ -8,6 +8,8 @@ from .models import Game
 import json
 import requests
 import logging
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 logger = logging.getLogger(__name__)
 
@@ -170,6 +172,27 @@ class UserGameStatusView(View):
         if current_game:
             # User is currently in a game
             logger.info(f"User {user_id} is in-game")
+
+            # Notify the user's friends' WebSocket groups
+            try:
+                friends_response = requests.get(f"https://friendship:8003/get_friends/{user_id}/", verify=False)
+                friends_response.raise_for_status()
+                friends = friends_response.json()
+
+                channel_layer = get_channel_layer()
+                for friend in friends:
+                    friend_id = friend['id']
+                    group_name = f"user_{friend_id}"
+                    async_to_sync(channel_layer.group_send)(
+                        group_name,
+                        {
+                            "type": "user_in_game",
+                            "message": f"User {user_id} is in-game",
+                        }
+                    )
+            except requests.RequestException as e:
+                logger.error(f"Error fetching friends for user {user_id}: {e}")
+                return JsonResponse({'error': 'Error fetching friends'}, status=500)
 
             return JsonResponse({
                 'in_game': True

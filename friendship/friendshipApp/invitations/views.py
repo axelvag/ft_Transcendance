@@ -417,3 +417,22 @@ def delete_user_data(request, user_id):
         return JsonResponse({"status": "error", "message": "User not found."}, status=404)
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_friends(request, user_id):
+    try:
+        friendships = Friendship.objects.filter(Q(user_id=user_id) | Q(friend_id=user_id))
+        friends = []
+
+        for friendship in friendships:
+            friend = friendship.friend if friendship.user_id == user_id else friendship.user
+            friends.append({
+                "id": friend.id,
+                "username": friend.username,
+                "email": friend.email,
+            })
+
+        return JsonResponse(friends, safe=False, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)

@@ -132,3 +132,10 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
       return None
     except Exception as e:
       return None
+
+  # async def user_in_game(self, event):
+  #       message = event['message']
+  #       await self.send(text_data=json.dumps({
+  #           'type': 'user_in_game',
+  #           'message': message
+  #       }))

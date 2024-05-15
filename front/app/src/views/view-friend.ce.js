@@ -8,6 +8,11 @@ class ViewFriend extends HTMLElement {
   connectedCallback() {
     this.wsUrl = `${WS_BASE_URL}:8003/ws/invitations/${user.id}/`;
     this.wsInstance = new WebSocket(this.wsUrl);
+
+    //ws to user in game
+    this.wsUrltoUserGame = `${WS_BASE_URL}:8009/user-status`;
+    this.wsInstanceUserGame = new WebSocket(this.wsUrltoUserGame);
+
     this.innerHTML = `
     <default-layout-sidebar></default-layout-sidebar>
     <default-layout-main>
@@ -80,6 +85,7 @@ class ViewFriend extends HTMLElement {
     `;
 
     this.initInvitationsWebSocket();
+    // this.initWSUserInGame();
 
     this.loadSentInvitations();
     this.loadFriendRequests();
@@ -88,53 +94,97 @@ class ViewFriend extends HTMLElement {
     this.querySelector('#search').addEventListener('click', this.searchFriends.bind(this));
   }
 
-  initInvitationsWebSocket() {
+  // initWSUserInGame() {
+  //   this.wsInstanceUserGame.onopen = () => {
+  //     console.log('WebSocket for UserIngame connected');
+  //   };
 
+  //   this.wsInstance.onmessage = event => {
+  //     const data = JSON.parse(event.data);
+
+  //     if (data.type === 'user_in_game') {
+  //       console.log('User is in-game:', data.message);
+  //       this.loadOnlineFriends();
+  //     }
+  //   };
+
+  //   this.wsInstance.onerror = event => {
+  //     console.error('WebSocket error observed:', event);
+  //   };
+
+  //   this.wsInstance.onclose = event => {
+  //     console.log('WebSocket close:', event.code, event.reason);
+  //   };
+  // }
+
+  initInvitationsWebSocket() {
+    this.loadOnlineFriends();
     this.wsInstance.onopen = () => {
-      console.log("WebSocket for invitation connected");
+      console.log('WebSocket for invitation connected');
     };
 
-    this.wsInstance.onmessage = (event) => {
+    this.wsInstanceUserGame.onopen = () => {
+      console.log('WebSocket for UserIngame in SearchOpponent connected');
+    };
+
+    this.wsInstanceUserGame.onmessage = event => {
+      const data = JSON.parse(event.data);
+      console.log("LDataaaaaaa", data);
+
+      if (data.type === 'user_in_game') {
+        console.log('User is in-game:', data.message);
+        this.loadOnlineFriends();
+      }
+    };
+
+    
+    this.wsInstance.onmessage = event => {
       const data = JSON.parse(event.data);
 
-      if (data.action === "accept_invitation" || data.action === "reject_invitation") {
+      if (data.action === 'accept_invitation' || data.action === 'reject_invitation') {
         this.loadOnlineFriends();
         this.loadOfflineFriends();
         this.loadSentInvitations();
         this.loadFriendRequests();
-      }
-      else if (data.action === "cancel_invitation") {
+      } else if (data.action === 'cancel_invitation') {
         this.loadSentInvitations();
         this.loadFriendRequests();
-      }
-      else if (data.action === "remove_friend") {
+      } else if (data.action === 'remove_friend') {
         this.loadOnlineFriends();
         this.loadOfflineFriends();
       }
-
+      
       if (data.message) {
         this.loadFriendRequests();
         this.loadSentInvitations();
       }
     };
-
-    this.wsInstance.onerror = (event) => {
-      console.error("WebSocket error observed:", event);
+    
+    this.wsInstance.onerror = event => {
+      console.error('WebSocket error observed:', event);
     };
 
-    this.wsInstance.onclose = (event) => {
-      console.log("WebSocket close:", event.code, event.reason);
+    this.wsInstance.onclose = event => {
+      console.log('WebSocket close:', event.code, event.reason);
+    };
+
+    this.wsInstanceUserGame.onerror = event => {
+      console.error('WebSocket error observed:', event);
+    };
+    
+    this.wsInstanceUserGame.onclose = event => {
+      console.log('WebSocket close:', event.code, event.reason);
     };
   }
 
   closeWebSocket() {
     if (this.wsInstance) {
       this.wsInstance.close();
-      console.log("WebSocket connection closed manually.");
+      console.log('WebSocket connection closed manually.');
     }
   }
 
-  // list send invitation 
+  // list send invitation
   async loadSentInvitations() {
     try {
       const csrfToken = await getCsrfToken();
@@ -148,8 +198,7 @@ class ViewFriend extends HTMLElement {
       const responseData = await response.json();
 
       const sentInvitationsList = document.getElementById('sent-invitations-list');
-      if (!sentInvitationsList)
-        return ;
+      if (!sentInvitationsList) return;
       sentInvitationsList.innerHTML = '';
 
       if (responseData && responseData.invitations) {
@@ -165,10 +214,8 @@ class ViewFriend extends HTMLElement {
 
             // add avatar
             const avatarImg = document.createElement('img');
-            if (!invitation.from_user_avatar)
-              avatarImg.src = 'assets/img/default-profile.jpg';
-            else
-              avatarImg.src = invitation.from_user_avatar;
+            if (!invitation.from_user_avatar) avatarImg.src = 'assets/img/default-profile.jpg';
+            else avatarImg.src = invitation.from_user_avatar;
             avatarImg.alt = 'User Avatar';
             avatarImg.style.width = '40px';
             avatarImg.style.height = '40px';
@@ -190,10 +237,15 @@ class ViewFriend extends HTMLElement {
             const cancelButton = document.createElement('button');
             cancelButton.textContent = 'Cancel';
             cancelButton.classList.add('btn', 'btn-warning');
-            cancelButton.onclick = () => showModal('Confirm Invitation Deletion', 'Are you sure you want to delete your invitation ? This action cannot be undone.', {
-              okCallback: () => this.cancelSentInvitation(invitation.invitation_id, invitation.from_user_username),
-              cancelCallback: () => console.log('Deletion cancelled.')
-            });
+            cancelButton.onclick = () =>
+              showModal(
+                'Confirm Invitation Deletion',
+                'Are you sure you want to delete your invitation ? This action cannot be undone.',
+                {
+                  okCallback: () => this.cancelSentInvitation(invitation.invitation_id, invitation.from_user_username),
+                  cancelCallback: () => console.log('Deletion cancelled.'),
+                }
+              );
 
             listItem.appendChild(userInfoDiv);
             listItem.appendChild(cancelButton);
@@ -202,7 +254,7 @@ class ViewFriend extends HTMLElement {
         } else {
           const noInvitationsItem = document.createElement('li');
           noInvitationsItem.classList.add('list-group-item');
-          noInvitationsItem.textContent = "No sent invitations.";
+          noInvitationsItem.textContent = 'No sent invitations.';
           sentInvitationsList.appendChild(noInvitationsItem);
         }
       } else {
@@ -237,7 +289,6 @@ class ViewFriend extends HTMLElement {
     }
   }
 
-
   // list request friends
   async loadFriendRequests() {
     try {
@@ -252,8 +303,7 @@ class ViewFriend extends HTMLElement {
       const responseData = await response.json();
 
       const friendRequestsList = document.getElementById('friend-requests');
-      if (!friendRequestsList)
-        return ;
+      if (!friendRequestsList) return;
       friendRequestsList.innerHTML = '';
 
       if (responseData && responseData.invitations) {
@@ -270,10 +320,8 @@ class ViewFriend extends HTMLElement {
 
             // Add the avatar
             const avatarImg = document.createElement('img');
-            if (!invitation.from_user_avatar)
-              avatarImg.src = 'assets/img/default-profile.jpg';
-            else
-              avatarImg.src = invitation.from_user_avatar;
+            if (!invitation.from_user_avatar) avatarImg.src = 'assets/img/default-profile.jpg';
+            else avatarImg.src = invitation.from_user_avatar;
             avatarImg.alt = 'User Avatar';
             avatarImg.style.width = '40px';
             avatarImg.style.height = '40px';
@@ -299,12 +347,14 @@ class ViewFriend extends HTMLElement {
             const acceptButton = document.createElement('button');
             acceptButton.textContent = 'Accept';
             acceptButton.classList.add('btn', 'btn-success', 'mx-1');
-            acceptButton.onclick = () => this.acceptFriendRequest(invitation.invitation_id, invitation.from_user_username);
+            acceptButton.onclick = () =>
+              this.acceptFriendRequest(invitation.invitation_id, invitation.from_user_username);
 
             const rejectButton = document.createElement('button');
             rejectButton.textContent = 'Reject';
             rejectButton.classList.add('btn', 'btn-danger', 'mx-1');
-            rejectButton.onclick = () => this.rejectFriendRequest(invitation.invitation_id, invitation.from_user_username);
+            rejectButton.onclick = () =>
+              this.rejectFriendRequest(invitation.invitation_id, invitation.from_user_username);
 
             buttonGroup.appendChild(acceptButton);
             buttonGroup.appendChild(rejectButton);
@@ -318,7 +368,7 @@ class ViewFriend extends HTMLElement {
         } else {
           const noInvitationsItem = document.createElement('li');
           noInvitationsItem.classList.add('list-group-item');
-          noInvitationsItem.textContent = "No friend requests.";
+          noInvitationsItem.textContent = 'No friend requests.';
           friendRequestsList.appendChild(noInvitationsItem);
         }
       } else {
@@ -329,10 +379,8 @@ class ViewFriend extends HTMLElement {
     }
   }
 
-
   // btn accept
   async acceptFriendRequest(invitationId, from_user_username) {
-
     try {
       const csrfToken = await getCsrfToken();
       const response = await fetch(BASE_URL + ':8003/accept_invitation/', {
@@ -351,18 +399,16 @@ class ViewFriend extends HTMLElement {
         this.loadOnlineFriends();
         this.loadFriendRequests();
       } else {
-        console.log("False");
+        console.log('False');
       }
-
     } catch (error) {
       console.error('Error:', error);
-      console.log("Failed to send friend request: " + error.message);
+      console.log('Failed to send friend request: ' + error.message);
     }
   }
 
   // btn reject
   async rejectFriendRequest(invitationId, from_user_username) {
-
     try {
       const csrfToken = await getCsrfToken();
       const response = await fetch(BASE_URL + ':8003/reject_invitation/', {
@@ -381,18 +427,15 @@ class ViewFriend extends HTMLElement {
         this.loadOnlineFriends();
         this.loadFriendRequests();
       } else {
-        console.log("False");
+        console.log('False');
       }
-
     } catch (error) {
       console.error('Error:', error);
-      console.log("Failed to send friend request: " + error.message);
+      console.log('Failed to send friend request: ' + error.message);
     }
-
   }
 
   async searchFriends() {
-
     const errorMessagesDiv = document.querySelector('#error-messages');
     errorMessagesDiv.innerHTML = '';
 
@@ -410,13 +453,18 @@ class ViewFriend extends HTMLElement {
 
     try {
       const csrfToken = await getCsrfToken();
-      const response = await fetch(`${BASE_URL}:8003/search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(user.id)}`, {
-        method: 'GET',
-        headers: {
-          'X-CSRFToken': csrfToken,
-        },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${BASE_URL}:8003/search_users/?query=${encodeURIComponent(searchInput)}&user_id=${encodeURIComponent(
+          user.id
+        )}`,
+        {
+          method: 'GET',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+          credentials: 'include',
+        }
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -426,7 +474,7 @@ class ViewFriend extends HTMLElement {
       if (searchResults.length === 0) {
         const noResultsItem = document.createElement('li');
         noResultsItem.classList.add('list-group-item');
-        noResultsItem.textContent = "No users found.";
+        noResultsItem.textContent = 'No users found.';
         searchResultsList.appendChild(noResultsItem);
       } else {
         searchResults.forEach(user => {
@@ -436,7 +484,6 @@ class ViewFriend extends HTMLElement {
           listItem.style.justifyContent = 'space-between';
           listItem.style.alignItems = 'center';
 
-
           // Create a container for the avatar and username
           const userInfoDiv = document.createElement('div');
           userInfoDiv.style.display = 'flex';
@@ -444,10 +491,8 @@ class ViewFriend extends HTMLElement {
 
           // Add the user's avatar
           const avatarImg = document.createElement('img');
-          if (!user.avatar_url)
-            avatarImg.src = 'assets/img/default-profile.jpg';
-          else
-            avatarImg.src = user.avatar_url;
+          if (!user.avatar_url) avatarImg.src = 'assets/img/default-profile.jpg';
+          else avatarImg.src = user.avatar_url;
           avatarImg.alt = 'User Avatar';
           avatarImg.style.width = '40px';
           avatarImg.style.height = '40px';
@@ -483,10 +528,8 @@ class ViewFriend extends HTMLElement {
     }
   }
 
-
   //Send Invitation user
   async sendFriendRequest(username, button) {
-
     const errorMessagesDiv = document.querySelector('#error-messages');
     errorMessagesDiv.innerHTML = '';
 
@@ -511,13 +554,12 @@ class ViewFriend extends HTMLElement {
       } else {
         const errorMessage = document.createElement('div');
         errorMessage.classList.add('alert', 'alert-danger');
-        errorMessage.textContent = "Failed to send friend request: " + (data.message || "Unknown error");
+        errorMessage.textContent = 'Failed to send friend request: ' + (data.message || 'Unknown error');
         document.querySelector('#error-messages').appendChild(errorMessage);
       }
-
     } catch (error) {
       console.error('Error:', error);
-      alert("Failed to send friend request: " + error.message);
+      alert('Failed to send friend request: ' + error.message);
     }
   }
 
@@ -536,7 +578,7 @@ class ViewFriend extends HTMLElement {
       }
       const { online_friends } = await response.json();
 
-      console.table("online_friends", online_friends);
+      console.table('online_friends', online_friends);
 
       const onlineFriendsList = this.querySelector('#online-friends');
       onlineFriendsList.innerHTML = '';
@@ -548,10 +590,8 @@ class ViewFriend extends HTMLElement {
 
           // Avatar
           const avatarImg = document.createElement('img');
-          if (!friend.avatar_url)
-            avatarImg.src = 'assets/img/default-profile.jpg';
-          else
-            avatarImg.src = friend.avatar_url;
+          if (!friend.avatar_url) avatarImg.src = 'assets/img/default-profile.jpg';
+          else avatarImg.src = friend.avatar_url;
           avatarImg.alt = 'User Avatar';
           avatarImg.style.width = '40px';
           avatarImg.style.height = '40px';
@@ -573,7 +613,7 @@ class ViewFriend extends HTMLElement {
           // In-game status as a badge
           const statusBadge = document.createElement('span');
           // statusBadge.classList.add('badge', friend.in_game ? 'badge-success' : 'badge-danger');
-          statusBadge.textContent = friend.in_game ? "In game" : "Not in game";
+          statusBadge.textContent = friend.in_game ? 'In game' : 'Not in game';
 
           // Set badge styling explicitly
           statusBadge.style.backgroundColor = friend.in_game ? 'green' : 'gray';
@@ -583,15 +623,15 @@ class ViewFriend extends HTMLElement {
           statusBadge.style.fontSize = '0.85em';
           listItem.appendChild(statusBadge);
 
-
           // Delete friend button
           const deleteButton = document.createElement('button');
           deleteButton.textContent = 'Delete';
           deleteButton.classList.add('btn', 'btn-danger');
-          deleteButton.onclick = () => showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
-            okCallback: () => this.confirmDeleteFriend(friend.friend_id),
-            cancelCallback: () => console.log('Deletion cancelled.')
-          });
+          deleteButton.onclick = () =>
+            showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
+              okCallback: () => this.confirmDeleteFriend(friend.friend_id),
+              cancelCallback: () => console.log('Deletion cancelled.'),
+            });
 
           listItem.appendChild(deleteButton);
 
@@ -600,7 +640,7 @@ class ViewFriend extends HTMLElement {
       } else {
         const noOnlineFriends = document.createElement('li');
         noOnlineFriends.classList.add('list-group-item');
-        noOnlineFriends.textContent = "No friends online.";
+        noOnlineFriends.textContent = 'No friends online.';
         onlineFriendsList.appendChild(noOnlineFriends);
       }
     } catch (error) {
@@ -633,10 +673,8 @@ class ViewFriend extends HTMLElement {
 
           // Avatar
           const avatarImg = document.createElement('img');
-          if (!friend.avatar_url)
-            avatarImg.src = 'assets/img/default-profile.jpg';
-          else
-            avatarImg.src = friend.avatar_url;
+          if (!friend.avatar_url) avatarImg.src = 'assets/img/default-profile.jpg';
+          else avatarImg.src = friend.avatar_url;
           avatarImg.alt = 'User Avatar';
           avatarImg.style.width = '40px';
           avatarImg.style.height = '40px';
@@ -659,10 +697,11 @@ class ViewFriend extends HTMLElement {
           const deleteButton = document.createElement('button');
           deleteButton.textContent = 'Delete';
           deleteButton.classList.add('btn', 'btn-danger');
-          deleteButton.onclick = () => showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
-            okCallback: () => this.confirmDeleteFriend(),
-            cancelCallback: () => console.log('Deletion cancelled.')
-          });
+          deleteButton.onclick = () =>
+            showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
+              okCallback: () => this.confirmDeleteFriend(),
+              cancelCallback: () => console.log('Deletion cancelled.'),
+            });
 
           listItem.appendChild(deleteButton);
           offlineFriendsList.appendChild(listItem);
@@ -670,7 +709,7 @@ class ViewFriend extends HTMLElement {
       } else {
         const noOfflineFriends = document.createElement('li');
         noOfflineFriends.classList.add('list-group-item');
-        noOfflineFriends.textContent = "No friends offline.";
+        noOfflineFriends.textContent = 'No friends offline.';
         offlineFriendsList.appendChild(noOfflineFriends);
       }
     } catch (error) {
@@ -680,7 +719,6 @@ class ViewFriend extends HTMLElement {
 
   // Function to confirm deletion and send delete request
   async confirmDeleteFriend(friendId) {
-
     try {
       const csrfToken = await getCsrfToken();
       const data = { friend_id: friendId, user_id: user.id };
@@ -697,13 +735,12 @@ class ViewFriend extends HTMLElement {
         this.loadOfflineFriends();
         this.loadOnlineFriends();
       } else {
-        throw new Error('Une erreur est survenue lors de la suppression de l\'ami.');
+        throw new Error("Une erreur est survenue lors de la suppression de l'ami.");
       }
     } catch (error) {
       console.error("Erreur lors de la suppression de l'ami:", error);
     }
   }
-
 }
 
 customElements.define('view-friend', ViewFriend);
