@@ -6,6 +6,7 @@ import { loginUser, setLocalUser } from '@/auth.js';
 import { getAuthorizationCode } from '@/auth.js';
 import { notify } from '@/notifications.js';
 import { BASE_URL } from '@/constants.js';
+import { fetchTournamentInfo } from '@/tournament.js';
 
 class ViewSignIn extends HTMLElement {
   connectedCallback() {
