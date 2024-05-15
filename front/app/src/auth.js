@@ -1,5 +1,5 @@
 import { redirectTo } from '@/router.js';
-import { fetchTournamentInfo, fetchDeletePlayer } from '@/tournament.js';
+import { fetchTournamentInfo, fetchDeletePlayer, getTournament } from '@/tournament.js';
 import { notify } from '@/notifications.js';
 import { BASE_URL, OAUTH_AUTHORIZE_URL } from '@/constants.js';
 import { closeViewFriendWebSocket } from '@/views/view-friend.ce.js';
@@ -125,8 +125,11 @@ const getCsrfToken = async () => {
 
 const logout = async () => {
   try {
-
-    await fetchDeletePlayer();
+    await fetchTournamentInfo();
+    let tournament = getTournament();
+    console.log("logout tournament", tournament);
+    if(tournament.status !== 1)
+      await fetchDeletePlayer();
     closeViewFriendWebSocket();
 
     const csrfToken = await getCsrfToken();
@@ -323,6 +326,11 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
 
 const deleteUser = async csrfToken => {
   try {
+    await fetchTournamentInfo();
+    let tournament = getTournament();
+    console.log("logout tournament", tournament);
+    if(tournament.status !== 1)
+      await fetchDeletePlayer();
     const url = `${BASE_URL}:8001/accounts/delete_user/${user.username}`;
     const response = await fetch(url, {
       method: 'DELETE',
@@ -406,6 +414,7 @@ const handleOAuthResponse = async () => {
             console.error("Erreur lors de l'envoi des données de l'utilisateur:", error);
           }
         }
+        await fetchTournamentInfo();
         const userProfileResponse = await fetch(`${BASE_URL}:8002/get_user_profile/${data.id}/`, {
           method: 'GET',
           credentials: 'include',
@@ -413,7 +422,6 @@ const handleOAuthResponse = async () => {
             'X-CSRFToken': csrfToken,
           },
         });
-
         const userProfileData = await userProfileResponse.json();
         if (userProfileData.success) {
           setLocalUser(userProfileData);
