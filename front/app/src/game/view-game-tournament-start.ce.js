@@ -206,9 +206,13 @@ class ViewTournamentstart extends HTMLElement {
               ? `<div class=" vs mx-4 fs-4 text-center">vs</div>`
               : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
           let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
+          let SpaceDownBracketFinalHeight = (tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br><br><br><br>` : '';
+          let SpaceDownBracketDemiFinalHeight = (tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br>` : '';
           // Le bracket ou le joueur vas jouer
           matchElement.innerHTML = `
                   ${SpaceDownBracketFinal}
+                  ${SpaceDownBracketFinalHeight}
+                  ${SpaceDownBracketDemiFinalHeight}
                   <div class="match-info">
                     <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                       <div class="card-body d-flex align-items-center">
@@ -287,9 +291,12 @@ class ViewTournamentstart extends HTMLElement {
               ? `<div class="vs mx-4 fs-4 text-center">vs</div>`
               : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
           let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
-
+          let SpaceDownBracketFinalHeight = (tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br><br><br><br>` : '';
+          let SpaceDownBracketDemiFinalHeight = (tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br>` : '';
           matchElement.innerHTML = `
-            ${SpaceDownBracketFinal}
+              ${SpaceDownBracketFinal}
+              ${SpaceDownBracketFinalHeight}
+              ${SpaceDownBracketDemiFinalHeight}
               <div class="match-info">
                 <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                   <div class="card-body d-flex align-items-center">
@@ -341,8 +348,12 @@ class ViewTournamentstart extends HTMLElement {
               ? `<div class=" vs mx-4 fs-4 text-center">vs</div>`
               : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
           let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
+          let SpaceDownBracketFinalHeight = (tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br><br><br><br>` : '';
+          let SpaceDownBracketDemiFinalHeight = (tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br>` : '';
           matchElement.innerHTML = `
               ${SpaceDownBracketFinal}
+              ${SpaceDownBracketFinalHeight}
+              ${SpaceDownBracketDemiFinalHeight}
               <div class="match-info">
                 <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                   <div class="card-body d-flex align-items-center">
@@ -444,7 +455,9 @@ class ViewTournamentstart extends HTMLElement {
           }
           if (winnerAvatarPath === null) winnerAvatarPath = '/assets/img/default-profile.jpg';
           console.log(winnerAvatarPath);
+          let SpaceDownWinnerHeight = this.#tournament.maxPlayer === 8 ? `<br><br><br><br><br><br><br><br>` : ``;
           winnerAvatar.innerHTML = `
+              ${SpaceDownWinnerHeight}
               <br><br><br><br>
               <h3 class="text-center mb-3">${lastMatch.winner_id}</h3>
               <img src="${winnerAvatarPath}" class="img-fluid rounded-circle m-n1" style="max-width: 100%; width: 200px; height: 200px; position:absolute;z-index:2" alt="Winner Avatar">
