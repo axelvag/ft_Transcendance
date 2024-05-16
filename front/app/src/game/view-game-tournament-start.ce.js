@@ -15,6 +15,7 @@ import {
   fetchTournamentInfo,
 } from '@/tournament.js';
 import { isAuthenticated } from '@/auth.js';
+import { notify, notifyInfo} from '@/notifications.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
@@ -22,7 +23,7 @@ import { BASE_URL, WS_BASE_URL } from '@/constants.js';
 class ViewTournamentstart extends HTMLElement {
   #user;
   #tournament;
-  #match
+  #match;
   #backUrl = '/'; // Définissez ici l'URL de redirection par défaut
 
   constructor() {
@@ -37,7 +38,7 @@ class ViewTournamentstart extends HTMLElement {
     const isLoggedIn = await isAuthenticated();
     // Modifiez l'URL de redirection en fonction de l'état de connexion
     this.#backUrl = isLoggedIn ? '/game/tournament' : '/';
-    if(this.#tournament.id === null){
+    if (this.#tournament.id === null) {
       redirectTo(this.#backUrl);
       return;
     }
@@ -60,29 +61,23 @@ class ViewTournamentstart extends HTMLElement {
 
     // Ajout d'un écouteur d'événements pour le bouton de sortie
     this.querySelector('#leaveTournamentBtn').addEventListener('click', async () => {
-        await this.infoMatch();
-        this.#match = getMatch();
-        console.log(this.#match);
-        if(this.#match.status !== 2)
-        {
-          if(this.#match.player1id !== "" && this.#match.player2id !== "")
-            await this.UserLeave();
-          else
-            await this.UserLeaveAlone();
-        }
-        // await fetchDeletePlayerAndTournament();
-        await this.deletePlayer();
+      await this.infoMatch();
+      this.#match = getMatch();
+      console.log(this.#match);
+      if (this.#match.status !== 2) {
+        if (this.#match.player1id !== '' && this.#match.player2id !== '') await this.UserLeave();
+        else await this.UserLeaveAlone();
+      }
+      // await fetchDeletePlayerAndTournament();
+      await this.deletePlayer();
     });
 
     this.initWebSocket();
-    if (this.#tournament.status != 2)
-      await this.createMatchs();
-    else
-      this.displayUpdate();
+    if (this.#tournament.status != 2) await this.createMatchs();
+    else this.displayUpdate();
   }
 
   async disconnectedCallback() {
-
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.close();
     }
@@ -96,12 +91,10 @@ class ViewTournamentstart extends HTMLElement {
       // console.log("Matchs created");
       const matches = await fetchGetMatchs();
       console.log(matches);
-      if (matches.success)
-        this.displayMatches(matches.matches_by_tour);
-      else
-        console.log("error : get matchs failled !");
+      if (matches.success) this.displayMatches(matches.matches_by_tour);
+      else console.log('error : get matchs failled !');
     } else {
-      console.log("error : create matchs failled !");
+      console.log('error : create matchs failled !');
     }
   }
 
@@ -124,102 +117,119 @@ class ViewTournamentstart extends HTMLElement {
 
       let tourTitle;
       if (tourIndex === totalTours - 1) {
-        tourTitle = "Finale";
+        tourTitle = 'Finale';
       } else if (tourIndex === totalTours - 2) {
-          tourTitle = "Demi-finale";
-        } else {
-          tourTitle = `Tour ${tourIndex + 1}`;
-        }
-        
-        const titleElement = document.createElement('h3');
-        titleElement.textContent = tourTitle;
-        tourElement.appendChild(titleElement);
-        
-        matches.forEach((match) => {
-          const matchElement = document.createElement('div');
-          matchElement.classList.add('match');
-          
-          let player1Name = match.player_1_username || "...";
-          let player2Name = match.player_2_username || "...";
-          let avatarImg1 = match.player_1_avatar || "/assets/img/default-profile.jpg";
-          let avatarImg2 = match.player_2_avatar || "/assets/img/default-profile.jpg";
-          
-          // Gérer l'affichage lorsque les joueurs ne sont pas encore déterminés
-          if (player1Name === "...") {
-            avatarImg1 = ""; // Ne pas afficher d'avatar
-          }
-          if (player2Name === "...") {
-            avatarImg2 = ""; // Ne pas afficher d'avatar
-          }
+        tourTitle = 'Demi-finale';
+      } else {
+        tourTitle = `Tour ${tourIndex + 1}`;
+      }
 
-          // Les joueurs ne ce mettent pas READY donc on lance un chrono
-          if (!this.#match.player1ready || !this.#match.player2ready) {
-            this.startChronoIfNotReady(match.match_id, player1Name, player2Name);
-          }
-          
-          // if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
-          // {
-          //   // Lancez un chrono de 60 secondes, je gere seulement si aucun des 2 joueurs n'est prêt
-          //   const matchId = match.match_id;
-          //   if (this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "")
-          //     return;
-          //   console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
-          //   const chronoTimeout = setTimeout(async () => {
-          //     // A la fin du chrono, on met les joueurs READY de force
-          //     this.infoMatch();
-          //     this.#match = getMatch();
-          //     await fetchTournamentInfo();
-          //     this.#tournament = getTournament();
-          //     if (this.#tournament.status === 2 || this.#tournament.id === null || this.#match.id === null)
-          //       return;
-          //     if (this.#match.player1id === "" || this.#match.player2id === "")
-          //       return;
-          //     console.log("MATCH STATUS ", this.#match.status)
-          //     if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
-          //       return;
-          //     console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
-          //     if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
-          //     {
-          //       if (this.#match.player1ready === 0 && this.#match.player1id === this.#user.id) {
-          //         console.log(player1Name, " vas etre READY de force");
-          //         await this.handleReadyButtonClick(this.#match.player1id);
-          //       }
-          //       if (this.#match.player2ready === 0 && this.#match.player2id === this.#user.id) {
-          //         console.log(player2Name, " vas etre READY de force");
-          //         await this.handleReadyButtonClick(this.#match.player2id);
-          //       }
-          //     }
-          //   }, 60000); // = 60 secondes
-          // }
-          
-          // console.log(this.#match.id);
-          // console.log(match.match_id);
-          if(this.#match.id === match.match_id && match.status != 2) {
-            console.log(this.#match);
-            // console.log("passe icii", player1Name,  player2Name, match.player_1_ready, match.player_2_ready);
-              const isPlayer1 = this.#user.id === match.player_1_id;
-              const isPlayer2 = this.#user.id === match.player_2_id;
-              const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
-              const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Play') : '';
-              let readyIconPlayer1 = match.player_1_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
-              let readyIconPlayer2 = match.player_2_ready ? '<span class="icon-check" style="color:green;">✔</span>' : '<span class="icon-cross" style="color:red;">✖</span>';
-              // si on est en final -> tourIndex === totalTours - 1
-              let vsElement = tourIndex === totalTours - 1 ? `<div class=" vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
-              let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
-              // Le bracket ou le joueur vas jouer
-              matchElement.innerHTML = `
+      const titleElement = document.createElement('h3');
+      titleElement.textContent = tourTitle;
+      tourElement.appendChild(titleElement);
+
+      matches.forEach(match => {
+        const matchElement = document.createElement('div');
+        matchElement.classList.add('match');
+
+        let player1Name = match.player_1_username || '...';
+        let player2Name = match.player_2_username || '...';
+        let avatarImg1 = match.player_1_avatar || '/assets/img/default-profile.jpg';
+        let avatarImg2 = match.player_2_avatar || '/assets/img/default-profile.jpg';
+
+        // Gérer l'affichage lorsque les joueurs ne sont pas encore déterminés
+        if (player1Name === '...') {
+          avatarImg1 = ''; // Ne pas afficher d'avatar
+        }
+        if (player2Name === '...') {
+          avatarImg2 = ''; // Ne pas afficher d'avatar
+        }
+
+        // Les joueurs ne ce mettent pas READY donc on lance un chrono
+        if (!this.#match.player1ready || !this.#match.player2ready) {
+          this.startChronoIfNotReady(match.match_id, player1Name, player2Name);
+        }
+
+        // if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
+        // {
+        //   // Lancez un chrono de 60 secondes, je gere seulement si aucun des 2 joueurs n'est prêt
+        //   const matchId = match.match_id;
+        //   if (this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "")
+        //     return;
+        //   console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
+        //   const chronoTimeout = setTimeout(async () => {
+        //     // A la fin du chrono, on met les joueurs READY de force
+        //     this.infoMatch();
+        //     this.#match = getMatch();
+        //     await fetchTournamentInfo();
+        //     this.#tournament = getTournament();
+        //     if (this.#tournament.status === 2 || this.#tournament.id === null || this.#match.id === null)
+        //       return;
+        //     if (this.#match.player1id === "" || this.#match.player2id === "")
+        //       return;
+        //     console.log("MATCH STATUS ", this.#match.status)
+        //     if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
+        //       return;
+        //     console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
+        //     if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
+        //     {
+        //       if (this.#match.player1ready === 0 && this.#match.player1id === this.#user.id) {
+        //         console.log(player1Name, " vas etre READY de force");
+        //         await this.handleReadyButtonClick(this.#match.player1id);
+        //       }
+        //       if (this.#match.player2ready === 0 && this.#match.player2id === this.#user.id) {
+        //         console.log(player2Name, " vas etre READY de force");
+        //         await this.handleReadyButtonClick(this.#match.player2id);
+        //       }
+        //     }
+        //   }, 60000); // = 60 secondes
+        // }
+
+        // console.log(this.#match.id);
+        // console.log(match.match_id);
+        if (this.#match.id === match.match_id && match.status != 2) {
+          console.log(this.#match);
+          // console.log("passe icii", player1Name,  player2Name, match.player_1_ready, match.player_2_ready);
+          const isPlayer1 = this.#user.id === match.player_1_id;
+          const isPlayer2 = this.#user.id === match.player_2_id;
+          const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
+          const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Play') : '';
+          let readyIconPlayer1 = match.player_1_ready
+            ? '<span class="icon-check" style="color:green;">✔</span>'
+            : '<span class="icon-cross" style="color:red;">✖</span>';
+          let readyIconPlayer2 = match.player_2_ready
+            ? '<span class="icon-check" style="color:green;">✔</span>'
+            : '<span class="icon-cross" style="color:red;">✖</span>';
+          // si on est en final -> tourIndex === totalTours - 1
+          let vsElement =
+            tourIndex === totalTours - 1
+              ? `<div class=" vs mx-4 fs-4 text-center">vs</div>`
+              : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+          let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
+          // Le bracket ou le joueur vas jouer
+          matchElement.innerHTML = `
                   ${SpaceDownBracketFinal}
                   <div class="match-info">
                     <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                       <div class="card-body d-flex align-items-center">
                         <div class="col-3">
-                          ${avatarImg1 ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">` : ""}
+                          ${
+                            avatarImg1
+                              ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">`
+                              : ''
+                          }
                         </div>
                         <div class="col-6">
                           <h5 class="card-title">${player1Name}</h5>
                         </div>
                         <div class="col-3 mb-2">
-                          ${(isPlayer1 && this.#match.player1id !== "" && this.#match.player2id !== "" ) ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer1 : "")}
+                          ${
+                            isPlayer1 && this.#match.player1id !== '' && this.#match.player2id !== ''
+                              ? `<button id="ready-player1-${match.match_id}" class="ready-button">${buttonPlayer1}</button>`
+                              : this.#match.player1id !== '' && this.#match.player2id !== ''
+                              ? readyIconPlayer1
+                              : ''
+                          }
                         </div>
                       </div>
                     </div>
@@ -227,42 +237,68 @@ class ViewTournamentstart extends HTMLElement {
                     <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                       <div class="card-body d-flex align-items-center">
                         <div class="col-3">
-                          ${avatarImg2 ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">` : ""}
+                          ${
+                            avatarImg2
+                              ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">`
+                              : ''
+                          }
                         </div>
                         <div class="col-6">
                           <h5 class="card-title">${player2Name}</h5>
                         </div>
                         <div class="col-3 mb-2">
-                          ${(isPlayer2 && this.#match.player1id !== "" && this.#match.player2id !== "" )? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>` : ((this.#match.player1id !== "" && this.#match.player2id !== "") ? readyIconPlayer2 : "")}
+                          ${
+                            isPlayer2 && this.#match.player1id !== '' && this.#match.player2id !== ''
+                              ? `<button id="ready-player2-${match.match_id}" class="ready-button">${buttonPlayer2}</button>`
+                              : this.#match.player1id !== '' && this.#match.player2id !== ''
+                              ? readyIconPlayer2
+                              : ''
+                          }
                         </div>
                       </div>
                     </div>
                   </div>
                   <br><br>
                 `;
-          } 
-          else if (match.status === 2) {
-            console.log("finishedddddddddddddddddddddddd", match);
-        
-            // Vérifier si aucun joueur n'a atteint un score de 5
-            const forfeit = match.player_1_score < 5 && match.player_2_score < 5;
-            // const player1Style = match.winner_id === player1Name ? 'color:green;' : (forfeit && match.winner_id !== player1Name ? 'color:gray;' : 'color:red;');
-            // const player2Style = match.winner_id === player2Name ? 'color:green;' : (forfeit && match.winner_id !== player2Name ? 'color:gray;' : 'color:red;');
-            const player1BoxStyle = match.winner_id === player1Name ? 'background-color:green;' : (forfeit && match.winner_id !== player1Name ? 'background-color:gray;' : 'background-color:red;');
-            const player2BoxStyle = match.winner_id === player2Name ? 'background-color:green;' : (forfeit && match.winner_id !== player2Name ? 'background-color:gray;' : 'background-color:red;');
-            const player1Text = forfeit && match.winner_id !== player1Name ? 'Forfait' : match.player_1_score;
-            const player2Text = forfeit && match.winner_id !== player2Name ? 'Forfait' : match.player_2_score;
-        
-            let vsElement = tourIndex === totalTours - 1 ? `<div class="vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
-            let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
-        
-            matchElement.innerHTML = `
+        } else if (match.status === 2) {
+          console.log('finishedddddddddddddddddddddddd', match);
+
+          // Vérifier si aucun joueur n'a atteint un score de 5
+          const forfeit = match.player_1_score < 5 && match.player_2_score < 5;
+          // const player1Style = match.winner_id === player1Name ? 'color:green;' : (forfeit && match.winner_id !== player1Name ? 'color:gray;' : 'color:red;');
+          // const player2Style = match.winner_id === player2Name ? 'color:green;' : (forfeit && match.winner_id !== player2Name ? 'color:gray;' : 'color:red;');
+          const player1BoxStyle =
+            match.winner_id === player1Name
+              ? 'background-color:green;'
+              : forfeit && match.winner_id !== player1Name
+              ? 'background-color:gray;'
+              : 'background-color:red;';
+          const player2BoxStyle =
+            match.winner_id === player2Name
+              ? 'background-color:green;'
+              : forfeit && match.winner_id !== player2Name
+              ? 'background-color:gray;'
+              : 'background-color:red;';
+          const player1Text = forfeit && match.winner_id !== player1Name ? 'Forfait' : match.player_1_score;
+          const player2Text = forfeit && match.winner_id !== player2Name ? 'Forfait' : match.player_2_score;
+
+          let vsElement =
+            tourIndex === totalTours - 1
+              ? `<div class="vs mx-4 fs-4 text-center">vs</div>`
+              : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+          let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
+
+          matchElement.innerHTML = `
             ${SpaceDownBracketFinal}
               <div class="match-info">
                 <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                   <div class="card-body d-flex align-items-center">
                     <div class="col-3">
-                      ${avatarImg1 ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">` : ""}
+                      ${
+                        avatarImg1
+                          ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">`
+                          : ''
+                      }
                     </div>
                     <div class="col-6">
                       <h5 class="card-title" ">${player1Name}</h5>
@@ -278,7 +314,11 @@ class ViewTournamentstart extends HTMLElement {
                 <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                   <div class="card-body d-flex align-items-center">
                     <div class="col-3">
-                      ${avatarImg2 ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">` : ""}
+                      ${
+                        avatarImg2
+                          ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">`
+                          : ''
+                      }
                     </div>
                     <div class="col-6">
                       <h5 class="card-title" ">${player2Name}</h5>
@@ -293,18 +333,25 @@ class ViewTournamentstart extends HTMLElement {
               </div>
               <br><br>
             `;
-        }        
-          // Les brackets pas encores faits ou des autres
-          else {
-            let vsElement = tourIndex === totalTours - 1 ? `<div class=" vs mx-4 fs-4 text-center">vs</div>` : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
-            let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : "";
-            matchElement.innerHTML = `
+        }
+        // Les brackets pas encores faits ou des autres
+        else {
+          let vsElement =
+            tourIndex === totalTours - 1
+              ? `<div class=" vs mx-4 fs-4 text-center">vs</div>`
+              : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
+          let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
+          matchElement.innerHTML = `
               ${SpaceDownBracketFinal}
               <div class="match-info">
                 <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                   <div class="card-body d-flex align-items-center">
                     <div class="col-3">
-                      ${avatarImg1 ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">` : ""}
+                      ${
+                        avatarImg1
+                          ? `<img src="${avatarImg1}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player1Name}">`
+                          : ''
+                      }
                     </div>
                     <div class="col-6">
                       <h5 class="card-title">${player1Name}</h5>
@@ -315,7 +362,11 @@ class ViewTournamentstart extends HTMLElement {
                 <div class="player-info card text-center" style="width: 18rem; height: 6rem; border: 2px solid white;">
                   <div class="card-body d-flex align-items-center">
                     <div class="col-3">
-                      ${avatarImg2 ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">` : ""}
+                      ${
+                        avatarImg2
+                          ? `<img src="${avatarImg2}" class="card-img-top img-fluid rounded-circle m-n1" style="max-width: 100%;" width="90" height="90" alt="${player2Name}">`
+                          : ''
+                      }
                     </div>
                     <div class="col-6">
                       <h5 class="card-title">${player2Name}</h5>
@@ -325,48 +376,59 @@ class ViewTournamentstart extends HTMLElement {
                 <br><br>
               </div>
             `;
-          }
-          // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
-       if (this.#match.id === match.match_id && this.#user.id === match.player_1_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player2id !== "") {
-            const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
-            player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
         }
-        if (this.#match.id === match.match_id && this.#user.id === match.player_2_id && match.status != 2 && this.#match.player1id !== "" && this.#match.player2id !== "") {
-            const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
-            player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
+        // Attacher un gestionnaire d'événements pour le bouton "Prêt" si visible
+        if (
+          this.#match.id === match.match_id &&
+          this.#user.id === match.player_1_id &&
+          match.status != 2 &&
+          this.#match.player1id !== '' &&
+          this.#match.player2id !== ''
+        ) {
+          const player1ReadyButton = matchElement.querySelector(`#ready-player1-${match.match_id}`);
+          player1ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_1_id));
+        }
+        if (
+          this.#match.id === match.match_id &&
+          this.#user.id === match.player_2_id &&
+          match.status != 2 &&
+          this.#match.player1id !== '' &&
+          this.#match.player2id !== ''
+        ) {
+          const player2ReadyButton = matchElement.querySelector(`#ready-player2-${match.match_id}`);
+          player2ReadyButton.addEventListener('click', () => this.handleReadyButtonClick(match.player_2_id));
         }
         tourElement.appendChild(matchElement);
       });
       if (tourIndex === totalTours - 1) {
         // Ajouter le `tourElement` courant à `tournamentTabElement`
         tournamentTabElement.appendChild(tourElement);
-    
+
         // Créer un nouveau `tourElement` pour `finaleHeader`
         const finalTourElement = document.createElement('div');
         finalTourElement.classList.add('tour');
         finalTourElement.style.display = 'flex';
         finalTourElement.style.flexDirection = 'column'; // Alignement vertical des éléments dans ce tour
         finalTourElement.style.marginRight = '150px'; // Espacement entre les tours
-    
+
         // Créer le `finaleHeader`
         const finaleHeader = document.createElement('div');
         finaleHeader.style.display = 'flex';
         finaleHeader.style.alignItems = 'flex-start';
-    
+
         // finaleHeader.appendChild(titleElement);
-    
+
         const winnerContainer = document.createElement('div');
         winnerContainer.style.display = 'flex';
         winnerContainer.style.flexDirection = 'column'; // Empiler les éléments verticalement
         // winnerContainer.style.marginLeft = '150px';
-    
+
         const winnerTitleElement = document.createElement('h3');
         winnerTitleElement.textContent = 'Winner';
         winnerContainer.appendChild(winnerTitleElement);
-    
+
         finaleHeader.appendChild(winnerContainer);
-    
-        
+
         // Ajouter `finaleHeader` à `finalTourElement`
         finalTourElement.appendChild(finaleHeader);
 
@@ -374,15 +436,13 @@ class ViewTournamentstart extends HTMLElement {
         const lastMatch = matches[matches.length - 1];
         if (lastMatch && lastMatch.winner_id && tourIndex === totalTours - 1) {
           const winnerAvatar = document.createElement('p');
-          let winnerAvatarPath = "/assets/img/default-profile.jpg";
+          let winnerAvatarPath = '/assets/img/default-profile.jpg';
           if (lastMatch.winner_id === lastMatch.player_1_username) {
             winnerAvatarPath = lastMatch.player_1_avatar;
-          }
-          else if (lastMatch.winner_id === lastMatch.player_2_username) {
+          } else if (lastMatch.winner_id === lastMatch.player_2_username) {
             winnerAvatarPath = lastMatch.player_2_avatar;
           }
-          if(winnerAvatarPath === null)
-            winnerAvatarPath = "/assets/img/default-profile.jpg";
+          if (winnerAvatarPath === null) winnerAvatarPath = '/assets/img/default-profile.jpg';
           console.log(winnerAvatarPath);
           winnerAvatar.innerHTML = `
               <br><br><br><br>
@@ -392,13 +452,11 @@ class ViewTournamentstart extends HTMLElement {
               `;
           finalTourElement.appendChild(winnerAvatar);
         }
-    
+
         // Ajouter `finalTourElement` à `tournamentTabElement`
         tournamentTabElement.appendChild(finalTourElement);
-        
-    }
-    if (tourIndex !== totalTours - 1) 
-      tournamentTabElement.appendChild(tourElement);
+      }
+      if (tourIndex !== totalTours - 1) tournamentTabElement.appendChild(tourElement);
     });
   }
 
@@ -419,7 +477,7 @@ class ViewTournamentstart extends HTMLElement {
       }
 
       const data = await response.json();
-      console.log("LaaaaaDatattatatatatatata", data);
+      console.log('LaaaaaDatattatatatatatata', data);
       if (data.success) {
         redirectTo(`/game/online/${data.game_id}/${this.#tournament.id}`);
         console.log(`Player ${playerId} is now marked as ready in the backend.`);
@@ -431,23 +489,19 @@ class ViewTournamentstart extends HTMLElement {
     }
   }
 
-
   async deletePlayer() {
     await fetchDeletePlayerAndTournament();
     redirectTo(this.#backUrl);
   }
-  
+
   async displayUpdate() {
     this.#match = getMatch();
     // console.log("display update match", this.#match);
-    if(this.#match.status === 0 && this.#match.leave !== 0)
-      await updateWinnerLeave();
+    if (this.#match.status === 0 && this.#match.leave !== 0) await updateWinnerLeave();
     const matches = await fetchGetMatchs();
-      // console.log("iciiiiiiiiiiiiiiiiiiiiiiiii", matches);
-      if (matches.success)
-        this.displayMatches(matches.matches_by_tour);
-      else 
-        console.log("error : get matchs failled !");
+    // console.log("iciiiiiiiiiiiiiiiiiiiiiiiii", matches);
+    if (matches.success) this.displayMatches(matches.matches_by_tour);
+    else console.log('error : get matchs failled !');
   }
 
   async infoMatch() {
@@ -455,17 +509,17 @@ class ViewTournamentstart extends HTMLElement {
   }
 
   async UserLeave() {
-    const winner = await fetchLeaveMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
-  //   console.log(winner);
-  //   if (winner.success) {
-  //       await this.displayUpdate();
-  //   } else {
-  //       console.log("Error: winner failed!");
-  //   }
+    const winner = await fetchLeaveMatch(); // Assurez-vous que fetchWinnerMatch est également une fonction async
+    //   console.log(winner);
+    //   if (winner.success) {
+    //       await this.displayUpdate();
+    //   } else {
+    //       console.log("Error: winner failed!");
+    //   }
   }
-  
+
   async UserLeaveAlone() {
-    const data = await fetchLeaveMatchAlone();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+    const data = await fetchLeaveMatchAlone(); // Assurez-vous que fetchWinnerMatch est également une fonction async
     console.log(data);
   }
 
@@ -480,39 +534,72 @@ class ViewTournamentstart extends HTMLElement {
   }
 
   startChronoIfNotReady(matchId, player1Name, player2Name) {
-    if (this.#match.id !== matchId || this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "") {
+    if (
+      this.#match.id !== matchId ||
+      this.#match.status === 2 ||
+      this.#match.player1id === '' ||
+      this.#match.player2id === ''
+    ) {
       return;
     }
 
-    console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
+    console.log('DEBUT match', this.#match.id, ' avec ', player1Name, ' et ', player2Name, 'DEBUT');
     const matchTemp = this.#match.id;
+
+    // Notify after 30 seconds if player1 is not ready
+    const notifyTimeout = setTimeout(async () => {
+      await this.infoMatch();
+      this.#match = getMatch();
+      await fetchTournamentInfo();
+      this.#tournament = getTournament();
+      if (this.#match.id === matchTemp && this.#match.status === 0) {
+        if (this.#match.player1ready == 0 && this.#match.player1id === this.#user.id) {
+          notifyInfo(`Warning, please be ready or you loose!`);
+          console.log('oooooooooooooooooooooooooooooooooooooooooooo');
+        }
+        else if (this.#match.player2ready == 0 && this.#match.player2id === this.#user.id) {
+          notifyInfo(`Warning, please be ready or you loose!`);
+          console.log('oooooooooooooooooooooooooooooooooooooooooooo');
+        }
+      }
+    }, 30000); // 30 secondes
+
     const chronoTimeout = setTimeout(async () => {
       // A la fin du chrono, on met les joueurs READY de force
       await this.infoMatch();
       this.#match = getMatch();
       await fetchTournamentInfo();
       this.#tournament = getTournament();
-      if (this.#tournament.status === 2 || this.#tournament.id === null || this.#match.id === null || this.#match.id !== matchTemp || this.#match.player1id === "" || this.#match.player2id === "") {
+      if (
+        this.#tournament.status === 2 ||
+        this.#tournament.id === null ||
+        this.#match.id === null ||
+        this.#match.id !== matchTemp ||
+        this.#match.player1id === '' ||
+        this.#match.player2id === ''
+      ) {
         return;
       }
-      console.log("MATCH STATUS ", this.#match.status);
+      console.log('MATCH STATUS ', this.#match.status);
       if (this.#match.status === 2 || this.#match.status === 1) {
         return;
       }
-      console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
+      console.log('FIN 60s match', this.#match.id, ' avec ', player1Name, ' et ', player2Name, 'FIN');
       if (this.#match.player1ready === 0 && this.#match.player2ready === 0) {
         this.UserNobodyReadyTime();
+        notifyInfo('2 user not ready, random Winner going to choose!');
       }
-      console.log("Les 2 joueurs sont READY");
+      console.log('Les 2 joueurs sont READY');
       if (this.#match.player1ready === 0 && this.#match.player2ready === 1 && this.#match.player1id === this.#user.id) {
-        console.log(player1Name, " vas etre READY de force");
+        console.log(player1Name, ' vas etre READY de force');
         // this.UserOneReadyTime(this.#match.player2id);
         await this.handleReadyButtonClick(this.#match.player1id);
-      }
-      else if (this.#match.player2ready === 0 && this.#match.player1ready === 1 && this.#match.player2id === this.#user.id) {
-        console.log(player2Name, " vas etre READY de force");
+        notifyInfo(`${player1Name} not ready, he will be mark as ready!`);
+      } else if (this.#match.player2ready === 0 && this.#match.player1ready === 1 && this.#match.player2id === this.#user.id) {
+        console.log(player2Name, ' vas etre READY de force');
         // this.UserOneReadyTime(this.#match.player1id);
         await this.handleReadyButtonClick(this.#match.player2id);
+        notifyInfo(`${player2Name} not ready, he will be mark as ready!`);
       }
     }, 60000); // 60 secondes
   }
@@ -527,24 +614,24 @@ class ViewTournamentstart extends HTMLElement {
       this.socket.send(JSON.stringify({ tournoi_id: this.#tournament.id }));
     };
 
-    this.socket.onmessage = async (event) => {
-        // Logique pour gérer les messages entrants.
-        const data = JSON.parse(event.data);
+    this.socket.onmessage = async event => {
+      // Logique pour gérer les messages entrants.
+      const data = JSON.parse(event.data);
 
-        if (data.action === 'player_ready') {
-            this.displayUpdate();
-        }
-        if (data.action === 'winner') {
-          await this.infoMatch();
-          await this.displayUpdate();
-        }
+      if (data.action === 'player_ready') {
+        this.displayUpdate();
+      }
+      if (data.action === 'winner') {
+        await this.infoMatch();
+        await this.displayUpdate();
+      }
     };
 
     this.socket.onclose = async () => {
-        console.log('WebSocket connection closedd');
+      console.log('WebSocket connection closedd');
     };
 
-    this.socket.onerror = (error) => {
+    this.socket.onerror = error => {
       console.error('WebSocket error:', error);
     };
 
