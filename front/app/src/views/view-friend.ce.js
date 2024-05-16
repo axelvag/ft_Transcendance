@@ -118,13 +118,12 @@ class ViewFriend extends HTMLElement {
   // }
 
   initInvitationsWebSocket() {
-    this.loadOnlineFriends();
     this.wsInstance.onopen = () => {
       console.log('WebSocket for invitation connected');
     };
 
     this.wsInstanceUserGame.onopen = () => {
-      console.log('WebSocket for UserIngame in SearchOpponent connected');
+      console.log('WebSocket for UserIngame connected');
     };
 
     this.wsInstanceUserGame.onmessage = event => {
