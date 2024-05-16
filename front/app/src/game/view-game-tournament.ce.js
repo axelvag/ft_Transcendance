@@ -15,6 +15,7 @@ class ViewTournament extends HTMLElement {
     this.#tournament = getTournament();
   }
   async connectedCallback() {
+    await fetchTournamentInfo();
     if(this.#tournament.status === 2){
       await fetchDeletePlayerAndTournament();
       await fetchTournamentInfo();
@@ -114,7 +115,6 @@ class ViewTournament extends HTMLElement {
           if (this.#tournament.id !== null && this.#tournament.id.toString() !== tournamentId) {
               showModal('You are already in a tournament. ', 'If you join this tournament, you will be disconnected from the other. Do you want to continue ?', {
                 okCallback: async () => {
-                  console.log('User will be removed from the current tournament.');
                   await fetchDeletePlayer();
                   if (this.socket && this.socket.readyState === WebSocket.OPEN) {
                     this.socket.close();
@@ -166,7 +166,6 @@ class ViewTournament extends HTMLElement {
     if (this.#tournament.id !== null) {
       showModal('You are already in a tournament. ', 'If you create this tournament, you will be disconnected from the other. Do you want to continue ?', {
         okCallback: async () => {
-          console.log('User will be removed from the current tournament.');
           await fetchDeletePlayer();
           this.tournamentName = document.getElementById('tournamentName');
           this.tournamentSizeValue = document.getElementById('tournamentSizeValue');
@@ -184,7 +183,7 @@ class ViewTournament extends HTMLElement {
           }
           fetchGetTournament(data.tournoi_id);
         } else {
-          console.log(data);
+          console.log("error");
         }
       },
         cancelCallback: () => {
@@ -209,13 +208,19 @@ class ViewTournament extends HTMLElement {
       }
       fetchGetTournament(data.tournoi_id);
     } else {
-      console.log(data);
+      console.log("error");
     }
   }
 }
 
   async loadTournois() {
     try {
+      await fetchTournamentInfo();
+      this.#tournament = getTournament();
+      if(this.#tournament.status === 1){
+        redirectTo(`/game/tournament/start`);
+        return;
+      }
         const response = await fetch(BASE_URL + ':8005/tournament/view/', {
             method: 'GET',
             headers: {
@@ -229,7 +234,6 @@ class ViewTournament extends HTMLElement {
         }
 
         const tournois = await response.json();
-        // console.log(tournois);
         const listElement = this.querySelector('#tournoisList');
         listElement.innerHTML = '<h2>Join a Tournaments</h2><br>'; // Titre pour la section
 
@@ -276,7 +280,7 @@ class ViewTournament extends HTMLElement {
     this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
-        console.log('WebSocket connection established');
+        // console.log('WebSocket connection established');
     };
 
     this.socket.onmessage = (event) => {
@@ -289,7 +293,7 @@ class ViewTournament extends HTMLElement {
     };
 
     this.socket.onclose = () => {
-        console.log('WebSocket connection closed');
+        // console.log('WebSocket connection closed');
     };
 
     this.socket.onerror = (error) => {

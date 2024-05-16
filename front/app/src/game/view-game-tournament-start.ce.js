@@ -27,10 +27,8 @@ class ViewTournamentstart extends HTMLElement {
 
   constructor() {
     super();
-    console.log('Start Tournament');
     this.#user = getProfile();
     this.#tournament = getTournament();
-    console.log(this.#tournament.id);
   }
 
   async connectedCallback() {
@@ -41,7 +39,6 @@ class ViewTournamentstart extends HTMLElement {
       redirectTo(this.#backUrl);
       return;
     }
-    // const tabTournamentFront = this.generateTournamentTab();
 
     this.innerHTML = `
       <div class="min-vh-100 halo-bicolor d-flex flex-column p-2">
@@ -62,7 +59,6 @@ class ViewTournamentstart extends HTMLElement {
     this.querySelector('#leaveTournamentBtn').addEventListener('click', async () => {
         await this.infoMatch();
         this.#match = getMatch();
-        console.log(this.#match);
         if(this.#match.status !== 2)
         {
           if(this.#match.player1id !== "" && this.#match.player2id !== "")
@@ -70,15 +66,15 @@ class ViewTournamentstart extends HTMLElement {
           else
             await this.UserLeaveAlone();
         }
-        // await fetchDeletePlayerAndTournament();
         await this.deletePlayer();
     });
 
     this.initWebSocket();
-    if (this.#tournament.status != 2)
+    if (this.#tournament.status === 0)
       await this.createMatchs();
-    else
+    else{
       this.displayUpdate();
+    }
   }
 
   async disconnectedCallback() {
@@ -90,12 +86,10 @@ class ViewTournamentstart extends HTMLElement {
 
   async createMatchs() {
     const data = await fetchCreateMatchs();
-    console.log(data);
     if (data.success) {
+      await fetchTournamentInfo();
       await this.infoMatch();
-      // console.log("Matchs created");
       const matches = await fetchGetMatchs();
-      console.log(matches);
       if (matches.success)
         this.displayMatches(matches.matches_by_tour);
       else
@@ -106,6 +100,7 @@ class ViewTournamentstart extends HTMLElement {
   }
 
   displayMatches(matchesByTour) {
+    console.log("dsplay match");
     this.#match = getMatch();
     const tournamentTabElement = this.querySelector('#tournamentTabFront');
     tournamentTabElement.innerHTML = ''; // Effacer les matchs précédents
@@ -157,46 +152,7 @@ class ViewTournamentstart extends HTMLElement {
             this.startChronoIfNotReady(match.match_id, player1Name, player2Name);
           }
           
-          // if (this.#match.id === match.match_id && match.status !== 2 && (match.player_1_ready === 0 || match.player_2_ready === 0))
-          // {
-          //   // Lancez un chrono de 60 secondes, je gere seulement si aucun des 2 joueurs n'est prêt
-          //   const matchId = match.match_id;
-          //   if (this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "")
-          //     return;
-          //   console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
-          //   const chronoTimeout = setTimeout(async () => {
-          //     // A la fin du chrono, on met les joueurs READY de force
-          //     this.infoMatch();
-          //     this.#match = getMatch();
-          //     await fetchTournamentInfo();
-          //     this.#tournament = getTournament();
-          //     if (this.#tournament.status === 2 || this.#tournament.id === null || this.#match.id === null)
-          //       return;
-          //     if (this.#match.player1id === "" || this.#match.player2id === "")
-          //       return;
-          //     console.log("MATCH STATUS ", this.#match.status)
-          //     if (this.#match.status === 2 || this.#match.player1ready === 1 || this.#match.player2ready === 1)
-          //       return;
-          //     console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
-          //     if (this.#match.player1ready === 0 && this.#match.player2ready === 0)
-          //     {
-          //       if (this.#match.player1ready === 0 && this.#match.player1id === this.#user.id) {
-          //         console.log(player1Name, " vas etre READY de force");
-          //         await this.handleReadyButtonClick(this.#match.player1id);
-          //       }
-          //       if (this.#match.player2ready === 0 && this.#match.player2id === this.#user.id) {
-          //         console.log(player2Name, " vas etre READY de force");
-          //         await this.handleReadyButtonClick(this.#match.player2id);
-          //       }
-          //     }
-          //   }, 60000); // = 60 secondes
-          // }
-          
-          // console.log(this.#match.id);
-          // console.log(match.match_id);
           if(this.#match.id === match.match_id && match.status != 2) {
-            console.log(this.#match);
-            // console.log("passe icii", player1Name,  player2Name, match.player_1_ready, match.player_2_ready);
               const isPlayer1 = this.#user.id === match.player_1_id;
               const isPlayer2 = this.#user.id === match.player_2_id;
               const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
@@ -242,12 +198,8 @@ class ViewTournamentstart extends HTMLElement {
                 `;
           } 
           else if (match.status === 2) {
-            console.log("finishedddddddddddddddddddddddd", match);
-        
             // Vérifier si aucun joueur n'a atteint un score de 5
             const forfeit = match.player_1_score < 5 && match.player_2_score < 5;
-            // const player1Style = match.winner_id === player1Name ? 'color:green;' : (forfeit && match.winner_id !== player1Name ? 'color:gray;' : 'color:red;');
-            // const player2Style = match.winner_id === player2Name ? 'color:green;' : (forfeit && match.winner_id !== player2Name ? 'color:gray;' : 'color:red;');
             const player1BoxStyle = match.winner_id === player1Name ? 'background-color:green;' : (forfeit && match.winner_id !== player1Name ? 'background-color:gray;' : 'background-color:red;');
             const player2BoxStyle = match.winner_id === player2Name ? 'background-color:green;' : (forfeit && match.winner_id !== player2Name ? 'background-color:gray;' : 'background-color:red;');
             const player1Text = forfeit && match.winner_id !== player1Name ? 'Forfait' : match.player_1_score;
@@ -353,12 +305,9 @@ class ViewTournamentstart extends HTMLElement {
         finaleHeader.style.display = 'flex';
         finaleHeader.style.alignItems = 'flex-start';
     
-        // finaleHeader.appendChild(titleElement);
-    
         const winnerContainer = document.createElement('div');
         winnerContainer.style.display = 'flex';
         winnerContainer.style.flexDirection = 'column'; // Empiler les éléments verticalement
-        // winnerContainer.style.marginLeft = '150px';
     
         const winnerTitleElement = document.createElement('h3');
         winnerTitleElement.textContent = 'Winner';
@@ -383,7 +332,6 @@ class ViewTournamentstart extends HTMLElement {
           }
           if(winnerAvatarPath === null)
             winnerAvatarPath = "/assets/img/default-profile.jpg";
-          console.log(winnerAvatarPath);
           winnerAvatar.innerHTML = `
               <br><br><br><br>
               <h3 class="text-center mb-3">${lastMatch.winner_id}</h3>
@@ -403,7 +351,6 @@ class ViewTournamentstart extends HTMLElement {
   }
 
   async handleReadyButtonClick(playerId) {
-    console.log(`Player ${playerId} is ready!`);
 
     try {
       const response = await fetch(`${BASE_URL}:8005/tournament/ready/${playerId}/${this.#match.id}/`, {
@@ -419,10 +366,8 @@ class ViewTournamentstart extends HTMLElement {
       }
 
       const data = await response.json();
-      console.log("LaaaaaDatattatatatatatata", data);
       if (data.success) {
         redirectTo(`/game/online/${data.game_id}/${this.#tournament.id}`);
-        console.log(`Player ${playerId} is now marked as ready in the backend.`);
       } else {
         console.error('Could not mark the player as ready in the backend.', data.error);
       }
@@ -438,16 +383,15 @@ class ViewTournamentstart extends HTMLElement {
   }
   
   async displayUpdate() {
+    await this.infoMatch();
     this.#match = getMatch();
-    // console.log("display update match", this.#match);
-    if(this.#match.status === 0 && this.#match.leave !== 0)
+    if(this.#match.status === 0 && this.#match.leave !== 0){
       await updateWinnerLeave();
+      return;
+    }
     const matches = await fetchGetMatchs();
-      // console.log("iciiiiiiiiiiiiiiiiiiiiiiiii", matches);
       if (matches.success)
         this.displayMatches(matches.matches_by_tour);
-      else 
-        console.log("error : get matchs failled !");
   }
 
   async infoMatch() {
@@ -456,62 +400,49 @@ class ViewTournamentstart extends HTMLElement {
 
   async UserLeave() {
     const winner = await fetchLeaveMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
-  //   console.log(winner);
-  //   if (winner.success) {
-  //       await this.displayUpdate();
-  //   } else {
-  //       console.log("Error: winner failed!");
-  //   }
   }
   
   async UserLeaveAlone() {
     const data = await fetchLeaveMatchAlone();  // Assurez-vous que fetchWinnerMatch est également une fonction async
-    console.log(data);
   }
 
   async UserNobodyReadyTime() {
     const data = await fetchUserNobodyReadyTime();
-    console.log(data);
   }
 
   async UserOneReadyTime(winnerId) {
     const data = await fetchUserOneReadyTime(winnerId);
-    console.log(data);
   }
 
   startChronoIfNotReady(matchId, player1Name, player2Name) {
     if (this.#match.id !== matchId || this.#match.status === 2 || this.#match.player1id === "" || this.#match.player2id === "") {
       return;
     }
-
-    console.log("DEBUT match", this.#match.id, " avec ", player1Name, " et ", player2Name, "DEBUT");
+    
     const matchTemp = this.#match.id;
+    const tournamentTemp = this.#tournament.id;
     const chronoTimeout = setTimeout(async () => {
-      // A la fin du chrono, on met les joueurs READY de force
-      await this.infoMatch();
-      this.#match = getMatch();
       await fetchTournamentInfo();
       this.#tournament = getTournament();
+      if (this.#tournament.id !== tournamentTemp || this.#tournament.status === 2 || this.#tournament.id === null)
+        return;
+      // A la fin du chrono, on met les joueurs READY de force
+      console.log("get last match", this.#tournament);
+      await this.infoMatch();
+      this.#match = getMatch();
       if (this.#tournament.status === 2 || this.#tournament.id === null || this.#match.id === null || this.#match.id !== matchTemp || this.#match.player1id === "" || this.#match.player2id === "") {
         return;
       }
-      console.log("MATCH STATUS ", this.#match.status);
       if (this.#match.status === 2 || this.#match.status === 1) {
         return;
       }
-      console.log("FIN 60s match", this.#match.id, " avec ", player1Name, " et ", player2Name, "FIN");
       if (this.#match.player1ready === 0 && this.#match.player2ready === 0) {
         this.UserNobodyReadyTime();
       }
-      console.log("Les 2 joueurs sont READY");
       if (this.#match.player1ready === 0 && this.#match.player2ready === 1 && this.#match.player1id === this.#user.id) {
-        console.log(player1Name, " vas etre READY de force");
-        // this.UserOneReadyTime(this.#match.player2id);
         await this.handleReadyButtonClick(this.#match.player1id);
       }
       else if (this.#match.player2ready === 0 && this.#match.player1ready === 1 && this.#match.player2id === this.#user.id) {
-        console.log(player2Name, " vas etre READY de force");
-        // this.UserOneReadyTime(this.#match.player1id);
         await this.handleReadyButtonClick(this.#match.player2id);
       }
     }, 60000); // 60 secondes
@@ -522,8 +453,7 @@ class ViewTournamentstart extends HTMLElement {
     this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
-      console.log('WebSocket connection established start tournament');
-      // this.socket.send(JSON.stringify({user_id: this.#user.id}));
+      // console.log('WebSocket connection established start tournament');
       this.socket.send(JSON.stringify({ tournoi_id: this.#tournament.id }));
     };
 
@@ -532,7 +462,7 @@ class ViewTournamentstart extends HTMLElement {
         const data = JSON.parse(event.data);
 
         if (data.action === 'player_ready') {
-            this.displayUpdate();
+          await this.displayUpdate();
         }
         if (data.action === 'winner') {
           await this.infoMatch();
@@ -541,7 +471,7 @@ class ViewTournamentstart extends HTMLElement {
     };
 
     this.socket.onclose = async () => {
-        console.log('WebSocket connection closedd');
+        // console.log('WebSocket connection closedd');
     };
 
     this.socket.onerror = (error) => {

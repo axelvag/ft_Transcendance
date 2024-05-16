@@ -305,8 +305,6 @@ const fetchTournamentInfo = async () => {
 
     if (data.id) {
       setLocalTournament(data);
-    } else {
-      console.log('player is not in a tournament');
     }
   } catch (error) {
     console.error('An error occurred:', error);
@@ -333,7 +331,6 @@ const fetchInfoMatch = async () => {
       }
 
       const data = await response.json();
-      // console.log("last match", data);
 
       if (data.success) {
         setLocalMatch(data.matches_data);
@@ -370,7 +367,6 @@ const fetchCreateMatchs = async () => {
 const fetchGetMatchs = async () => {
   try {
     if (tournament.id === null) {
-      console.log('Tournament ID is null. Doing nothing.');
       return { success: false, error: 'Tournament ID is null' };
     }
 
@@ -393,20 +389,8 @@ const fetchGetMatchs = async () => {
   }
 };
 
-// const fetchWinnerMatch = async () => {
-//   const response = await fetch(`${BASE_URL}:8005/tournament/update_winner/${match.id}/${match.winner}/${0}/${0}/`, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     credentials: 'include',
-//   })
-//   return response.json();
-// };
-
-const fetchWinnerMatch2 = async (winner, scorePlayer1, scroePlayer2) => {
+const fetchWinnerMatch = async (winner, scorePlayer1, scroePlayer2) => {
   try {
-    console.log('wineeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer', scorePlayer1, scroePlayer2);
     const response = await fetch(
       `${BASE_URL}:8005/tournament/update_winner/${match.id}/${winner}/${scorePlayer1}/${scroePlayer2}/`,
       {
@@ -533,7 +517,6 @@ const fetchDeletePlayerAndTournament = async () => {
   try {
     let user = getProfile();
     if (user.id === null) {
-      console.log('User ID is null. Doing nothing.');
       return { success: false, error: 'User ID is null' };
     }
 
@@ -550,7 +533,6 @@ const fetchDeletePlayerAndTournament = async () => {
     }
 
     const data = await response.json();
-    console.log(data);
 
     if (data.success) {
       resetLocalTournament();
@@ -569,8 +551,7 @@ const fetchDeletePlayerAndTournament = async () => {
 export {
   tournament,
   updateWinnerLeave,
-  fetchWinnerMatch2,
-  // fetchWinnerMatch,
+  fetchWinnerMatch,
   fetchLeaveMatch,
   fetchDeletePlayerAndTournament,
   setLocalTournament,
