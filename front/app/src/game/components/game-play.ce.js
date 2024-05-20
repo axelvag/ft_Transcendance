@@ -8,6 +8,7 @@ import GameWorkerRemote from '../utils/GameWorkerRemote.js?worker';
 import AudioPlayer from '../utils/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
+import { notifyError } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
 import { fetchWinnerMatch2 } from '@/tournament.js';
 
@@ -47,25 +48,6 @@ const template = `
     </div>
   </div>
   <div id="gamePlay-matchup"></div>
-</div>
-
-
-<!-- Error Modal -->
-<div id="gamePlayErrorModal" hidden>
-  <div class="modal d-block" tabindex="-1">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-danger d-block text-center">
-          <ui-icon name="error" class="fs-1"></ui-icon>
-        </div>
-        <div class="modal-body d-flex flex-column align-items-center gap-2 py-4">
-          <p>An unexpected error occured!</p>
-          <button type="button" class="btn btn-danger" data-link="/">Leave</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-backdrop show"></div>
 </div>
 `;
 
@@ -168,8 +150,8 @@ class GamePlay extends HTMLElement {
     // Game error
     this.gameWorker.onerror = function (e) {
       console.error(e.message);
-      this.gameWorker.terminate();
-      this.querySelector('#gamePlayErrorModal').hidden = false;
+      notifyError('An unexpected error occured!');
+      redirectTo('/dashboard');
     };
     this.gameWorker.onerror = this.gameWorker.onerror.bind(this);
 
@@ -315,6 +297,8 @@ class GamePlay extends HTMLElement {
         `;
     } catch (e) {
       console.error(e);
+      notifyError('An unexpected error occured!');
+      redirectTo('/dashboard');
     }
   }
 
