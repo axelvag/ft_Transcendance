@@ -161,7 +161,7 @@ class GameMatchup extends HTMLElement {
     this.#playerRight.name = this.getAttribute('player-right-name');
     this.#playerRight.avatar = this.getAttribute('player-right-avatar');
     this.#playerRight.type = this.getAttribute('player-right-type');
-    this.#playerRight.wins = this.getAttribute('player-right-wins');
+    this.#playerRight.wins = this.hasAttribute('player-right-wins');
 
     this.playerRightEl = this.querySelector('.gameMatchup-player.is-right');
     if (this.playerRightEl) {
@@ -174,7 +174,7 @@ class GameMatchup extends HTMLElement {
         this.playerRightEl.removeAttribute('type');
       }
       if (this.#playerRight.wins) {
-        this.playerRightEl.setAttribute('wins', this.#playerRight.wins);
+        this.playerRightEl.setAttribute('winner', true);
       } else {
         this.playerRightEl.removeAttribute('winner');
       }

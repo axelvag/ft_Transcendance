@@ -303,12 +303,12 @@ class GamePlay extends HTMLElement {
           player-left-name="${this.#gameState.playerLeft.name}"
           player-left-avatar="${this.#gameState.playerLeft.avatar}"
           player-left-type="${this.#gameState.playerLeft.type}"
-          player-left-wins="${isPlayerLeftWinner}"
+          ${isPlayerLeftWinner ? 'player-left-wins' : ''}
           player-right-id="${this.#gameState.playerRight.id}"
           player-right-name="${this.#gameState.playerRight.name}"
           player-right-avatar="${this.#gameState.playerRight.avatar}"
           player-right-type="${this.#gameState.playerRight.type}"
-          player-left-wins="${isPlayerRightWinner}"
+          ${isPlayerRightWinner ? 'player-right-wins' : ''}
           title="${title}"
           details='${details}'
           ></game-matchup>
