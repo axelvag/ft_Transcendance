@@ -153,6 +153,7 @@ const notifyError = data => {
   data = {
     icon: 'error',
     iconClass: 'text-danger',
+    autohide: false,
     ...data,
   };
 

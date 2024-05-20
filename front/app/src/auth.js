@@ -1,6 +1,6 @@
 import { redirectTo } from '@/router.js';
 import { fetchTournamentInfo, fetchDeletePlayer, getTournament } from '@/tournament.js';
-import { notify } from '@/notifications.js';
+import { notifyInfo, notifyError } from '@/notifications.js';
 import { BASE_URL, OAUTH_AUTHORIZE_URL } from '@/constants.js';
 import { closeViewFriendWebSocket } from '@/views/view-friend.ce.js';
 
@@ -127,9 +127,8 @@ const logout = async () => {
   try {
     await fetchTournamentInfo();
     let tournament = getTournament();
-    console.log("logout tournament", tournament);
-    if(tournament.status !== 1)
-      await fetchDeletePlayer();
+    console.log('logout tournament', tournament);
+    if (tournament.status !== 1) await fetchDeletePlayer();
     closeViewFriendWebSocket();
 
     const csrfToken = await getCsrfToken();
@@ -143,19 +142,10 @@ const logout = async () => {
         'X-CSRFToken': csrfToken,
       },
     });
-    notify({
-      icon: 'info',
-      iconClass: 'text-info',
-      message: 'You have been <b>logged out</b> successfully!',
-    });
+    notifyInfo('You have been <b>logged out</b> successfully!');
   } catch (error) {
     console.error('Error:', error);
-    notify({
-      icon: 'error',
-      iconClass: 'text-danger',
-      message: 'Logout failed!',
-      autohide: false,
-    });
+    notifyError('Logout failed!');
   }
   await resetLocalUser();
 };
@@ -237,39 +227,29 @@ const loginUser = async (formData, csrfToken) => {
       body: JSON.stringify(formData),
     });
     return response.json();
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Erreur:', error);
-    notify({
-      icon: 'error',
-      iconClass: 'text-danger',
-      message: 'delete user failed!',
-    });
+    notifyError('Delete user failed!');
     return { success: false, error: error.message };
   }
 };
 
 const sendSignUpRequest = async (formData, csrfToken) => {
   try {
-  const response = await fetch(BASE_URL + ':8001/accounts/register/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken,
-    },
-    mode: 'cors',
-    credentials: 'include',
-    body: JSON.stringify(formData),
-  });
-  return response.json();
-  }
-  catch (error) {
-    console.error('Erreur:', error);
-    notify({
-      icon: 'error',
-      iconClass: 'text-danger',
-      message: 'register user failed!',
+    const response = await fetch(BASE_URL + ':8001/accounts/register/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      mode: 'cors',
+      credentials: 'include',
+      body: JSON.stringify(formData),
     });
+    return response.json();
+  } catch (error) {
+    console.error('Erreur:', error);
+    notifyError('Register user failed!');
     return { success: false, error: error.message };
   }
 };
@@ -287,14 +267,9 @@ const passwordReset = async (formData, csrfToken) => {
       body: JSON.stringify(formData),
     });
     return response.json();
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Erreur:', error);
-    notify({
-      icon: 'error',
-      iconClass: 'text-danger',
-      message: 'password reset failed!',
-    });
+    notifyError('Password reset failed!');
     return { success: false, error: error.message };
   }
 };
@@ -312,14 +287,9 @@ const sendEmailPasswordReset = async (formData, csrfToken, url) => {
       body: JSON.stringify(formData),
     });
     return response.json();
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Erreur:', error);
-    notify({
-      icon: 'error',
-      iconClass: 'text-danger',
-      message: 'send email failed!',
-    });
+    notifyError('Send email failed!');
     return { success: false, error: error.message };
   }
 };
@@ -328,9 +298,8 @@ const deleteUser = async csrfToken => {
   try {
     await fetchTournamentInfo();
     let tournament = getTournament();
-    console.log("logout tournament", tournament);
-    if(tournament.status !== 1)
-      await fetchDeletePlayer();
+    console.log('logout tournament', tournament);
+    if (tournament.status !== 1) await fetchDeletePlayer();
     const url = `${BASE_URL}:8001/accounts/delete_user/${user.username}`;
     const response = await fetch(url, {
       method: 'DELETE',
@@ -342,21 +311,16 @@ const deleteUser = async csrfToken => {
       },
       body: JSON.stringify({ user_id: user.id }),
     });
-  
+
     const data = await response.json();
     if (data.success) {
       user.isAuthenticated = false;
       resetLocalUser(data);
       localStorage.setItem('isLogged', 'false');
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Erreur:', error);
-    notify({
-      icon: 'error',
-      iconClass: 'text-danger',
-      message: 'delete user failed!',
-    });
+    notifyError('Delete user failed!');
   }
 };
 
@@ -426,18 +390,10 @@ const handleOAuthResponse = async () => {
         if (userProfileData.success) {
           setLocalUser(userProfileData);
           redirectTo('/dashboard');
-          notify({
-            icon: 'info',
-            iconClass: 'text-info',
-            message: 'You have been <b>logged in</b> successfully!',
-          });
+          notifyInfo('You have been <b>logged in</b> successfully!');
         } else {
           console.error('Failed to load user profile:', userProfileData.message);
-          notify({
-            icon: 'error',
-            iconClass: 'text-danger',
-            message: 'Failed to load user profile!',
-          });
+          notifyError('Failed to load user profile!');
         }
       } else {
         console.error('Failed Auth42', data.error);
