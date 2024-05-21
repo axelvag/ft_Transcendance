@@ -14,6 +14,6 @@ urlpatterns = [
     path('online_friends/<int:user_id>/', views.online_friends, name='online_friends'),
     path('offline_friends/<int:user_id>/', views.offline_friends, name='offline_friends'),
     path('search_users/', views.search_users, name='search_users'),
-    path('get_profile_info/<int:user_id>/', views.get_profile_info, name='get_profile_info'),
+    # path('get_profile_info/<int:user_id>/', views.get_profile_info, name='get_profile_info'),
     path('delete_user_data/<int:user_id>/', views.delete_user_data, name='delete_user_data'),
 ]
