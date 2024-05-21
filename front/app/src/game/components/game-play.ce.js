@@ -355,7 +355,7 @@ class GamePlay extends HTMLElement {
     };
     this.style.setProperty('--gamePlay-ratio', `${this.#gameState.width / this.#gameState.height}`);
     this.renderPlayers();
-    this.renderMatchup();
+    if (this.#isOnline) this.renderMatchup();
     this.renderScores();
     this.rendererEl.init(this.#gameState);
     this.rendererEl.start();
