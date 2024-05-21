@@ -517,7 +517,7 @@ def set_player_ready(request, player_id, match_id):
         return JsonResponse({"success": False, "error": "Player not found."}, status=404)
 
 
-
+@verif_sessionID
 def get_profile_info_cookie(user_id, cookies):
     profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:

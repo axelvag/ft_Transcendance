@@ -1,6 +1,7 @@
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { BASE_URL } from '@/constants.js';
 import { notify } from '@/notifications.js';
+import { getCsrfToken } from '@/auth.js';
 
 class ViewEmailConfirmation extends HTMLElement {
   async connectedCallback() {
@@ -32,14 +33,24 @@ class ViewEmailConfirmation extends HTMLElement {
     const uidb64 = params.get('uidb64');
     const token = params.get('token');
     try{
-      const response1 = await fetch(`${BASE_URL}:8001/accounts/is_user_active/${uidb64}/${token}`);
+      const response1 = await fetch(`${BASE_URL}:8001/accounts/is_user_active/${uidb64}/${token}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
       const data1 = await response1.json();
       if (data1.success) {
         // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
         this.querySelector('#email-confirm-loading').hidden = true;
         this.querySelector('#email-confirm-success').hidden = false;
       } else {
-        const response = await fetch(`${BASE_URL}:8001/accounts/activate/${uidb64}/${token}`);
+        const csrfToken = await getCsrfToken();
+        const response = await fetch(`${BASE_URL}:8001/accounts/activate/${uidb64}/${token}`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+          credentials: 'include',
+        });
         const data = await response.json();
         this.querySelector('#email-confirm-loading').hidden = true;
         if (data.success) {
@@ -62,7 +73,14 @@ class ViewEmailConfirmation extends HTMLElement {
         this.querySelector('#email-confirm-loading').hidden = false;
   
         // Effectuez une nouvelle demande de confirmation par e-mail
-        const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_confirmation/${uidb64}`);
+        const csrfToken = await getCsrfToken();
+        const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_confirmation/${uidb64}`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+          credentials: 'include',
+        });
         const data = await response.json();
       });
     }
