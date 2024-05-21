@@ -41,7 +41,6 @@ class ViewForgetPass extends HTMLElement {
 
   async submitForm(event) {
     event.preventDefault();
-    console.log('Click submit !');
     const form = event.target;
     const email = document.getElementById('email').value;
 
@@ -50,17 +49,11 @@ class ViewForgetPass extends HTMLElement {
     const formData = {
       email: email,
     };
-    console.log(JSON.stringify(formData));
     const data = await passwordReset(formData, csrfToken);
-    console.log(data);
     if (data.success) {
       const successNotification = document.getElementById('success-notification');
       if (successNotification) successNotification.style.display = 'block';
       document.getElementById('pass-form').style.display = 'none';
-      // Redirection vers la page de connexion
-      // console.log('yoooooooooooooo');
-      // window.location.href = "/login";
-      // alert('success');
     } else {
       alert('errors');
       console.log(data.errors);

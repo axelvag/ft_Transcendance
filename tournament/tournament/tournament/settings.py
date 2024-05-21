@@ -147,7 +147,6 @@ CORS_ALLOWED_ORIGINS = [
     f"{URL}:8002",
 ]
 
-# print(URL)
 
 # CORS_ORIGINS_ALLOWED_ALL = True
 

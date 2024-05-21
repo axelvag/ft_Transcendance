@@ -79,12 +79,6 @@ class ViewSignIn extends HTMLElement {
       </auth-layout>
     `;
 
-    // this.querySelector('a[data-link="/forget-pass"]').addEventListener('click', (event) => {
-    //   event.preventDefault(); // Empêche le navigateur de suivre le lien
-    //   console.log("ici forget pass");
-    //   redirectTo('/forget-pass'); // Changez cette fonction selon votre logique de navigation
-    // });
-
     this.querySelector('#signin-form').addEventListener('submit', this.submitForm.bind(this));
     this.passwordError = this.querySelector('#password-error');
     this.emailError = this.querySelector('#email-error');

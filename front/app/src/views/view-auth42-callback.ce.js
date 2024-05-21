@@ -7,7 +7,6 @@ class ViewLoading extends HTMLElement {
     window.addEventListener('storage', event => {
       if (event.key === 'isLogged' && event.newValue === 'false') {
         // Logique pour gérer la déconnexion, par exemple :
-        console.log('logout logout');
         window.location.href = '/login'; // Rediriger vers la page de connexion
         return;
       }

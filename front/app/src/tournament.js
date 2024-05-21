@@ -334,8 +334,6 @@ const fetchInfoMatch = async () => {
 
       if (data.success) {
         setLocalMatch(data.matches_data);
-      } else {
-        console.log('player is not in a match');
       }
     } catch (error) {
       console.error('An error occurred:', error);

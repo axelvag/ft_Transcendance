@@ -153,7 +153,6 @@ class ViewSigUp extends HTMLElement {
       this.passwordError.textContent = 'The passwords do not match.';
       this.password1.classList.add('is-invalid');
       this.password2.classList.add('is-invalid');
-      console.log('password !=');
       return false;
     }
 
@@ -195,7 +194,6 @@ class ViewSigUp extends HTMLElement {
     };
 
     const data = await sendSignUpRequest(formData, csrfToken);
-    console.log('data', data);
 
     if (data.success) {
       const successNotification = document.getElementById('success-notification');
