@@ -93,6 +93,7 @@ const editProfileTemplate = user => `
   </h2>
   <div class="position-relative">
     <form id="profile-edit">
+      <div id="general-error" class="alert alert-danger" style="display: none;"></div>
       <div class="mb-4 text-center">
         <label class="form-label d-block" for="avatarFile">Profile picture</label>
         <div class="d-inline-block d-flex flex-column align-items-center position-relative">
@@ -281,8 +282,21 @@ class ViewProfile extends HTMLElement {
       } catch (err) {
         this.querySelector('#profile-edit-loader').hidden = true;
         this.querySelector('#profile-edit').classList.remove('opacity-25');
+
+        this.showGeneralError('An error has occurred. Please try again.');
+        this.querySelector('#profile-edit-loader').hidden = true;
+        this.querySelector('#profile-edit').classList.remove('opacity-25');
+
         console.error(err);
       }
+    }
+  }
+
+  showGeneralError(message) {
+    const errorDiv = this.querySelector('#general-error');
+    if (errorDiv) {
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
     }
   }
 
