@@ -37,7 +37,6 @@ class MyConsumer(AsyncWebsocketConsumer):
         except requests.RequestException as e:
             print(f"Erreur de requête HTTP: {e}")
             return JsonResponse({'error': 'Erreur de communication avec le service externe'}, status=503)
-        print(response)
         if response.status_code != 200:
             raise ValidationError('wrong session ID')
 
@@ -62,12 +61,10 @@ class MyConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_discard(self.tournoi_group_name, self.channel_name)
 
     async def receive(self, text_data):
-        logging.critical("Received data")
         text_data_json = json.loads(text_data)
         
         # Traitement pour associer un utilisateur à un groupe spécifique
         if 'user_id' in text_data_json:
-            # self.user_id = text_data_json['user_id']
             user_id = text_data_json['user_id']
             self.user_group_name = f"user_{user_id}"
             await self.channel_layer.group_add(self.user_group_name, self.channel_name)
@@ -75,14 +72,10 @@ class MyConsumer(AsyncWebsocketConsumer):
             
         # Traitement pour s'abonner à un groupe spécifique au tournoi
         if 'tournoi_id' in text_data_json:
-            # self.tournoi_id = text_data_json['tournoi_id']
             tournoi_id = text_data_json['tournoi_id']
             self.tournoi_group_name = f"tournoi_{tournoi_id}"
             await self.channel_layer.group_add(self.tournoi_group_name, self.channel_name)
         
-        # if 'user_id' in text_data_json and 'tournoi_id' in text_data_json:
-        #     self.user_id = text_data_json['user_id']
-        #     self.tournoi_id = text_data_json['tournoi_id']
             
         message = text_data_json.get('message')
         if message:
@@ -93,13 +86,11 @@ class MyConsumer(AsyncWebsocketConsumer):
 
     # Handlers pour les événements spécifiques
     async def tournoi_cree(self, event):
-        logging.critical("Mise à jour de la liste des tournois")
         await self.send(text_data=json.dumps({
             "action": "reload_tournois"
         }))
         
     async def add_player(self, event):
-        logging.critical("Ajout d'un joueur dans la liste")
         await self.send(text_data=json.dumps({
             "action": "add_Player"
         }))
@@ -109,10 +100,6 @@ class MyConsumer(AsyncWebsocketConsumer):
             "action": "delete_tournament"
         }))
         
-    # async def player_disconnected(self, event):
-    #     await self.send(text_data=json.dumps({
-    #         "action": "player_disconnected"
-    #     }))
         
     async def display_player(self, event):
         await self.send(text_data=json.dumps({

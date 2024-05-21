@@ -63,7 +63,6 @@ def activate(request, uidb64, token):
 
 def activateEmail(request, user, to_email):
     mail_subject = "Activate your user account"
-    print("URL: ", os.getenv('BASE_URL'))
     message = render_to_string("template_activate_account.html", {
         'url': os.getenv('BASE_URL'),
         'user': user.username,
@@ -379,7 +378,6 @@ def oauth_callback(request):
                     verify=False
                 )
             except requests.RequestException as e:
-                print(f"HTTP request error: {e}")
                 return JsonResponse({'error': 'Communication error with external service'}, status=503)
             if profile_data.status_code == 200:
                 profile_data_json = profile_data.json()

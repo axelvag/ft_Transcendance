@@ -16,6 +16,10 @@ BASE_URL = os.getenv('BASE_URL')
 
 User = get_user_model()
 
+def is_valid_image(file):
+    valid_image_mimetypes = ['image/jpeg', 'image/png', 'image/gif']
+    return file.content_type in valid_image_mimetypes
+
 @csrf_exempt
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
@@ -61,6 +65,9 @@ def update_user(request):
                 avatar42 = None
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "message": "Invalid or missing JSON data."}, status=400)
+
+    if avatar and not is_valid_image(avatar):
+            return JsonResponse({"success": False, "message": "Invalid image file type."}, status=400)
 
     auth_service_url = "https://authentification:8001/accounts/update_profile/"
     auth_data = {'id': user_id, 'username': username}

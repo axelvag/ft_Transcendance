@@ -16,22 +16,14 @@ class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
 
     def check_token(self, user, token):
         # Vérification du token
-        print("Token check")
         try:
             ts_b36, _ = token.split("-")
             ts = base36_to_int(ts_b36)
         except ValueError:
             return False
 
-        # print(datetime.datetime.fromtimestamp(ts))
-        # print(datetime.datetime.now())
-        # print(ts)
-        # print(datetime.datetime.now().timestamp())
-        print(datetime.datetime.now().timestamp() - ts)
-        # print(settings.PASSWORD_RESET_TIMEOUT * 60)
         # Calculer la durée depuis la création du token
         if (datetime.datetime.now() - datetime.datetime.fromtimestamp(ts)).total_seconds() > 978307800:
-            print("Temps Depasse")
             return False
 
         return True

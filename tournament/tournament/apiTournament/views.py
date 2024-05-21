@@ -104,7 +104,6 @@ def tournament_detail(request, tournament_id):
         # Essayez de récupérer le tournoi par son ID
         tournament = Tournoi.objects.get(pk=tournament_id)
         profile_info = get_profile_info_cookie(tournament.admin_id, request.COOKIES.get('sessionid')) if tournament.admin_id else {}
-        logging.critical(profile_info)
         player_count = tournament.players.count()
         if player_count == tournament.max_players - 1:
             tournament_group_name = f"tournoi_{tournament_id}"
@@ -146,7 +145,6 @@ def tournament_detail(request, tournament_id):
 def create_joueur(request):
     try:
         data = json.loads(request.body.decode('utf8'))
-        print("Received data:", data)
     except json.JSONDecodeError:
         return JsonResponse(data={'errors': "Invalid JSON format"}, status=406)
 
@@ -272,7 +270,6 @@ def tournoi_info(request, user_id):
 @require_http_methods(["DELETE"])
 def delete_joueur(request, user_id):
     try:
-        logging.critical("iciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         # Trouver tous les joueurs correspondants à user_id, supposant qu'un user_id puisse avoir plusieurs entrées
         joueurs = Joueur.objects.filter(user_id=user_id)
         

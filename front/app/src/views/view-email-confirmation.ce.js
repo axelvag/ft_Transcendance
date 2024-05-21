@@ -31,20 +31,16 @@ class ViewEmailConfirmation extends HTMLElement {
     const params = new URLSearchParams(queryString);
     const uidb64 = params.get('uidb64');
     const token = params.get('token');
-    console.log(uidb64);
-    console.log(token);
     try{
       const response1 = await fetch(`${BASE_URL}:8001/accounts/is_user_active/${uidb64}/${token}`);
       const data1 = await response1.json();
       if (data1.success) {
         // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
-        console.log('user Actif');
         this.querySelector('#email-confirm-loading').hidden = true;
         this.querySelector('#email-confirm-success').hidden = false;
       } else {
         const response = await fetch(`${BASE_URL}:8001/accounts/activate/${uidb64}/${token}`);
         const data = await response.json();
-        console.log(data);
         this.querySelector('#email-confirm-loading').hidden = true;
         if (data.success) {
           // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
