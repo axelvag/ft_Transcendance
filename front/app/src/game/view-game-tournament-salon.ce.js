@@ -71,14 +71,11 @@ class ViewTournamentSalon extends HTMLElement {
     const deleteBtn = this.querySelector('#deleteTournamentBtn');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
-
-            // this.deleteTournament();
             this.showDeleteConfirmation();
         });
     }
 
     await this.initWebSocket();
-    // this.addPlayer();
   }
 
 
@@ -102,7 +99,6 @@ class ViewTournamentSalon extends HTMLElement {
       tournament_id: this.#tournament.id,
     };
     const data = await fetchAddPlayer(formData);
-    console.log(data);
     if (data.success === false) {
       this.viewPlayer();
     }
@@ -137,7 +133,6 @@ class ViewTournamentSalon extends HTMLElement {
         }
 
         const players = await response.json();
-        console.log(players);
         const listElement = this.querySelector('#playersList');
         listElement.innerHTML = '<h2>Players in the Tournaments</h2><br>'; // Titre pour la section
 
@@ -167,12 +162,8 @@ class ViewTournamentSalon extends HTMLElement {
 
         // Calculer le nombre de joueurs en attente
         const nbPlayersWaiting = this.#tournament.maxPlayer - players.length;
-        console.log(this.#tournament.maxPlayer);
-        console.log(players.length);
         if (nbPlayersWaiting === 0) {
           this.startCountdownAndRedirect(listElement);
-          // redirectTo(`/game/tournament/start`);
-          // return;
         }
         else{
           const waitingElement = document.createElement('div');
@@ -220,7 +211,6 @@ startCountdownAndRedirect(listElement) {
     this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
-        console.log('WebSocket connection established');
         this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
         this.socket.send(JSON.stringify({user_id: this.#user.id}));
         this.addPlayer();
@@ -257,7 +247,6 @@ startCountdownAndRedirect(listElement) {
     };
 
     this.socket.onclose = () => {
-        console.log('WebSocket connection closed');
     };
 
     this.socket.onerror = (error) => {

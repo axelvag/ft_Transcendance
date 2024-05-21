@@ -9,7 +9,9 @@ class DefaultLayoutSidebar extends HTMLElement {
   connectedCallback() {
     const user = getProfile();
     const tournament = getTournament();
-
+    if (tournament && tournament.id && tournament.status === 1) {
+      TournamentExist(tournament.id);
+    }
     let tournamentButtonHTML = '';
     if (tournament && tournament.id && tournament.status !== 2) {
       tournamentButtonHTML = `

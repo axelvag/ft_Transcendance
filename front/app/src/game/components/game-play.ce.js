@@ -9,7 +9,7 @@ import AudioPlayer from '../utils/AudioPlayer.js';
 import { exitFullscreen } from '@/fullscreen.js';
 import { redirectTo } from '@/router.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
-import { fetchWinnerMatch2 } from '@/tournament.js';
+import { fetchWinnerMatch , getTournament} from '@/tournament.js';
 
 const template = `
 <div class="gamePlay" hidden>
@@ -384,7 +384,10 @@ class GamePlay extends HTMLElement {
         this.#gameState.scoreLeft > this.#gameState.scoreRight
           ? this.#gameState.playerLeft.id
           : this.#gameState.playerRight.id;
-      fetchWinnerMatch2(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
+      let tournament = getTournament();
+      console.log(tournament);
+      if(tournament.id !== null && tournament.status === 1)
+        fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
     }
 
     // sounds

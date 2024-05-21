@@ -1,9 +1,14 @@
 import { isAuthenticated } from '@/auth.js';
 import { redirectTo } from '@/router.js';
+import { getTournament, fetchTournamentInfo } from '@/tournament.js';
 
 class ViewGameSetMode extends HTMLElement {
   async connectedCallback() {
     const isLoggedIn = await isAuthenticated();
+    await fetchTournamentInfo();
+    let tournament = getTournament();
+    if(tournament.status === 1)
+        redirectTo(`/game/tournament/start`);
     const backUrl = isLoggedIn ? '/dashboard' : '/';
 
     const isNotAuthenticatedAlert = `
