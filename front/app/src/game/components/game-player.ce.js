@@ -14,12 +14,13 @@ class GamePlayer extends HTMLElement {
     this.#attrs.score = this.getAttribute('score');
     this.#attrs['score-max'] = this.getAttribute('score-max');
     this.#attrs.direction = this.getAttribute('direction');
+    this.#attrs['flip-avatar'] = this.getAttribute('flip-avatar');
 
     this.#render();
   }
 
   static get observedAttributes() {
-    return ['avatar', 'name', 'type', 'score', 'score-max', 'direction', 'winner'];
+    return ['avatar', 'name', 'type', 'score', 'score-max', 'direction', 'flip-avatar', 'winner'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -45,6 +46,12 @@ class GamePlayer extends HTMLElement {
       } else {
         this.querySelector('.gamePlayer').classList.remove('is-winner');
       }
+    } else if (name === 'flip-avatar') {
+      if (newValue != null) {
+        this.querySelector('.gamePlayer').classList.add('is-flip-avatar');
+      } else {
+        this.querySelector('.gamePlayer').classList.remove('is-flip-avatar');
+      }
     }
   }
 
@@ -53,8 +60,11 @@ class GamePlayer extends HTMLElement {
   }
 
   #render() {
+    const directionClass = `is-${this.#getSide()}`;
+    const flipAvatarClass = this.#attrs['flip-avatar'] != null ? 'is-flip-avatar' : '';
+
     this.innerHTML = `
-      <div class="gamePlayer is-${this.#getSide()}">
+      <div class="gamePlayer ${directionClass} ${flipAvatarClass}">
         <div class="gamePlayer-avatar">
           <div class="gamePlayer-avatar-img">
             <img src="${this.#attrs.avatar}" />

@@ -124,12 +124,12 @@ class ViewGameOnline extends HTMLElement {
         player-left-name="${this.#playerLeft.name}"
         player-left-avatar="${this.#playerLeft.avatar}"
         player-left-type="${this.#playerLeft.type}"
-        player-left-wins="${this.#playerLeft.id === this.#game.winner_id}"
+        ${this.#playerLeft.id === this.#game.winner_id ? 'player-left-wins' : ''}
         player-right-id="${this.#playerRight.id}"
         player-right-name="${this.#playerRight.name}"
         player-right-avatar="${this.#playerRight.avatar}"
         player-right-type="${this.#playerRight.type}"
-        player-left-wins="${this.#playerRight.id === this.#game.winner_id}"
+        ${this.#playerRight.id === this.#game.winner_id ? 'player-right-wins' : ''}
         title="${title}"
         details='${details}'
       ></game-matchup>

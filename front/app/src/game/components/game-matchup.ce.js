@@ -50,7 +50,7 @@ class GameMatchup extends HTMLElement {
         <div class="gameMatchup-players">
           <game-player class="gameMatchup-player is-left"></game-player>
           <div class="gameMatchup-players-separator text-bicolor">vs</div>
-          <game-player class="gameMatchup-player is-right"direction="right"></game-player>
+          <game-player class="gameMatchup-player is-right"></game-player>
         </div>
         
         <div class="gameMatchup-details">
@@ -161,10 +161,14 @@ class GameMatchup extends HTMLElement {
     this.#playerRight.name = this.getAttribute('player-right-name');
     this.#playerRight.avatar = this.getAttribute('player-right-avatar');
     this.#playerRight.type = this.getAttribute('player-right-type');
-    this.#playerRight.wins = this.getAttribute('player-right-wins');
+    this.#playerRight.wins = this.hasAttribute('player-right-wins');
 
     this.playerRightEl = this.querySelector('.gameMatchup-player.is-right');
     if (this.playerRightEl) {
+      this.playerRightEl.setAttribute('direction', 'right');
+      if (this.#playerRight.avatar.startsWith('/assets/img/avatar-')) {
+        this.playerRightEl.setAttribute('flip-avatar', '');
+      }
       this.playerRightEl.setAttribute('name', this.#playerRight?.name);
       this.playerRightEl.setAttribute('avatar', this.#playerRight?.avatar);
       this.playerRightEl.setAttribute('type', this.#playerRight?.type);
@@ -174,7 +178,7 @@ class GameMatchup extends HTMLElement {
         this.playerRightEl.removeAttribute('type');
       }
       if (this.#playerRight.wins) {
-        this.playerRightEl.setAttribute('wins', this.#playerRight.wins);
+        this.playerRightEl.setAttribute('winner', true);
       } else {
         this.playerRightEl.removeAttribute('winner');
       }

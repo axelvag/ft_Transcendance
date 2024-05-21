@@ -30,12 +30,13 @@ function join(gameId) {
 }
 
 function handleWebsocketMessage(e) {
-  try {
-    self.postMessage(JSON.parse(e.data));
-  } catch (error) {
-    self.postMessage('error');
-    clear();
+  const data = JSON.parse(e.data);
+  if (data.now) {
+    const nowDiff = Date.now() - data.now;
+    if (data?.state?.ball?.startTime) data.state.ball.startTime += nowDiff;
+    if (data?.state?.ball?.endTime) data.state.ball.endTime += nowDiff;
   }
+  self.postMessage(data);
 }
 
 function start() {

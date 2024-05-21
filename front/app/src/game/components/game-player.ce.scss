@@ -10,9 +10,12 @@
   &.is-right {
     --gamePlayer-inset: auto 0 auto auto;
     --gamePlayer-color: var(--bs-secondary);
-    --gamePlayer-avatar-transform: scale(-1, 1);
     --gamePlayer-score-flex-direction: row-reverse;
     --gamePlayer-type-inset: auto 0 0 auto;
+  }
+
+  &.is-flip-avatar {
+    --gamePlayer-avatar-transform: scale(-1, 1);
   }
 
   &.is-winner {

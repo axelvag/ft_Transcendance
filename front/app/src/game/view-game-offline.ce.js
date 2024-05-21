@@ -8,6 +8,7 @@ class ViewGameOffline extends HTMLElement {
   #playerLeft = null;
   #playerRight = null;
   #duo = false;
+  #isLoggedIn = false;
 
   constructor() {
     super();
@@ -22,9 +23,11 @@ class ViewGameOffline extends HTMLElement {
 
     this.#duo = this.hasAttribute('duo');
 
-    const isLoggedIn = await isAuthenticated();
+    this.#isLoggedIn = await isAuthenticated();
     let profile = null;
-    if (isLoggedIn) {
+
+    if (this.#isLoggedIn) {
+      // logged in
       profile = await getProfile();
       this.#playerLeft = {
         id: profile.id,
@@ -32,17 +35,23 @@ class ViewGameOffline extends HTMLElement {
         avatar: profile.avatar,
         type: this.#duo ? '' : 'you',
       };
+      this.#playerRight = {
+        ...characters[0],
+        type: this.#duo ? '' : 'ai',
+      };
+      this.displayPlayerRightSelect();
     } else {
+      //  logged out
       this.#playerLeft = {
         ...characters[0],
         type: this.#duo ? '' : 'you',
       };
+      this.#playerRight = {
+        ...characters[1],
+        type: this.#duo ? '' : 'ai',
+      };
+      this.displayPlayerLeftSelect();
     }
-    this.#playerRight = {
-      ...characters[1],
-      type: this.#duo ? '' : 'ai',
-    };
-    this.displayPlayerLeftSelect();
   }
 
   disconnectedCallback() {
@@ -79,9 +88,9 @@ class ViewGameOffline extends HTMLElement {
       ></game-select-player>
     `;
 
-    const playerLeftSelect = this.querySelector('#gameOffline-select-right');
-    playerLeftSelect.onCancel = this.displayPlayerLeftSelect;
-    playerLeftSelect.onSelect = newValue => {
+    const playerRightSelect = this.querySelector('#gameOffline-select-right');
+    playerRightSelect.onCancel = this.#isLoggedIn ? () => redirectTo('/dashboard') : this.displayPlayerLeftSelect;
+    playerRightSelect.onSelect = newValue => {
       this.#playerRight = newValue;
       this.displayPlayers();
     };
