@@ -24,7 +24,7 @@ def is_valid_image(file):
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}/"
         try:
             response = requests.get(update_url, verify=False)
         except requests.RequestException as e:
@@ -147,7 +147,7 @@ def get_user_profile(request, user_id):
     # call service authentification to get username and email
     auth_service_url = "https://authentification:8001/accounts/get_profile/"
     try:
-        auth_response = requests.get(f"{auth_service_url}{user_id}", cookies={'sessionid': request.COOKIES.get('sessionid')}, verify=False)
+        auth_response = requests.get(f"{auth_service_url}{user_id}/", cookies={'sessionid': request.COOKIES.get('sessionid')}, verify=False)
         if auth_response.status_code == 200:
             auth_data = auth_response.json()
             username = auth_data.get('username', '')

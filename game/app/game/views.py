@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def verify_sessionid(request):
   session_id = request.COOKIES.get('sessionid', None)
-  response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{session_id}", verify=False)
+  response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{session_id}/", verify=False)
   return response.json()['user_id']
 
 @method_decorator(csrf_exempt, name='dispatch')

@@ -50,7 +50,7 @@ User = get_user_model()
 def verif_sessionID_extension(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}/"
         try:
             response = requests.get(update_url, verify=False)
         except requests.RequestException as e:
@@ -378,7 +378,8 @@ def get_profile(request, user_id):
         "username": user.username,
         "email": user.email
     })
-
+    
+@require_http_methods(["POST"])
 def oauth_callback(request):
     try:
         data = json.loads(request.body.decode('utf8'))
