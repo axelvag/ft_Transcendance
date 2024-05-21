@@ -166,7 +166,7 @@ class GameMatchup extends HTMLElement {
     this.playerRightEl = this.querySelector('.gameMatchup-player.is-right');
     if (this.playerRightEl) {
       this.playerRightEl.setAttribute('direction', 'right');
-      if (this.#playerRight.type === 'ai') {
+      if (this.#playerRight.avatar.startsWith('/assets/img/avatar-')) {
         this.playerRightEl.setAttribute('flip-avatar', '');
       }
       this.playerRightEl.setAttribute('name', this.#playerRight?.name);

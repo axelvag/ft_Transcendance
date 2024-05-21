@@ -255,7 +255,7 @@ class GamePlay extends HTMLElement {
       this.playerRightEl.setAttribute('score', 0);
       this.playerRightEl.setAttribute('score-max', this.#gameState.scoreMax);
       this.playerRightEl.setAttribute('direction', 'right');
-      if (this.#playerRight.type === 'ai') {
+      if (this.#playerRight.avatar.startsWith('/assets/img/avatar-')) {
         this.playerRightEl.setAttribute('flip-avatar', '');
       }
     }
