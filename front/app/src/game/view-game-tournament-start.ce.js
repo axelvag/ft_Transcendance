@@ -546,11 +546,9 @@ class ViewTournamentstart extends HTMLElement {
         notifyInfo('2 user not ready, random Winner going to choose!');
       }
       if (this.#match.player1ready === 0 && this.#match.player2ready === 1 && this.#match.player1id === this.#user.id) {
-        // this.UserOneReadyTime(this.#match.player2id);
         await this.handleReadyButtonClick(this.#match.player1id);
         notifyInfo(`${player1Name} not ready, he will be mark as ready!`);
       } else if (this.#match.player2ready === 0 && this.#match.player1ready === 1 && this.#match.player2id === this.#user.id) {
-        // this.UserOneReadyTime(this.#match.player1id);
         await this.handleReadyButtonClick(this.#match.player2id);
         notifyInfo(`${player2Name} not ready, he will be mark as ready!`);
       }

@@ -211,7 +211,6 @@ startCountdownAndRedirect(listElement) {
     this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
-        // console.log('WebSocket connection established');
         this.socket.send(JSON.stringify({tournoi_id: this.#tournament.id}));
         this.socket.send(JSON.stringify({user_id: this.#user.id}));
         this.addPlayer();
@@ -248,7 +247,6 @@ startCountdownAndRedirect(listElement) {
     };
 
     this.socket.onclose = () => {
-        // console.log('WebSocket connection closed');
     };
 
     this.socket.onerror = (error) => {
