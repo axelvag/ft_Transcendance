@@ -11,7 +11,7 @@ import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
 import { notifyError } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
-import { fetchWinnerMatch , getTournament} from '@/tournament.js';
+import { fetchWinnerMatch, getTournament } from '@/tournament.js';
 
 const template = `
 <div class="gamePlay" hidden>
@@ -255,6 +255,9 @@ class GamePlay extends HTMLElement {
       this.playerRightEl.setAttribute('score', 0);
       this.playerRightEl.setAttribute('score-max', this.#gameState.scoreMax);
       this.playerRightEl.setAttribute('direction', 'right');
+      if (this.#playerRight.type === 'ai') {
+        this.playerRightEl.setAttribute('flip-avatar', '');
+      }
     }
   }
 
@@ -410,7 +413,7 @@ class GamePlay extends HTMLElement {
           : this.#gameState.playerRight.id;
       let tournament = getTournament();
       console.log(tournament);
-      if(tournament.id !== null && tournament.status === 1)
+      if (tournament.id !== null && tournament.status === 1)
         fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
     }
 

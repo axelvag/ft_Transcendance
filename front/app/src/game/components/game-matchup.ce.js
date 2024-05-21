@@ -50,7 +50,7 @@ class GameMatchup extends HTMLElement {
         <div class="gameMatchup-players">
           <game-player class="gameMatchup-player is-left"></game-player>
           <div class="gameMatchup-players-separator text-bicolor">vs</div>
-          <game-player class="gameMatchup-player is-right"direction="right"></game-player>
+          <game-player class="gameMatchup-player is-right"></game-player>
         </div>
         
         <div class="gameMatchup-details">
@@ -165,6 +165,10 @@ class GameMatchup extends HTMLElement {
 
     this.playerRightEl = this.querySelector('.gameMatchup-player.is-right');
     if (this.playerRightEl) {
+      this.playerRightEl.setAttribute('direction', 'right');
+      if (this.#playerRight.type === 'ai') {
+        this.playerRightEl.setAttribute('flip-avatar', '');
+      }
       this.playerRightEl.setAttribute('name', this.#playerRight?.name);
       this.playerRightEl.setAttribute('avatar', this.#playerRight?.avatar);
       this.playerRightEl.setAttribute('type', this.#playerRight?.type);
