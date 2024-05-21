@@ -89,9 +89,7 @@ class ViewFriend extends HTMLElement {
   }
 
   initInvitationsWebSocket() {
-    this.wsInstance.onopen = () => {
-      console.log('WebSocket for invitation connected');
-    };
+    this.wsInstance.onopen = () => {};
 
     this.wsInstance.onmessage = event => {
       const data = JSON.parse(event.data);
@@ -119,15 +117,12 @@ class ViewFriend extends HTMLElement {
       console.error('WebSocket error observed:', event);
     };
 
-    this.wsInstance.onclose = event => {
-      console.log('WebSocket close:', event.code, event.reason);
-    };
+    this.wsInstance.onclose = event => {};
   }
 
   closeWebSocket() {
     if (this.wsInstance) {
       this.wsInstance.close();
-      console.log('WebSocket connection closed manually.');
     }
   }
 
@@ -190,7 +185,7 @@ class ViewFriend extends HTMLElement {
                 'Are you sure you want to delete your invitation ? This action cannot be undone.',
                 {
                   okCallback: () => this.cancelSentInvitation(invitation.invitation_id, invitation.from_user_username),
-                  cancelCallback: () => console.log('Deletion cancelled.'),
+                  cancelCallback: () => {},
                 }
               );
 
@@ -345,12 +340,9 @@ class ViewFriend extends HTMLElement {
         this.loadOfflineFriends();
         this.loadOnlineFriends();
         this.loadFriendRequests();
-      } else {
-        console.log('False');
       }
     } catch (error) {
       console.error('Error:', error);
-      console.log('Failed to send friend request: ' + error.message);
     }
   }
 
@@ -373,12 +365,9 @@ class ViewFriend extends HTMLElement {
         this.loadOfflineFriends();
         this.loadOnlineFriends();
         this.loadFriendRequests();
-      } else {
-        console.log('False');
       }
     } catch (error) {
       console.error('Error:', error);
-      console.log('Failed to send friend request: ' + error.message);
     }
   }
 
@@ -506,7 +495,6 @@ class ViewFriend extends HTMLElement {
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to send friend request: ' + error.message);
     }
   }
 
@@ -577,7 +565,7 @@ class ViewFriend extends HTMLElement {
           deleteButton.onclick = () =>
             showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
               okCallback: () => this.confirmDeleteFriend(friend.friend_id),
-              cancelCallback: () => console.log('Deletion cancelled.'),
+              cancelCallback: () => {},
             });
 
           listItem.appendChild(deleteButton);
@@ -647,7 +635,7 @@ class ViewFriend extends HTMLElement {
           deleteButton.onclick = () =>
             showModal('Confirm User Deletion', 'Are you sure you want to delete user? This action cannot be undone.', {
               okCallback: () => this.confirmDeleteFriend(),
-              cancelCallback: () => console.log('Deletion cancelled.'),
+              cancelCallback: () => {},
             });
 
           listItem.appendChild(deleteButton);

@@ -29,19 +29,18 @@ const initModal = () => {
   document.body.insertAdjacentHTML('beforeend', modalHTML);
   const modalElement = document.querySelector(modalSelector);
   const modalInstance = new Modal(modalElement, {
-    keyboard: false
+    keyboard: false,
   });
 
   // Add event listener for 'OK' button
-    document.getElementById('modalOkButton').addEventListener('click', () => {
-      console.log('OK clicked');
-      modalInstance.hide();
-    });
+  document.getElementById('modalOkButton').addEventListener('click', () => {
+    modalInstance.hide();
+  });
 
   modalElement.addEventListener('hidden.bs.modal', () => {
     modalInstance.dispose();
     modalElement.remove();
-    isModalInitialized = false;  // Reinitialize if needed again
+    isModalInitialized = false; // Reinitialize if needed again
   });
 
   isModalInitialized = true;
@@ -73,6 +72,5 @@ const showModal = (title, message, options = {}) => {
 
   modalInstance.show();
 };
-
 
 export { showModal, initModal };

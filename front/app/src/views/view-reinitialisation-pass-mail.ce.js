@@ -54,9 +54,6 @@ class ViewForgetPass extends HTMLElement {
       const successNotification = document.getElementById('success-notification');
       if (successNotification) successNotification.style.display = 'block';
       document.getElementById('pass-form').style.display = 'none';
-    } else {
-      alert('errors');
-      console.log(data.errors);
     }
   }
 }

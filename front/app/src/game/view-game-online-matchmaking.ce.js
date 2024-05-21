@@ -1,5 +1,6 @@
 import { redirectTo } from '@/router.js';
 import { WS_BASE_URL } from '@/constants.js';
+import { notifyError } from '@/notifications.js';
 
 class ViewGameOnlineMatchmaking extends HTMLElement {
   #ws;
@@ -12,9 +13,8 @@ class ViewGameOnlineMatchmaking extends HTMLElement {
     this.#ws = new WebSocket(`${WS_BASE_URL}:8009/search-opponent`);
     this.#ws.onerror = this.handleError;
     this.#ws.onmessage = this.handleMessage;
-    this.#ws.onopen = () => console.log('WebSocket opened');
+    this.#ws.onopen = () => {};
     this.#ws.onclose = () => {
-      console.log('WebSocket closed');
       this.#ws = null;
     };
   }
@@ -52,9 +52,7 @@ class ViewGameOnlineMatchmaking extends HTMLElement {
   handleError(e) {
     console.error('WebSocket error:', e);
     redirectTo('/game');
-
-    // TODO: improve error handling
-    alert('Matchmaking: An error occured. Please try again.');
+    notifyError('Matchmaking: An error occured. Please try again.');
   }
 
   handleMessage(e) {

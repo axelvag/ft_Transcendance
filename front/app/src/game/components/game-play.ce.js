@@ -412,7 +412,6 @@ class GamePlay extends HTMLElement {
           ? this.#gameState.playerLeft.id
           : this.#gameState.playerRight.id;
       let tournament = getTournament();
-      console.log(tournament);
       if (tournament.id !== null && tournament.status === 1)
         fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
     }

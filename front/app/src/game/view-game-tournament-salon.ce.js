@@ -91,7 +91,7 @@ class ViewTournamentSalon extends HTMLElement {
       'Are you sure you want to delete your tournament? This action cannot be undone.',
       {
         okCallback: () => this.deleteTournament(),
-        cancelCallback: () => console.log('Deletion cancelled.'),
+        cancelCallback: () => {},
       }
     );
   }
@@ -123,8 +123,6 @@ class ViewTournamentSalon extends HTMLElement {
     if (data.success) {
       resetLocalTournament();
       redirectTo(this.#backUrl);
-    } else {
-      console.log('error');
     }
   }
 
