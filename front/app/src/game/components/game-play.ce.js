@@ -6,7 +6,8 @@ import './game-play.ce.scss';
 import GameWorker from '../utils/GameWorker.js?worker';
 import GameWorkerRemote from '../utils/GameWorkerRemote.js?worker';
 import AudioPlayer from '../utils/AudioPlayer.js';
-import { exitFullscreen } from '@/fullscreen.js';
+import { enterFullscreen, exitFullscreen } from '@/fullscreen.js';
+import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
 import { notifyError } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
@@ -16,7 +17,37 @@ const template = `
 <div class="gamePlay" hidden>
   <div class="gamePlay-wrapper">
     <div class="gamePlay-header">
+
+      <!-- Scoreboard -->
       <game-scoreboard></game-scoreboard>
+
+    </div>
+    <div class="gamePlay-nav">
+
+      <!-- Back -->
+      <button class="gamePlay-nav-item" id="gamePlay-back">
+        <ui-icon name="arrow-left"></ui-icon>
+      </button>
+
+      <!-- Spacer -->
+      <div class="gamePlay-nav-spacer"></div>
+
+      <!-- Theme -->
+      <button class="gamePlay-nav-item dark-hidden" id="gamePlay-theme-dark">
+        <ui-icon name="sun"></ui-icon>
+      </button>
+      <button class="gamePlay-nav-item dark-visible" id="gamePlay-theme-light">
+        <ui-icon name="moon"></ui-icon>
+      </button>
+
+      <!-- Fullscreen -->
+      <button class="gamePlay-nav-item fullscreen-hidden" id="gamePlay-enterFullscreen">
+        <ui-icon name="expand"></ui-icon>
+      </button>
+      <button class="gamePlay-nav-item fullscreen-visible" id="gamePlay-exitFullscreen">    
+        <ui-icon name="collapse"></ui-icon>
+      </button>
+
     </div>
     <div class="gamePlay-body">
       <div class="gamePlay-body-left">
@@ -41,11 +72,6 @@ const template = `
       </div>
       </div>
     </div>
-    <div class="gamePlay-footer">
-      <a href="#" class="gamePlay-footer-btn" data-action="pause">
-        <ui-icon name="pause"></ui-icon>
-      </a>
-    </div>
   </div>
   <div id="gamePlay-matchup"></div>
 </div>
@@ -65,6 +91,7 @@ class GamePlay extends HTMLElement {
   #playerLeftKeys = ['w', 's'];
   #playerRightKeys = ['ArrowUp', 'ArrowDown'];
   #aiInterval = null;
+  #backRoute;
 
   constructor() {
     super();
@@ -78,7 +105,17 @@ class GamePlay extends HTMLElement {
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
     this.handleClick = this.handleClick.bind(this);
 
+    this.#audioPlayer = new AudioPlayer();
+    this.#audioPlayer.load('collision', '/assets/sounds/hit.wav');
+    this.#audioPlayer.load('score', '/assets/sounds/score.wav');
+    this.#audioPlayer.load('victory', '/assets/sounds/victory.wav');
+    this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
+  }
+
+  connectedCallback() {
+    // Web worker
     this.#isOnline = this.hasAttribute('game-id');
+
     if (this.#isOnline) {
       this.gameWorker = new GameWorkerRemote();
       this.gameWorker.postMessage({
@@ -92,15 +129,18 @@ class GamePlay extends HTMLElement {
       this.gameWorker = new GameWorker();
     }
 
-    this.#audioPlayer = new AudioPlayer();
-    this.#audioPlayer.load('collision', '/assets/sounds/hit.wav');
-    this.#audioPlayer.load('score', '/assets/sounds/score.wav');
-    this.#audioPlayer.load('victory', '/assets/sounds/victory.wav');
-    this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
-  }
-
-  connectedCallback() {
+    // Template
     this.innerHTML = template;
+
+    // back route
+    this.#backRoute = this.getAttribute('back-route') || '/dashboard';
+
+    // Nav
+    this.querySelector('#gamePlay-enterFullscreen').addEventListener('click', enterFullscreen);
+    this.querySelector('#gamePlay-exitFullscreen').addEventListener('click', exitFullscreen);
+    this.querySelector('#gamePlay-theme-dark').addEventListener('click', () => selectTheme('dark'));
+    this.querySelector('#gamePlay-theme-light').addEventListener('click', () => selectTheme('light'));
+    this.querySelector('#gamePlay-back').addEventListener('click', () => redirectTo(this.#backRoute));
 
     // Players
     this.#playerLeft = {
@@ -280,7 +320,7 @@ class GamePlay extends HTMLElement {
 
       this.matchupEl.innerHTML = `
         <game-matchup
-          back-route="${this.getAttribute('back-route') || '/dashboard'}"
+          back-route="${this.#backRoute}"
           player-left-id="${this.#gameState.playerLeft.id}"
           player-left-name="${this.#gameState.playerLeft.name}"
           player-left-avatar="${this.#gameState.playerLeft.avatar}"
@@ -447,7 +487,7 @@ class GamePlay extends HTMLElement {
     e.preventDefault();
     const action = actionBtn.getAttribute('data-action');
     if (action === 'quit') {
-      redirectTo(this.getAttribute('back-route') || '/dashboard');
+      redirectTo(this.#backRoute);
     } else if (action === 'resume') {
       this.gameWorker.postMessage({ type: 'resume' });
     } else if (action === 'pause') {
