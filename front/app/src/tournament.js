@@ -80,19 +80,6 @@ const resetLocalMatch = () => {
   match.player2ready = null;
 };
 
-// const getMatch = () => {
-//   return {
-//     id: match.id,
-//     winner: match.winner,
-//     status: match.status,
-//     player1id: match.player1id,
-//     player2id: match.player2id,
-//     leave: match.leave,
-//   };
-// };
-//   match.game_id = null;
-// };
-
 const getMatch = () => ({ ...match });
 
 const fetchGetTournament = async tournamentId => {

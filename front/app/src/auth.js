@@ -127,7 +127,6 @@ const logout = async () => {
   try {
     await fetchTournamentInfo();
     let tournament = getTournament();
-    console.log("logout tournament", tournament);
     if(tournament.status !== 1)
       await fetchDeletePlayer();
     closeViewFriendWebSocket();
@@ -328,7 +327,6 @@ const deleteUser = async csrfToken => {
   try {
     await fetchTournamentInfo();
     let tournament = getTournament();
-    console.log("logout tournament", tournament);
     if(tournament.status !== 1)
       await fetchDeletePlayer();
     const url = `${BASE_URL}:8001/accounts/delete_user/${user.username}`;
