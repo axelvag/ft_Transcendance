@@ -9,7 +9,7 @@ import AudioPlayer from '../utils/AudioPlayer.js';
 import { enterFullscreen, exitFullscreen } from '@/fullscreen.js';
 import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
-import { notifyError } from '@/notifications.js';
+import { notifyError, notifyInfo } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
 import { fetchWinnerMatch, getTournament } from '@/tournament.js';
 
@@ -297,6 +297,12 @@ class GamePlay extends HTMLElement {
             <ui-icon name="quit"></ui-icon>
           </button>
         `;
+        setTimeout(() => {
+          if (this.#gameState.status === 'waiting') {
+            redirectTo(this.#backRoute);
+            notifyInfo('The opponent did not join the game.');
+          }
+        }, 60000);
       } else if (this.#gameState.status === 'paused') {
         title = 'Paused';
         details = `
