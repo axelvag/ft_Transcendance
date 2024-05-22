@@ -46,9 +46,19 @@ class ViewNewPass extends HTMLElement {
     const params = new URLSearchParams(queryString);
     this.uidb64 = params.get('uidb64');
     const token = params.get('token');
+    console.log(this.uidb64);
+    console.log(token);
     try{
-      const response = await fetch(`${BASE_URL}:8001/accounts/activate_mail_pass/${this.uidb64}/${token}`);
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`${BASE_URL}:8001/accounts/activate_mail_pass/${this.uidb64}/${token}`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+      });
       const data = await response.json();
+      console.log(data);
       this.querySelector('#email-confirm-loading').hidden = true;
       if (data.success) {
         // if (data.message) this.querySelector('#email-confirm-success').textContent = data.message;
@@ -71,7 +81,14 @@ class ViewNewPass extends HTMLElement {
         this.querySelector('#email-confirm-loading').hidden = false;
   
         // Effectuez une nouvelle demande de confirmation par e-mail
-        const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_rest/${this.uidb64}`);
+        const csrfToken = await getCsrfToken();
+        const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_rest/${this.uidb64}`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+          credentials: 'include',
+        });
         const data = await response.json();
       });
     }
@@ -88,20 +105,24 @@ class ViewNewPass extends HTMLElement {
   async submitForm(event) {
     event.preventDefault();
 
+    console.log('Click submit !');
     const password1 = document.getElementById('password1').value;
     const password2 = document.getElementById('password2').value;
 
     const csrfToken = await getCsrfToken();
 
     const url = `${BASE_URL}:8001/accounts/password-change/${this.uidb64}`; // Ajout de uidb64 à l'URL
+    console.log(url);
     const formData = {
       new_password: password1, // Assurez-vous que ces clés correspondent aux attentes de votre backend
       confirm_password: password2,
     };
 
     const data = await sendEmailPasswordReset(formData, csrfToken, url);
+    console.log(data);
     if (data.success) {
       redirectTo('/login');
+      console.log('Success!');
       notify({
         icon: 'info',
         iconClass: 'text-info',

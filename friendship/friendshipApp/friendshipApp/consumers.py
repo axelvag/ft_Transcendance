@@ -26,7 +26,7 @@ class InvitationConsumer(AsyncWebsocketConsumer):
         else:
             print("Session ID non trouvé")
 
-        update_url = f"https://authentification:8001/accounts/verif_sessionid/{sessionid}"
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{sessionid}/"
         try:
             response = requests.get(update_url, verify=False)
         except requests.RequestException as e:

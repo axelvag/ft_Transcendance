@@ -26,7 +26,7 @@ User = get_user_model()
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}/"
         try:
             response = requests.get(update_url, verify=False)
         except requests.RequestException as e:
@@ -517,7 +517,7 @@ def set_player_ready(request, player_id, match_id):
         return JsonResponse({"success": False, "error": "Player not found."}, status=404)
 
 
-
+# @verif_sessionID
 def get_profile_info_cookie(user_id, cookies):
     profile_service_url = f"https://profile:8002/get_user_profile/{user_id}/"
     try:

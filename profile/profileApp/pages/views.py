@@ -24,7 +24,7 @@ def is_valid_image(file):
 def verif_sessionID(view_func):
     def wrapper(request, *args, **kwargs):
         session_id = request.COOKIES.get('sessionid', None)
-        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}"
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}/"
         try:
             response = requests.get(update_url, verify=False)
         except requests.RequestException as e:
@@ -73,7 +73,7 @@ def update_user(request):
     auth_data = {'id': user_id, 'username': username}
 
     try:
-        auth_response = requests.post(auth_service_url, json=auth_data, verify=False)
+        auth_response = requests.post(auth_service_url, json=auth_data, cookies={'sessionid': request.COOKIES.get('sessionid')}, verify=False)
         if auth_response.status_code == 400:
             return JsonResponse({"success": False, "message": "This user name is already taken."})
         if auth_response.status_code != 200:
@@ -147,7 +147,7 @@ def get_user_profile(request, user_id):
     # call service authentification to get username and email
     auth_service_url = "https://authentification:8001/accounts/get_profile/"
     try:
-        auth_response = requests.get(f"{auth_service_url}{user_id}", verify=False)
+        auth_response = requests.get(f"{auth_service_url}{user_id}/", cookies={'sessionid': request.COOKIES.get('sessionid')}, verify=False)
         if auth_response.status_code == 200:
             auth_data = auth_response.json()
             username = auth_data.get('username', '')
@@ -176,6 +176,7 @@ def get_user_profile(request, user_id):
     })
 
 @csrf_exempt
+@verif_sessionID
 @require_http_methods(["DELETE"])
 def delete_user_profile(request, user_id):
     logging.info(f"Attempting to delete profile for user_id: {user_id}")

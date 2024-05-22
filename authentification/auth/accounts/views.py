@@ -46,6 +46,24 @@ load_dotenv(dotenv_path)
 # Create your views here.
 User = get_user_model()
 
+@csrf_exempt
+def verif_sessionID_extension(view_func):
+    def wrapper(request, *args, **kwargs):
+        session_id = request.COOKIES.get('sessionid', None)
+        update_url = f"https://authentification:8001/accounts/verif_sessionid/{session_id}/"
+        try:
+            response = requests.get(update_url, verify=False)
+        except requests.RequestException as e:
+                print(f"HTTP request error: {e}")
+                return JsonResponse({'error': 'Communication error with external service'}, status=503)
+        if response.status_code != 200:
+            return JsonResponse({"success": False, "message": "SessionID Invalid"}, status=400)
+        
+        return view_func(request, *args, **kwargs)
+    
+    return wrapper
+
+@require_http_methods(["POST"])
 def activate(request, uidb64, token):
     User = get_user_model()
     try:
@@ -77,6 +95,7 @@ def activateEmail(request, user, to_email):
     else:
         return JsonResponse({"success": False, "message": f'Problem sending email to {to_email}, check if you typed it correctly.'}, status=HttpResponseBadRequest.status_code)
 
+@require_http_methods(["POST"])
 def login_user(request):
     if request.method == 'POST':
         try:
@@ -117,6 +136,7 @@ def login_user(request):
 
     return JsonResponse({"success": False, "message": "Invalid request method."}, status=HttpResponseBadRequest.status_code)
 
+@require_http_methods(["POST"])
 def logout_user(request):
     if request.method == 'POST':
         logout(request)
@@ -145,6 +165,7 @@ def register_user(request):
 def get_csrf_token(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
+@require_http_methods(["GET"])
 def is_user_active(request, uidb64, token):
     User = get_user_model()
     try:
@@ -158,6 +179,7 @@ def is_user_active(request, uidb64, token):
     else:
         return JsonResponse({"success": False, "message": "user non actif."}, status=400)
 
+@require_http_methods(["POST"])
 def resend_email_confirmation(request, uidb64):
     User = get_user_model()
     try:
@@ -213,7 +235,7 @@ def password_reset(request):
     else:
         return JsonResponse({'error': 'Request method not allowed.'}, status=405)
 
-
+@require_http_methods(["POST"])
 def activate_mail_pass(request, uidb64, token):
     User = get_user_model()
     try:
@@ -257,6 +279,7 @@ def password_change(request, uidb64):
     else:
         return JsonResponse({'error': 'Request method not allowed.'}, status=405)
 
+@require_http_methods(["POST"])
 def resend_email_rest(request, uidb64):
     User = get_user_model()
     try:
@@ -289,7 +312,7 @@ def delete_user(request, username):
         data = json.loads(request.body)
         user_id = data.get('user_id')
 
-        response = requests.post(f"https://friendship:8003/delete_user_data/{user_id}/", verify=False)
+        response = requests.post(f"https://friendship:8003/delete_user_data/{user_id}/", cookies={'sessionid': request.COOKIES.get('sessionid')}, verify=False)
         if response.status_code == 200:
             user.delete()
             return JsonResponse({"success": True, "message": "User deleted successfully."}, status=200)
@@ -310,7 +333,8 @@ def is_user_logged_in(request):
 
 
 @csrf_exempt
-# @require_http_methods(["POST"])
+@verif_sessionID_extension
+@require_http_methods(["POST"])
 def update_profile(request):
     data = json.loads(request.body)
     user_id = data.get('id')
@@ -339,6 +363,7 @@ def update_profile(request):
     return JsonResponse({"success": True, "message": "User information updated successfully.", "username": user.username, "email": user.email})
 
 @csrf_exempt
+@verif_sessionID_extension
 @require_http_methods(["GET"])
 def get_profile(request, user_id):
     try:
@@ -353,7 +378,8 @@ def get_profile(request, user_id):
         "username": user.username,
         "email": user.email
     })
-
+    
+@require_http_methods(["POST"])
 def oauth_callback(request):
     try:
         data = json.loads(request.body.decode('utf8'))
@@ -441,3 +467,5 @@ def verif_sessionID(request, session_id):
 
     # Réponse de succès avec le nom d'utilisateur
     return JsonResponse({'success': 'Valid session', 'username': user.username, 'user_id': user.id}, status=200)
+
+

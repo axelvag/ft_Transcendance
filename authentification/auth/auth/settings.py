@@ -187,3 +187,5 @@ OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
 OAUTH_REDIRECT_URI = f'{os.getenv("BASE_URL")}:8000/auth42-callback'  # Ajustez selon votre URI de redirection
 OAUTH_AUTHORIZATION_URL = 'https://api.intra.42.fr/oauth/authorize'
 OAUTH_TOKEN_URL = 'https://api.intra.42.fr/oauth/token'
+
+APPEND_SLASH = False
