@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def verify_sessionid(request):
   session_id = request.COOKIES.get('sessionid', None)
-  response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{session_id}", verify=False)
+  response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{session_id}/", verify=False)
   return response.json()['user_id']
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -39,7 +39,7 @@ class GameListView(View):
     # Create a new game
     try:
       data = json.loads(request.body)
-      game = Game(player_left_id=data.get('player_left_id'), player_right_id=data.get('player_right_id'))
+      game = Game(player_left_id=data.get('player_left_id'), player_right_id=data.get('player_right_id'), match_id=data.get('match_id'))
       game.save()
       return JsonResponse(game.json(), safe=False, status=201)
     except json.JSONDecodeError:
@@ -84,10 +84,10 @@ class GameItemView(View):
         return JsonResponse({'error': 'player_left_id and player_right_id cannot be the same'}, safe=False, status=400)
       if data.get('player_right_id') and data.get('player_right_id') == game.player_left_id:
         return JsonResponse({'error': 'player_left_id and player_right_id cannot be the same'}, safe=False, status=400)
-      # todo check if player_left_id  and player_right_id exist
 
       game.player_left_id = data.get('player_left_id', game.player_left_id)
       game.player_right_id = data.get('player_right_id', game.player_right_id)
+      game.match_id = data.get('match_id', game.match_id)
       game.save()
       return JsonResponse(game.json(), safe=False, status=200)
     except json.JSONDecodeError:
@@ -162,6 +162,12 @@ class GamePlayerHistoryView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class UserGameStatusView(View):
     def get(self, request, user_id):
+
+        try:
+          verify_sessionid(request)
+        except Exception as e:
+          return JsonResponse({'error': str(e)}, safe=False, status=403)
+
         # Find any game where the user is currently playing
         current_game = Game.objects.filter(
             (Q(player_left_id=user_id) | Q(player_right_id=user_id)) & Q(status='RUNNING')

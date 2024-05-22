@@ -29,7 +29,7 @@ class SearchOpponentConsumer(AsyncWebsocketConsumer):
     if not sessionid:
       raise Exception('session ID not found')
 
-    response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{sessionid}", verify=False)
+    response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{sessionid}/", verify=False)
     if response.status_code != 200:
       raise Exception('wrong session ID')
     

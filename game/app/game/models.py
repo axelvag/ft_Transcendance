@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+import requests
 
 class Game(models.Model):
   STATUS_CHOICES = [
@@ -19,6 +20,8 @@ class Game(models.Model):
   player_right_score = models.IntegerField(default=0)
   player_right_connected = models.BooleanField(default=False)
   player_right_forfeit = models.BooleanField(default=False)
+
+  match_id = models.CharField(max_length=255, null=True, blank=True)
   
   status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='WAITING')
   winner_id = models.CharField(max_length=255, null=True, blank=True)
@@ -36,6 +39,7 @@ class Game(models.Model):
       'player_right_score': self.player_right_score,
       'player_right_connected': self.player_right_connected,
       'player_right_forfeit': self.player_right_forfeit,
+      'match_id': self.match_id,
       'status': self.status,
       'winner_id': self.winner_id,
       'created_at': self.created_at.strftime('%Y-%m-%dT%H:%M:%S'),
@@ -59,28 +63,29 @@ class Game(models.Model):
     elif self.player_right_id == player_id:
       self.player_right_connected = True
     if self.player_left_connected and self.player_right_connected:
-      self.status = 'READY'
-      # trasnsition RUNNING
-      if self.status == 'READY':
-            self.status = 'RUNNING'
+      self.status = 'RUNNING'
     self.save()
     return True
 
-  def leave(self, player_id):
+  def leave(self, player_id, sessionid):
     self.refresh_from_db()
+    if self.status == 'FINISHED' or self.status == 'ABORTED':
+      return
     if self.player_left_id == player_id:
       self.player_left_connected = False
       opponent_id = self.player_right_id
     elif self.player_right_id == player_id:
       self.player_right_connected = False
       opponent_id = self.player_left_id
-    if self.status != 'FINISHED':
-      self.status = 'FINISHED'
-      self.ended_at = timezone.now()
-      self.winner_id = opponent_id
-      self.player_left_forfeit = (self.player_left_id == player_id)
-      self.player_right_forfeit = (self.player_right_id == player_id)
+    self.status = 'FINISHED'
+    self.ended_at = timezone.now()
+    self.winner_id = opponent_id
+    self.player_left_forfeit = (self.player_left_id == player_id)
+    self.player_right_forfeit = (self.player_right_id == player_id)
     self.save()
+    if (self.match_id != None):
+      print("update winnerrrrrrrrrrrrrrrrrrrrr leaveeeeeeeeeeeeeeeeeeeeee")
+      self.send_tournament_winner(sessionid)
 
   def end(self, data):
     self.refresh_from_db()
@@ -99,5 +104,17 @@ class Game(models.Model):
     self.player_right_score = data.get('player_right_score', self.player_right_score)
     self.player_right_forfeit = data.get('player_right_forfeit', False)
     self.save()
-    return True
+    if (self.match_id != None):
+      print("update winnerrrrrrrrrrrrrrrrrrrrr enddddddddddddddddd")
+      self.send_tournament_winner(data.get('sessionid', None))
 
+  def send_tournament_winner(self, sessionid):
+    self.refresh_from_db()
+    try:
+      request_url = f"https://tournament:8005/tournament/update_winner/{self.match_id}/{self.winner_id}/{self.player_left_score}/{self.player_right_score}/"
+      response = requests.post(request_url, cookies={'sessionid': sessionid}, verify=False)
+      response.raise_for_status()
+    except requests.RequestException as e:
+      return
+    except Exception as e:
+      return

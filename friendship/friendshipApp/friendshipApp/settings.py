@@ -19,7 +19,7 @@ URL = os.getenv('BASE_URL')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-6bdpwckj*ktsr&n57rvtw0fi(yvppihbv$&r@f-575@exceg9q'
+SECRET_KEY = os.getenv('SECRET_KEY_FRIE')
 DEBUG = True
 
 

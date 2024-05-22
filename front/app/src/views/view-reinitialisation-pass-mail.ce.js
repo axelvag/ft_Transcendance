@@ -22,6 +22,7 @@ class ViewForgetPass extends HTMLElement {
             </button>
           </div>
         </form>
+        <div id="email-error" class="alert alert-danger mt-4" style="display: none;">Wrong email.</div>
         <div id="success-notification" style="display: none;">
           <div class="alert alert-success mb-4">
             <div class="mb-2"><strong>Reset successful!</strong></div>
@@ -36,11 +37,13 @@ class ViewForgetPass extends HTMLElement {
       </auth-layout>
     `;
 
+    this.emailError = this.querySelector('#email-error');
     this.querySelector('#pass-form').addEventListener('submit', this.submitForm.bind(this));
   }
 
   async submitForm(event) {
     event.preventDefault();
+    this.emailError.style.display = 'none';
     const form = event.target;
     const email = document.getElementById('email').value;
 
@@ -54,6 +57,8 @@ class ViewForgetPass extends HTMLElement {
       const successNotification = document.getElementById('success-notification');
       if (successNotification) successNotification.style.display = 'block';
       document.getElementById('pass-form').style.display = 'none';
+    } else {
+      this.emailError.style.display = 'block';
     }
   }
 }

@@ -185,7 +185,7 @@ const fetchCreateTournament = async formData => {
 const fetchDeletePlayer = async () => {
   try {
     let user = getProfile();
-    const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
+    const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ const fetchDeletePlayer = async () => {
 const fetchDeletePlayerSalon = async () => {
   try {
     let user = getProfile();
-    const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}`, {
+    const response = await fetch(`${BASE_URL}:8005/tournament/delete_joueur/${user.id}/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ const fetchDeletePlayerSalon = async () => {
 
 const fetchDeleteTournament = async () => {
   try {
-    const response = await fetch(`${BASE_URL}:8005/tournament/delete_tournment/${tournament.id}`, {
+    const response = await fetch(`${BASE_URL}:8005/tournament/delete_tournment/${tournament.id}/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -274,7 +274,7 @@ const fetchAddPlayer = async formData => {
 const fetchTournamentInfo = async () => {
   try {
     let user = getProfile();
-    const response = await fetch(`${BASE_URL}:8005/tournament/tournoi_info/${user.id}`, {
+    const response = await fetch(`${BASE_URL}:8005/tournament/tournoi_info/${user.id}/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

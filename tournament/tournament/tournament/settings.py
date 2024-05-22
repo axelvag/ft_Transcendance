@@ -26,7 +26,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-)p-$ohcb5#w(jkm6xf!8%citl!)=zckszwa)n6a+$w5xmtcx=r'
 SECRET_KEY = os.getenv('SECRET_KEY_TOUR')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -174,3 +173,5 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     },
 }
+
+APPEND_SLASH = False

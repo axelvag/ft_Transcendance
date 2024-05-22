@@ -145,8 +145,8 @@ class ViewTournamentstart extends HTMLElement {
         if (this.#match.id === match.match_id && match.status != 2) {
           const isPlayer1 = this.#user.id === match.player_1_id;
           const isPlayer2 = this.#user.id === match.player_2_id;
-          const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Not Ready' : 'Play') : '';
-          const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Not Ready' : 'Play') : '';
+          const buttonPlayer1 = isPlayer1 ? (match.player_1_ready ? 'Play' : 'Play') : '';
+          const buttonPlayer2 = isPlayer2 ? (match.player_2_ready ? 'Play' : 'Play') : '';
           let readyIconPlayer1 = match.player_1_ready
             ? '<span class="icon-check" style="color:green;">✔</span>'
             : '<span class="icon-cross" style="color:red;">✖</span>';

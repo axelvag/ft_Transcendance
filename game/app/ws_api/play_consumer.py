@@ -10,7 +10,7 @@ engines = {}
 
 # @method_decorator(csrf_exempt, name='dispatch')
 class PlayConsumer(AsyncWebsocketConsumer):
-  async def get_user_id(self):
+  async def check_session_id(self):
     cookies = self.scope['headers']
 
     # Convert the headers to a dictionary
@@ -29,7 +29,7 @@ class PlayConsumer(AsyncWebsocketConsumer):
     if not sessionid:
       raise Exception('session ID not found')
 
-    response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{sessionid}", verify=False)
+    response = requests.get(f"https://authentification:8001/accounts/verif_sessionid/{sessionid}/", verify=False)
     if response.status_code != 200:
       raise Exception('wrong session ID')
     
@@ -37,12 +37,17 @@ class PlayConsumer(AsyncWebsocketConsumer):
     if not user_id:
       raise Exception('user not found')
     
-    return str(user_id)
+    return {
+      'user_id': str(user_id),
+      'sessionid': sessionid
+    }
   
   async def connect(self):
     # Verify the session ID
-    self.user_id = await self.get_user_id()
-    if self.user_id is None:
+    response = await self.check_session_id()
+    self.user_id = response['user_id']
+    self.sessionid = response['sessionid']
+    if self.user_id is None or self.sessionid is None:
       await self.close()
       return
 
@@ -83,7 +88,7 @@ class PlayConsumer(AsyncWebsocketConsumer):
 
   async def disconnect(self, close_code):
     await self.channel_layer.group_discard(self.group_name, self.channel_name)
-    await database_sync_to_async(self.game.leave)(self.user_id)
+    await database_sync_to_async(self.game.leave)(self.user_id, self.sessionid)
 
     # notify
     await self.send_group({
@@ -146,6 +151,7 @@ class PlayConsumer(AsyncWebsocketConsumer):
         'winner_id': winner_id,
         'player_left_score': player_left_score,
         'player_right_score': player_right_score,
+        'sessionid': self.sessionid
       })
       engines[self.game_id].clear()
       del engines[self.game_id]

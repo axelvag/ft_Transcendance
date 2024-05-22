@@ -47,7 +47,14 @@ class ViewNewPass extends HTMLElement {
     this.uidb64 = params.get('uidb64');
     const token = params.get('token');
     try {
-      const response = await fetch(`${BASE_URL}:8001/accounts/activate_mail_pass/${this.uidb64}/${token}`);
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`${BASE_URL}:8001/accounts/activate_mail_pass/${this.uidb64}/${token}`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+      });
       const data = await response.json();
       this.querySelector('#email-confirm-loading').hidden = true;
       if (data.success) {
@@ -71,7 +78,14 @@ class ViewNewPass extends HTMLElement {
         this.querySelector('#email-confirm-loading').hidden = false;
 
         // Effectuez une nouvelle demande de confirmation par e-mail
-        const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_rest/${this.uidb64}`);
+        const csrfToken = await getCsrfToken();
+        const response = await fetch(`${BASE_URL}:8001/accounts/resend_email_rest/${this.uidb64}`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+          credentials: 'include',
+        });
         const data = await response.json();
       });
     } catch (error) {
