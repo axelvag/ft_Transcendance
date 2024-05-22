@@ -330,6 +330,13 @@ class GamePlay extends HTMLElement {
         `;
       } else if (this.#gameState.status === 'aborted') {
         title = 'Aborted';
+      } else if (this.#gameState.status === 'left') {
+        title = `You win by forfeit!`;
+        details = `
+          <button class="gameMatchup-btn" data-action="quit">
+            <ui-icon name="quit"></ui-icon>
+          </button>
+        `;
       }
 
       this.matchupEl.innerHTML = `

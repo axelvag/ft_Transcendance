@@ -89,12 +89,18 @@ class PlayConsumer(AsyncWebsocketConsumer):
   async def disconnect(self, close_code):
     await self.channel_layer.group_discard(self.group_name, self.channel_name)
     await database_sync_to_async(self.game.leave)(self.user_id, self.sessionid)
+    
+    if (engines[self.game_id]):
+      await sync_to_async(engines[self.game_id].clear)()
+      del engines[self.game_id]
 
-    # notify
     await self.send_group({
-      'type': 'log',
-      'game': self.game.json()
+      'type': 'update',
+      'state': {
+        'status': 'left'
+      },
     })
+
 
   async def receive(self, text_data):
     try:
