@@ -9,7 +9,7 @@ import AudioPlayer from '../utils/AudioPlayer.js';
 import { enterFullscreen, exitFullscreen } from '@/fullscreen.js';
 import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
-import { notifyError } from '@/notifications.js';
+import { notifyError, notifyInfo } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
 import { fetchWinnerMatch, getTournament } from '@/tournament.js';
 
@@ -297,6 +297,17 @@ class GamePlay extends HTMLElement {
             <ui-icon name="quit"></ui-icon>
           </button>
         `;
+        setTimeout(() => {
+          if (this.#gameState.status === 'waiting') {
+            let tournament = getTournament();
+            if (tournament.id !== null && tournament.status === 1) {
+              const winnerId = this.#playerLeft.type === 'you' ? this.#playerLeft.id : this.#playerRight.id;
+              fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
+            }
+            redirectTo(this.#backRoute);
+            notifyInfo('The opponent did not join the game.');
+          }
+        }, 60000);
       } else if (this.#gameState.status === 'paused') {
         title = 'Paused';
         details = `
@@ -403,18 +414,6 @@ class GamePlay extends HTMLElement {
     // players and board
     if (updates.scoreLeft != null || updates.scoreRight != null) {
       this.renderScores();
-    }
-
-    // send winner to tournament
-    if (updates.status === 'finished') {
-      const winnerId =
-        this.#gameState.scoreLeft > this.#gameState.scoreRight
-          ? this.#gameState.playerLeft.id
-          : this.#gameState.playerRight.id;
-      let tournament = getTournament();
-      console.log(tournament);
-      if (tournament.id !== null && tournament.status === 1)
-        fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
     }
 
     // sounds

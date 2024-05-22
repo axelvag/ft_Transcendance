@@ -408,6 +408,14 @@ def create_matches(request, tournament_id):
             matches_created.append(match)
             match_id += 1
 
+            # Send game match.id to game
+            try:
+                requests.put(f"https://game:8009/games/{game_id}", json={
+                    "match_id": match.id,
+                }, cookies=request.COOKIES, verify=False)
+            except Exception as e:
+                return JsonResponse({"error": "Failed to send match.id to game"}, status=response.status_code)
+
         current_tour = 2
         while number_of_matches > 1:
             match_id = 1  # Réinitialiser match_id à 1 pour chaque nouveau tour
@@ -569,9 +577,14 @@ def get_latest_match_for_user(request, user_id, tournament_id):
 @verif_sessionID
 @require_http_methods(["POST"])
 def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, score2):
+    print('update_winner', match_id, winner_id, score1, score2)
     try:
         match = Match.objects.get(id=match_id)
+        print('match', match)
+        if (match.winner is not None):
+            return JsonResponse({'success': "Match already has a winner."}, status=200)
         winner = Joueur.objects.get(user_id=winner_id)
+        print('winner', winner)
         winner.status_ready = 0
         match.winner = winner
         match.status = Match.FINISHED
@@ -579,7 +592,9 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, s
         match.player_2_score = score2
         match.save()
         winner.save()
+        print('winner updated')
     except ObjectDoesNotExist:
+        print('update_winner error')
         return JsonResponse({'error': "Match or Player not found."}, status=404)
 
     next_tour = match.tour + 1
@@ -633,6 +648,12 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, s
 
                     game_data = response.json()
                     next_match.game_id = game_data.get("id")
+                    try:
+                        requests.put(f"https://game:8009/games/{next_match.game_id}", json={
+                            "match_id": next_match.id,
+                        }, cookies=request.COOKIES, verify=False)
+                    except Exception as e:
+                        return JsonResponse({"error": "Failed to send match.id to game"}, status=response.status_code)
             
             next_match.save()
         else:
