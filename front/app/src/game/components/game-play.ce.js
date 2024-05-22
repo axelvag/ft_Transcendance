@@ -416,6 +416,17 @@ class GamePlay extends HTMLElement {
       this.renderScores();
     }
 
+    // send winner to tournament
+    if (updates.status === 'finished') {
+      const winnerId =
+        this.#gameState.scoreLeft > this.#gameState.scoreRight
+          ? this.#gameState.playerLeft.id
+          : this.#gameState.playerRight.id;
+      let tournament = getTournament();
+      if (tournament.id !== null && tournament.status === 1)
+        fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
+    }
+
     // sounds
     this.#audioPlayer.play(data?.event);
   }

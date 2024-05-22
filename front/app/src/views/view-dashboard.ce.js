@@ -82,7 +82,6 @@ class ViewDashboard extends HTMLElement {
     const gameCounterEl = this.querySelector('#viewDashboard-gameCounter');
     const victoryCounterEl = this.querySelector('#viewDashboard-victoryCounter');
     const defeatCounterEl = this.querySelector('#viewDashboard-defeatCounter');
-    console.log(gameCounterEl);
     try {
       const statistics = await fetch(`${BASE_URL}:8009/game-statistics`, {
         credentials: 'include',

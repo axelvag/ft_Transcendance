@@ -193,8 +193,6 @@ class ViewTournament extends HTMLElement {
                 this.socket.close();
               }
               fetchGetTournament(data.tournoi_id);
-            } else {
-              console.log('error');
             }
           },
           cancelCallback: () => {
@@ -218,8 +216,6 @@ class ViewTournament extends HTMLElement {
           this.socket.close();
         }
         fetchGetTournament(data.tournoi_id);
-      } else {
-        console.log('error');
       }
     }
   }
@@ -289,9 +285,7 @@ class ViewTournament extends HTMLElement {
     // Assurez-vous que l'URL correspond à votre serveur WebSocket.
     this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
-    this.socket.onopen = () => {
-      // console.log('WebSocket connection established');
-    };
+    this.socket.onopen = () => {};
 
     this.socket.onmessage = event => {
       // Logique pour gérer les messages entrants.
@@ -302,9 +296,7 @@ class ViewTournament extends HTMLElement {
       }
     };
 
-    this.socket.onclose = () => {
-      // console.log('WebSocket connection closed');
-    };
+    this.socket.onclose = () => {};
 
     this.socket.onerror = error => {
       console.error('WebSocket error:', error);

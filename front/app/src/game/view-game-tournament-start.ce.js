@@ -87,8 +87,6 @@ class ViewTournamentstart extends HTMLElement {
       await this.infoMatch();
       const matches = await fetchGetMatchs();
       if (matches.success) this.displayMatches(matches.matches_by_tour);
-    } else {
-      console.log('error : create matchs failled !');
     }
   }
 
@@ -567,7 +565,6 @@ class ViewTournamentstart extends HTMLElement {
     this.socket = new WebSocket(WS_BASE_URL + ':8005/tournament/websocket/');
 
     this.socket.onopen = () => {
-      // console.log('WebSocket connection established start tournament');
       this.socket.send(JSON.stringify({ tournoi_id: this.#tournament.id }));
     };
 
@@ -584,9 +581,7 @@ class ViewTournamentstart extends HTMLElement {
       }
     };
 
-    this.socket.onclose = async () => {
-      // console.log('WebSocket connection closedd');
-    };
+    this.socket.onclose = async () => {};
 
     this.socket.onerror = error => {
       console.error('WebSocket error:', error);

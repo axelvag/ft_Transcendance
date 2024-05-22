@@ -200,8 +200,6 @@ const fetchDeletePlayer = async () => {
     const data = await response.json();
     if (data.success) {
       resetLocalTournament();
-    } else {
-      console.log('error');
     }
   } catch (error) {
     console.error('An error occurred:', error);
@@ -522,8 +520,6 @@ const fetchDeletePlayerAndTournament = async () => {
     if (data.success) {
       resetLocalTournament();
       resetLocalMatch();
-    } else {
-      console.log('error');
     }
 
     return data;
