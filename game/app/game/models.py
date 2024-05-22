@@ -84,6 +84,7 @@ class Game(models.Model):
     self.player_right_forfeit = (self.player_right_id == player_id)
     self.save()
     if (self.match_id != None):
+      print("update winnerrrrrrrrrrrrrrrrrrrrr leaveeeeeeeeeeeeeeeeeeeeee")
       self.send_tournament_winner(sessionid)
 
   def end(self, data):
@@ -104,6 +105,7 @@ class Game(models.Model):
     self.player_right_forfeit = data.get('player_right_forfeit', False)
     self.save()
     if (self.match_id != None):
+      print("update winnerrrrrrrrrrrrrrrrrrrrr enddddddddddddddddd")
       self.send_tournament_winner(data.get('sessionid', None))
 
   def send_tournament_winner(self, sessionid):

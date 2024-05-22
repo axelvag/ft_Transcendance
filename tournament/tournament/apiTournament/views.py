@@ -646,6 +646,12 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, s
 
                     game_data = response.json()
                     next_match.game_id = game_data.get("id")
+                    try:
+                        requests.put(f"https://game:8009/games/{next_match.game_id}", json={
+                            "match_id": next_match.id,
+                        }, cookies=request.COOKIES, verify=False)
+                    except Exception as e:
+                        return JsonResponse({"error": "Failed to send match.id to game"}, status=response.status_code)
             
             next_match.save()
         else:
