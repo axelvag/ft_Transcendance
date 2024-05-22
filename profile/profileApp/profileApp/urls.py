@@ -21,7 +21,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('update_user/', views.update_user, name='update_user'),
     path('get_user_profile/<int:user_id>/', views.get_user_profile, name='get_user_profile'),
     path('delete_user_profile/<int:user_id>/', views.delete_user_profile, name='delete_user_profile'),

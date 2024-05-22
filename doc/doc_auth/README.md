@@ -6,18 +6,19 @@
 
 At first i have to install django : a FrameWork of Python for web developpement.
 
-``` bash
+```bash
 python -m venv env
 ```
+
 I use this command then the virtual environment was created in our directory django-web-app afterwards i create the admin project name auth(authentification) with this command :
 
-``` bash
+```bash
 django-admin startproject merchex
 ```
 
 thanks to django the file includes a lot of things who will be usefull like a settings.py who includes all the apps for the authentification.
 
-``` Python
+```Python
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,21 +32,21 @@ INSTALLED_APPS = [
 ```
 
 there is also the file urls.py who include the path of the several pages of the site
-``` Python
+
+```Python
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('Home/', include('Home.urls')),
     path('accounts/', include('accounts.urls'))
 ]
 ```
+
 ## Athentification developpement
 
 Next i create a secondary app name Home who include the html for the page sign in and sign up but the main things is the third application accounts in this application there is several path login/ registered/ logout/ and activate/: the urls.py of accounts
 
-``` Python
+```Python
 from django.urls import path
 from . import views
 
@@ -61,7 +62,7 @@ urlpatterns = [
 
 At first i create register in the views the primary function of views.py is to receive web requests and return web responses. Each view in this file is responsible for processing incoming requests, performing any necessary logic, and returning the appropriate response to the user.
 
-``` Python
+```Python
 def register_user(request):
     if request.method == 'POST':
         form = UserCreationFormWithEmail(request.POST)
@@ -76,11 +77,12 @@ def register_user(request):
 
     return render(request, "accounts/register.html", {'form': form})
 ```
+
 The provided code is a Django view function named register_user, which handles the user registration process. Here's a summary of its functionality:
 
 The function first checks if the incoming request is a POST request If it's a POST request, the function creates an instance of UserCreationFormWithEmail who is the UserCreationForm give by django but update with a email field
 
-``` Python
+```Python
 class UserCreationFormWithEmail(UserCreationForm):
     email = forms.EmailField(required=True, help_text='Requis. Entrez une adresse email valide.')
 
@@ -102,7 +104,7 @@ The user is then saved to the database.
 
 The function activateEmail is called, passing the request, user object, and the user's email. This function likely handles sending an activation email to the user.
 
-``` Python
+```Python
 def activateEmail(request, user, to_email):
     mail_subject = "Activate your user account"
     message = render_to_string("template_activate_account.html", {
@@ -119,9 +121,10 @@ def activateEmail(request, user, to_email):
     else:
         messages.error(request, f'Problem sending email to {to_email}, check if you typed it correctly.')
 ```
-For generate the token 
 
-``` Python
+For generate the token
+
+```Python
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
         return f"{user.pk}{timestamp}{user.is_active}"
@@ -131,7 +134,7 @@ account_activation_token = AccountActivationTokenGenerator()
 
 I use a html tmeplate for the mail send
 
-``` h
+```h
 {% autoescape off %}
 Hi {{ user.username }},
 
@@ -140,9 +143,10 @@ Please click on the link below to confirm your registration:
 {{ protocol }}://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %}
 {% endautoescape %}
 ```
-When the user clic that active his acompte with the function activate 
 
-``` Python
+When the user clic that active his acompte with the function activate
+
+```Python
 def activate(request, uidb64, token):
     User = get_user_model()
     try:
@@ -162,9 +166,10 @@ def activate(request, uidb64, token):
 
     return redirect("Home:index")
 ```
+
 When the user is activate the link redirect the user in the login page
 
-``` Python
+```Python
 def login_user(request):
     if request.method == 'POST':
         username_or_email = request.POST["username"]
@@ -192,6 +197,7 @@ def login_user(request):
     form = UsernameOrEmailAuthenticationForm()
     return render(request, "accounts/login.html", {"form": form})
 ```
+
 The function first checks if the incoming request is a POST request, which indicates that login credentials have been submitted.
 If it's a POST request, the function retrieves the username (or email) and password from the request.
 
@@ -203,7 +209,7 @@ Using Django's authenticate function, it attempts to verify the credentials. If 
 
 And i have the function logout_user
 
-``` Python
+```Python
 def logout_user(request):
     logout(request)
     return redirect("Home:index")

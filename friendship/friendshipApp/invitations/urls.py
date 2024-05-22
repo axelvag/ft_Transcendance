@@ -3,7 +3,6 @@ from . import views
 from django.contrib import admin
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('send_invitation/', views.send_invitation, name='send_invitation'),
     path('accept_invitation/', views.accept_invitation, name='accept_invitation'),
     path('reject_invitation/', views.reject_invitation, name='reject_invitation'),
