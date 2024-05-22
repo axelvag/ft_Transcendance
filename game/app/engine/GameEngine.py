@@ -147,6 +147,7 @@ class GameEngine:
     self._previousCollider = None
 
     self._notify({
+      'now': now(),
       'type': 'init',
       'state': self._getState(),
     })
@@ -158,6 +159,7 @@ class GameEngine:
     self._ball.startTime = now()
     self._ball.endTime = self._ball.startTime
     self._notify({
+      'now': now(),
       'type': 'update',
       'event': 'newRound',
       'state': {
@@ -175,6 +177,7 @@ class GameEngine:
       self._ballSpeed = self._ballSpeedOnStart
       self._calculateNextCollision()
       self._notify({
+        'now': now(),
         'type': 'update',
         'state': { 'ball': self._ball.json() }
       })
@@ -266,7 +269,7 @@ class GameEngine:
     self._previousCollider = None
     if (collision['type']):
        self._previousCollider = collision['side'] + collision['type']
-    self._ball.startTime = self._ball.endTime
+    self._ball.startTime = now()
 
     # wall
     if (collision['type'] == 'wall'):
@@ -317,6 +320,7 @@ class GameEngine:
         
         self._calculateNextCollision()
         self._notify({
+          'now': now(),
           'type': 'update',
           'event': 'collision',
           'state': { 'ball': self._ball.json() },
@@ -324,6 +328,7 @@ class GameEngine:
       else:
         self._calculateNextCollision()
         self._notify({
+          'now': now(),
           'type': 'update',
           'state': { 'ball': self._ball.json() },
         })
@@ -352,6 +357,7 @@ class GameEngine:
 
       # send update
       self._notify({
+        'now': now(),
         'type': 'update',
         'event': 'victory' if isMaxScoreReached else 'score',
         'state': {
@@ -365,6 +371,7 @@ class GameEngine:
   def _start(self):
     if (self._status != 'initialized'):
       self._notify({
+        'now': now(),
         'type': 'update',
         'state': { 'status': self._status }
       })
@@ -387,6 +394,7 @@ class GameEngine:
 
     self._status = 'paused'
     self._notify({
+      'now': now(),
       'type': 'update',
       'state': {
         'ball': self._ball.json(),
@@ -408,6 +416,7 @@ class GameEngine:
       self._calculateNextCollision()
     
     self._notify({
+      'now': now(),
       'type': 'update',
       'state': {
         'ball': self._ball.json(),
@@ -453,6 +462,7 @@ class GameEngine:
         self._paddleLeft.endTime = self._paddleLeft.startTime + ((currentY - targetY) / self._paddleSpeed) * 1000
 
     self._notify({
+      'now': now(),
       'type': 'update',
       'state': { 'paddleLeft': self._paddleLeft.json() }
     })
@@ -492,6 +502,7 @@ class GameEngine:
         self._paddleRight.endTime = self._paddleRight.startTime + ((currentY - targetY) / self._paddleSpeed) * 1000
 
     self._notify({
+      'now': now(),
       'type': 'update',
       'state': { 'paddleRight': self._paddleRight.json() }
     })

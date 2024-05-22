@@ -15,7 +15,7 @@ import {
   fetchTournamentInfo,
 } from '@/tournament.js';
 import { isAuthenticated } from '@/auth.js';
-import { notify, notifyInfo} from '@/notifications.js';
+import { notify, notifyInfo } from '@/notifications.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { redirectTo } from '@/router.js';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
@@ -58,22 +58,18 @@ class ViewTournamentstart extends HTMLElement {
 
     // Ajout d'un écouteur d'événements pour le bouton de sortie
     this.querySelector('#leaveTournamentBtn').addEventListener('click', async () => {
-        await this.infoMatch();
-        this.#match = getMatch();
-        if(this.#match.status !== 2)
-        {
-          if(this.#match.player1id !== "" && this.#match.player2id !== "")
-            await this.UserLeave();
-          else
-            await this.UserLeaveAlone();
-        }
-        await this.deletePlayer();
+      await this.infoMatch();
+      this.#match = getMatch();
+      if (this.#match.status !== 2) {
+        if (this.#match.player1id !== '' && this.#match.player2id !== '') await this.UserLeave();
+        else await this.UserLeaveAlone();
+      }
+      await this.deletePlayer();
     });
 
     this.initWebSocket();
-    if (this.#tournament.status === 0)
-      await this.createMatchs();
-    else{
+    if (this.#tournament.status === 0) await this.createMatchs();
+    else {
       this.displayUpdate();
     }
   }
@@ -90,8 +86,7 @@ class ViewTournamentstart extends HTMLElement {
       await fetchTournamentInfo();
       await this.infoMatch();
       const matches = await fetchGetMatchs();
-      if (matches.success)
-        this.displayMatches(matches.matches_by_tour);
+      if (matches.success) this.displayMatches(matches.matches_by_tour);
     } else {
       console.log('error : create matchs failled !');
     }
@@ -166,8 +161,12 @@ class ViewTournamentstart extends HTMLElement {
               ? `<div class=" vs mx-4 fs-4 text-center">vs</div>`
               : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
           let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
-          let SpaceDownBracketFinalHeight = (tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br><br><br><br>` : '';
-          let SpaceDownBracketDemiFinalHeight = (tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br>` : '';
+          let SpaceDownBracketFinalHeight =
+            tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8
+              ? `<br><br><br><br><br><br><br><br><br>`
+              : '';
+          let SpaceDownBracketDemiFinalHeight =
+            tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8 ? `<br><br><br><br><br><br>` : '';
           // Le bracket ou le joueur vas jouer
           matchElement.innerHTML = `
                   ${SpaceDownBracketFinal}
@@ -225,7 +224,6 @@ class ViewTournamentstart extends HTMLElement {
                   <br><br>
                 `;
         } else if (match.status === 2) {
-
           // Vérifier si aucun joueur n'a atteint un score de 5
           const forfeit = match.player_1_score < 5 && match.player_2_score < 5;
           const player1BoxStyle =
@@ -248,8 +246,12 @@ class ViewTournamentstart extends HTMLElement {
               ? `<div class="vs mx-4 fs-4 text-center">vs</div>`
               : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
           let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
-          let SpaceDownBracketFinalHeight = (tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br><br><br><br>` : '';
-          let SpaceDownBracketDemiFinalHeight = (tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br>` : '';
+          let SpaceDownBracketFinalHeight =
+            tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8
+              ? `<br><br><br><br><br><br><br><br><br>`
+              : '';
+          let SpaceDownBracketDemiFinalHeight =
+            tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8 ? `<br><br><br><br><br><br>` : '';
           matchElement.innerHTML = `
               ${SpaceDownBracketFinal}
               ${SpaceDownBracketFinalHeight}
@@ -305,8 +307,12 @@ class ViewTournamentstart extends HTMLElement {
               ? `<div class=" vs mx-4 fs-4 text-center">vs</div>`
               : `<div class="vs mx-4 fs-4 text-center">vs</div>`;
           let SpaceDownBracketFinal = tourIndex === totalTours - 1 ? `<br><br><br><br>` : '';
-          let SpaceDownBracketFinalHeight = (tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br><br><br><br>` : '';
-          let SpaceDownBracketDemiFinalHeight = (tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8) ? `<br><br><br><br><br><br>` : '';
+          let SpaceDownBracketFinalHeight =
+            tourIndex === totalTours - 1 && this.#tournament.maxPlayer === 8
+              ? `<br><br><br><br><br><br><br><br><br>`
+              : '';
+          let SpaceDownBracketDemiFinalHeight =
+            tourIndex === totalTours - 2 && this.#tournament.maxPlayer === 8 ? `<br><br><br><br><br><br>` : '';
           matchElement.innerHTML = `
               ${SpaceDownBracketFinal}
               ${SpaceDownBracketFinalHeight}
@@ -427,7 +433,6 @@ class ViewTournamentstart extends HTMLElement {
   }
 
   async handleReadyButtonClick(playerId) {
-
     try {
       const response = await fetch(`${BASE_URL}:8005/tournament/ready/${playerId}/${this.#match.id}/`, {
         method: 'POST',
@@ -460,13 +465,12 @@ class ViewTournamentstart extends HTMLElement {
   async displayUpdate() {
     await this.infoMatch();
     this.#match = getMatch();
-    if(this.#match.status === 0 && this.#match.leave !== 0){
+    if (this.#match.status === 0 && this.#match.leave !== 0) {
       await updateWinnerLeave();
       return;
     }
     const matches = await fetchGetMatchs();
-      if (matches.success)
-        this.displayMatches(matches.matches_by_tour);
+    if (matches.success) this.displayMatches(matches.matches_by_tour);
   }
 
   async infoMatch() {
@@ -474,11 +478,11 @@ class ViewTournamentstart extends HTMLElement {
   }
 
   async UserLeave() {
-    const winner = await fetchLeaveMatch();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+    const winner = await fetchLeaveMatch(); // Assurez-vous que fetchWinnerMatch est également une fonction async
   }
 
   async UserLeaveAlone() {
-    const data = await fetchLeaveMatchAlone();  // Assurez-vous que fetchWinnerMatch est également une fonction async
+    const data = await fetchLeaveMatchAlone(); // Assurez-vous que fetchWinnerMatch est également une fonction async
   }
 
   async UserNobodyReadyTime() {
@@ -498,7 +502,7 @@ class ViewTournamentstart extends HTMLElement {
     ) {
       return;
     }
-    
+
     const tournamentTemp = this.#tournament.id;
     const matchTemp = this.#match.id;
 
@@ -513,8 +517,7 @@ class ViewTournamentstart extends HTMLElement {
       if (this.#match.id === matchTemp && this.#match.status === 0) {
         if (this.#match.player1ready == 0 && this.#match.player1id === this.#user.id) {
           notifyInfo(`Warning, please be ready or you loose!`);
-        }
-        else if (this.#match.player2ready == 0 && this.#match.player2id === this.#user.id) {
+        } else if (this.#match.player2ready == 0 && this.#match.player2id === this.#user.id) {
           notifyInfo(`Warning, please be ready or you loose!`);
         }
       }
@@ -548,7 +551,11 @@ class ViewTournamentstart extends HTMLElement {
       if (this.#match.player1ready === 0 && this.#match.player2ready === 1 && this.#match.player1id === this.#user.id) {
         await this.handleReadyButtonClick(this.#match.player1id);
         notifyInfo(`${player1Name} not ready, he will be mark as ready!`);
-      } else if (this.#match.player2ready === 0 && this.#match.player1ready === 1 && this.#match.player2id === this.#user.id) {
+      } else if (
+        this.#match.player2ready === 0 &&
+        this.#match.player1ready === 1 &&
+        this.#match.player2id === this.#user.id
+      ) {
         await this.handleReadyButtonClick(this.#match.player2id);
         notifyInfo(`${player2Name} not ready, he will be mark as ready!`);
       }
@@ -568,17 +575,17 @@ class ViewTournamentstart extends HTMLElement {
       // Logique pour gérer les messages entrants.
       const data = JSON.parse(event.data);
 
-        if (data.action === 'player_ready') {
-          await this.displayUpdate();
-        }
-        if (data.action === 'winner') {
-          await this.infoMatch();
-          await this.displayUpdate();
-        }
+      if (data.action === 'player_ready') {
+        await this.displayUpdate();
+      }
+      if (data.action === 'winner') {
+        await this.infoMatch();
+        await this.displayUpdate();
+      }
     };
 
     this.socket.onclose = async () => {
-        // console.log('WebSocket connection closedd');
+      // console.log('WebSocket connection closedd');
     };
 
     this.socket.onerror = error => {

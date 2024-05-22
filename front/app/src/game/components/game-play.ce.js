@@ -6,16 +6,48 @@ import './game-play.ce.scss';
 import GameWorker from '../utils/GameWorker.js?worker';
 import GameWorkerRemote from '../utils/GameWorkerRemote.js?worker';
 import AudioPlayer from '../utils/AudioPlayer.js';
-import { exitFullscreen } from '@/fullscreen.js';
+import { enterFullscreen, exitFullscreen } from '@/fullscreen.js';
+import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
+import { notifyError } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
-import { fetchWinnerMatch , getTournament} from '@/tournament.js';
+import { fetchWinnerMatch, getTournament } from '@/tournament.js';
 
 const template = `
 <div class="gamePlay" hidden>
   <div class="gamePlay-wrapper">
     <div class="gamePlay-header">
+
+      <!-- Scoreboard -->
       <game-scoreboard></game-scoreboard>
+
+    </div>
+    <div class="gamePlay-nav">
+
+      <!-- Back -->
+      <button class="gamePlay-nav-item" id="gamePlay-back">
+        <ui-icon name="arrow-left"></ui-icon>
+      </button>
+
+      <!-- Spacer -->
+      <div class="gamePlay-nav-spacer"></div>
+
+      <!-- Theme -->
+      <button class="gamePlay-nav-item dark-hidden" id="gamePlay-theme-dark">
+        <ui-icon name="sun"></ui-icon>
+      </button>
+      <button class="gamePlay-nav-item dark-visible" id="gamePlay-theme-light">
+        <ui-icon name="moon"></ui-icon>
+      </button>
+
+      <!-- Fullscreen -->
+      <button class="gamePlay-nav-item fullscreen-hidden" id="gamePlay-enterFullscreen">
+        <ui-icon name="expand"></ui-icon>
+      </button>
+      <button class="gamePlay-nav-item fullscreen-visible" id="gamePlay-exitFullscreen">    
+        <ui-icon name="collapse"></ui-icon>
+      </button>
+
     </div>
     <div class="gamePlay-body">
       <div class="gamePlay-body-left">
@@ -40,32 +72,8 @@ const template = `
       </div>
       </div>
     </div>
-    <div class="gamePlay-footer">
-      <a href="#" class="gamePlay-footer-btn" data-action="pause">
-        <ui-icon name="pause"></ui-icon>
-      </a>
-    </div>
   </div>
   <div id="gamePlay-matchup"></div>
-</div>
-
-
-<!-- Error Modal -->
-<div id="gamePlayErrorModal" hidden>
-  <div class="modal d-block" tabindex="-1">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-danger d-block text-center">
-          <ui-icon name="error" class="fs-1"></ui-icon>
-        </div>
-        <div class="modal-body d-flex flex-column align-items-center gap-2 py-4">
-          <p>An unexpected error occured!</p>
-          <button type="button" class="btn btn-danger" data-link="/">Leave</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-backdrop show"></div>
 </div>
 `;
 
@@ -83,6 +91,7 @@ class GamePlay extends HTMLElement {
   #playerLeftKeys = ['w', 's'];
   #playerRightKeys = ['ArrowUp', 'ArrowDown'];
   #aiInterval = null;
+  #backRoute;
 
   constructor() {
     super();
@@ -96,7 +105,17 @@ class GamePlay extends HTMLElement {
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
     this.handleClick = this.handleClick.bind(this);
 
+    this.#audioPlayer = new AudioPlayer();
+    this.#audioPlayer.load('collision', '/assets/sounds/hit.wav');
+    this.#audioPlayer.load('score', '/assets/sounds/score.wav');
+    this.#audioPlayer.load('victory', '/assets/sounds/victory.wav');
+    this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
+  }
+
+  connectedCallback() {
+    // Web worker
     this.#isOnline = this.hasAttribute('game-id');
+
     if (this.#isOnline) {
       this.gameWorker = new GameWorkerRemote();
       this.gameWorker.postMessage({
@@ -110,15 +129,18 @@ class GamePlay extends HTMLElement {
       this.gameWorker = new GameWorker();
     }
 
-    this.#audioPlayer = new AudioPlayer();
-    this.#audioPlayer.load('collision', '/assets/sounds/hit.wav');
-    this.#audioPlayer.load('score', '/assets/sounds/score.wav');
-    this.#audioPlayer.load('victory', '/assets/sounds/victory.wav');
-    this.#audioPlayer.load('defeat', '/assets/sounds/defeat.wav');
-  }
-
-  connectedCallback() {
+    // Template
     this.innerHTML = template;
+
+    // back route
+    this.#backRoute = this.getAttribute('back-route') || '/dashboard';
+
+    // Nav
+    this.querySelector('#gamePlay-enterFullscreen').addEventListener('click', enterFullscreen);
+    this.querySelector('#gamePlay-exitFullscreen').addEventListener('click', exitFullscreen);
+    this.querySelector('#gamePlay-theme-dark').addEventListener('click', () => selectTheme('dark'));
+    this.querySelector('#gamePlay-theme-light').addEventListener('click', () => selectTheme('light'));
+    this.querySelector('#gamePlay-back').addEventListener('click', () => redirectTo(this.#backRoute));
 
     // Players
     this.#playerLeft = {
@@ -168,8 +190,8 @@ class GamePlay extends HTMLElement {
     // Game error
     this.gameWorker.onerror = function (e) {
       console.error(e.message);
-      this.gameWorker.terminate();
-      this.querySelector('#gamePlayErrorModal').hidden = false;
+      notifyError('An unexpected error occured!');
+      redirectTo('/dashboard');
     };
     this.gameWorker.onerror = this.gameWorker.onerror.bind(this);
 
@@ -233,6 +255,9 @@ class GamePlay extends HTMLElement {
       this.playerRightEl.setAttribute('score', 0);
       this.playerRightEl.setAttribute('score-max', this.#gameState.scoreMax);
       this.playerRightEl.setAttribute('direction', 'right');
+      if (this.#playerRight.avatar.startsWith('/assets/img/avatar-')) {
+        this.playerRightEl.setAttribute('flip-avatar', '');
+      }
     }
   }
 
@@ -298,23 +323,25 @@ class GamePlay extends HTMLElement {
 
       this.matchupEl.innerHTML = `
         <game-matchup
-          back-route="${this.getAttribute('back-route') || '/dashboard'}"
+          back-route="${this.#backRoute}"
           player-left-id="${this.#gameState.playerLeft.id}"
           player-left-name="${this.#gameState.playerLeft.name}"
           player-left-avatar="${this.#gameState.playerLeft.avatar}"
           player-left-type="${this.#gameState.playerLeft.type}"
-          player-left-wins="${isPlayerLeftWinner}"
+          ${isPlayerLeftWinner ? 'player-left-wins' : ''}
           player-right-id="${this.#gameState.playerRight.id}"
           player-right-name="${this.#gameState.playerRight.name}"
           player-right-avatar="${this.#gameState.playerRight.avatar}"
           player-right-type="${this.#gameState.playerRight.type}"
-          player-left-wins="${isPlayerRightWinner}"
+          ${isPlayerRightWinner ? 'player-right-wins' : ''}
           title="${title}"
           details='${details}'
           ></game-matchup>
         `;
     } catch (e) {
       console.error(e);
+      notifyError('An unexpected error occured!');
+      redirectTo('/dashboard');
     }
   }
 
@@ -328,7 +355,7 @@ class GamePlay extends HTMLElement {
     };
     this.style.setProperty('--gamePlay-ratio', `${this.#gameState.width / this.#gameState.height}`);
     this.renderPlayers();
-    this.renderMatchup();
+    if (this.#isOnline) this.renderMatchup();
     this.renderScores();
     this.rendererEl.init(this.#gameState);
     this.rendererEl.start();
@@ -386,7 +413,7 @@ class GamePlay extends HTMLElement {
           : this.#gameState.playerRight.id;
       let tournament = getTournament();
       console.log(tournament);
-      if(tournament.id !== null && tournament.status === 1)
+      if (tournament.id !== null && tournament.status === 1)
         fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
     }
 
@@ -466,7 +493,7 @@ class GamePlay extends HTMLElement {
     e.preventDefault();
     const action = actionBtn.getAttribute('data-action');
     if (action === 'quit') {
-      redirectTo(this.getAttribute('back-route') || '/dashboard');
+      redirectTo(this.#backRoute);
     } else if (action === 'resume') {
       this.gameWorker.postMessage({ type: 'resume' });
     } else if (action === 'pause') {
