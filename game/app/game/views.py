@@ -162,6 +162,12 @@ class GamePlayerHistoryView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class UserGameStatusView(View):
     def get(self, request, user_id):
+
+        try:
+          verify_sessionid(request)
+        except Exception as e:
+          return JsonResponse({'error': str(e)}, safe=False, status=403)
+
         # Find any game where the user is currently playing
         current_game = Game.objects.filter(
             (Q(player_left_id=user_id) | Q(player_right_id=user_id)) & Q(status='RUNNING')

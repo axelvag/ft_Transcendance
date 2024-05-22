@@ -342,7 +342,7 @@ def online_friends(request, user_id):
                 profile_info = get_profile_info(user.id, cookies)
 
                 game_service_url = f"https://game:8009/games/{friend_id}/game-status"
-                response = requests.get(game_service_url, verify=False)
+                response = requests.get(game_service_url, cookies={'sessionid': cookies}, verify=False)
                 in_game = False
                 if response.status_code == 200:
                     in_game = True
