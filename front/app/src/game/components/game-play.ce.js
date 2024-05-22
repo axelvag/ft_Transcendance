@@ -302,7 +302,7 @@ class GamePlay extends HTMLElement {
             let tournament = getTournament();
             if (tournament.id !== null && tournament.status === 1) {
               const winnerId = this.#playerLeft.type === 'you' ? this.#playerLeft.id : this.#playerRight.id;
-              fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
+              fetchWinnerMatch(winnerId, 0, 0);
             }
             redirectTo(this.#backRoute);
             notifyInfo('The opponent did not join the game.');

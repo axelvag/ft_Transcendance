@@ -72,7 +72,6 @@ class ViewTournamentSalon extends HTMLElement {
     this.querySelector('#leaveTournamentBtn')?.addEventListener('click', () => {
       resetLocalTournament();
       this.deletePlayer();
-      redirectTo(this.#backUrl);
     });
 
     const deleteBtn = this.querySelector('#deleteTournamentBtn');
@@ -116,6 +115,8 @@ class ViewTournamentSalon extends HTMLElement {
 
   async deletePlayer() {
     const data = await fetchDeletePlayerSalon();
+    if(data.success)
+      redirectTo(this.#backUrl);
   }
 
   async deleteTournament() {

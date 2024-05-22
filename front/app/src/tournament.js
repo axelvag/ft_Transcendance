@@ -160,6 +160,37 @@ const TournamentExist = async tournamentId => {
   }
 };
 
+const TournamentStillExist = async tournamentId => {
+  try {
+    const response = await fetch(`${BASE_URL}:8005/tournament/get/${tournamentId}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      resetLocalTournament();
+      const data = await fetchDeletePlayerSalon();
+    }
+  } catch (error) {
+    console.error('An error occurred:', error);
+    redirectTo(`/game/tournament`);
+    notify({
+      icon: 'info',
+      iconClass: 'text-info',
+      message: `An error occurred while fetching the tournament</b>`,
+    });
+  }
+};
+
 const fetchCreateTournament = async formData => {
   try {
     const response = await fetch(BASE_URL + ':8005/tournament/create_tournament/', {
@@ -553,4 +584,5 @@ export {
   fetchLeaveMatchAlone,
   fetchUserNobodyReadyTime,
   fetchUserOneReadyTime,
+  TournamentStillExist,
 };

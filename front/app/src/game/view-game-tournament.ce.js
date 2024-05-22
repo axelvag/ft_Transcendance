@@ -8,6 +8,7 @@ import {
   getTournament,
   fetchDeletePlayerAndTournament,
   fetchTournamentInfo,
+  TournamentStillExist,
 } from '@/tournament.js';
 import '@/components/layouts/auth-layout/auth-layout.ce.js';
 import { BASE_URL, WS_BASE_URL } from '@/constants.js';
@@ -224,6 +225,8 @@ class ViewTournament extends HTMLElement {
     try {
       await fetchTournamentInfo();
       this.#tournament = getTournament();
+      if(this.#tournament.id)
+       await TournamentStillExist(this.#tournament.id);
       if (this.#tournament.status === 1) {
         redirectTo(`/game/tournament/start`);
         return;
