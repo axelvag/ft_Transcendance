@@ -11,6 +11,7 @@ import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
 import { notifyError, notifyInfo } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
+import { fetchWinnerMatch, getTournament } from '@/tournament.js';
 
 const template = `
 <div class="gamePlay" hidden>
@@ -298,6 +299,11 @@ class GamePlay extends HTMLElement {
         `;
         setTimeout(() => {
           if (this.#gameState.status === 'waiting') {
+            let tournament = getTournament();
+            if (tournament.id !== null && tournament.status === 1) {
+              const winnerId = this.#playerLeft.type === 'you' ? this.#playerLeft.id : this.#playerRight.id;
+              fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
+            }
             redirectTo(this.#backRoute);
             notifyInfo('The opponent did not join the game.');
           }

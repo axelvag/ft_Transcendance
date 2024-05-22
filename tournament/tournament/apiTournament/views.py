@@ -581,6 +581,8 @@ def update_winner_and_prepare_next_match(request, match_id, winner_id, score1, s
     try:
         match = Match.objects.get(id=match_id)
         print('match', match)
+        if (match.winner is not None):
+            return JsonResponse({'success': "Match already has a winner."}, status=200)
         winner = Joueur.objects.get(user_id=winner_id)
         print('winner', winner)
         winner.status_ready = 0
