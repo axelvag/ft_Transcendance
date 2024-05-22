@@ -11,7 +11,6 @@ import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
 import { notifyError } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
-import { fetchWinnerMatch, getTournament } from '@/tournament.js';
 
 const template = `
 <div class="gamePlay" hidden>
@@ -403,18 +402,6 @@ class GamePlay extends HTMLElement {
     // players and board
     if (updates.scoreLeft != null || updates.scoreRight != null) {
       this.renderScores();
-    }
-
-    // send winner to tournament
-    if (updates.status === 'finished') {
-      const winnerId =
-        this.#gameState.scoreLeft > this.#gameState.scoreRight
-          ? this.#gameState.playerLeft.id
-          : this.#gameState.playerRight.id;
-      let tournament = getTournament();
-      console.log(tournament);
-      if (tournament.id !== null && tournament.status === 1)
-        fetchWinnerMatch(winnerId, this.#gameState.scoreLeft, this.#gameState.scoreRight);
     }
 
     // sounds

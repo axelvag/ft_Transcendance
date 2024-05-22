@@ -276,7 +276,7 @@ const fetchAddPlayer = async formData => {
 const fetchTournamentInfo = async () => {
   try {
     let user = getProfile();
-    const response = await fetch(`${BASE_URL}:8005/tournament/tournoi_info/${user.id}`, {
+    const response = await fetch(`${BASE_URL}:8005/tournament/tournoi_info/${user.id}/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
