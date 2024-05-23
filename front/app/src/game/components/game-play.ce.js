@@ -11,7 +11,7 @@ import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
 import { notifyError, notifyInfo } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
-import { fetchWinnerMatchWaiting, getTournament } from '@/tournament.js';
+import { fetchWinnerMatchWaiting, fetchWinnerMatch, getTournament } from '@/tournament.js';
 
 const template = `
 <div class="gamePlay" hidden>
