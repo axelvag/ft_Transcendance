@@ -513,8 +513,6 @@ class ViewFriend extends HTMLElement {
       }
       const { online_friends } = await response.json();
 
-      console.table('online_friends', online_friends);
-
       const onlineFriendsList = this.querySelector('#online-friends');
       onlineFriendsList.innerHTML = '';
 

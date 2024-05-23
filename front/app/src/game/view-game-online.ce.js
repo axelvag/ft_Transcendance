@@ -155,6 +155,7 @@ class ViewGameOnline extends HTMLElement {
       <game-play
         back-route=${this.#backRoute}
         game-id="${this.#game.id}"
+        match-id="${this.#game.match_id || ''}"
         player-left-id="${this.#playerLeft.id}"
         player-left-name="${this.#playerLeft.name}"
         player-left-avatar="${this.#playerLeft.avatar}"

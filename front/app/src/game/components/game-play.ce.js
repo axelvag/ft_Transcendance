@@ -11,7 +11,7 @@ import { selectTheme } from '@/theme.js';
 import { redirectTo } from '@/router.js';
 import { notifyError, notifyInfo } from '@/notifications.js';
 import calculateNextAiPosition from '../utils/calculateNextAiPosition.js';
-import { fetchWinnerMatch, getTournament } from '@/tournament.js';
+import { fetchWinnerMatchWaiting, getTournament } from '@/tournament.js';
 
 const template = `
 <div class="gamePlay" hidden>
@@ -90,6 +90,7 @@ class GamePlay extends HTMLElement {
   #playerRight = {};
   #playerLeftKeys = ['w', 's'];
   #playerRightKeys = ['ArrowUp', 'ArrowDown'];
+  #matchId;
   #aiInterval = null;
   #backRoute;
 
@@ -135,6 +136,9 @@ class GamePlay extends HTMLElement {
     // back route
     this.#backRoute = this.getAttribute('back-route') || '/dashboard';
 
+    // Match id
+    this.#matchId = this.getAttribute('match-id');
+    
     // Nav
     this.querySelector('#gamePlay-enterFullscreen').addEventListener('click', enterFullscreen);
     this.querySelector('#gamePlay-exitFullscreen').addEventListener('click', exitFullscreen);
@@ -302,7 +306,7 @@ class GamePlay extends HTMLElement {
             let tournament = getTournament();
             if (tournament.id !== null && tournament.status === 1) {
               const winnerId = this.#playerLeft.type === 'you' ? this.#playerLeft.id : this.#playerRight.id;
-              fetchWinnerMatch(winnerId, 0, 0);
+              fetchWinnerMatchWaiting(this.#matchId, winnerId, 0, 0);
             }
             redirectTo(this.#backRoute);
             notifyInfo('The opponent did not join the game.');
