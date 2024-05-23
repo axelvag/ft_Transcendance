@@ -427,6 +427,30 @@ const fetchWinnerMatch = async (winner, scorePlayer1, scroePlayer2) => {
   }
 };
 
+const fetchWinnerMatchWaiting = async (match ,winner, scorePlayer1, scroePlayer2) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}:8005/tournament/update_winner/${match}/${winner}/${scorePlayer1}/${scroePlayer2}/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('An error occurred:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 const fetchLeaveMatch = async () => {
   try {
     let user = getProfile();
@@ -585,4 +609,5 @@ export {
   fetchUserNobodyReadyTime,
   fetchUserOneReadyTime,
   TournamentStillExist,
+  fetchWinnerMatchWaiting,
 };
