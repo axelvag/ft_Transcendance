@@ -56,6 +56,12 @@ services:
     restart: always
     networks:
       - back
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   # Back - authentification
   authentification:
@@ -72,7 +78,8 @@ services:
     networks:
       - back
     depends_on:
-      - data_base
+      data_base:
+        condition: service_healthy
     env_file:
       - .env
     restart: on-failure
@@ -92,7 +99,10 @@ services:
     networks:
       - back
     depends_on:
-      - data_base
+      data_base:
+        condition: service_healthy
+      authentification:
+        condition: service_started
     env_file:
       - .env
     restart: on-failure
@@ -111,7 +121,10 @@ services:
     networks:
       - back
     depends_on:
-      - data_base
+      data_base:
+        condition: service_healthy
+      authentification:
+        condition: service_started
     env_file:
       - .env
     restart: on-failure
@@ -129,7 +142,10 @@ services:
     networks:
       - back
     depends_on:
-      - data_base
+      data_base:
+        condition: service_healthy
+      authentification:
+        condition: service_started
     env_file:
       - .env
     restart: on-failure
@@ -148,7 +164,10 @@ services:
     networks:
       - back
     depends_on:
-      - data_base
+      data_base:
+        condition: service_healthy
+      authentification:
+        condition: service_started
     env_file:
       - .env
     restart: on-failure
