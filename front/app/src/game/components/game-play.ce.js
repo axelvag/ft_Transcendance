@@ -282,14 +282,6 @@ class GamePlay extends HTMLElement {
       let title = '';
       let details = '';
 
-      if (this.#gameState.status === 'finished') {
-        if (this.#gameState.scoreLeft > this.#gameState.scoreRight) {
-          isPlayerLeftWinner = true;
-        } else {
-          isPlayerRightWinner = true;
-        }
-      }
-
       if (this.#gameState.status === 'waiting') {
         title = 'Waiting for opponent...';
         details = `
@@ -321,6 +313,11 @@ class GamePlay extends HTMLElement {
           </div>
         `;
       } else if (this.#gameState.status === 'finished') {
+        if (this.#gameState.scoreLeft > this.#gameState.scoreRight) {
+          isPlayerLeftWinner = true;
+        } else {
+          isPlayerRightWinner = true;
+        }
         const winnerName = isPlayerLeftWinner ? this.#playerLeft.name : this.#playerRight.name;
         title = `${winnerName} wins!`;
         details = `
@@ -331,6 +328,11 @@ class GamePlay extends HTMLElement {
       } else if (this.#gameState.status === 'aborted') {
         title = 'Aborted';
       } else if (this.#gameState.status === 'left') {
+        if (this.#playerLeft.type === 'you') {
+          isPlayerLeftWinner = true;
+        } else {
+          isPlayerRightWinner = true;
+        }
         title = `You win by forfeit!`;
         details = `
           <button class="gameMatchup-btn" data-action="quit">
